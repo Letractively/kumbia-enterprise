@@ -1,0 +1,72 @@
+
+
+<div align='center'>
+
+<?php View::getContent(); ?>
+
+<div class='paso'>
+Paso 1: Seleccionar aplicaci&oacute;n
+</div>
+
+<?php echo Tag::form("create/component") ?>
+<table width="100%">
+	<tr>
+		<td  valign="top">
+			<p align='left'>
+				Seleccione la aplicaci&oacute;n:
+			</p>
+			<table align="center">
+				<tr>
+					<td align="right"><b>Aplicaci&oacute;n Existente:</b></td>
+					<td>
+						<?php echo Tag::selectStatic("extappname", $applications, "use_dummy: yes") ?>
+					</td>
+				</tr>
+				<tr>
+					<td align="right"><b>Crear Nueva:</b></td>
+					<td><?php echo Tag::textField("newappname", "disabled: disabled") ?></td>
+				</tr>
+			</table>
+			<p align='left'>
+				Seleccione el entorno para obtener los data sources:
+			</p>
+			<table align="center">
+				<tr>
+					<td align="right"><b>Entorno:</b></td>
+					<td>
+						<?php echo Tag::selectStatic("environ", $environments, "use_dummy: yes") ?>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" align="right">
+						<?php echo Tag::submitButton("Siguiente") ?>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td valign="top" width="20%" align="center">
+			<div id='tipInfo' align="left">
+				<b>Informaci&oacute;n &Uacute;til</b>
+				<p>
+				Puede crear el formulario en una aplicaci&oacute;n existente
+				&oacute; en una nueva.
+				</p>
+				<p>
+				Seleccione la opci&oacute;n 'Seleccione...' para activar el cuadro de texto
+				'Nueva aplicaci&oacute;n'.
+				</p>
+				<p>El nombre de la aplicaci&oacute;n debe cumplir con los requisitos
+				de nombres de directorios del sistema operativo/kernel "<?php echo PHP_OS ?>".</p>
+				<p>
+				El entorno permite establecer que gestor relacional se utilizar&aacute; para la generaci&oacute;n
+				de las pantallas e identificar sus posibles caracter&iacute;sticas. Utilice 'USAR ENTORNO ACTIVO' para
+				cargar los par&aacute;metros de conexi&oacute;n del entorno activo en config.ini.
+				</p>
+			</div>
+		</td>
+	</tr>
+</table>
+<?php echo Tag::endForm() ?>
+</div>
+
+<?php echo Tag::javascriptInclude("appgen/create") ?>

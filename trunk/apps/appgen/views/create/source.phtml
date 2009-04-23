@@ -1,0 +1,38 @@
+<?php View::getContent(); ?>
+
+<div align='center'>
+<?php echo Tag::form("create/attributes") ?>
+<table width="100%">
+	<tr>
+		<td valign="top">
+			<div class='paso'>
+			Paso 3: Seleccionar el data source formulario
+			</div>
+			<table align="center">
+				<tr>
+					<td align="right">
+						<b>Seleccione la tabla:</b>
+					</td>
+					<td><?php echo Tag::selectStatic("source", $sources) ?></td>
+				</tr>
+				<tr>
+					<td colspan="2" align="right">
+						<?php echo Tag::buttonToAction("Anterior", "create/form") ?>
+						<?php echo Tag::submitButton("Siguiente") ?>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td valign="top" width="20%" align="center">
+			<div id='tipInfo' align="left">
+				<b>Informaci&oacute;n &Uacute;til</b><br>
+				Seleccione la tabla de la cu&aacute;l se leer&aacute;n los
+				atributos para definir la estructura del formulario;
+			</div>
+		</td>
+	</tr>
+</table>
+<?php echo Tag::endForm() ?>
+</div>
+
+<?php echo Tag::javascriptInclude("appgen/create") ?>

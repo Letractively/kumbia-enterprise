@@ -1,0 +1,37 @@
+<pre>
+<?php echo View::getContent(); ?>
+</pre>
+<h2><?php echo $logName ?></h2>
+<table>
+	<tr>
+		<td align="right"><b>Tama&ntilde;o:</b></td>
+		<td><?php echo Helpers::toHuman($logSize) ?></td>
+	</tr>
+	<tr>
+		<td align="right"><b>&Uacute;ltima Modificaci&oacute;n:</b></td>
+		<td><?php echo $logLastModify ?></td>
+	</tr>
+</table>
+<br>
+<table cellspacing="0" id='table-<?= $logName ?>' width="100%">
+	<thead>
+		<tr style="background:#eeeeee;">
+			<th width='250'>Fecha</th>
+			<th width='100'>Tipo</Th>
+			<th>Log</th>
+		</tr>
+	</thead>
+	<tbody>
+	<?php
+	foreach($logContent as $logLine){
+		$regs = explode("]", str_replace("[", "", $logLine));
+		$regs[2] = wordwrap($regs[2], 60, "<br>");
+		echo "<tr>
+			<td>{$regs[0]}</td>
+			<td>{$regs[1]}</td>
+			<td>{$regs[2]}</td>
+		</tr>";
+	}
+	?>
+	</tbody>
+</table>

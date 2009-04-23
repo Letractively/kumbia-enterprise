@@ -1,0 +1,115 @@
+<?php View::getContent(); ?>
+
+<div align="left">
+Source: <?php echo $source ?>
+</div>
+
+<div align='center'>
+<?php echo Tag::form("create/attributes") ?>
+<table width="100%">
+	<tr>
+		<td valign="top">
+			<div class='paso'>
+			Paso 5: Establezca las relaciones del formulario
+			</div>
+			<div style='padding:10px'>
+			<table align="center" width="100%">
+				<tr>
+					<td>
+						<div style='padding:10px'>
+						<b>Seleccione las tablas y los atributos relacionados:</b>
+						</div>
+						<?php if(count($attributes)>0){ ?>
+						<table class='attributeList' align="center" cellspacing="0" width="100%">
+							<thead>
+								<tr>
+									<th>Campo</th>
+									<th>Tabla Relaci&oacute;n</th>
+									<th>Campos Relaci&oacute;n</th>
+								</tr>
+							</thead>
+						<?php
+
+						foreach($attributes as $attribute){
+							$relation = $attribute->getRelations();
+							$relationList = $relation->getRelationsList();
+							$fieldList = array();
+							foreach($relationList as $list){
+								$fieldList[] = $list->getFieldName();
+							}
+							print "<tr>";
+							print "<td>".$attribute->getFieldName()."</td>";
+							print "<td>".$relation->getTableRelation()."</td>";
+							print "<td>".join(",", $fieldList)."</td>";
+							print "<td align='center'>".Tag::buttonToAction("Editar", "create/editRelation/".$relation->getId())."</td>";
+							print "<td align='center'>".Tag::button("Eliminar")."</td>";
+							print "</tr>";
+						}
+
+						?>
+						</table>
+						<?php } ?>
+
+						<div style='margin:10px'>
+						<i>Nueva Relaci&oacute;n:</i>
+						<table>
+							<tr>
+								<td>
+									<table>
+										<tr>
+											<td align="right"><b>Campo:</b></td>
+											<td><?php echo Tag::selectStatic('campo', $fields, "use_dummy: yes") ?></td>
+										</tr>
+										<tr>
+											<td align="right"><b>Tabla Relaci&oacute;n:</b></td>
+											<td><?php echo Tag::selectStatic('tableRelation', $sources, "use_dummy: yes", "onchange: AppGen.getAttributes(this)") ?></td>
+										</tr>
+										<tr>
+											<td align="right"><b>Campo Relaci&oacute;n:</b></td>
+											<td><?php echo Tag::selectStatic('fieldRelation') ?></td>
+										</tr>
+										<tr>
+											<td align="right"><b>Campo Relaci&oacute;n Detalle:</b></td>
+											<td><?php echo Tag::selectStatic('fieldDetail') ?></td>
+										</tr>
+										<tr>
+											<td align="right"><b>Campo Relaci&oacute;n Ordenamiento:</b></td>
+											<td><?php echo Tag::selectStatic('fieldOrder') ?></td>
+										</tr>
+										<tr>
+											<td colspan="2" align="right">
+											<?php echo Tag::button("Agregar Campo", "onclick: AppGen.addRelation()") ?>
+											</td>
+										</tr>
+									</table>
+								</td>
+								<td valign="top">
+									<div id='relationDiv'></div>
+								</td>
+						</table>
+						</div>
+
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" align="right">
+						<?php echo Tag::buttonToAction("Anterior", "create/source") ?>
+						<?php echo Tag::submitButton("Guardar Cambios") ?>
+						<?php echo Tag::buttonToAction("Siguiente", "create/formOptions") ?>
+					</td>
+				</tr>
+			</table>
+			</div>
+		</td>
+		<td valign="top" width="20%" align="center">
+			<div id='tipInfo' align="left">
+				<b>Informaci&oacute;n &Uacute;til</b><br>
+
+			</div>
+		</td>
+	</tr>
+</table>
+<?php echo Tag::endForm() ?>
+</div>
+
+<?php echo Tag::javascriptInclude("appgen/create") ?>
