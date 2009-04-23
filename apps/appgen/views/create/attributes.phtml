@@ -1,0 +1,173 @@
+<?php View::getContent(); ?>
+
+<div align='center'>
+<?php echo Tag::form("create/attributes") ?>
+<table width="100%">
+	<tr>
+		<td valign="top">
+			<div class='paso'>
+			Paso 4: Seleccionar el data source formulario
+			</div>
+
+			<p><b>Source: <?php echo $source ?></b></p>
+
+			<table align="center" width="100%">
+				<tr>
+					<td>
+						<b>Seleccione las caracter&iacute;sticas de los atributos:</b>
+						<table class='attributeList' cellspacing="0" width="100%">
+
+						<?php
+
+						$color = "#ffffff";
+						$componentes = array(
+							'TE' => 'Caja de Texto',
+							'TA' => 'Textarea',
+							'DA' => 'Campo Fecha',
+							'EM' => 'Campo E-Mail',
+							'TN' => 'Caja de Texto Num&eacute;rica',
+							'TM' => 'Caja de Texto Solo May&uacute;sculas',
+							'CR' => 'Combo Relaci&oacute;n Integridad'
+						);
+						$generos = array(
+							'M' => 'Masculino',
+							'F' => 'Femenino'
+						);
+						foreach($attributes as $attribute){
+							$buscar = $attribute->getSearch()=="Y" ? "checked='checked'" : "";
+							$report = $attribute->getReport()=="Y" ? "checked='checked'" : "";
+							$browse = $attribute->getBrowse()=="Y" ? "checked='checked'" : "";
+							$readonly = $attribute->getReadOnly()=="Y" ? "checked='checked'" : "";
+							print "
+							<tr>
+								<th></th>
+								<th>Nombre</th>
+								<th>Tipo/Tama&ntilde;o</th>
+								<th>Permite Nulos</th>
+								<th>Llave Primaria</th>
+							</tr>
+							<tr bgcolor='$color'>
+								<td><input type='checkbox' checked='checked'></td>
+								<td>".$attribute->getFieldName()."</td>
+								<td>".$attribute->getType()."</td>
+								<td align='center'>".($attribute->getAllowNull()=="Y" ? "SI" : "NO")."</td>
+								<td align='center'>".($attribute->getPrimaryKey()=="Y" ? "SI" : "NO")."</td>
+							</tr>
+							<tr bgcolor='$color'>
+								<td colspan='5' class='attInfo'>
+								<p>
+									<table cellspacing='0'>
+										<tr>
+											<td align='right'><b>Etiqueta:</b></td>
+											<td><input type='text' name='etiqueta[]' size='20' value='".$attribute->getLabel()."'></td>
+											<td align='right'><b>Tama&ntilde;o:</b></td>
+											<td><input type='text' name='size[]' size='10' value='".$attribute->getSize()."'></td>
+											<td align='right'><b>Caracteres M&aacute;ximo:</b></td>
+											<td><input type='text' name='maxlength[]' size='10' value='".$attribute->getMaxlength()."'></td>
+										</tr>
+										<tr>
+											<td align='right'><b>Tipo Componente:</b></td>
+											<td>".Tag::selectStatic("component[]", $componentes, "value: ".$attribute->getComponent())."</td>
+											<td align='right'><b>Genero:</b></td>
+											<td>".Tag::selectStatic("genero[]", $generos, "value: M")."</td>
+										</tr>
+										<tr>
+											<td colspan='4'>
+												<table>
+													<tr>
+														<td><input name='search[]' type='checkbox' value='{$attribute->getId()}' $buscar/></td>
+														<td>Aparece en la pantalla de buscar registros</td>
+													</tr>
+													<tr>
+														<td><input name='report[]' type='checkbox' value='{$attribute->getId()}' $report/></td>
+														<td>Aparece en el reporte</td>
+													</tr>
+													<tr>
+														<td><input name='browse[]' type='checkbox' value='{$attribute->getId()}' $browse/></td>
+														<td>Aparece en pantalla de visualizaci&oacute;n</td>
+													</tr>
+													<tr>
+														<td><input name='readonly[]' type='checkbox' value='{$attribute->getId()}' $readonly/></td>
+														<td>Es de solo lectura?</td>
+													</tr>
+												</table>
+											</td>
+										</tr>
+									</table>
+								</p>
+								</td>
+							</tr>
+							";
+							if($color=="#ffffff"){
+								$color = "#E8EEF8";
+							} else {
+								$color = "#ffffff";
+							}
+						}
+
+						?>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" align="right">
+						<?php echo Tag::buttonToAction("Anterior", "create/source") ?>
+						<?php echo Tag::submitButton("Guardar Cambios") ?>
+						<?php echo Tag::buttonToAction("Siguiente", "create/relations") ?>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td valign="top" width="20%" align="center">
+			<div id='tipInfo' align="left">
+				<b>Informaci&oacute;n &Uacute;til</b><br>
+				<p>
+				Esta pantalla presenta la lista de atributos de la tabla
+				seleccionada.
+				</p>
+				En cada atributo es posible configurar:
+				<p>
+				<b>ETIQUETA</b>:
+				Es el texto que identifica cada campo en el formulario.
+				</p>
+				<p>
+				<b>TAMA&Ntilde;O</b>:
+				El tama&ntilde;o de la caja de texto &oacute; textarea cuando aplica.
+				</p>
+				<p>
+				<b>TIPO COMPONENTE</b>:
+				El tipo de Widget &oacute; componente utilizado para capturar y presentar los datos de este campo.
+				</p>
+				</p>
+				Los tipos de widgets son:
+				<p>
+				<p>
+				<b>Caja de Texto:</b>
+				Permite capturar texto &oacute; n&uacute;meros sin validaci&oacute;n alguna. La caracter&iacute;stica
+				'Tama&nbsp;o' permite establecer cuantos caracteres se deben visualizar y 'Caracteres M&aacute;ximo'
+				cuantos debe tener como m&aacute;ximo.
+				</p>
+				<b>Caja de Texto Num&eacute;rico:</b>
+				Permite capturar valor num&eacute;ricos como enteros y flotantes.
+				</p>
+				<b>Textarea:</b>
+				Permite capturar textos largos y de varias l&iacute;neas.
+				</p>
+				<b>Caja de Fecha:</b>
+				Permite capturar valores de fechas.
+				</p>
+				<b>Caja de E-Mail:</b>
+				Permite capturar valores de correos electr&oacute;nicos validando su formato.
+				</p>
+				<p>
+				<b>GENERO</b>:
+				Indique como se debe hacer referencia al campo. Usando 'EL' &oacute; usando 'LA'.
+				</p>
+			</div>
+		</td>
+	</tr>
+</table>
+<?php echo Tag::endForm() ?>
+</div>
+
+<?php echo Tag::javascriptInclude("appgen/create") ?>

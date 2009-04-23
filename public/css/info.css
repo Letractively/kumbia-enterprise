@@ -1,0 +1,35 @@
+
+body {
+	margin: 0px;
+	font-family: "Lucida Grande", "Tahoma","sans-serif";
+}
+
+div, li, ul {
+	font-family: "Lucida Grande", "Tahoma","sans-serif";
+	font-size: 12px;
+}
+
+h2 {
+	font-family: "Trebuchet MS","sans-serif";
+	font-size: 18px;
+}
+
+#kumbia-info-header {
+	font-size: 11px;
+	padding: 5px;
+	color: white;
+	background: #587993;
+	float: right;
+}
+
+a {
+	color: #587993;
+}
+
+#kumbia-info-content {
+	padding: 10px;
+}
+
+#kumbia-info-footer {
+	color: #676767
+}

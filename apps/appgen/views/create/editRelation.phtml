@@ -1,0 +1,48 @@
+<?php View::getContent(); ?>
+
+<div align='center'>
+
+<div class='paso'>
+Editar opciones de una relaci&oacute;n
+</div>
+
+<?php echo Tag::form("create/saveRelation") ?>
+<table width="100%">
+	<tr>
+		<td align="left">
+			<table align="left" width="100%">
+				<tr>
+					<td align="right"><b>Tabla Relaci&oacute;n:</b></td>
+					<td><?php echo $tableRelation ?></td>
+				</tr>
+				<tr>
+					<td align="right"><b>Campo Relaci&oacute;n:</b></td>
+					<td><?php echo "id" ?></td>
+				</tr>
+				<tr>
+					<td align="right"><b>Campo detalle:</b></td>
+					<td><?php echo Tag::selectStatic("fieldDetail", $fields) ?></td>
+				</tr>
+				<tr>
+					<td align="right"><b>Campo ordenamiento:</b></td>
+					<td><?php echo Tag::selectStatic("fieldOrder", $fields) ?></td>
+				</tr>
+				<tr>
+					<td colspan="2" align="right">
+						<?php echo Tag::buttonToAction("Cancelar", "create/relations") ?>
+						<?php echo Tag::submitButton("Guardar") ?>
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td valign="top" width="20%" align="center">
+			<div id='tipInfo' align="left">
+				<b>Informaci&oacute;n &Uacute;til</b><br>
+			</div>
+		</td>
+	</tr>
+</table>
+<?php echo Tag::endForm() ?>
+</div>
+
+<?php echo Tag::javascriptInclude("appgen/create") ?>

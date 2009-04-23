@@ -1,0 +1,26 @@
+<?php
+
+print View::getContent();
+
+/*foreach($config as $section => $configSection){
+	print "<b>$section</b><br>";
+	print "<table>";
+	foreach($configSection as $name => $value){
+		print "<tr>
+			<td align='right'>$name</td>
+			<td>".Tag::textField("conf-$name", "value: $value")."</td>
+		</tr>";
+	}
+	print "</table>";
+}*/
+
+
+?>
+
+<div id='data-conf-<?php echo $configName ?>-<?php echo $appName ?>' style='display:none'>
+<?php echo json_encode($jsonConfig) ?>
+</div>
+
+<?php foreach($config as $sectionName => $settings): ?>
+<div id='el-conf-<?php echo $configName ?>-<?php echo $appName ?>-<?php echo $sectionName ?>'></div><br/><br/>
+<?php endforeach; ?>

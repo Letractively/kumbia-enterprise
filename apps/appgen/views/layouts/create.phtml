@@ -1,0 +1,37 @@
+<?php Tag::stylesheetLink("appgen/appgen") ?>
+<div id='header'>
+	<table>
+		<tr>
+			<td><h1>Louder Application Forms</h1></td>
+		</tr>
+	</table>
+	<div>Usuario: <b>test</b>
+	<?php
+		if($extappname!=""){
+			print "Aplicaci&oacute;n: <b>$extappname</b>";
+		}
+	?>
+	</div>
+</div>
+
+<div class='mainMenu'>
+	<?php echo Tag::linkTo("create/index", "Inicio") ?>
+</div>
+
+<div align='center'>
+	<div id="mainContent" align="left">
+		<?php View::getContent(); ?>
+	</div>
+</div>
+
+<div id='footer'>
+<div align="right">
+Application Forms 0.1
+</div>
+<table width="100%">
+	<tr>
+		<td align="left">Idioma: Espa&ntilde;ol</td>
+		<td align="right">Copyright 2005-2009, Todos los derechos reservados</td>
+	</tr>
+</table>
+</div>
