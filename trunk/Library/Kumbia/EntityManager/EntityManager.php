@@ -236,7 +236,7 @@ abstract class EntityManager {
 	 */
 	private static function _initializeModel($entityName, $model){
 		if(class_exists($entityName)==false){
-			throw new EntityManagerException("No se encontr&oacute; la clase \"$entityName\", es necesario definir una clase en el modelo '$model' llamado '$entityName' para que esto funcione correctamente.");
+			throw new EntityManagerException("No se encontró la clase \"$entityName\", es necesario definir una clase en el modelo '$model' llamado '$entityName' para que esto funcione correctamente.");
 		} else {
 			self::$_entities[$entityName] = new $entityName();
 			if(!is_subclass_of(self::$_entities[$entityName], "ActiveRecordBase")){
@@ -421,7 +421,7 @@ abstract class EntityManager {
 				$returnedRecord = self::$_entities[$referenceTable]->findFirst($condition);
 				return $returnedRecord;
 			} else {
-				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relaci&oacute;n n-1");
+				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación n-1");
 			}
 		} else {
 			$entity = self::getEntityInstance($referenceTable);
@@ -461,7 +461,7 @@ abstract class EntityManager {
 				$returnedRecord = self::$_entities[$referenceTable]->findFirst($condition);
 				return $returnedRecord;
 			} else {
-				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relaci&oacute;n 1-1");
+				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación 1-1");
 			}
 		} else {
 			$entity = self::getEntityInstance($referenceTable);
@@ -518,7 +518,7 @@ abstract class EntityManager {
 			if(isset(self::$_entities[$referenceTable])){
 				return call_user_func_array(array(self::$_entities[$referenceTable], "find"), $findParams);
 			} else {
-				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relaci&oacute;n n-1");
+				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación n-1");
 			}
 		} else {
 			$referencedEntity = self::getEntityInstance($referenceTable);
@@ -552,7 +552,7 @@ abstract class EntityManager {
 		if(!isset(self::$_belongsTo[$entityName][$indexKey])){
 			if(is_array($fields)){
 				if(count($fields)>0&&$referenceTable==''){
-					throw new EntityManagerException("Debe indicar la tabla referenciada en la relaci&oacute;n belongsTo");
+					throw new EntityManagerException("Debe indicar la tabla referenciada en la relación belongsTo");
 				}
 			} else {
 				if($referenceTable==''){
@@ -605,7 +605,7 @@ abstract class EntityManager {
 		if(!isset(self::$_hasMany[$entityName][$indexKey])){
 			if(is_array($fields)){
 				if(count($fields)>0&&$referenceTable==''){
-					throw new EntityManagerException("Debe indicar la tabla referenciada en la relaci&oacute;n hasMany");
+					throw new EntityManagerException("Debe indicar la tabla referenciada en la relación hasMany");
 				}
 			} else {
 				if($referenceTable==''){
@@ -658,7 +658,7 @@ abstract class EntityManager {
 		if(!isset(self::$_hasOne[$entityName][$indexKey])){
 			if(is_array($fields)){
 				if(count($fields)>0&&$referenceTable==''){
-					throw new EntityManagerException("Debe indicar la tabla referenciada en la relaci&oacute;n hasOne");
+					throw new EntityManagerException("Debe indicar la tabla referenciada en la relación hasOne");
 				}
 			} else {
 				if($referenceTable==''){

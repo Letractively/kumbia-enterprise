@@ -51,7 +51,7 @@ class LdapAuth implements AuthInterface {
 	 */
 	public function __construct($auth, $extraArgs){
 		if(extension_loaded("ldap")==false){
-			throw new AuthException("Debe cargar la extensi&oacute;n de php llamada 'ldap'");
+			throw new AuthException("Debe cargar la extensión de php llamada 'ldap'");
 		}
 		$this->setParams($extraArgs);
 		if(!isset($this->server)){
@@ -199,7 +199,7 @@ class LdapAuth implements AuthInterface {
 	}
 
 	/**
-	 * Limpia el objeto cerrando la conexi&oacute;n si esta existe
+	 * Limpia el objeto cerrando la conexión si esta existe
 	 *
 	 * @access public
 	 */

@@ -156,7 +156,7 @@ class DbPdoSQLite extends DbPDO {
 	public function createTable($table, $definition, $index=array(), $tableOptions=array()){
 		$createSQL = "CREATE TABLE $table (";
 		if(!is_array($definition)){
-			new DbException("Definici&oacute;n invalida para crear la tabla '$table'");
+			new DbException("Definición invalida para crear la tabla '$table'");
 			return false;
 		}
 		$create_lines = array();

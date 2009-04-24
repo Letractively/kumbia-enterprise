@@ -232,7 +232,7 @@ abstract class GeneratorReport {
 		$q = $db->query($query);
 		if(!is_bool($q)){
 			if(!$db->numRows($q)){
-				Flash::notice("No hay informaci&oacute;n para listar");
+				Flash::notice("No hay información para listar");
 				return;
 			}
 		} else {

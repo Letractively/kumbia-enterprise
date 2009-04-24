@@ -123,7 +123,7 @@ class Auth extends Object {
 	 */
 	public function setAdapter($adapter, $auth = null, $extraArgs=array()){
 		if(!in_array($adapter, self::$_supportedAdapters)){
-			throw new AuthException("Adaptador de autenticaci&oacute;n '$adapter' no soportado");
+			throw new AuthException("Adaptador de autenticación '$adapter' no soportado");
 		}
 		$this->_adapter = $adapter;
 		if(Core::fileExists("Library/Kumbia/Auth/Adapters/".ucfirst($adapter).".php")){
@@ -133,7 +133,7 @@ class Auth extends Object {
 			require 'Library/Kumbia/Auth/Interface.php';
 			require 'Library/Kumbia/Auth/Adapters/'.ucfirst($adapter).'.php';
 		} else {
-			throw new AuthException("No existe el adaptador de autenticaci&oacute;n: '$adapter'");
+			throw new AuthException("No existe el adaptador de autenticación: '$adapter'");
 		}
 		$adapterClass = $adapter."Auth";
 		$this->_extraArgs = $extraArgs;
@@ -151,7 +151,7 @@ class Auth extends Object {
 	}
 
 	/**
-	 * Realiza el proceso de autenticaci&oacute;n
+	 * Realiza el proceso de autenticación
 	 *
 	 * @access public
 	 * @return array
@@ -206,7 +206,7 @@ class Auth extends Object {
 	}
 
 	/**
-	 * Realiza el proceso de autenticaci&oacute;n usando HTTP
+	 * Realiza el proceso de autenticación usando HTTP
 	 *
 	 * @access public
 	 * @return array
@@ -290,7 +290,7 @@ class Auth extends Object {
 	}
 
 	/**
-	 * Determinar si debe dormir la aplicacion cuando falle la autenticaci&oacute;n y cuanto tiempo en segundos
+	 * Determinar si debe dormir la aplicacion cuando falle la autenticación y cuanto tiempo en segundos
 	 *
 	 * @param boolean $value
 	 * @param integer $time

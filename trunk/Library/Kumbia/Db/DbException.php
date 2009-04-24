@@ -35,7 +35,7 @@
 class DbException extends CoreException {
 
 	/**
-	 * Conexion que gener&oacute; la excepcion
+	 * Conexion que generó la excepcion
 	 *
 	 * @var DbBase
 	 */
@@ -63,7 +63,7 @@ class DbException extends CoreException {
 		if($this->_dbBase!=null){
 			$htmlCode = "
 			<div class='exceptionExtra'>
-				<b>Datos de la Conexi&oacute;n Activa:</b>
+				<b>Datos de la Conexión Activa:</b>
 				<table class='exceptionExtra' cellspacing='0' width='100%' align='center'>
 					<tr>
 						<td align='right' class='exceptionLeftColumn' width='150'><b>Solo Lectura:</b></td>
@@ -74,7 +74,7 @@ class DbException extends CoreException {
 						<td align='left' class='exceptionRightColumn'>".($this->_dbBase->getHaveAutoCommit() ? "<b>SI</b>" : "NO")."</b></td>
 					</tr>
 					<tr>
-						<td align='right' class='exceptionLeftColumn' width='150'><b>Bajo una Transacci&oacute;n:</b></td>
+						<td align='right' class='exceptionLeftColumn' width='150'><b>Bajo una Transacción:</b></td>
 						<td align='left' class='exceptionRightColumn'>".($this->_dbBase->isUnderTransaction() ? "<b>SI</b>" : "NO")."</b></td>
 					</tr>
 					<tr>

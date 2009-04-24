@@ -41,11 +41,11 @@ class LengthValidator extends ActiveRecordValidator implements ActiveRecordValid
 	 */
 	public function checkOptions(){
 		if(!$this->isSetOption('minimum')&&!$this->isSetOption('maximum')){
-			throw new ActiveRecordValidatorException("El Validador Length requiere que indique la opci&oacute;n maximum &oacute; minimum");
+			throw new ActiveRecordValidatorException("El Validador Length requiere que indique la opción maximum ó minimum");
 		}
 		if($this->isSetOption('minimum')){
 			if($this->getOption('minimum')<0){
-				throw new ActiveRecordValidatorException("La opci&oacute;n 'mimimum' debe ser un entero positivo");
+				throw new ActiveRecordValidatorException("La opción 'mimimum' debe ser un entero positivo");
 			}
 		}
 	}

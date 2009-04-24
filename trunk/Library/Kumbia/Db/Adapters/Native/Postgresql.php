@@ -27,22 +27,22 @@
  *
  * La base de datos PostgreSQL es un producto Open Source y disponible sin costo.
  * Postgres, desarrollado originalmente en el Departamento de Ciencias de
- * Computaci&oacute;n de UC Berkeley, fue pionero en muchos de los conceptos de
+ * Computación de UC Berkeley, fue pionero en muchos de los conceptos de
  * objetos y relacionales que ahora est&aacute;n apareciendo en algunas bases de
  * datos comerciales. Provee soporte para lenguajes SQL92/SQL99, transacciones,
  * integridad referencial, procedimientos almacenados y extensibilidad de tipos.
- * PostgreSQL es un descendiente de c&oacute;digo abierto de su c&oacute;digo original de Berkeley.
+ * PostgreSQL es un descendiente de código abierto de su código original de Berkeley.
  *
  * Estas funciones le permiten acceder a servidores de bases de datos PostgreSQL.
- * Puede encontrar m&aacute;s informaci&oacute;n sobre PostgreSQL en http://www.postgresql.org.
- * La documentaci&oacute;n de PostgreSQL puede encontrarse en http://www.postgresql.org/docs.
+ * Puede encontrar m&aacute;s información sobre PostgreSQL en http://www.postgresql.org.
+ * La documentación de PostgreSQL puede encontrarse en http://www.postgresql.org/docs.
  *
  * @category	Kumbia
  * @package		Db
  * @subpackage	Adapters
  * @copyright 	Copyright (c) 2005-2007 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2007-2007 Emilio Silveira (emilio.rst@gmail.com)
- * @license		http://www.kumbia.org/license.txt New BSD License
+ * @license		New BSD License
  * @link		http://www.php.net/manual/es/ref.pgsql.php
  * @access		Public
  */
@@ -64,7 +64,7 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	const DB_NUM = PGSQL_NUM;
 
 	/**
-	 * Hace una conexi&oacute;n a la base de datos de PostgreSQL
+	 * Hace una conexión a la base de datos de PostgreSQL
 	 *
 	 * @param string $dbhost
 	 * @param string $dbuser
@@ -77,7 +77,7 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	public function connect($dbhost='', $dbuser='', $dbpass='', $dbname='', $dbport='', $dbdsn=''){
 
 		if(!extension_loaded('pgsql')){
-			throw new DbException('Debe cargar la extensi&oacute;n de PHP llamada php_pgsql');
+			throw new DbException('Debe cargar la extensión de PHP llamada php_pgsql');
 			return false;
 		}
 
@@ -96,7 +96,7 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 			return true;
 		} else {
 			if($this->display_errors){
-				throw new DbException("No se puede conectar a PostgreSQL, verifique q el servicio este arriba y los par&aacute;metros de conexi&oacute;n sean correctos", false);
+				throw new DbException("No se puede conectar a PostgreSQL, verifique q el servicio este arriba y los par&aacute;metros de conexión sean correctos", false);
 			}
 			$this->lastError = $this->error();
 			$this->log($this->lastError, Logger::ERROR);
@@ -399,7 +399,7 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	public function createTable($table, $definition, $index=array()){
 		$create_sql = "CREATE TABLE $table (";
 		if(!is_array($definition)){
-			new DbException("Definici&oacute;n invalida para crear la tabla '$table'");
+			new DbException("Definición invalida para crear la tabla '$table'");
 			return false;
 		}
 		$create_lines = array();

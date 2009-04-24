@@ -126,7 +126,7 @@ class TemporaryActiveRecord extends ActiveRecord {
 		if(method_exists($this, "_tableDefinition")==true){
 			$tableDefinition = $this->_tableDefinition();
 			if(!isset($tableDefinition['attributes'])){
-				throw new ActiveRecordException("Los atributos en la definici&oacute;n de la entidad no son correctos");
+				throw new ActiveRecordException("Los atributos en la definición de la entidad no son correctos");
 			}
 			if(!isset($tableDefinition['indexes'])){
 				$tableDefinition['indexes'] = array();
@@ -145,12 +145,12 @@ class TemporaryActiveRecord extends ActiveRecord {
 			}
 			$this->_dumpLock = false;
 		} else {
-			throw new ActiveRecordException("No ha definido el metodo '_tableDefinition' para obtener la definici&oacute;n de la tabla temporal");
+			throw new ActiveRecordException("No ha definido el metodo '_tableDefinition' para obtener la definición de la tabla temporal");
 		}
 	}
 
 	/**
-	 * Vuelca la informaci&oacute;n de la tabla $tableName en la base de datos
+	 * Vuelca la información de la tabla $tableName en la base de datos
 	 * para crear los atributos y meta-data del TemporaryActiveRecord
 	 *
 	 * @access protected

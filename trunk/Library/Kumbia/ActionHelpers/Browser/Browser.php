@@ -128,7 +128,7 @@ abstract class Browser {
 	}
 
 	/**
-	 * Devuelve la versi&oacute;n del explorador utilizado
+	 * Devuelve la versión del explorador utilizado
 	 *
 	 * @return string
 	 * @static

@@ -211,10 +211,10 @@ class AuditLogger extends Object {
 						if($this->_transaction instanceof ActiveRecordTransaction){
 							$audit->setTransaction($this->_transaction);
 						} else {
-							throw new AuditLoggerException("Objeto invalido de transacci&oacute;n");
+							throw new AuditLoggerException("Objeto invalido de transacción");
 						}
 					} else {
-						throw new AuditLoggerException("Objeto invalido de transacci&oacute;n");
+						throw new AuditLoggerException("Objeto invalido de transacción");
 					}
 				}
 				foreach($this->_fieldsToLog as $key => $isEnabled){

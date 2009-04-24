@@ -89,7 +89,7 @@ class DigestAuth implements AuthInterface {
 			if(isset($extra_args[$param])){
 				$this->$param = $extra_args[$param];
 			} else {
-				throw new AuthException("Debe especificar el par&aacute;metro '$param' en los par&aacute;metros de autenticaci&oacute;n");
+				throw new AuthException("Debe especificar el parámetro '$param' en los parámetros de autenticación");
 			}
 		}
 		foreach(array('algorithm') as $param){
@@ -102,9 +102,13 @@ class DigestAuth implements AuthInterface {
 	/**
 	 * Obtiene los datos de identidad obtenidos al autenticar
 	 *
+	 * @return array
 	 */
 	public function getIdentity(){
-		$identity = array("username" => $this->username, "realm" => $this->realm);
+		$identity = array(
+			'username' => $this->username,
+			'realm' => $this->realm
+		);
 		return $identity;
 	}
 
@@ -117,14 +121,14 @@ class DigestAuth implements AuthInterface {
 		if($this->_resource==null){
 			$this->_resource = @fopen($this->filename, "r");
 			if($this->_resource===false){
-				throw new AuthException("No existe &aacute; no se puede leer el archivo '{$this->filename}'");
+				throw new AuthException("No existe ó no se puede leer el archivo '{$this->filename}'");
 			}
 		}
 		$existsUser = false;
 		if(is_callable($this->algorithm)){
 			$callback = $this->algorithm;
 		} else {
-			throw new AuthException("El algoritmo de comprobaci&oacute;n del password es invalido");
+			throw new AuthException("El algoritmo de comprobación del password es invalido");
 		}
 		if(isset($this->charset)){
 			$charset = $this->charset;

@@ -101,7 +101,7 @@ class ActiveRecordTransaction {
 				$this->_db->setTimeout($definition->getTimeout());
 				$this->setPropagation($definition->getPropagation());
 			} else {
-				throw new ActiveRecordTransactionException("Definici&oacute;n de transacci&oacute;n invalida");
+				throw new ActiveRecordTransactionException("Definición de transacci&oacute;n invalida");
 			}
 		} else {
 			$connection = Db::rawConnect(true);

@@ -280,7 +280,7 @@ abstract class DbJDBC extends DbBase {
 	}
 
 	/**
-	 * Cancela una transacci&oacute;n si es posible
+	 * Cancela una transacción si es posible
 	 *
 	 * @access public
 	 * @return boolean
@@ -296,7 +296,7 @@ abstract class DbJDBC extends DbBase {
 	}
 
 	/**
-	 * Hace commit sobre una transacci&oacute;n si es posible
+	 * Hace commit sobre una transacción si es posible
 	 *
 	 * @access public
 	 * @return boolean

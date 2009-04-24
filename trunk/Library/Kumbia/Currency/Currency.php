@@ -233,7 +233,7 @@ class Currency {
 	}
 
 	/**
-	 * Las siguientes funciones son utilizadas para la generaci&oacute;n
+	 * Las siguientes funciones son utilizadas para la generación
 	 * de versiones escritas de numeros
 	 *
 	 * @param numeric $a

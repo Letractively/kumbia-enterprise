@@ -168,7 +168,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Emula la acci&oacute;n Report llamando a show
+	 * Emula la acción Report llamando a show
 	 */
 	public public function reportAction(){
 
@@ -176,7 +176,7 @@ abstract class StandardForm extends Controller {
 
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
-			throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operaci&oacute;n de reporte');
+			throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operación de reporte');
 			return $this->routeTo(array('action' => 'index'));
 		}
 		if(!$this->{$modelName}->isDumped()){
@@ -190,9 +190,9 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
-		 * before_report, si este m&eacute;todo devuelve false termina la ejecuci&oacute;n
-		 * de la acci&oacute;n
+		 * Busca si existe un método o un llamado variable al método
+		 * before_report, si este método devuelve false termina la ejecución
+		 * de la acción
 		 */
 		if(method_exists($this, "beforeReport")){
 			if($this->beforeReport()===false){
@@ -216,9 +216,9 @@ abstract class StandardForm extends Controller {
 		GeneratorReport::generate($this->form);
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
-		 * after_insert, si este m&eacute;todo devuelve false termina la ejecuci&oacute;n
-		 * de la acci&oacute;n
+		 * Busca si existe un método o un llamado variable al método
+		 * after_insert, si este método devuelve false termina la ejecución
+		 * de la acción
 		 */
 		if(method_exists($this, "afterReport")){
 			if($this->afterReport()===false){
@@ -267,7 +267,7 @@ abstract class StandardForm extends Controller {
 
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
-			throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operaci&oacute;n de inserci&oacute;n');
+			throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operación de inserción');
 			return $this->routeTo(array('action' => 'index'));
 		}
 
@@ -280,9 +280,9 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
-		 * validation, si este m&eacute;todo devuelve false termina la ejecuci&oacute;n
-		 * de la acci&oacute;n
+		 * Busca si existe un método o un llamado variable al método
+		 * validation, si este método devuelve false termina la ejecución
+		 * de la acción
 		 */
 		if(method_exists($this, "validation")){
 			if($this->validation()===false){
@@ -309,9 +309,9 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
-		 * beforeInsert, si este m&eacute;todo devuelve false termina la ejecucin
-		 * de la acci&oacute;n
+		 * Busca si existe un método o un llamado variable al método
+		 * beforeInsert, si este método devuelve false termina la ejecucin
+		 * de la acción
 		 */
 		if(method_exists($this, "beforeInsert")){
 			if($this->beforeInsert()===false){
@@ -359,7 +359,7 @@ abstract class StandardForm extends Controller {
 			if($this->successInsertMessage){
 				Flash::success($this->successInsertMessage);
 			} else {
-				Flash::success("Se insert&oacute; correctamente el registro");
+				Flash::success("Se insertó correctamente el registro");
 			}
 		} else {
 			if(isset($this->failuresInsertMessage)&&$this->failuresInsertMessage!=""){
@@ -374,7 +374,7 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
+		 * Busca si existe un método o un llamado variable al método
 		 * after_insert
 		 */
 		if(method_exists($this, "afterInsert")){
@@ -397,7 +397,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Emula la acci&oacute;n Update llamando a show
+	 * Emula la acción Update llamando a show
 	 *
 	 * @access public
 	 */
@@ -410,7 +410,7 @@ abstract class StandardForm extends Controller {
 
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
-			throw new StandardFormException('No hay un modelo "'.$this->getSource().'" para hacer la operaci&oacute;n de actualizaci&oacute;n');
+			throw new StandardFormException('No hay un modelo "'.$this->getSource().'" para hacer la operación de actualización');
 			return $this->routeTo(array('action' => 'index'));
 		}
 
@@ -448,9 +448,9 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
-		 * validation, si este m&eacute;todo devuelve false termina la ejecuci&oacute;n
-		 * de la acci&oacute;n
+		 * Busca si existe un método o un llamado variable al método
+		 * validation, si este método devuelve false termina la ejecución
+		 * de la acción
 		 */
 		if(method_exists($this, "validation")){
 			if($this->validation()===false){
@@ -512,7 +512,7 @@ abstract class StandardForm extends Controller {
 			if($this->successUpdateMessage){
 				Flash::success($this->successUpdateMessage);
 			} else {
-				Flash::success("Se actualiz&oacute; correctamente el registro");
+				Flash::success("Se actualizó correctamente el registro");
 			}
 		} else {
 			foreach($this->{$modelName}->getMessages() as $message){
@@ -530,7 +530,7 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
+		 * Busca si existe un método o un llamado variable al método
 		 * after_update
 		 */
 		if(method_exists($this, "afterUpdate")){
@@ -577,7 +577,7 @@ abstract class StandardForm extends Controller {
 
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
-			throw new StandardFormException('No hay un modelo "'.$this->getSource().'" para hacer la operaci&oacute;n de actualizaci&oacute;n');
+			throw new StandardFormException('No hay un modelo "'.$this->getSource().'" para hacer la operación de actualización');
 			return $this->routeTo(array('action' => 'index'));
 		}
 
@@ -594,9 +594,9 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
-		 * before_delete, si este m&eacute;todo devuelve false termina la ejecuci&oacute;n
-		 * de la acci&oacute;n
+		 * Busca si existe un método o un llamado variable al método
+		 * before_delete, si este método devuelve false termina la ejecución
+		 * de la acción
 		 */
 		if(method_exists($this, "beforeDelete")){
 			if($this->beforeDelete()===false){
@@ -628,7 +628,7 @@ abstract class StandardForm extends Controller {
 			if($this->successDeleteMessage!=''){
 				Flash::success($this->successDeleteMessage);
 			} else {
-				Flash::success("Se elimin&oacute; correctamente el registro");
+				Flash::success("Se eliminó correctamente el registro");
 			}
 		} else {
 			if($this->failureDeleteMessage!=''){
@@ -642,7 +642,7 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
+		 * Busca si existe un método o un llamado variable al método
 		 * after_delete
 		 */
 		if(method_exists($this, "afterDelete")){
@@ -664,7 +664,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Emula la acci&oacute;n Query llamando a show
+	 * Emula la acción Query llamando a show
 	 */
 	public function queryAction(){
 
@@ -674,7 +674,7 @@ abstract class StandardForm extends Controller {
 
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
-			throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operaci&oacute;n de consulta');
+			throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operación de consulta');
 			return $this->routeTo(array('action' => 'index'));
 		}
 
@@ -856,9 +856,9 @@ abstract class StandardForm extends Controller {
 		}
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
-		 * before_fetch, si este m&eacute;todo devuelve false termina la ejecuci&oacute;n
-		 * de la acci&oacute;n
+		 * Busca si existe un método o un llamado variable al método
+		 * before_fetch, si este método devuelve false termina la ejecución
+		 * de la acción
 		 */
 		if(method_exists($this, "beforeFetch")){
 			if($this->beforeFetch()===false){
@@ -895,7 +895,7 @@ abstract class StandardForm extends Controller {
 		$_REQUEST['id'] = $num;
 
 		/**
-		 * Busca si existe un m&eacute;todo o un llamado variable al m&eacute;todo
+		 * Busca si existe un método o un llamado variable al método
 		 * after_delete
 		 */
 		if(method_exists($this, "afterFetch")){
@@ -928,7 +928,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Emula la acci&oacute;n Browse llamando a show
+	 * Emula la acción Browse llamando a show
 	 *
 	 * @access public
 	 */
@@ -942,7 +942,7 @@ abstract class StandardForm extends Controller {
 	 * para mostrar el formulario y su accion asociada.
 	 * La propiedad $this->getSource() indica la tabla con la que se va a generar
 	 * el formulario
-	 * La funci&oacute;n buildForm es la encargada de crear el formulario
+	 * La función buildForm es la encargada de crear el formulario
 	 * esta se encuentra en forms.functions.php
 	 *
 	 * @access public
@@ -1059,7 +1059,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica que un campo tendr&oacute; un helper de ayuda
+	 * Indica que un campo tendró un helper de ayuda
 	 *
 	 * @access public
 	 * @param string $field
@@ -1082,7 +1082,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica que un campo ser&oacute; de tipo imagen
+	 * Indica que un campo seró de tipo imagen
 	 *
 	 * @access public
 	 * @param string $what
@@ -1092,7 +1092,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica que un campo ser&oacute; de tipo numerico
+	 * Indica que un campo seró de tipo numerico
 	 *
 	 * @access public
 	 * @param string $what
@@ -1103,7 +1103,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica que un campo ser&oacute; de tipo Time
+	 * Indica que un campo seró de tipo Time
 	 *
 	 * @access public
 	 * @param string $what
@@ -1113,7 +1113,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica que un campo ser&oacute; de tipo fecha
+	 * Indica que un campo seró de tipo fecha
 	 *
 	 * @access public
 	 * @param string $what
@@ -1124,7 +1124,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica que un campo ser&oacute; de tipo password
+	 * Indica que un campo seró de tipo password
 	 *
 	 * @access public
 	 * @param string $what
@@ -1134,7 +1134,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica que un campo ser&oacute; de tipo textarea
+	 * Indica que un campo seró de tipo textarea
 	 *
 	 * @access public
 	 * @param string $what
@@ -1144,7 +1144,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica una lista de campos recibir&oacute;n entrada solo en may&oacute;sculas
+	 * Indica una lista de campos recibirón entrada solo en mayósculas
 	 *
 	 */
 	protected function setTextUpper(){
@@ -1157,7 +1157,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Crea un combo est&oacute;tico
+	 * Crea un combo estótico
 	 *
 	 * @param string $what
 	 * @param string $arr
@@ -1248,7 +1248,7 @@ abstract class StandardForm extends Controller {
 
 	/**
 	 * Recibe una lista de campos que no van a ser incluidos en
-	 * la generaci&oacute;n del formulario
+	 * la generación del formulario
 	 *
 	 * @access protected
 	 */
@@ -1264,7 +1264,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Permite cambiar el tama&oacute;o (size) de un campo $what a $size
+	 * Permite cambiar el tamaóo (size) de un campo $what a $size
 	 *
 	 * @access protected
 	 * @param string $what
@@ -1275,7 +1275,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Permite cambiar el tama&oacute;o m&oacute;ximo de caracteres que se puedan
+	 * Permite cambiar el tamaóo móximo de caracteres que se puedan
 	 * digitar en un campo texto
 	 *
 	 * @access protected
@@ -1287,7 +1287,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Hace que un campo aparezca en la pantalla de visualizaci&oacute;n
+	 * Hace que un campo aparezca en la pantalla de visualización
 	 *
 	 * @access protected
 	 */
@@ -1389,7 +1389,7 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Indica que un campo ser&oacute; de tipo Hidden
+	 * Indica que un campo seró de tipo Hidden
 	 *
 	 * @access protected
 	 * @param array $fields
@@ -1488,7 +1488,7 @@ abstract class StandardForm extends Controller {
 	public function onException($e){
 		if(get_class($e)=="DbException"){
 			if($e instanceof DbConstraintViolationException){
-				Flash::error("No se puede efectuar la operaci&oacute;n ya que el registro se esta usando en  otras partes del sistema");
+				Flash::error("No se puede efectuar la operación ya que el registro se esta usando en  otras partes del sistema");
 				$action = Router::getAction();
 				$this->RouteTo("action: index");
 			} else {
