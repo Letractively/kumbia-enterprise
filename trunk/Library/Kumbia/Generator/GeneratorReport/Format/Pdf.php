@@ -22,11 +22,6 @@
  */
 
 /**
- * @see FPDF
- */
-require 'Library/Fpdf/Fpdf.php';
-
-/**
  * PDFGenerator
  *
  * Generador de Reportes a PDF
@@ -38,14 +33,14 @@ require 'Library/Fpdf/Fpdf.php';
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
-class PDF extends FPDF {
+class PDF extends PdfDocument {
 
 	/**
 	 * Cabecera de la pagina
 	 *
 	 */
-	public function Header() {
-		$this->Ln(10);
+	public function Header(){
+		$this->lineFeed(10);
 	}
 
 	/**
@@ -57,24 +52,24 @@ class PDF extends FPDF {
 		$config = CoreConfig::readFromActiveApplication("config.ini");
 		$active_app = Core::getActiveApplication();
 
-		//Posicion: a 1,5 cm del final
-		$this->SetY(-21);
+		//Posición: a 1,5 cm del final
+		$this->setY(-21);
 		//Arial italic 8
-		$this->SetFont('Arial', '', 7);
+		$this->setFont('Arial', '', 7);
 
 		//Posicion: a 1,5 cm del final
 		$this->SetY(-18);
 		//Arial italic 8
-		$this->SetFont('Arial','',7);
-		//N�mero de p�gina
-		$this->Cell(0,10, $config->application->name,0,0,'C');
+		$this->SetFont('Arial', '', 7);
+		//Número de página
+		$this->Cell(0,10, $config->application->name, 0, 0, 'C');
 
-		//Posici�n: a 1,5 cm del final
+		//Posición: a 1,5 cm del final
 		$this->SetY(-10);
 		//Arial italic 8
-		$this->SetFont('Arial','',8);
-		//N�mero de p�gina
-		$this->Cell(0,10,'-- '.$this->PageNo().' --',0,0,'C');
+		$this->SetFont('Arial', '', 8);
+		//Número de página
+		$this->Cell(0,10,'-- '.$this->PageNo().' --', 0, 0, 'C');
 
 	}
 
@@ -96,66 +91,65 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 
 	//Orientación
 	if($sumArray>200) {
-		$orientation = 'L';
+		$orientation = PdfDocument::ORI_LANDSCAPE;
 	} else {
-		$orientation = 'P';
+		$orientation = PdfDocument::ORI_PORTRAIT;
 	}
 
 	$numRows = 140;
 	//Tipo de Papel
-	if($sumArray>250) {
-		$paper = 'legal';
+	if($sumArray>250){
+		$paper = PdfDocument::PAPER_LEGAL;
 	} else {
-		$paper = 'letter';
+		$paper = PdfDocument::PAPER_LETTER;
 	}
 
-	if($paper=='letter'&&$orientation=='P'){
+	if($paper==PdfDocument::PAPER_LETTER&&$orientation==PdfDocument::ORI_PORTRAIT){
 		$widthPage = 220;
 		$numRows = 42;
 	}
 
-	if($paper=='legal'&&$orientation=='L'){
+	if($paper==PdfDocument::PAPER_LEGAL&&$orientation==PdfDocument::ORI_LANDSCAPE){
 		$widthPage = 355;
 		$numRows = 30;
 	}
 
-	if($paper=='letter'&&$orientation=='L'){
+	if($paper==PdfDocument::PAPER_LETTER&&$orientation==PdfDocument::ORI_LANDSCAPE){
 		$widthPage = 270;
 		$numRows = 30;
 	}
 
 	//Crear Documento PDF
-	$pdf = new PDF($orientation, 'mm', $paper);
+	$pdf = new PDF($orientation, PdfDocument::UNIT_MM, PdfDocument::PAPER_LETTER);
 
 	$pdf->Open();
 	$pdf->AddPage();
 
 	//Nombre del Listado
-	$pdf->SetFillColor(255, 255, 255);
-	$pdf->AddFont('Verdana','','verdana.php');
-	$pdf->SetFont('Verdana','', 14);
-	$pdf->SetY(20);
-	$pdf->SetX(0);
+	$pdf->setFillColor(255, 255, 255);
+	$pdf->addFont('Verdana','','verdana.php');
+	$pdf->setFont('Verdana','', 14);
+	$pdf->setY(20);
+	$pdf->setX(0);
 
-
-	$pdf->Ln();
+	$pdf->lineFeed();
 
 	if($config->application->name){
 		$pdf->MultiCell(0, 6, strtoupper($config->application->name), 0, "C", 0);
 	}
 	$pdf->MultiCell(0, 6, "REPORTE DE ".strtoupper($title), 0, "C", 0);
-	$pdf->SetFont('Verdana','', 12);
+	$pdf->setFont('Verdana','', 12);
 	if(isset($_SESSION['fecsis'])){
 		$pdf->MultiCell(0, 6, "FECHA ".date("Y-m-d"), 0, "C", 0);
 	}
-	$pdf->Ln();
+	$pdf->lineFeed();
 
-	//Colores, ancho de l�nea y fuente en negrita
-	$pdf->SetFillColor(0xF2,0xF2, 0xF2);
-	$pdf->SetTextColor(0);
-	$pdf->SetDrawColor(0,0,0);
-	$pdf->SetLineWidth(.2);
-	$pdf->SetFont('Arial', 'B', 10);
+	//Colores, ancho de línea y fuente en negrita
+	$pdf->setFillColor(0xF2, 0xF2, 0xF2);
+	$pdf->setTextColor(0);
+	$pdf->setDrawColor(0, 0, 0);
+	$pdf->setLineWidth(.2);
+	$pdf->setFont('Arial', 'B', 10);
 
 	if($weightArray[0]<11){
 		$weightArray[0] = 11;
@@ -163,13 +157,13 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 
 	//Parametros del Reporte
 	$pos = floor(($widthPage/2)-($sumArray/2));
-	$pdf->SetX($pos);
+	$pdf->setX($pos);
 	for($i=0;$i<=count($headerArray)-1;$i++){
 		$pdf->Cell($weightArray[$i],7,$headerArray[$i], 1, 0, 'C', 1);
 	}
-	$pdf->Ln();
+	$pdf->lineFeed();
 
-	//Restauraci�n de colores y fuentes
+	//Restauración de colores y fuentes
 	$pdf->SetFillColor(224, 235, 255);
 	$pdf->SetTextColor(0);
 	$pdf->SetFont('Arial','B', 7);
@@ -220,14 +214,6 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 	$pdf->SetFillColor(0xF2,0xF2, 0xF2);
 	$pdf->Cell($weightArray[0], 5, "TOTAL",'LRTB', 0, 'R');
 	$pdf->Cell($weightArray[1], 5, $t,'LRTB', 0, 'L');
-
-	/*print "<div style='background: url(img/bg2.jpg) #F2f2f2;border:1px solid #c0c0c0'>
-	<table><td><img src='img/information.gif' width='64' height='64'/></td><td>";
-	print "Papel: $paper<br>";
-	print "Orientaci�n: $orientation<br>";
-	print "Ancho P�gina: $widthPage mm<br>";
-	print "N�mero P�ginas: $p<br>";
-	print "</td></table></div><br>";*/
 
 	$file = md5(mt_rand(0, 10000));
 	$pdf->Output("public/temp/".$file .".pdf", 'F');

@@ -135,6 +135,8 @@ abstract class CoreClassPath {
 		'LoggerException' => 'Logger/LoggerException',
 		'NamespaceContainer' => 'Session/Namespace/NamespaceContainer',
 		'Object' => 'Object',
+		'PdfDocument' => 'PdfDocument/PdfDocument',
+		'PdfDocumentException' =>  'PdfDocument/PdfDocumentException',
 		'PHPUnit' => 'PHPUnit/PHPUnit',
 		'PHPUnitTestCase' => 'PHPUnit/PHPUnitTestCase',
 		'PHPUnitException' => 'PHPUnit/PHPUnitException',
