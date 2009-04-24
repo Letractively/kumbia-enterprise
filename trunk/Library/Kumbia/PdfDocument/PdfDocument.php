@@ -2116,7 +2116,7 @@ class PdfDocument {
 				$this->_out('>>');
 				$this->_out('endobj');
 			} else {
-				if($type=='Type1'||$type=='TrueType'){
+				if($type==PdfDocument::FONT_TYPE_TYPE1||$type==PdfDocument::FONT_TYPE_TRUETYPE){
 					//Additional Type1 or TrueType font
 					$this->_newobj();
 					$this->_out('<</Type /Font');
@@ -2232,20 +2232,24 @@ class PdfDocument {
 		$this->_out('>>');
 	}
 
-	private function _putresources(){
+	private function _putResources(){
 		$this->_putfonts();
 		$this->_putimages();
 		//Resource dictionary
-		$this->offsets[2]=strlen($this->_buffer);
+		$this->offsets[2] = strlen($this->_buffer);
 		$this->_out('2 0 obj');
 		$this->_out('<<');
-		$this->_putresourcedict();
+		$this->_putResourceDict();
 		$this->_out('>>');
 		$this->_out('endobj');
 	}
 
-	private function _putinfo(){
-		$this->_out('/Producer '.$this->_textstring('FPDF '.FPDF_VERSION));
+	/**
+	 * Imprime la información del encabezado del documento
+	 *
+	 */
+	private function _putInfo(){
+		$this->_out('/Producer '.$this->_textstring('KEF '.Core::FRAMEWORK_VERSION));
 		if(!empty($this->_title)){
 			$this->_out('/Title '.$this->_textstring($this->_title));
 		}
@@ -2295,10 +2299,18 @@ class PdfDocument {
 		}
 	}
 
+	/**
+	 * Imprime el encabezado del documento PDF
+	 *
+	 */
 	private function _putHeader(){
 		$this->_out('%PDF-'.$this->_pdfVersion);
 	}
 
+	/**
+	 * Imprime el pie de pagina del document PDF
+	 *
+	 */
 	private function _putTrailer(){
 		$this->_out('/Size '.($this->_n+1));
 		$this->_out('/Root '.$this->_n.' 0 R');
@@ -2327,17 +2339,21 @@ class PdfDocument {
 		$this->_out('0 '.($this->_n+1));
 		$this->_out('0000000000 65535 f ');
 		for($i=1;$i<=$this->_n;$i++){
-			$this->_out(sprintf('%010d 00000 n ',$this->offsets[$i]));
+			if(isset($this->offsets[$i])){
+				$this->_out(sprintf('%010d 00000 n ', $this->offsets[$i]));
+			} else {
+				$this->_out(sprintf('%010d 00000 n ', 0));
+			}
 		}
 		//Trailer
 		$this->_out('trailer');
 		$this->_out('<<');
-		$this->_puttrailer();
+		$this->_putTrailer();
 		$this->_out('>>');
 		$this->_out('startxref');
 		$this->_out($o);
 		$this->_out('%%EOF');
-		$this->_state=3;
+		$this->_state = 3;
 	}
 
 	/**

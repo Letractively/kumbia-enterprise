@@ -158,17 +158,16 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 	//Parametros del Reporte
 	$pos = floor(($widthPage/2)-($sumArray/2));
 	$pdf->setX($pos);
-	for($i=0;$i<=count($headerArray)-1;$i++){
-		$pdf->writeCell($weightArray[$i],7,$headerArray[$i], 1, 0, 'C', 1);
+	$numberColumns = count($headerArray)-1;
+	for($i=0;$i<=$numberColumns;$i++){
+		$pdf->writeCell($weightArray[$i], 7, $headerArray[$i], 1, 0, 'C', 1);
 	}
 	$pdf->lineFeed();
 
 	//Restauración de colores y fuentes
-	$pdf->SetFillColor(224, 235, 255);
-	$pdf->SetTextColor(0);
-	$pdf->SetFont('Arial','B', 7);
-
-	//print_r($weightArray);
+	$pdf->setFillColor(224, 235, 255);
+	$pdf->setTextColor(0);
+	$pdf->setFont('Arial', 'B', 7);
 
 	//Buscamos y listamos
 	$n = 1;
@@ -195,8 +194,9 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 			$n = 1;
 			$p++;
 		}
-		$pdf->SetX($pos);
-		for($i=0;$i<=count($row)-1;$i++){
+		$pdf->setX($pos);
+		$numberColumns = count($row)-1;
+		for($i=0;$i<=$numberColumns;$i++){
 			if(is_numeric($row[$i])){
 				$pdf->writeCell($weightArray[$i], 5, trim($row[$i]),'LRTB', 0, 'C');
 			} else {
