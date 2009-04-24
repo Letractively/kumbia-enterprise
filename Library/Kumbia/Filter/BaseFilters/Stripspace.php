@@ -20,7 +20,7 @@
  * @copyright	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright	Copyright (c) 2007-2007 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
  * @license		New BSD License
- * @version 	$Id: Stripspace.php 135 2009-04-16 11:06:19Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**

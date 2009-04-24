@@ -19,7 +19,7 @@
  * @copyright	Copyright (c) 2008-2009 Oscar Garavito (game013@gmail.com)
  * @copyright	Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license		New BSD License
- * @version 	$Id: Date.php 135 2009-04-16 11:06:19Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**

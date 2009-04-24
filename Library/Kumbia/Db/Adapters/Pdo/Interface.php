@@ -19,7 +19,7 @@
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2006-2007 Giancarlo Corzo Vigil (www.antartec.com)
  * @license		New BSD License
- * @version 	$Id: Interface.php 135 2009-04-16 11:06:19Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**

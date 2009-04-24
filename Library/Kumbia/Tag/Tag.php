@@ -20,7 +20,7 @@
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
  * @license 	New BSD License
- * @version 	$Id: Tag.php 140 2009-04-23 00:04:43Z CarvajalDiazEduar $
+ * @version 	$Id$
  */
 
 /**

@@ -18,7 +18,7 @@
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2007-2007 Julian Cortes (jucorant at gmail.com)
  * @license		New BSD License
- * @version 	$Id: StandardBuild.php 135 2009-04-16 11:06:19Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**

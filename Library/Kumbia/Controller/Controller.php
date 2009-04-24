@@ -17,7 +17,7 @@
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
- * @version 	$Id: Controller.php 139 2009-04-22 17:59:47Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**
