@@ -730,6 +730,8 @@ class PdfDocument {
 		$this->setCompression(true);
 		//Set default PDF version number
 		$this->_pdfVersion = '1.4';
+		//Set de font PATH
+		$this->_fontPath = 'Library/Kumbia/PdfDocument/Fonts/';
 	}
 
 	/**
@@ -1206,7 +1208,7 @@ class PdfDocument {
 	 * @param string $style
 	 * @param string $file
 	 */
-	public function addFont($family,$style='',$file=''){
+	public function addFont($family, $style='', $file=''){
 		$family = strtolower($family);
 		if($file==''){
 			$file = str_replace(' ','',$family).strtolower($style).'.php';
@@ -1261,8 +1263,8 @@ class PdfDocument {
 				);
 			} else {
 				$this->_fontFiles[$file] = array(
-					'length1' => $size1,
-					'length2' => $size2
+					'length1' => isset($size1)  ? $size1 : 0,
+					'length2' => isset($size2)  ? $size2 : 0
 				);
 			}
 		}
@@ -1312,14 +1314,14 @@ class PdfDocument {
 		if(!isset($this->_fonts[$fontkey])){
 			//Check if one of the standard fonts
 			if(isset(self::$_coreFonts[$fontkey])){
-				if(!isset($fpdf_charwidths[$fontkey])){
+				if(!isset($fpdfCharWidths[$fontkey])){
 					//Load metric file
 					$file = $family;
 					if($family=='times'||$family=='helvetica'){
 						$file.=strtolower($style);
 					}
-					include $this->_getFontPath().$file.'.php';
-					if(!isset($fpdf_charwidths[$fontkey])){
+					require $this->_getFontPath().$file.'.php';
+					if(!isset($fpdfCharWidths[$fontkey])){
 						throw new PdfDocumentException('Could not include font metric file');
 					}
 				}
@@ -1330,7 +1332,7 @@ class PdfDocument {
 					'name' => self::$_coreFonts[$fontkey],
 					'up' => -100,
 					'ut' => 50,
-					'cw' => $fpdf_charwidths[$fontkey]
+					'cw' => $fpdfCharWidths[$fontkey]
 				);
 			} else {
 				throw new PdfDocumentException('Undefined font: '.$family.' '.$style);
@@ -1965,18 +1967,24 @@ class PdfDocument {
 	 *
 	 * @return string
 	 */
-	protected function _getfontpath(){
-		if(!defined('FPDF_FONTPATH') && is_dir(dirname(__FILE__).'/font')){
-			define('FPDF_FONTPATH',dirname(__FILE__).'/font/');
-		}
-		return defined('FPDF_FONTPATH') ? FPDF_FONTPATH : '';
+	protected function _getFontPath(){
+		return $this->_fontPath;
+	}
+
+	/**
+	 * Establece el PATH donde se encuentran las fuentes
+	 *
+	 * @param string $path
+	 */
+	public function setFontPath($path){
+		$this->_fontPath = $path;
 	}
 
 	/**
 	 * Generar Paginas
 	 *
 	 */
-	protected function _putpages(){
+	protected function _putPages(){
 		$nb = $this->_activePage;
 		if(!empty($this->_aliasNbPages)){
 			//Replace number of pages
@@ -2045,7 +2053,7 @@ class PdfDocument {
 	 * Colocar fuentes
 	 *
 	 */
-	protected function _putfonts(){
+	protected function _putFonts(){
 		$nf = $this->_n;
 		foreach($this->_diffs as $diff){
 			//Encodings

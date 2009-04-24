@@ -6,9 +6,10 @@
   <title>Louder Application Forms</title>
   <?php Tag::stylesheetLink('style', true) ?>
   <?php echo Core::stylesheetLinkTags() ?>
+  <?php echo Tag::javascriptLibrary('framework/scriptaculous/protoculous') ?>
   <?php echo Core::javascriptBase() ?>
  </head>
  <body>
-    <?php View::getContent(); ?>
+    <?php print View::getContent(); ?>
  </body>
 </html>
