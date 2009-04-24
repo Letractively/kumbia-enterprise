@@ -99,8 +99,7 @@ class ApplicationController extends Controller  {
 	 * @return boolean
 	 */
 	protected function validateRequired($fields, $base='', $getMode=''){
-		if(class_exists("Validation"))
-			return Validation::validateRequired($fields, $base, $getMode);
+		return Validation::validateRequired($fields, $base, $getMode);
 	}
 
 	/**
@@ -120,21 +119,22 @@ class ApplicationController extends Controller  {
 	 * @param string $message
 	 */
 	protected function addValidationMessage($message, $field=''){
-		$this->_messages[] = new ValidationMessage($message, $field);
+		Validation::addValidationMessage($message, $field);
 	}
 
 	/**
-	 * Devuelve los mensajes de validacion generados
+	 * Devuelve los mensajes de validación generados
 	 *
 	 * @access protected
 	 * @return array
 	 */
 	public function getValidationMessages(){
-		return $this->_messages;
+		return Validation::getMessages();
 	}
 
 	/**
-	 * La definicion de este metodo indica si se debe exportar las variables publicas
+	 * La definición de este método indica si se debe exportar
+	 * las variables públicas
 	 *
 	 * @return true
 	 */

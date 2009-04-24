@@ -179,4 +179,22 @@ class Validation {
 		return self::$_validationFailed;
 	}
 
+	/**
+	 * Obtiene los mensajes de validación
+	 *
+	 * @access public
+	 * @return array
+	 * @static
+	 */
+	public static function getMessages(){
+		$messages = array();
+		foreach(self::$_validationMessages as $fieldName => $messages){
+			foreach($messages as $message){
+				$validationMessage = new ValidationMessage($message, $fieldName);
+				$messages[] = $validationMessage;
+			}
+		}
+		return $messages;
+	}
+
 }
