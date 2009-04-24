@@ -108,7 +108,11 @@ class Auth extends Object {
 			$adapter = $extraArgs[0];
 			unset($extraArgs[0]);
 		} else {
-			$adapter = 'model';
+			if(isset($extraArgs['adapter'])){
+				$adapter = $extraArgs['adapter'];
+			} else {
+				$adapter = 'model';
+			}
 		}
 		$this->setAdapter($adapter, $this, $extraArgs);
 	}
@@ -198,9 +202,9 @@ class Auth extends Object {
 				sleep($this->_sleepTime);
 			}
 		}
-		Session::set('KUMBIA_AUTH_IDENTITY', $this->_adapterObject->getIdentity());
+		Session::set('AUTH_IDENTITY', $this->_adapterObject->getIdentity());
 		self::$_activeIdentity = $this->_adapterObject->getIdentity();
-		Session::set('KUMBIA_AUTH_VALID', $result);
+		Session::set('AUTH_VALID', $result);
 		self::$_isValid = $result;
 		return $result;
 	}
@@ -343,7 +347,7 @@ class Auth extends Object {
 		if(count(self::$_activeIdentity)){
 			return self::$_activeIdentity;
 		} else {
-			self::$_activeIdentity = Session::get('KUMBIA_AUTH_IDENTITY');
+			self::$_activeIdentity = Session::get('AUTH_IDENTITY');
 			return self::$_activeIdentity;
 		}
 	}
@@ -356,9 +360,9 @@ class Auth extends Object {
 	 */
 	static public function destroyIdentity(){
 		self::$_isValid = null;
-		Session::unsetData('KUMBIA_AUTH_VALID');
+		Session::unsetData('AUTH_VALID');
 		self::$_activeIdentity = null;
-		Session::unsetData('KUMBIA_AUTH_IDENTITY');
+		Session::unsetData('AUTH_IDENTITY');
 	}
 
 }
