@@ -58,18 +58,18 @@ class PDF extends PdfDocument {
 		$this->setFont('Arial', '', 7);
 
 		//Posicion: a 1,5 cm del final
-		$this->SetY(-18);
+		$this->setY(-18);
 		//Arial italic 8
-		$this->SetFont('Arial', '', 7);
+		$this->setFont('Arial', '', 7);
 		//Número de página
-		$this->Cell(0,10, $config->application->name, 0, 0, 'C');
+		$this->writeCell(0,10, $config->application->name, 0, 0, 'C');
 
 		//Posición: a 1,5 cm del final
-		$this->SetY(-10);
+		$this->setY(-10);
 		//Arial italic 8
-		$this->SetFont('Arial', '', 8);
+		$this->setFont('Arial', '', 8);
 		//Número de página
-		$this->Cell(0,10,'-- '.$this->PageNo().' --', 0, 0, 'C');
+		$this->writeCell(0,10,'-- '.$this->PageNo().' --', 0, 0, 'C');
 
 	}
 
@@ -135,12 +135,12 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 	$pdf->lineFeed();
 
 	if($config->application->name){
-		$pdf->MultiCell(0, 6, strtoupper($config->application->name), 0, "C", 0);
+		$pdf->writeMultiCell(0, 6, strtoupper($config->application->name), 0, "C", 0);
 	}
-	$pdf->MultiCell(0, 6, "REPORTE DE ".strtoupper($title), 0, "C", 0);
+	$pdf->writeMultiCell(0, 6, "REPORTE DE ".strtoupper($title), 0, "C", 0);
 	$pdf->setFont('Verdana','', 12);
 	if(isset($_SESSION['fecsis'])){
-		$pdf->MultiCell(0, 6, "FECHA ".date("Y-m-d"), 0, "C", 0);
+		$pdf->writeMultiCell(0, 6, "FECHA ".date("Y-m-d"), 0, "C", 0);
 	}
 	$pdf->lineFeed();
 
@@ -159,7 +159,7 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 	$pos = floor(($widthPage/2)-($sumArray/2));
 	$pdf->setX($pos);
 	for($i=0;$i<=count($headerArray)-1;$i++){
-		$pdf->Cell($weightArray[$i],7,$headerArray[$i], 1, 0, 'C', 1);
+		$pdf->writeCell($weightArray[$i],7,$headerArray[$i], 1, 0, 'C', 1);
 	}
 	$pdf->lineFeed();
 
@@ -177,16 +177,16 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 	foreach($result as $row){
 		//$pdf->Cell(Ancho, Alto, contenido, ?, ?, Align)
 		if($n>$numRows||($p==1&&($n>$numRows-3))){
-			$pdf->AddPage($orientation);
-			$pdf->SetY(30);
-			$pdf->SetX($pos);
-			$pdf->SetFillColor(0xF2,0xF2, 0xF2);
-			$pdf->SetTextColor(0);
-			$pdf->SetDrawColor(0,0,0);
-			$pdf->SetLineWidth(.2);
-			$pdf->SetFont('Arial', 'B', 10);
+			$pdf->addPage($orientation);
+			$pdf->setY(30);
+			$pdf->setX($pos);
+			$pdf->setFillColor(0xF2, 0xF2, 0xF2);
+			$pdf->setTextColor(0);
+			$pdf->setDrawColor(0,0,0);
+			$pdf->setLineWidth(.2);
+			$pdf->setFont('Arial', 'B', 10);
 			for($i=0;$i<count($headerArray);$i++){
-				$pdf->Cell($weightArray[$i], 7, $headerArray[$i], 1, 0, 'C', 1);
+				$pdf->writeCell($weightArray[$i], 7, $headerArray[$i], 1, 0, 'C', 1);
 			}
 			$pdf->Ln();
 			$pdf->SetFillColor(224, 235, 255);
@@ -198,25 +198,24 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 		$pdf->SetX($pos);
 		for($i=0;$i<=count($row)-1;$i++){
 			if(is_numeric($row[$i])){
-				$pdf->Cell($weightArray[$i], 5, trim($row[$i]),'LRTB', 0, 'C');
+				$pdf->writeCell($weightArray[$i], 5, trim($row[$i]),'LRTB', 0, 'C');
 			} else {
-				$pdf->Cell($weightArray[$i], 5, trim($row[$i]),'LRTB', 0, 'L');
+				$pdf->writeCell($weightArray[$i], 5, trim($row[$i]),'LRTB', 0, 'L');
 			}
 		}
 		$n++;
 		$t++;
-		$pdf->Ln();
-
+		$pdf->lineFeed();
 	}
 
-	$pdf->SetX($pos);
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->SetFillColor(0xF2,0xF2, 0xF2);
-	$pdf->Cell($weightArray[0], 5, "TOTAL",'LRTB', 0, 'R');
-	$pdf->Cell($weightArray[1], 5, $t,'LRTB', 0, 'L');
+	$pdf->setX($pos);
+	$pdf->setFont('Arial', 'B', 7);
+	$pdf->setFillColor(0xF2,0xF2, 0xF2);
+	$pdf->writeCell($weightArray[0], 5, "TOTAL",'LRTB', 0, 'R');
+	$pdf->writeCell($weightArray[1], 5, $t,'LRTB', 0, 'L');
 
 	$file = md5(mt_rand(0, 10000));
-	$pdf->Output("public/temp/".$file .".pdf", 'F');
+	$pdf->outputDocument("public/temp/".$file .".pdf", 'F');
 	if(isset($raw_output)){
 		print "<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".pdf', null); </script>";
 	} else {

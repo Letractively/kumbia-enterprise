@@ -1279,8 +1279,6 @@ class PdfDocument {
 	 */
 	public function setFont($family, $style='', $size=0){
 
-		global $fpdf_charwidths;
-
 		$family = strtolower($family);
 		if($family==''){
 			$family = $this->_fontFamily;
@@ -1295,7 +1293,7 @@ class PdfDocument {
 		$style = strtoupper($style);
 		if(strpos($style,'U')!==false){
 			$this->_underline = true;
-			$style=str_replace('U','',$style);
+			$style=str_replace('U', '', $style);
 		} else {
 			$this->_underline = false;
 		}
@@ -1321,7 +1319,7 @@ class PdfDocument {
 						$file.=strtolower($style);
 					}
 					require $this->_getFontPath().$file.'.php';
-					if(!isset($fpdfCharWidths[$fontkey])){
+					if(!isset($pdfCharWidths[$fontkey])){
 						throw new PdfDocumentException('Could not include font metric file');
 					}
 				}
@@ -1332,7 +1330,7 @@ class PdfDocument {
 					'name' => self::$_coreFonts[$fontkey],
 					'up' => -100,
 					'ut' => 50,
-					'cw' => $fpdfCharWidths[$fontkey]
+					'cw' => $pdfCharWidths[$fontkey]
 				);
 			} else {
 				throw new PdfDocumentException('Undefined font: '.$family.' '.$style);
@@ -1540,7 +1538,7 @@ class PdfDocument {
 	 * @param string $align
 	 * @param integer $fill
 	 */
-	public function MultiCell($w, $h, $txt, $border=0,$align='J',$fill=0){
+	public function writeMultiCell($w, $h, $txt, $border=0, $align='J', $fill=0){
 		$cw = &$this->_currentFont['cw'];
 		if($w==0){
 			$w = $this->_width-$this->_rightMargin-$this->_x;
