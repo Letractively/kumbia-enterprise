@@ -102,6 +102,7 @@ abstract class Dispatcher {
 	 * Otros codigos de excepciones
 	 */
 	const INVALID_METHOD_CALLBACK = 104;
+	const INVALID_ARGUMENT_NUMBER = 105;
 
 	/**
 	 * Estados de Ejecucion de la Peticion
@@ -360,7 +361,7 @@ abstract class Dispatcher {
 						Router::routeTo('action: notFound', "id: $action");
 						return self::$_controller;
 					} else {
-						self::throwException("No se encontró la Acción \"{$action}\". Es necesario definir un m&eacute;todo en la clase
+						self::throwException("No se encontró la Acción \"{$action}\". Es necesario definir un método en la clase
 						 controladora '{$controller}' llamado '{$action}Action' para que
 						 esto funcione correctamente.", Dispatcher::NOT_FOUND_ACTION);
 					}
@@ -369,13 +370,13 @@ abstract class Dispatcher {
 				self::$_requestStatus = self::STATUS_RUNNING_CONTROLLER_ACTION;
 				$method = new ReflectionMethod($appController, $actionMethod);
 				if($method->isPublic()==false){
-					self::throwException("El m&eacute;todo de la acción '{$action}Action' debe ser declarado con visibilidad p&uacute;blica.", self::INVALID_METHOD_CALLBACK);
+					self::throwException("El método de la acción '{$action}Action' debe ser declarado con visibilidad pública.", self::INVALID_METHOD_CALLBACK);
 				}
 				$methodParameters = $method->getParameters();
 				$paramNumber = 0;
 				foreach($methodParameters as $methodParameter){
 					if($methodParameter->isOptional()==false&&!isset($parameters[$paramNumber])){
-						self::throwException("No se ha definido un valor para el par&aacute;metro '".$methodParameter->getName()."' de la acción '$action'");
+						self::throwException("No se ha definido un valor para el par&aacute;metro '".$methodParameter->getName()."' de la acción '$action'", self::INVALID_ARGUMENT_NUMBER);
 					}
 					$paramNumber++;
 				}
