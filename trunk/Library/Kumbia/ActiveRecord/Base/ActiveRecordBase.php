@@ -21,7 +21,7 @@
  * @copyright	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
  * @copyright	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
  * @license		New BSD License
- * @version 	$Id: ActiveRecordBase.php 139 2009-04-22 17:59:47Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**

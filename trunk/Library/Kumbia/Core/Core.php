@@ -18,7 +18,7 @@
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
  * @license		New BSD License
- * @version 	$Id: Core.php 142 2009-04-23 18:33:59Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**

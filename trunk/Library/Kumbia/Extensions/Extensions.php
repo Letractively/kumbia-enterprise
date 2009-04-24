@@ -18,7 +18,7 @@
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2008-2008 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
  * @license		New BSD License
- * @version 	$Id: Extensions.php 135 2009-04-16 11:06:19Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**
