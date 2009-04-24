@@ -174,6 +174,8 @@ abstract class CoreClassPath {
 		'Traslate' => 'Traslate/Traslate',
 		'View' => 'View/View',
 		'ViewException' => 'View/ViewException',
+		'Validation' => 'Validation/Validation',
+		'ValidationException' => 'Validation/ValidationException',
 		'ValidationMessage' => 'Validation/ValidationMessage',
 		'WebServiceController' => 'Controller/WebService/WebServiceController',
 		'WebServiceClient' => 'Soap/Client/WebServiceClient',
