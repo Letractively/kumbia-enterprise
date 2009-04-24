@@ -162,7 +162,7 @@ class DbPdoMsSQL extends DbPDO {
 	public function createTable($table, $definition, $index=array()){
 		$create_sql = "CREATE TABLE $table (";
 		if(!is_array($definition)){
-			new DbException("Definici&oacute;n invalida para crear la tabla '$table'");
+			new DbException("Definición invalida para crear la tabla '$table'");
 			return false;
 		}
 		$create_lines = array();

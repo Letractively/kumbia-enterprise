@@ -114,7 +114,7 @@ abstract class ActiveRecordMetaData extends Object {
 	static private $_modelsDatesIn = array();
 
 	/**
-	 * Escribe en la ruta de sesi&oacute;n asignada al modelo
+	 * Escribe en la ruta de sesión asignada al modelo
 	 *
 	 * @access private
 	 * @param string $schema

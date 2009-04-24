@@ -189,7 +189,7 @@ class ControllerBase {
 	 */
 	public static function createApplication($name){
 		if(file_exists("apps/$name")){
-			throw new ComponentBuilderException("La aplicaci&oacute;n '$name 'ya existe");
+			throw new ComponentBuilderException("La aplicación '$name 'ya existe");
 		}
 		@mkdir("apps/$name");
 		@mkdir("apps/$name/controllers");

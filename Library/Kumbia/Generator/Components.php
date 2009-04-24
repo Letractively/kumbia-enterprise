@@ -100,7 +100,7 @@ abstract class Component {
 				}
 			}
 
-			//Validaciones JavaScript Dominio de Valores >7 &oacute; <15
+			//Validaciones JavaScript Dominio de Valores >7 ó <15
 			$validation = "";
 
 			//Numerico
@@ -243,7 +243,7 @@ abstract class Component {
 			}
 		}
 
-		//Validaci&oacute;n contra el Motor de Base de Datos
+		//Validación contra el Motor de Base de Datos
 		$validation.="checkValueIn(\"$name\", \"".$com['foreignTable']."\", \"".$com['messageError']."\", \"".$com['detailField']."\", \"{$com['useHelper']}\", \"{$com['column_relation']}\"); ";
 
 		//Validaciones otras

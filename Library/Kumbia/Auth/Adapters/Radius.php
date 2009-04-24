@@ -104,14 +104,14 @@ class RadiusAuth implements AuthInterface {
 	public function __construct($auth, $extraArgs){
 
 		if(!extension_loaded("radius")){
-			throw new AuthException("Debe cargar la extensi&oacute;n de php llamada radius");
+			throw new AuthException("Debe cargar la extensión de php llamada radius");
 		}
 
 		foreach(array('server', 'secret') as $param){
 			if(isset($extraArgs[$param])){
 				$this->$param = $extraArgs[$param];
 			} else {
-				throw new AuthException("Debe especificar el parametro '$param' en los par&aacute;metros");
+				throw new AuthException("Debe especificar el parámetro '$param' en los parámetros");
 			}
 		}
 

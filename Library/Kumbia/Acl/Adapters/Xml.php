@@ -133,7 +133,7 @@ class AclXml implements AclAdapter {
 			if(isset($accessConstraint->{"action-name"})){
 				$actionName = (string) $accessConstraint->{"action-name"};
 			} else {
-				//El constraint de la lista de acceso No. $n no ha definido la acci&oacute;n a aplicar
+				//El constraint de la lista de acceso No. $n no ha definido la acción a aplicar
 				$message = CoreLocale::getErrorMessage(-35, $n);
 				throw new AclException($message, -35);
 			}

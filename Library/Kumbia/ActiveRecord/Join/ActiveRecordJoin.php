@@ -75,7 +75,7 @@ class ActiveRecordJoin extends Object {
 				foreach($params['groupFields'] as $alias => $field){
 					if(preg_match('/\{\#([a-zA-Z0-9\_]+)\}/', $field, $regs)){
 						if(!isset($entitiesSources[$regs[1]])){
-							throw new ActiveRecordException("La entidad '{$regs[1]}' en los campos solicitados no se encontr&oacute; en la lista de entidades a agrupar");
+							throw new ActiveRecordException("La entidad '{$regs[1]}' en los campos solicitados no se encontró en la lista de entidades a agrupar");
 						} else {
 							$sqlField = str_replace($regs[0], $entitiesSources[$regs[1]], $field);
 							if(!is_numeric($alias)){
@@ -108,7 +108,7 @@ class ActiveRecordJoin extends Object {
 						$replacedField = $field;
 						while(preg_match('/\{\#([a-zA-Z0-9\_]+)\}/', $replacedField, $regs)){
 							if(!isset($entitiesSources[$regs[1]])){
-								throw new ActiveRecordException("La entidad '{$regs[1]}' en los campos solicitados no se encontr&oacute; en la lista de entidades con acumulado de sumatoria");
+								throw new ActiveRecordException("La entidad '{$regs[1]}' en los campos solicitados no se encontró en la lista de entidades con acumulado de sumatoria");
 							} else {
 								$replacedField = str_replace($regs[0], $entitiesSources[$regs[1]], $replacedField);
 								if(is_numeric($alias)){
@@ -139,7 +139,7 @@ class ActiveRecordJoin extends Object {
 				foreach($params['fields'] as $alias => $field){
 					if(preg_match('/\{\#([a-zA-Z0-9]+)\}/', $field, $regs)){
 						if(!in_array($regs[1], $params['entities'])){
-							throw new ActiveRecordException("La entidad '{$regs[1]}' en los campos solicitados no se encontr&oacute; en la lista de entidades");
+							throw new ActiveRecordException("La entidad '{$regs[1]}' en los campos solicitados no se encontró en la lista de entidades");
 	 					} else {
 	 						if(is_numeric($alias)){
 	 							$requestedFields[] = str_replace($regs[0], $entitiesSources[$regs[1]], $field);

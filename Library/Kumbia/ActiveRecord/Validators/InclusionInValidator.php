@@ -41,10 +41,10 @@ class InclusionInValidator extends ActiveRecordValidator implements ActiveRecord
 	 */
 	public function checkOptions(){
 		if(!$this->isSetOption('domain')){
-			throw new ActiveRecordValidatorException("El Validador InclusionIn requiere que indique la lista de opciones de inclusi&oacute;n");
+			throw new ActiveRecordValidatorException("El Validador InclusionIn requiere que indique la lista de opciones de inclusión");
 		}
 		if(!is_array($this->getOption('domain'))){
-			throw new ActiveRecordValidatorException("La lista de comparaci&oacute;n debe ser un vector en InclusionInValidator");
+			throw new ActiveRecordValidatorException("La lista de comparación debe ser un vector en InclusionInValidator");
 		}
 	}
 

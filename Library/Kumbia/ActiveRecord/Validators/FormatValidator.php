@@ -42,7 +42,7 @@ class FormatValidator extends ActiveRecordValidator implements ActiveRecordValid
 	 */
 	public function checkOptions(){
 		if($this->isSetOption('format')==false){
-			throw new ActiveRecordValidatorException("El Validador Format requiere que indique la expres&oacute;nn regular (Perl-Compatible)");
+			throw new ActiveRecordValidatorException("El Validador Format requiere que indique la expresión regular (Perl-Compatible)");
 		}
 	}
 

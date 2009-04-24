@@ -408,7 +408,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Vuelca la informaci&oacute;n de la tabla $table en la base de datos
+	 * Vuelca la información de la tabla $table en la base de datos
 	 * para crear los atributos y meta-data del ActiveRecord
 	 *
 	 * @access protected
@@ -454,7 +454,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Elimina la informaci&oacute;n de cache del objeto y hace que sea cargada en la proxima operaci&oacute;n
+	 * Elimina la información de cache del objeto y hace que sea cargada en la proxima operación
 	 *
 	 * @access public
 	 */
@@ -738,7 +738,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	public function findForUpdate($params=''){
 		$this->_connect();
 		if($this->_db->isUnderTransaction()==false){
-			throw new ActiveRecordException('No se puede hacer el findForUpdate mientras no este bajo una transacci&oacute;n');
+			throw new ActiveRecordException('No se puede hacer el findForUpdate mientras no este bajo una transacción');
 		}
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
@@ -759,7 +759,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	public function findWithSharedLock($params=''){
 		$this->_connect();
 		if($this->_db->isUnderTransaction()==false){
-			throw new ActiveRecordException('No se puede hacer el findWithSharedLock mientras no este bajo una transacci&oacute;n');
+			throw new ActiveRecordException('No se puede hacer el findWithSharedLock mientras no este bajo una transacción');
 		}
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
@@ -1285,7 +1285,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Agrega un mensaje a la lista de errores de validaci&oacute;n
+	 * Agrega un mensaje a la lista de errores de validación
 	 *
 	 * @param string $field
 	 * @param string $message
@@ -1546,7 +1546,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 						if(isset($this->$k)){
 							$this->$k = $r;
 						} else {
-							throw new ActiveRecordException("No existe el Atributo '$k' en la entidad '{$this->_source}' al ejecutar la inserci&oacute;n");
+							throw new ActiveRecordException("No existe el Atributo '$k' en la entidad '{$this->_source}' al ejecutar la inserción");
 						}
 					}
 					if($primaryKeys[0]=='id'){
@@ -1572,7 +1572,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			}
 		} else {
 			if($values!==''){
-				throw new ActiveRecordException("Parámetro incompatible en acci&oacute;n 'create'. No se pudo crear ningun registro");
+				throw new ActiveRecordException("Parámetro incompatible en acción 'create'. No se pudo crear ningun registro");
 			} else {
 				//Detectar campo autonumerico
 				if($primaryKeys[0]=='id'){
@@ -2260,7 +2260,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			}
 		}
 		if(!class_exists($className)){
-			throw new ActiveRecordException("No se encontr&oacute; el validador de entidades '$className'");
+			throw new ActiveRecordException("No se encontró el validador de entidades '$className'");
 		}
 		if(!in_array('ActiveRecordValidatorInterface', class_implements($className))){
 			throw new ActiveRecordException("La clase validador '$className' debe implementar la interface ActiveRecordValidatorInteface");
@@ -2456,7 +2456,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				try {
 					$reflectorProperty = new ReflectionProperty(get_class($this), $property);
 					if($reflectorProperty->isPublic()==false){
-						throw new ActiveRecordException("Propiedad protegida &oacute; privada '$property' leida de el modelo '$this->_source' ");
+						throw new ActiveRecordException("Propiedad protegida ó privada '$property' leida de el modelo '$this->_source' ");
 					}
 				}
 				catch(Exception $e){
@@ -2543,7 +2543,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				return EntityManager::getHasOneRecords($entityName, $requestedRelation, $this);
 			}
 		}
-		throw new ActiveRecordException("No se encontr&oacute; el m&eacute;todo '$method' en el modelo '".get_class($this)."'");
+		throw new ActiveRecordException("No se encontró el método '$method' en el modelo '".get_class($this)."'");
 
 		/*
 		if(array_key_exists($mmodel, $this->_hasAndBelongsToMany)) {

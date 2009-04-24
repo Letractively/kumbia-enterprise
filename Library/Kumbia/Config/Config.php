@@ -72,7 +72,7 @@ class Config extends Object {
 		}
 		$config = new Config();
 		if(Core::fileExists($file)==false){
-			throw new ConfigException("No existe el archivo de configuraci&oacute;n $file");
+			throw new ConfigException("No existe el archivo de configuración $file");
 		}
 		$iniSettings = @parse_ini_file(Core::getFilePath($file), true);
 		foreach($iniSettings as $conf => $value){

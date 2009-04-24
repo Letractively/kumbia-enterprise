@@ -130,7 +130,7 @@ class CoreException extends Exception {
 						<thead>
 							<th>#</th>
 							<th>Valor</th>
-							<th>M&eacute;todo/Funci&oacute;n</th>
+							<th>M&eacute;todo/Función</th>
 							<th>L&iacute;nea</th>
 							<th>Archivo</th>
 							<th>Tiempo</th>
@@ -202,7 +202,7 @@ class CoreException extends Exception {
 						if(strpos($trace['file'], "apps")){
 							$file = $trace['file'];
 							$line = $trace['line'];
-							print "</pre><strong>La excepci&oacute;n se ha generado en el archivo '$rfile' en la l&iacute;nea '$line':</strong><br>";
+							print "</pre><strong>La excepción se ha generado en el archivo '$rfile' en la l&iacute;nea '$line':</strong><br>";
 							print "<div style='color: #000000; margin: 10px; border: 1px solid #333333; background: #FFFFFF; padding:0px'><table cellspacing='0' cellpadding='0' width='100%'>";
 							$lines = file($file);
 							$eline = $line;
@@ -293,15 +293,15 @@ class CoreException extends Exception {
 				}
 
 				print "<div style='font-size:12px; margin: 0px 15px 0px 15px; padding: 5px; border:1px solid #969696; background: #f2f2f2;' align='left'>";
-				print "<i><strong>Informaci&oacute;n Adicional:</strong></i><br>";
+				print "<i><strong>Información Adicional:</strong></i><br>";
 				print "<div style='padding: 5px'>";
-				print "<strong>Versi&oacute;n Framework:</strong> ".Core::FRAMEWORK_VERSION."<br>";
+				print "<strong>Versión Framework:</strong> ".Core::FRAMEWORK_VERSION."<br>";
 				print "<strong>Nombre de la Instancia:</strong> ".$instanceName."<br>";
 				print "<strong>Fecha del Sistema:</strong> ".date("r")."<br>";
-				print "<strong>Aplicaci&oacute;n actual:</strong> ".Core::getActiveApplication()."<br>";
+				print "<strong>Aplicación actual:</strong> ".Core::getActiveApplication()."<br>";
 				print "<strong>Entorno actual:</strong> ".$config->application->mode."<br>";
 				$url = Router::getApplication()."/".Router::getController()."/".Router::getAction();
-				print "<strong>Ubicaci&oacute;n actual:</strong> ".$url."<br>";
+				print "<strong>Ubicación actual:</strong> ".$url."<br>";
 				print "<strong>Modelos Cargados:</strong> ".join(", ", array_keys(EntityManager::getEntities()))."<br>";
 				if(isset($_SESSION['KMOD'][$instanceName][$active_app])){
 					print "<strong>Modulos Cargados:</strong> ".join(", ", $_SESSION['KMOD'][$instanceName][$active_app])."<br>";
@@ -318,7 +318,7 @@ class CoreException extends Exception {
 				}
 				print "<strong>Memoria Utilizada:</strong> ".(Helpers::toHuman(memory_get_peak_usage(true)))."<br>";
 				print "<strong>Memoria Actual:</strong> ".(Helpers::toHuman(memory_get_usage()))."<br>";
-				print "<strong>Tiempo empleado para atender la petici&oacute;n:</strong> ".(round($requestTime-$_SERVER['REQUEST_TIME'], 3))." segs <br>";
+				print "<strong>Tiempo empleado para atender la petición:</strong> ".(round($requestTime-$_SERVER['REQUEST_TIME'], 3))." segs <br>";
 				print "</div></div>";
 			} else {
 				$traceback = $this->getTrace();

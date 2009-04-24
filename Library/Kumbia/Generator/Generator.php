@@ -60,7 +60,7 @@ abstract class Generator {
 
 	/**
 	 * Obtiene el tipo de explorador usado por el cliente
-	 * de la aplicaci&oacute;n
+	 * de la aplicación
 	 *
 	 * @return string
 	 */
@@ -92,7 +92,7 @@ abstract class Generator {
 	}
 
 	/**
-	 * Vuelca la informaci&oacute;n de la tabla para construir el array
+	 * Vuelca la información de la tabla para construir el array
 	 * interno que luego sirve para construir el formulario
 	 *
 	 * @param array $form
@@ -251,7 +251,7 @@ abstract class Generator {
 	}
 
 	/**
-	 * Genera informaci&oacute;n importante para la construcci&oacute;n del formulario
+	 * Genera información importante para la construcción del formulario
 	 *
 	 * @param mixed $form
 	 * @param boolean $scaffold
@@ -333,7 +333,7 @@ abstract class Generator {
 		}
 
 		if(!$form['components']){
-			throw new StandardFormException("No se pudo cargar la informaci&oacute;n de la relaci&oacute;n '{$form['source']}'</span><br>Verifique que la entidad exista en la base de datos actual &oacute; que los par&aacute;metros se&aacute;n correctos");
+			throw new StandardFormException("No se pudo cargar la información de la relación '{$form['source']}'</span><br>Verifique que la entidad exista en la base de datos actual ó que los par&aacute;metros se&aacute;n correctos");
 			return;
 		}
 

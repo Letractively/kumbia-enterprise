@@ -62,7 +62,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	private $_pdoStatement;
 
 	/**
-	 * DSN de conexi&oacute;n
+	 * DSN de conexión
 	 *
 	 * @var string
 	 */
@@ -133,7 +133,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	const ISOLATION_SERIALIZABLE = 4;
 
 	/**
-	 * Hace una conexi&oacute;n a la base de datos con PDO
+	 * Hace una conexión a la base de datos con PDO
 	 *
 	 * @param string $dbdsn
 	 * @param string $dbUser
@@ -143,7 +143,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	public function connect($descriptor){
 
 		if(!extension_loaded('pdo')){
-			throw new DbException('Debe cargar la extensi&oacute;n de PHP llamada php_pdo');
+			throw new DbException('Debe cargar la extensión de PHP llamada php_pdo');
 		}
 
 		$username = isset($descriptor->username) ? $descriptor->username : null;
@@ -153,7 +153,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 		try {
 			$this->_pdo = new PDO($dsn, $username, $password);
 			if(!$this->_pdo){
-				throw new DbException('No se pudo realizar la conexion con '.$this->_dbRBDM, 0, false);
+				throw new DbException('No se pudo realizar la conexión con '.$this->_dbRBDM, 0, false);
 			}
 			if($this->_dbRBDM!='odbc'){
 				$this->_pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -179,7 +179,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 */
 	public function query($sqlQuery){
 		if(!$this->_pdo){
-			throw new DbException("No hay conexi&oacute;n para realizar esta acci&oacute;n:", 0);
+			throw new DbException("No hay conexión para realizar esta acción:", 0);
 		}
 		parent::beforeQuery($sqlQuery);
 		$this->_lastQuery = $sqlQuery;
@@ -221,7 +221,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 */
 	public function exec($sqlQuery){
 		if(!$this->_pdo){
-			throw new DbException("No hay conexi&oacute;n para realizar esta acci&oacute;n:", 0);
+			throw new DbException("No hay conexión para realizar esta acción:", 0);
 		}
 		parent::beforeQuery($sqlQuery);
 		$this->_lastQuery = $sqlQuery;
@@ -276,7 +276,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 */
 	public function fetchArray($pdoStatement=''){
 		if(!$this->_pdo){
-			throw new DbException("No hay conexi&oacute;n para realizar esta acci&oacute;n:", 0, true, $this);
+			throw new DbException("No hay conexión para realizar esta acción:", 0, true, $this);
 		}
 		if(!$pdoStatement){
 			$pdoStatement = $this->_pdoStatement;
@@ -344,7 +344,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 */
 	public function fieldName($number, $pdoStatement=''){
 		if(!$this->_pdo){
-			throw new DbException("No hay conexi&oacute;n para realizar esta acci&oacute;n:", 0, true, $this);
+			throw new DbException("No hay conexión para realizar esta acción:", 0, true, $this);
 		}
 		if(!$pdoStatement){
 			$pdoStatement = $this->_pdoStatement;
@@ -387,7 +387,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 */
 	public function affectedRows($pdoStatement=''){
 		if(!$this->_pdo){
-			throw new DbException("No hay conexi&oacute;n para realizar esta acci&oacute;n:", 0);
+			throw new DbException("No hay conexión para realizar esta acción:", 0);
 		}
 		if($pdoStatement){
 			try {
@@ -450,7 +450,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	}
 
 	/**
-	 * Inicia una transacci&oacute;n si es posible
+	 * Inicia una transacción si es posible
 	 *
 	 * @access public
 	 * @return boolean
@@ -462,7 +462,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	}
 
 	/**
-	 * Cancela una transacci&oacute;n si es posible
+	 * Cancela una transacción si es posible
 	 *
 	 * @access public
 	 * @return boolean
@@ -478,7 +478,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	}
 
 	/**
-	 * Hace commit sobre una transacci&oacute;n si es posible
+	 * Hace commit sobre una transacción si es posible
 	 *
 	 * @access public
 	 * @return boolean
@@ -511,7 +511,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	}
 
 	/**
-	 * Realiza una inserci&oacute;n
+	 * Realiza una inserción
 	 *
 	 * @access public
 	 * @param string $table
@@ -522,11 +522,11 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	public function insert($table, $values, $fields=null, $automaticQuotes=false){
 		$insertSQL = "";
 		if($this->isReadOnly()==true){
-			throw new DbException("No se puede efectuar la operaci&oacute;n. La transacci&oacute;n es de solo lectura");
+			throw new DbException("No se puede efectuar la operación. La transacción es de solo lectura");
 		}
 		if(is_array($values)==true){
 			if(count($values)==0){
-				throw new DbException("Imposible realizar inserci&oacute;n en '$table'' sin datos");
+				throw new DbException("Imposible realizar inserción en '$table'' sin datos");
 			} else {
 				if($automaticQuotes==true){
 					foreach($values as $key => $value){
@@ -560,7 +560,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 */
 	public function update($table, $fields, $values, $whereCondition=null, $automaticQuotes=false){
 		if($this->isReadOnly()==true){
-			throw new DbException("No se puede efectuar la operaci&oacute;n. La transacci&oacute;n es de solo lectura", 0, true, $this);
+			throw new DbException("No se puede efectuar la operación. La transacción es de solo lectura", 0, true, $this);
 		}
 		$updateSql = 'UPDATE '.$table.' SET ';
 		if(count($fields)!=count($values)){

@@ -177,7 +177,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			$this->_lastResultQuery = false;
 			$errorCode = $this->noError($resultQuery);
 			$errorMessage = $this->error($php_errormsg);
-			$errorMessage = "\"$errorMessage\" al ejecutar \"$sqlQuery\"  en la conexi&oacute;n ".$this->_idConnection;
+			$errorMessage = "\"$errorMessage\" al ejecutar \"$sqlQuery\"  en la conexión ".$this->_idConnection;
 			switch($errorCode){
 				case 6550:
 				case 907:
@@ -439,7 +439,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Cancela una transacci&oacute;n si es posible
+	 * Cancela una transacción si es posible
 	 *
 	 * @access public
 	 * @return boolean
@@ -451,13 +451,13 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			return oci_rollback($this->_idConnection);
 		} else {
 			if($this->_autoCommit==false){
-				throw new DbException("No hay una transacci&oacute;n activa en la conexi&oacute;n al gestor relacional", 0, true, $this);
+				throw new DbException("No hay una transacción activa en la conexión al gestor relacional", 0, true, $this);
 			}
 		}
 	}
 
 	/**
-	 * Hace commit sobre una transacci&oacute;n si es posible
+	 * Hace commit sobre una transacción si es posible
 	 *
 	 * @access public
 	 * @return boolean
@@ -469,7 +469,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			return oci_commit($this->_idConnection);
 		} else {
 			if($this->_autoCommit==false){
-				throw new DbException("No hay una transacci&oacute;n activa en la conexi&oacute;n al gestor relacional", 0, true, $this);
+				throw new DbException("No hay una transacción activa en la conexión al gestor relacional", 0, true, $this);
 			}
 		}
 	}
@@ -557,7 +557,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	public function createTable($table, $definition, $index=array(), $tableOptions=array()){
 		$create_sql = "CREATE TABLE $table (";
 		if(!is_array($definition)){
-			new DbException("Definici&oacute;n invalida para crear la tabla '$table'");
+			new DbException("Definición invalida para crear la tabla '$table'");
 			return false;
 		}
 		$create_lines = array();

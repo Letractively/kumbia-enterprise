@@ -78,14 +78,14 @@ class Kerberos5Auth implements AuthInterface {
 	public function __construct($auth, $extraArgs){
 
 		if(!extension_loaded("kadm5")){
-			throw new AuthException("Debe cargar la extensi&oacute;n de php llamada kadm5");
+			throw new AuthException("Debe cargar la extensión de php llamada kadm5");
 		}
 
 		foreach(array('server', 'realm', 'principal', 'password') as $param){
 			if(isset($extraArgs[$param])){
 				$this->$param = $extraArgs[$param];
 			} else {
-				throw new AuthException("Debe especificar el parametro '$param' en los par&aacute;metros");
+				throw new AuthException("Debe especificar el parámetro '$param' en los par&aacute;metros");
 			}
 		}
 	}

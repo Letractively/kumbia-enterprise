@@ -114,7 +114,7 @@ class DbMySQLi extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Hace una conexi&oacute;n a la base de datos de MySQL
+	 * Hace una conexión a la base de datos de MySQL
 	 *
 	 * @param stdClass $descriptor
 	 * @return resource
@@ -215,7 +215,7 @@ class DbMySQLi extends DbBase implements DbBaseInterface  {
 			return $resultQuery;
 		} else {
 			$this->_lastResultQuery = false;
-			$errorMessage = $this->error(" al ejecutar <i>\"$sqlStatement\"</i> en la conexi&oacute;n \"".$this->getConnectionId(true)."\"");
+			$errorMessage = $this->error(" al ejecutar <i>\"$sqlStatement\"</i> en la conexión \"".$this->getConnectionId(true)."\"");
 			if($this->noError()==1205){
 				throw new DbLockAdquisitionException($errorMessage, $this->noError(), true, $this);
 			}
@@ -566,7 +566,7 @@ class DbMySQLi extends DbBase implements DbBaseInterface  {
 			$createSQL = "CREATE TABLE $table (";
 		}
 		if(is_array($definition)==false){
-			throw new DbException("Definici&oacute;n invalida para crear la tabla '$table'");
+			throw new DbException("Definición invalida para crear la tabla '$table'");
 			return false;
 		}
 		$createLines = array();

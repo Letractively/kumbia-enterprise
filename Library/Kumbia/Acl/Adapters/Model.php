@@ -216,7 +216,7 @@ class AclModel implements AclAdapter {
 	 * Agrega un recurso a la Lista ACL
 	 *
 	 * Resource_name puede ser el nombre de un objeto concreo, por ejemplo
-	 * consulta, buscar, insertar, valida etc &oacute; una lista de ellos
+	 * consulta, buscar, insertar, valida etc ó una lista de ellos
 	 *
 	 * Ej:
 	 * <code>

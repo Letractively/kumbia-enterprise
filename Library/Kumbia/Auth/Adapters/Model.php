@@ -85,11 +85,11 @@ class ModelAuth implements AuthInterface {
 			if(isset($extraArgs[$param])){
 				$this->$param = $extraArgs[$param];
 			} else {
-				throw new AuthException("Debe especificar el parametro '$param' en los par&aacute;metros");
+				throw new AuthException("Debe especificar el parámetro '$param' en los parámetros");
 			}
 		}
 		if(EntityManager::isEntity($extraArgs['class'])==false){
-			throw new AuthException("No existe el modelo '{$extraArgs['class']}' para realizar la autenticaci&oacute;n");
+			throw new AuthException("No existe el modelo '{$extraArgs['class']}' para realizar la autenticación");
 		}
 		unset($extraArgs[0]);
 		unset($extraArgs['class']);

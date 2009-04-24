@@ -312,7 +312,7 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-     * Indica si la petici&oacute;n se realizo usando AJAX de Prototype
+     * Indica si la petición se realizo usando AJAX de Prototype
      *
      * @return boolean
      */

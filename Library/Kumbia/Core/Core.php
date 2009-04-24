@@ -315,7 +315,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Funci&oacute;n Principal donde se inicia el flujo de ejecucion
+	 * Función Principal donde se inicia el flujo de ejecucion
 	 *
 	 * @access public
 	 * @return boolean
@@ -667,7 +667,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Metodo que muestra informaci&oacute;n del Framework y la licencia
+	 * Metodo que muestra información del Framework y la licencia
 	 *
 	 * @access public
 	 * @static
@@ -800,7 +800,7 @@ abstract class Core {
                 E_ERROR              => 'Error',
                 E_WARNING            => 'Warning',
                 E_PARSE              => 'Parsing Error',
-                E_NOTICE             => 'Notificaci&oacute;n',
+                E_NOTICE             => 'Notificación',
                 E_CORE_ERROR         => 'Core Error',
                 E_CORE_WARNING       => 'Core Warning',
                 E_COMPILE_ERROR      => 'Compile Error',

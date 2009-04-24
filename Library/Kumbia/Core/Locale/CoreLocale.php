@@ -48,7 +48,7 @@ class CoreLocale {
 		$errorCode = (int) $errorCode;
 		$config = CoreConfig::getInstanceConfig();
 		if(!isset($config->core->locale)){
-			throw new CoreLocaleException("No esta definida la localizaci&oacute;n en el archivo de configuraci&oacute;n de la instancia", -99);
+			throw new CoreLocaleException("No esta definida la localización en el archivo de configuración de la instancia", -99);
 		}
 		$language = substr($config->core->locale, 0, 2);
 		$messagesFile = "languages/$language/LC_MESSAGES/errorMessages.php";
