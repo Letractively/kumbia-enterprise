@@ -441,7 +441,21 @@ class PdfDocument {
 	private $_n;
 
 	/**
-	 * Fuentes del Nucleo del Componente
+	 * Indica si esta en modo debug
+	 *
+	 * @var boolean
+	 */
+	private $_debug = false;
+
+	/**
+	 * Códificación del documento
+	 *
+	 * @var int
+	 */
+	private $_encoding = 1;
+
+	/**
+	 * Fuentes del Núcleo del Componente
 	 *
 	 */
 	const FONT_TYPE_CORE = 0;
@@ -591,6 +605,24 @@ class PdfDocument {
 	const PAPER_LETTER = 5;
 
 	/**
+	 * Codificación ISO-8859-1
+	 *
+	 */
+	const ENC_ISO88591 = 1;
+
+	/**
+	 * Codificación UTF-8
+	 *
+	 */
+	const ENC_UTF8 = 2;
+
+	/**
+	 * Codificación Japonesa JP
+	 *
+	 */
+	const ENC_ISO2022JP = 3;
+
+	/**
 	 * Fuentes Estandar
 	 *
 	 * @var array
@@ -613,12 +645,12 @@ class PdfDocument {
 	);
 
 	/**
-	 * Constructor de la clase FPDF
+	 * Constructor de la clase PdfDocument
 	 *
-	 * @param string $orientation
-	 * @param string $unit
-	 * @param string $format
-	 * @return FPDF
+	 * @param int $orientation
+	 * @param int $unit
+	 * @param int $format
+	 * @return PdfDocument
 	 */
 	public function __construct($orientation=self::ORI_PORTRAIT, $unit=self::UNIT_MM, $format=self::PAPER_A4){
 		//Some checks
@@ -646,6 +678,7 @@ class PdfDocument {
 		$this->_textColor = '0 g';
 		$this->_colorFlag = false;
 		$this->_ws = 0;
+
 		//Scale factor
 		if($unit==self::UNIT_PT){
 			$this->_scaleFactor = 1;
@@ -732,6 +765,32 @@ class PdfDocument {
 		$this->_pdfVersion = '1.4';
 		//Set de font PATH
 		$this->_fontPath = 'Library/Kumbia/PdfDocument/Fonts/';
+	}
+
+	/**
+	 * Establece si el documento se genera el modo debug
+	 *
+	 * @param boolean $debug
+	 */
+	public function setDebug($debug){
+		$this->_debug = $debug;
+	}
+
+	/**
+	 * Establece la códificación de los textos recibidos
+	 *
+	 * @param int $encoding
+	 */
+	public function setEncoding($encoding){
+		switch($encoding){
+			case self::ENC_ISO88591:
+			case self::ENC_UTF8:
+			case self::ENC_ISO2022JP:
+				break;
+			default:
+				throw new PdfDocumentException('Tipo de Codificación incorrecta');
+		}
+		$this->_encoding = $encoding;
 	}
 
 	/**
@@ -1010,7 +1069,7 @@ class PdfDocument {
 	 *
 	 * @return integer
 	 */
-	public function PageNo(){
+	public function getPageNumber(){
 		return $this->_activePage;
 	}
 
@@ -1100,9 +1159,9 @@ class PdfDocument {
 	/**
 	 * Establece el color para las operaciones de relleno
 	 *
-	 * @param integer $r
-	 * @param integer $g
-	 * @param integer $b
+	 * @param integer $red
+	 * @param integer $green
+	 * @param integer $blue
 	 */
 	public function setFillColor($red, $green=-1, $blue=-1){
 		if($red instanceof PdfColor){
@@ -1119,23 +1178,27 @@ class PdfDocument {
 		if($this->_activePage>0){
 			$this->_out($this->_fillColor);
 		}
-
 	}
 
 	/**
 	 * Set color for text
 	 *
-	 * @param integer $r
-	 * @param integer $g
-	 * @param integer $b
+	 * @param integer $red
+	 * @param integer $green
+	 * @param integer $blue
 	 */
-	public function setTextColor($r,$g=-1,$b=-1){
-		if(($r==0 && $g==0 && $b==0) || $g==-1){
-			$this->_textColor=sprintf('%.3f g',$r/255);
+	public function setTextColor($red, $green=-1, $blue=-1){
+		if($red instanceof PdfColor){
+			$color = $red;
+			$this->_textColor = sprintf('%.3f %.3f %.3f rg', $color->getRed(), $color->getGreen(), $color->getBlue());
 		} else {
-			$this->_textColor=sprintf('%.3f %.3f %.3f rg',$r/255,$g/255,$b/255);
+			if(($red==0 && $green==0 && $blue==0) || $green==-1){
+				$this->_textColor = sprintf('%.3f g', $red/255);
+			} else {
+				$this->_textColor = sprintf('%.3f %.3f %.3f rg', $red/255, $green/255, $blue/255);
+			}
 		}
-		$this->_colorFlag=($this->_fillColor!=$this->_textColor);
+		$this->_colorFlag = ($this->_fillColor!=$this->_textColor);
 	}
 
 	/**
@@ -1175,7 +1238,7 @@ class PdfDocument {
 	 * @param integer $x2
 	 * @param integer $y2
 	 */
-	public function Line($x1, $y1, $x2, $y2){
+	public function drawLine($x1, $y1, $x2, $y2){
 		$this->_out(sprintf('%.2f %.2f m %.2f %.2f l S',$x1*$this->_scaleFactor,($this->_height-$y1)*$this->_scaleFactor,$x2*$this->_scaleFactor,($this->_height-$y2)*$this->_scaleFactor));
 	}
 
@@ -1188,7 +1251,7 @@ class PdfDocument {
 	 * @param integer $h
 	 * @param string $style
 	 */
-	public function Rect($x,$y,$w,$h,$style=''){
+	public function drawRect($x, $y, $w, $h, $style=''){
 		if($style=='F'){
 			$op='f';
 		} else {
@@ -1453,11 +1516,11 @@ class PdfDocument {
 				$this->_ws = 0;
 				$this->_out('0 Tw');
 			}
-			$this->AddPage($this->_currentOrientation);
+			$this->addPage($this->_currentOrientation);
 			$this->_x = $x;
 			if($ws>0){
 				$this->_ws = $ws;
-				$this->_out(sprintf('%.3f Tw',$ws*$k));
+				$this->_out(sprintf('%.3f Tw', $ws*$k));
 			}
 		}
 		if($w==0){
@@ -1475,36 +1538,37 @@ class PdfDocument {
 		if(is_string($border)){
 			$x = $this->_x;
 			$y = $this->_y;
-			if(strpos($border,'L')!==false){
+			if(strpos($border, 'L')!==false){
 				$s.=sprintf('%.2f %.2f m %.2f %.2f l S ',$x*$k,($this->_height-$y)*$k,$x*$k,($this->_height-($y+$h))*$k);
 			}
-			if(strpos($border,'T')!==false){
+			if(strpos($border, 'T')!==false){
 				$s.=sprintf('%.2f %.2f m %.2f %.2f l S ',$x*$k,($this->_height-$y)*$k,($x+$w)*$k,($this->_height-$y)*$k);
 			}
-			if(strpos($border,'R')!==false){
+			if(strpos($border, 'R')!==false){
 				$s.=sprintf('%.2f %.2f m %.2f %.2f l S ',($x+$w)*$k,($this->_height-$y)*$k,($x+$w)*$k,($this->_height-($y+$h))*$k);
 			}
-			if(strpos($border,'B')!==false){
+			if(strpos($border, 'B')!==false){
 				$s.=sprintf('%.2f %.2f m %.2f %.2f l S ',$x*$k,($this->_height-($y+$h))*$k,($x+$w)*$k,($this->_height-($y+$h))*$k);
 			}
 		}
 		if($txt!==''){
-			if($align=='R'){
+			if($align==self::ALIGN_RIGHT){
 				$dx = $w-$this->_cellMargin-$this->GetStringWidth($txt);
 			} else {
-				if($align=='C'){
+				if($align==self::ALIGN_CENTER){
 					$dx = ($w-$this->GetStringWidth($txt))/2;
 				} else {
 					$dx = $this->_cellMargin;
 				}
 			}
+			$txt = $this->_getEncodedString($txt);
 			if($this->_colorFlag){
-				$s.='q '.$this->_textColor.' ';
-				$txt2=str_replace(')','\\)',str_replace('(','\\(',str_replace('\\','\\\\',$txt)));
-				$s.=sprintf('BT %.2f %.2f Td (%s) Tj ET',($this->_x+$dx)*$k,($this->_height-($this->_y+.5*$h+.3*$this->_fontSize))*$k,$txt2);
+				$s.= 'q '.$this->_textColor.' ';
+				$txt2 = str_replace(')','\\)',str_replace('(','\\(',str_replace('\\','\\\\',$txt)));
+				$s.= sprintf('BT %.2f %.2f Td (%s) Tj ET',($this->_x+$dx)*$k,($this->_height-($this->_y+.5*$h+.3*$this->_fontSize))*$k,$txt2);
 			}
 			if($this->_underline){
-				$s.=' '.$this->_dounderline($this->_x+$dx,$this->_y+.5*$h+.3*$this->_fontSize,$txt);
+				$s.=' '.$this->_doUnderline($this->_x+$dx, $this->_y+.5*$h+.3*$this->_fontSize, $txt);
 			}
 			if($this->_colorFlag){
 				$s.=' Q';
@@ -1529,6 +1593,23 @@ class PdfDocument {
 	}
 
 	/**
+	 * Devuelve una cadena codificada en ISO8859-1
+	 *
+	 * @param string $txt
+	 * @return string
+	 */
+	private function _getEncodedString($txt){
+		if($this->_encoding==self::ENC_ISO88591){
+			return utf8_encode($txt);
+		} else {
+			if($this->_encoding==self::ENC_UTF8){
+				return utf8_decode($txt);
+			}
+		}
+		return $txt;
+	}
+
+	/**
 	 * Output text with automatic or explicit line breaks
 	 *
 	 * @param integer $w
@@ -1538,18 +1619,18 @@ class PdfDocument {
 	 * @param string $align
 	 * @param integer $fill
 	 */
-	public function writeMultiCell($w, $h, $txt, $border=0, $align='J', $fill=0){
+	public function writeMultiCell($w, $h, $txt, $border=0, $align=self::ALIGN_JUSTIFY, $fill=0){
 		$cw = &$this->_currentFont['cw'];
 		if($w==0){
 			$w = $this->_width-$this->_rightMargin-$this->_x;
 		}
 		$wmax = ($w-2*$this->_cellMargin)*1000/$this->_fontSize;
-		$s = str_replace("\r",'',$txt);
+		$s = str_replace("\r", '', $txt);
 		$nb = strlen($s);
 		if($nb>0 && $s[$nb-1]=="\n"){
 			$nb--;
 		}
-		$b=0;
+		$b = 0;
 		if($border){
 			if($border==1){
 				$border = 'LTRB';
@@ -1557,13 +1638,13 @@ class PdfDocument {
 				$b2 = 'LR';
 			} else {
 				$b2 = '';
-				if(strpos($border,'L')!==false){
+				if(strpos($border, 'L')!==false){
 					$b2.='L';
 				}
-				if(strpos($border,'R')!==false){
+				if(strpos($border, 'R')!==false){
 					$b2.='R';
 				}
-				$b = (strpos($border,'T')!==false) ? $b2.'T' : $b2;
+				$b = (strpos($border, 'T')!==false) ? $b2.'T' : $b2;
 			}
 		}
 		$sep =-1;
@@ -1606,13 +1687,13 @@ class PdfDocument {
 						$i++;
 					}
 					if($this->_ws>0){
-						$this->_ws=0;
+						$this->_ws = 0;
 						$this->_out('0 Tw');
 					}
-					$this->writeCell($w,$h,substr($s,$j,$i-$j),$b,2,$align,$fill);
+					$this->writeCell($w, $h, substr($s, $j, $i-$j), $b, 2, $align, $fill);
 				} else {
-					if($align=='J'){
-						$this->_ws=($ns>1) ? ($wmax-$ls)/1000*$this->_fontSize/($ns-1) : 0;
+					if($align==self::ALIGN_JUSTIFY){
+						$this->_ws = ($ns>1) ? ($wmax-$ls)/1000*$this->_fontSize/($ns-1) : 0;
 						$this->_out(sprintf('%.3f Tw',$this->_ws*$this->_scaleFactor));
 					}
 					$this->writeCell($w, $h, substr($s, $j, $sep-$j), $b, 2, $align, $fill);
@@ -1701,11 +1782,11 @@ class PdfDocument {
 					$this->writeCell($w,$h,substr($s,$j,$i-$j),0,2,'',0,$link);
 				} else {
 					$this->writeCell($w,$h,substr($s,$j,$sep-$j),0,2,'',0,$link);
-					$i=$sep+1;
+					$i = $sep+1;
 				}
 				$sep=-1;
-				$j=$i;
-				$l=0;
+				$j = $i;
+				$l = 0;
 				if($nl==1){
 					$this->_x = $this->_leftMargin;
 					$w = $this->_width-$this->_rightMargin-$this->_x;
@@ -1733,7 +1814,7 @@ class PdfDocument {
 	 * @param string $type
 	 * @param string $link
 	 */
-	public function Image($file, $x, $y, $w=0, $h=0, $type='', $link=''){
+	public function addImage($file, $x, $y, $w=0, $h=0, $type='', $link=''){
 		if(!isset($this->_images[$file])){
 			//First use of image, get info
 			if($type==''){
@@ -1750,18 +1831,18 @@ class PdfDocument {
 				$info = $this->_parsejpg($file);
 			} else {
 				if($type=='png'){
-					$info=$this->_parsepng($file);
+					$info = $this->_parsepng($file);
 				} else {
 					//Allow for additional formats
-					$mtd='_parse'.$type;
-					if(!method_exists($this,$mtd)){
+					$mtd = '_parse'.$type;
+					if(!method_exists($this, $mtd)){
 						throw new PdfDocumentException('Unsupported image type: '.$type);
 					}
 					$info=$this->$mtd($file);
 				}
 			}
 			set_magic_quotes_runtime($mqr);
-			$info['i']=count($this->_images)+1;
+			$info['i'] = count($this->_images)+1;
 			$this->_images[$file]=$info;
 		} else {
 			$info = $this->_images[$file];
@@ -1834,7 +1915,7 @@ class PdfDocument {
 	 *
 	 * @param integer $y
 	 */
-	public function SetY($y){
+	public function setY($y){
 		$this->_x = $this->_leftMargin;
 		if($y>=0){
 			$this->_y = $y;
@@ -1883,17 +1964,21 @@ class PdfDocument {
 		switch($dest){
 			case 'I':
 				//Send to standard output
-				if(ob_get_contents()){
-					throw new PdfDocumentException('Some data has already been output, can\'t send PDF file');
-				}
-				if(php_sapi_name()!='cli'){
-					//We send to a browser
-					header('Content-Type: application/pdf');
-					if(headers_sent()){
-						throw new PdfDocumentException('Some data has already been output to browser, can\'t send PDF file');
+				if($this->_debug==false){
+					if(ob_get_contents()){
+						throw new PdfDocumentException('Some data has already been output, can\'t send PDF file');
 					}
-					header('Content-Length: '.strlen($this->_buffer));
-					header('Content-disposition: inline; filename="'.$name.'"');
+					if(php_sapi_name()!='cli'){
+						//We send to a browser
+						if($this->_debug==false){
+							header('Content-Type: application/pdf');
+							if(headers_sent()){
+								throw new PdfDocumentException('Some data has already been output to browser, can\'t send PDF file');
+							}
+							header('Content-Length: '.strlen($this->_buffer));
+							header('Content-disposition: inline; filename="'.$name.'"');
+						}
+					}
 				}
 				echo $this->_buffer;
 				break;
@@ -1933,6 +2018,14 @@ class PdfDocument {
 	}
 
 	/**
+	 * Envia el documento PDF a la salida estándar
+	 *
+	 */
+	public function outputToBrowser(){
+		$this->outputDocument('', 'I');
+	}
+
+	/**
 	 * Devuelve el ancho disponible para utilizar (sin margenes)
 	 *
 	 * @return int
@@ -1956,7 +2049,7 @@ class PdfDocument {
 		}
 		//Check for decimal separator
 		if(sprintf('%.1f',1.0)!='1.0'){
-			setlocale(LC_NUMERIC,'C');
+			setlocale(LC_NUMERIC, 'C');
 		}
 	}
 
@@ -2033,7 +2126,7 @@ class PdfDocument {
 			$this->_out('endobj');
 		}
 		//Pages root
-		$this->offsets[1] = strlen($this->_buffer);
+		$this->_offsets[1] = strlen($this->_buffer);
 		$this->_out('1 0 obj');
 		$this->_out('<</Type /Pages');
 		$kids='/Kids [';
@@ -2214,7 +2307,7 @@ class PdfDocument {
 		}
 	}
 
-	public function _putxobjectdict(){
+	private function _putxobjectdict(){
 		foreach($this->_images as $image){
 			$this->_out('/I'.$image['i'].' '.$image['n'].' 0 R');
 		}
@@ -2236,7 +2329,7 @@ class PdfDocument {
 		$this->_putfonts();
 		$this->_putimages();
 		//Resource dictionary
-		$this->offsets[2] = strlen($this->_buffer);
+		$this->_offsets[2] = strlen($this->_buffer);
 		$this->_out('2 0 obj');
 		$this->_out('<<');
 		$this->_putResourceDict();
@@ -2339,11 +2432,7 @@ class PdfDocument {
 		$this->_out('0 '.($this->_n+1));
 		$this->_out('0000000000 65535 f ');
 		for($i=1;$i<=$this->_n;$i++){
-			if(isset($this->offsets[$i])){
-				$this->_out(sprintf('%010d 00000 n ', $this->offsets[$i]));
-			} else {
-				$this->_out(sprintf('%010d 00000 n ', 0));
-			}
+			$this->_out(sprintf('%010d 00000 n ', $this->_offsets[$i]));
 		}
 		//Trailer
 		$this->_out('trailer');
@@ -2408,18 +2497,18 @@ class PdfDocument {
 	}
 
 	/**
-		 * Underline text
-		 *
-		 * @param unknown_type $x
-		 * @param unknown_type $y
-		 * @param unknown_type $txt
-		 * @return unknown
-		 */
-	protected function _dounderline($x,$y,$txt){
+	 * Underline text
+	 *
+	 * @param int $x
+	 * @param int $y
+	 * @param int $txt
+	 * @return string
+	 */
+	protected function _doUnderline($x, $y, $txt){
 		//
-		$up=$this->_currentFont['up'];
-		$ut=$this->_currentFont['ut'];
-		$w=$this->GetStringWidth($txt)+$this->_ws*substr_count($txt,' ');
+		$up = $this->_currentFont['up'];
+		$ut = $this->_currentFont['ut'];
+		$w = $this->GetStringWidth($txt)+$this->_ws*substr_count($txt,' ');
 		return sprintf('%.2f %.2f %.2f %.2f re f',$x*$this->_scaleFactor,($this->_height-($y-$up/1000*$this->_fontSize))*$this->_scaleFactor,$w*$this->_scaleFactor,-$ut/1000*$this->_fontSizePt);
 	}
 
@@ -2429,7 +2518,7 @@ class PdfDocument {
 	 * @param string $file
 	 * @return string
 	 */
-	protected function _parsejpg($file){
+	protected function _parseJpg($file){
 		$a = GetImageSize($file);
 		if(!$a){
 			throw new PdfDocumentException('Missing or incorrect image file: '.$file);
@@ -2448,13 +2537,20 @@ class PdfDocument {
 		}
 		$bpc = isset($a['bits']) ? $a['bits'] : 8;
 		//Read whole file
-		$f=fopen($file,'rb');
-		$data='';
+		$f = fopen($file,'rb');
+		$data = '';
 		while(!feof($f)){
 			$data.=fread($f,4096);
 		}
 		fclose($f);
-		return array('w'=>$a[0],'h'=>$a[1],'cs'=>$colspace,'bpc'=>$bpc,'f'=>'DCTDecode','data'=>$data);
+		return array(
+			'w' => $a[0],
+			'h' => $a[1],
+			'cs' => $colspace,
+			'bpc' => $bpc,
+			'f' => 'DCTDecode',
+			'data' => $data
+		);
 	}
 
 	/**
@@ -2463,7 +2559,7 @@ class PdfDocument {
 	 * @param string $file
 	 * @return string
 	 */
-	protected function _parsepng($file){
+	protected function _parsePNG($file){
 		$f = fopen($file,'rb');
 		if(!$f){
 			throw new PdfDocumentException('Can\'t open image file: '.$file);
