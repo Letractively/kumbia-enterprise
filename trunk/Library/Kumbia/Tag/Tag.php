@@ -267,6 +267,7 @@ abstract class Tag {
 	/**
 	 * Caja de Texto que autocompleta los resultados
 	 *
+	 * @param mixed $params
 	 * @return string
 	 * @static
 	 */
@@ -347,8 +348,8 @@ abstract class Tag {
 	/**
 	 * Crea una caja de texto que solo acepta numeros
 	 *
-	 * @param string $params
-	 * @return string
+	 * @param 	mixed $params
+	 * @return 	string
 	 * @static
 	 */
 	public static function numericField($params){
@@ -384,8 +385,8 @@ abstract class Tag {
 	/**
 	 * Crea una caja de password que solo acepta numeros
 	 *
-	 * @param string $name
-	 * @return string
+	 * @param 	mixed $params
+	 * @return 	string
 	 */
 	public static function numericPasswordField($params){
 		$numberArguments = func_num_args();
@@ -418,9 +419,9 @@ abstract class Tag {
 	/**
 	 * Crea un campo que acepta solo fechas
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return string
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
 	 * @static
 	 */
 	public static function dateField($params){
@@ -549,9 +550,10 @@ abstract class Tag {
 	 * Crea un campo para la captura de fechas que permite personalizar
 	 * los meses de acuerdo a la localizacion
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return string
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @param 	Traslate $traslate
+	 * @return 	string
 	 * @static
 	 */
 	public static function localeDateField($params, $traslate){
@@ -654,9 +656,9 @@ abstract class Tag {
 	/**
 	 * Crea un combo que toma los valores de un array
 	 *
-	 * @param string $name
-	 * @param string $data
-	 * @return string
+	 * @param 	mixed $params
+	 * @param 	string $data
+	 * @return 	string
 	 */
 	public static function selectStatic($params='', $data=''){
 		if(func_num_args()>1){
@@ -721,9 +723,9 @@ abstract class Tag {
 	/**
 	 * Crea una lista SELECT
 	 *
-	 * @access public
-	 * @param string $params
-	 * @param array $data
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @param 	array $data
 	 * @static
 	 */
 	public static function select($params='', $data=''){
@@ -802,9 +804,11 @@ abstract class Tag {
 	/**
 	 * Crea una lista SELECT cuyos textos de las opciones estan localizados
 	 *
-	 * @access public
-	 * @param string $params
-	 * @param array $data
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @param 	array $data
+	 * @param 	Traslate $traslate
+	 * @return 	string
 	 * @static
 	 */
 	public static function localeSelect($params='', $data='', $traslate){
@@ -818,13 +822,13 @@ abstract class Tag {
 			}
 			$callback = false;
 			if(isset($params['option_callback'])){
-				if(strpos($params['option_callback'], ".")){
-					$callback = explode(".", $params['option_callback']);
+				if(strpos($params['option_callback'], '.')){
+					$callback = explode('.', $params['option_callback']);
 				} else {
 					$callback = $params['option_callback'];
 				}
 				if(is_callable($callback)==false){
-					throw new TagException("El option_callback no es valido");
+					throw new TagException('El option_callback no es valido');
 				}
 				unset($params['option_callback']);
 			}
@@ -873,9 +877,11 @@ abstract class Tag {
 	/**
 	 * Crea una lista SELECT con datos de modelos y de arrays
 	 *
-	 * @access public
-	 * @param string $name
-	 * @param array $data
+	 * @access 	public
+	 * @param 	string $name
+	 * @param 	string $modelData
+	 * @param 	array $arrayData
+	 * @return 	string
 	 * @static
 	 */
 	public static function selectMixed($name='', $modelData='', $arrayData=''){
@@ -958,7 +964,7 @@ abstract class Tag {
  	 *
 	 * @param string $src
 	 * @param string $cache
-	 * @return unknown
+	 * @return string
 	 */
 	public static function javascriptInclude($src='', $cache=true){
 		if($src==""){
@@ -999,9 +1005,10 @@ abstract class Tag {
 	/**
  	 * Crea un boton de submit tipo imagen para el formulario actual
 	 *
-	 * @access public
-	 * @param string $caption
-	 * @return string
+	 * @access 	public
+	 * @param 	string $caption
+	 * @param 	string $src
+	 * @return 	string
 	 * @static
 	 */
 	public static function submitImage($caption, $src){
@@ -1100,8 +1107,8 @@ abstract class Tag {
 	/**
 	 * Permite generar un formulario remoto
 	 *
-	 * @param string $data
-	 * @return string
+	 * @param 	mixed $params
+	 * @return 	string
 	 */
 	public static function formRemote($params){
 		$numberArguments = func_num_args();
@@ -1206,7 +1213,9 @@ abstract class Tag {
 	/**
 	 * Establece el titulo del documento HTML
 	 *
+	 * @access public
 	 * @param string $title
+	 * @static
 	 */
 	public static function setDocumentTitle($title){
 		self::$_documentTitle = $title;
@@ -1215,7 +1224,9 @@ abstract class Tag {
 	/**
 	 * Devuelve el titulo del documento HTML
 	 *
-	 * @return unknown
+	 * @access public
+	 * @return string
+	 * @static
 	 */
 	public static function getDocumentTitle(){
 		return '<title>'.self::$_documentTitle.'</title>'."\r\n";
@@ -1262,7 +1273,9 @@ abstract class Tag {
 	/**
 	 * Crea una etiqueta de formulario
 	 *
-	 * @param string $action
+	 * @access 	public
+	 * @param 	string $action
+	 * @return 	string
 	 * @static
 	 */
 	public static function form($action){
@@ -1296,7 +1309,7 @@ abstract class Tag {
 	 * Etiqueta para cerrar un formulario
 	 *
 	 * @access public
-	 * @return $string
+	 * @return string
 	 * @static
 	 */
 	public static function endForm(){
@@ -1306,9 +1319,9 @@ abstract class Tag {
 	/**
  	 * Crea una caja de Texto
  	 *
- 	 * @access public
- 	 * @param string $params
- 	 * @return string
+ 	 * @access 	public
+ 	 * @param 	mixed $params
+ 	 * @return 	string
  	 * @static
  	 */
 	static public function textField($params){
@@ -1339,8 +1352,8 @@ abstract class Tag {
 	/**
 	 * Crea un componente para capturar Passwords
 	 *
-	 * @param string $params
-	 * @return string
+	 * @param 	mixed $params
+	 * @return 	string
 	 */
 	static public function passwordField($params){
 		$numberArguments = func_num_args();
@@ -1369,10 +1382,12 @@ abstract class Tag {
 	}
 
 	/**
-	 * Crea un boton de submit para el formulario actual
+	 * Crea un botón de submit para el formulario actual
 	 *
-	 * @param string $caption
-	 * @return html code
+	 * @access	public
+	 * @param	string $caption
+	 * @return	string
+	 * @static
 	 */
 	public static function submitButton($caption){
 		$numberArguments = func_num_args();
@@ -1397,8 +1412,10 @@ abstract class Tag {
 	/**
 	 * Crea un CheckBox
 	 *
-	 * @param string $params
-	 * @return string
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
+	 * @static
 	 */
 	public static function checkboxField($params){
 		$numberArguments = func_num_args();
@@ -1427,8 +1444,10 @@ abstract class Tag {
 	/**
 	 * Crea una caja de texto que acepta solo texto en Mayuscula
 	 *
-	 * @param string $name
-	 * @return string
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
+	 * @static
 	 */
 	public static function textUpperField($params){
 		$numberArguments = func_num_args();
@@ -1463,8 +1482,10 @@ abstract class Tag {
 	/**
 	 * Crea un Input tipo Text
 	 *
-	 * @param string $name
-	 * @return string
+	 * @access 	public
+	 * @param 	string $name
+	 * @return 	string
+	 * @static
 	 */
 	public static function fileField($name){
 		$numberArguments = func_num_args();
@@ -1489,8 +1510,10 @@ abstract class Tag {
 	/**
 	 * Crea un input tipo Radio
 	 *
-	 * @param string $name
-	 * @return string
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
+	 * @static
 	 */
 	public static function radioField($params){
 		$numberArguments = func_num_args();
@@ -1531,9 +1554,9 @@ abstract class Tag {
 	/**
 	 * Crea un Componente Oculto
 	 *
-	 * @access public
-	 * @param string $name
-	 * @return string
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
 	 * @static
 	 */
 	public static function hiddenField($params){
@@ -1561,8 +1584,10 @@ abstract class Tag {
 	/**
 	 * Crea una opcion de un SELECT
 	 *
-	 * @param string $value
-	 * @param string $text
+	 * @access 	public
+	 * @param	string $value
+	 * @param 	string $text
+	 * @static
 	 */
 	public static function option($value, $text){
 		if(func_num_args()>1){
@@ -1588,7 +1613,9 @@ abstract class Tag {
 	/**
 	 * Crea un componente para Subir Imagenes
 	 *
+	 * @access public
 	 * @return string
+	 * @static
 	 */
 	public static function uploadImage(){
 		$numberArguments = func_num_args();
@@ -1634,9 +1661,11 @@ abstract class Tag {
 	/**
 	 * Hace que un elemento reciba items con drag-n-drop
 	 *
-	 * @param string $obj
-	 * @param string $action
-	 * @return string
+	 * @access 	public
+	 * @param 	string $obj
+	 * @param 	string $action
+	 * @return 	string
+	 * @static
 	 */
 	public static function setDroppable($obj, $action=''){
 		$numberArguments = func_num_args();
@@ -1650,9 +1679,11 @@ abstract class Tag {
 	/**
 	 * Hace que un elemento reciba items con drag-n-drop
 	 *
-	 * @param string $obj
-	 * @param string $action
-	 * @return string
+	 * @access 	public
+	 * @param 	string $action
+	 * @param 	double $seconds
+	 * @return 	string
+	 * @static
 	 */
 	public static function redirectTo($action, $seconds = 0.01){
 		$seconds*=1000;
@@ -1664,6 +1695,7 @@ abstract class Tag {
 	 *
 	 * @access public
 	 * @param int $n
+	 * @static
 	 */
 	public static function trBreak($n=''){
 		static $l;
@@ -1704,6 +1736,13 @@ abstract class Tag {
 		}
 	}
 
+	/**
+	 * Intercala entre llamados una lista de colores para etiquetas TR
+	 *
+	 * @access public
+	 * @param array $colors
+	 * @static
+	 */
 	public static function trColor($colors){
 		static $i;
 		if(func_num_args()>1){
@@ -1731,6 +1770,13 @@ abstract class Tag {
 		print ">";
 	}
 
+	/**
+	 * Intercala entre llamados una lista de clases CSS para etiquetas TR
+	 *
+	 * @access 	public
+	 * @param 	array $classes
+	 * @static
+	 */
 	public static function trClassName($classes){
 		static $i;
 		if(func_num_args()>1){
@@ -1761,11 +1807,11 @@ abstract class Tag {
 	/**
 	 * Crea un botón que al hacer click carga un controlador y una acción determinada
 	 *
-	 * @access public
-	 * @param string $caption
-	 * @param string $action
-	 * @param string $classCSS
-	 * @return string
+	 * @access 	public
+	 * @param 	string $caption
+	 * @param 	string $action
+	 * @param 	string $classCSS
+	 * @return 	string
 	 * @static
 	 */
 	static public function buttonToAction($caption, $action, $classCSS=''){
@@ -1775,10 +1821,10 @@ abstract class Tag {
 	/**
 	 * Crea un Button que al hacer click carga con AJAX un controlador y una accion determinada
 	 *
-	 * @param string $caption
-	 * @param string $action
-	 * @param string $classCSS
-	 * @return string
+	 * @param 	string $caption
+	 * @param 	string $action
+	 * @param 	string $classCSS
+	 * @return 	string
 	 */
 	static public function buttonToRemoteAction($caption, $action, $classCSS=''){
 		$numberArguments = func_num_args();
@@ -1904,7 +1950,15 @@ abstract class Tag {
 		return $page;
 	}
 
-
+	/**
+	 * Crea pestañas de diferentes colores
+	 *
+	 * @access public
+	 * @param array $tabs
+	 * @param string $color
+	 * @param int $width
+	 * @static
+	 */
 	static public function tab($tabs, $color='green', $width=800){
 
 		switch($color){

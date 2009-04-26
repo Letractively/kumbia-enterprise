@@ -153,6 +153,7 @@ abstract class CoreClassPath {
 		'StandardForm' => 'Controller/StandardForm/StandardFormController',
 		'StandardFormException' => 'Controller/StandardForm/StandardFormException',
 		'Security' => 'Security/Security',
+		'SecurityFirewall' => 'Security/Firewall/SecurityFirewall',
 		'Soap' => 'Soap/Soap',
 		'Registry' => 'Registry/Registry',
 		'Report' => 'Report/Report',

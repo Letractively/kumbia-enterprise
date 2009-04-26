@@ -268,11 +268,11 @@ class ControllerRequest extends Object {
 	public function getParamRequest($paramName){
 		if(func_num_args()>1){
 			$args = func_get_args();
-			$args[0] = isset($_REQUEST[$paramName]) ? $_REQUEST[$paramName] : "";
+			$args[0] = isset($_REQUEST[$paramName]) ? $_REQUEST[$paramName] : '';
 			$filter = new Filter();
-			return call_user_func_array(array($filter, "applyFilter"), $args);
+			return call_user_func_array(array($filter, 'applyFilter'), $args);
 		}
-		return isset($_REQUEST[$paramName]) ? $_REQUEST[$paramName] : "";
+		return isset($_REQUEST[$paramName]) ? $_REQUEST[$paramName] : '';
 	}
 
 	/**
@@ -393,9 +393,9 @@ class ControllerRequest extends Object {
      */
     public function getScheme(){
         if($this->getServer('HTTP_HTTPS')=='on'){
-        	return "https";
+        	return 'https';
         } else {
-        	return "http";
+        	return 'http';
         }
     }
 
@@ -408,7 +408,7 @@ class ControllerRequest extends Object {
         $scheme = $this->getScheme();
         $name = $this->getParamServer('HTTP_SERVER_NAME');
         $port = $this->getParamServer('HTTP_SERVER_PORT');
-        if(($scheme=="http"&&$port==80)||($scheme=="https"&&$port==443)){
+        if(($scheme=='http'&&$port==80)||($scheme=='https'&&$port==443)){
             return $name;
         } else {
             return $name.':'.$port;
@@ -423,7 +423,7 @@ class ControllerRequest extends Object {
     	if(isset($_SERVER['REQUEST_METHOD'])){
 			return $_SERVER['REQUEST_METHOD'];
     	} else {
-    		return "";
+    		return '';
     	}
     }
 
