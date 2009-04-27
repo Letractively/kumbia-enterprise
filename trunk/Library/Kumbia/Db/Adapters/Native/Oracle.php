@@ -165,7 +165,16 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			$this->_lastResultQuery = $resultQuery;
 		} else {
 			$this->_lastResultQuery = false;
-			throw new DbException($this->error($php_errormsg), $this->noError());
+			$errorCode = $this->noError($resultQuery);
+			$errorMessage = $this->error($php_errormsg);
+			$errorMessage = "\"$errorMessage\" al ejecutar \"$sqlQuery\"  en la conexión ".$this->_idConnection;
+			switch($errorCode){
+				case 1756:
+					throw new DbSQLGrammarException($errorMessage, $errorCode, true, $this);
+					break;
+				default:
+					throw new DbException($errorMessage, $errorCode, true, $this);
+			}
 			return false;
 		}
 		if($this->_autoCommit==true){
@@ -630,10 +639,20 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	 */
 	public function listTables($schema=''){
 		if($schema==''){
-			return $this->fetchAll("SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '".strtoupper($this->getUsername())."'");
+			$query = "SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '".strtoupper($this->getUsername())."'";
 		} else {
-			return $this->fetchAll("SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '".strtoupper($schema)."'");
+			$query = "SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '".strtoupper($schema)."'";
 		}
+		$fetchMode = $this->_fetchMode;
+		$this->_fetchMode = self::DB_NUM;
+		$tables = $this->fetchAll($query);
+		$allTables = array();
+		foreach($tables as $table){
+			$allTables[] = $table[0];
+		}
+		$this->_fetchMode = $fetchMode;
+		return $allTables;
+
 	}
 
 	/**
@@ -811,7 +830,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	 * @return string|array
 	 */
 	public static function getPHPExtensionRequired(){
-		return "oci8";
+		return 'oci8';
 	}
 
 }
