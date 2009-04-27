@@ -146,7 +146,7 @@ class FeedItem {
 	}
 
 	/**
-	 * Establece el guid del item
+	 * Establece el guid (identificador único) del item
 	 *
 	 * @param string $guid
 	 */
@@ -155,7 +155,7 @@ class FeedItem {
 	}
 
 	/**
-	 * Obtiene el guid del item
+	 * Obtiene el guid (identificador único) del item
 	 *
 	 * @return string
 	 */
