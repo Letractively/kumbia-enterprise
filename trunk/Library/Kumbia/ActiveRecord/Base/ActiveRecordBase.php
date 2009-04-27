@@ -2342,9 +2342,10 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	 * @param mixed $fields
 	 * @param string $referenceTable
 	 * @param string $referencedFields
+	 * @param string $relationName
 	 */
-	protected function belongsTo($fields='', $referenceTable='', $referencedFields=''){
-		EntityManager::addBelongsTo(get_class($this), $fields, $referenceTable, $referencedFields);
+	protected function belongsTo($fields='', $referenceTable='', $referencedFields='', $relationName=''){
+		EntityManager::addBelongsTo(get_class($this), $fields, $referenceTable, $referencedFields, $relationName);
 	}
 
 	/**

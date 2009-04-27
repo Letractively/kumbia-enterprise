@@ -534,31 +534,36 @@ abstract class EntityManager {
 	 * @param string $fields
 	 * @param string $referenceTable
 	 * @param string $referencedFields
+	 * @param string $relationName
 	 * @static
 	 */
-	public static function addBelongsTo($entityName, $fields='', $referenceTable='', $referencedFields=''){
+	public static function addBelongsTo($entityName, $fields='', $referenceTable='', $referencedFields='', $relationName=''){
 		if(!isset(self::$_belongsTo[$entityName])){
 			self::$_belongsTo[$entityName] = array();
 		}
-		if(!$referenceTable){
-			if(is_array($fields)){
-				$indexKey = join("", sort(array_map("ucfirst", $fields)));
+		if($relationName==''){
+			if(!$referenceTable){
+				if(is_array($fields)){
+					$indexKey = join('', sort(array_map('ucfirst', $fields)));
+				} else {
+					$indexKey = Utils::camelize($fields);
+				}
 			} else {
-				$indexKey = Utils::camelize($fields);
+				$indexKey = Utils::camelize($referenceTable);
 			}
 		} else {
-			$indexKey = Utils::camelize($referenceTable);
+			$indexKey = $relationName;
 		}
 		if(!isset(self::$_belongsTo[$entityName][$indexKey])){
 			if(is_array($fields)){
 				if(count($fields)>0&&$referenceTable==''){
-					throw new EntityManagerException("Debe indicar la tabla referenciada en la relación belongsTo");
+					throw new EntityManagerException('Debe indicar la tabla referenciada en la relación belongsTo');
 				}
 			} else {
 				if($referenceTable==''){
 					$referenceTable = $fields;
-					$fields = $fields."_id";
-					$referencedFields = "id";
+					$fields = $fields.'_id';
+					$referencedFields = 'id';
 				}
 			}
 			if($referencedFields==''){
@@ -566,13 +571,13 @@ abstract class EntityManager {
 			}
 			if(is_array($referencedFields)){
 				if(count($fields)!=count($referencedFields)){
-					throw new EntityManagerException("El n&uacute;mero de campos referenciados no es el mismo");
+					throw new EntityManagerException('El número de campos referenciados no es el mismo');
 				}
 			}
 			self::$_belongsTo[$entityName][$indexKey] = array(
-				"fi" => $fields,
-				"rt" => $referenceTable,
-				"rf" => $referencedFields
+				'fi' => $fields,
+				'rt' => $referenceTable,
+				'rf' => $referencedFields
 			);
 		} else {
 			return;
@@ -595,7 +600,7 @@ abstract class EntityManager {
 		}
 		if($referenceTable==''){
 			if(is_array($fields)){
-				$indexKey = join("", sort(array_map("ucfirst", $fields)));
+				$indexKey = join('', sort(array_map('ucfirst', $fields)));
 			} else {
 				$indexKey = ucfirst(Utils::camelize($fields));
 			}
@@ -605,13 +610,13 @@ abstract class EntityManager {
 		if(!isset(self::$_hasMany[$entityName][$indexKey])){
 			if(is_array($fields)){
 				if(count($fields)>0&&$referenceTable==''){
-					throw new EntityManagerException("Debe indicar la tabla referenciada en la relación hasMany");
+					throw new EntityManagerException('Debe indicar la tabla referenciada en la relación hasMany');
 				}
 			} else {
 				if($referenceTable==''){
 					$referenceTable = $fields;
-					$referencedFields = "id";
-					$fields = Utils::uncamelize(Utils::lcfirst($entityName))."_id";
+					$referencedFields = 'id';
+					$fields = Utils::uncamelize(Utils::lcfirst($entityName)).'_id';
 				}
 			}
 			if($referencedFields==''){
@@ -619,13 +624,13 @@ abstract class EntityManager {
 			}
 			if(is_array($referencedFields)){
 				if(count($fields)!=count($referencedFields)){
-					throw new EntityManagerException("El n&uacute;mero de campos referenciados no es el mismo");
+					throw new EntityManagerException('El número de campos referenciados no es el mismo');
 				}
 			}
 			self::$_hasMany[$entityName][$indexKey] = array(
-				"fi" => $fields,
-				"rt" => $referenceTable,
-				"rf" => $referencedFields
+				'fi' => $fields,
+				'rt' => $referenceTable,
+				'rf' => $referencedFields
 			);
 		} else {
 			return;
@@ -648,7 +653,7 @@ abstract class EntityManager {
 		}
 		if($referenceTable==''){
 			if(is_array($fields)){
-				$indexKey = join("", sort(array_map("ucfirst", $fields)));
+				$indexKey = join('', sort(array_map('ucfirst', $fields)));
 			} else {
 				$indexKey = ucfirst(Utils::camelize($fields));
 			}
@@ -658,13 +663,13 @@ abstract class EntityManager {
 		if(!isset(self::$_hasOne[$entityName][$indexKey])){
 			if(is_array($fields)){
 				if(count($fields)>0&&$referenceTable==''){
-					throw new EntityManagerException("Debe indicar la tabla referenciada en la relación hasOne");
+					throw new EntityManagerException('Debe indicar la tabla referenciada en la relación hasOne');
 				}
 			} else {
 				if($referenceTable==''){
 					$referenceTable = $fields;
-					$fields = "id";
-					$referencedFields = Utils::uncamelize(Utils::lcfirst($entityName))."_id";
+					$fields = 'id';
+					$referencedFields = Utils::uncamelize(Utils::lcfirst($entityName)).'_id';
 				}
 			}
 			if($referencedFields==''){
@@ -672,13 +677,13 @@ abstract class EntityManager {
 			}
 			if(is_array($referencedFields)){
 				if(count($fields)!=count($referencedFields)){
-					throw new EntityManagerException("El n&uacute;mero de campos referenciados no es el mismo");
+					throw new EntityManagerException('El número de campos referenciados no es el mismo');
 				}
 			}
 			self::$_hasOne[$entityName][$indexKey] = array(
-				"fi" => $fields,
-				"rt" => $referenceTable,
-				"rf" => $referencedFields
+				'fi' => $fields,
+				'rt' => $referenceTable,
+				'rf' => $referencedFields
 			);
 		} else {
 			return;
