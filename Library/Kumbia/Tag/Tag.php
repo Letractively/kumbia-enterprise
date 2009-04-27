@@ -91,10 +91,14 @@ abstract class Tag {
 			return self::$_displayValues[$name];
 		} else {
 			if(@isset($_POST[$name])){
-				return $_POST[$name];
+				if(get_magic_quotes_gpc()==false){
+					return $_POST[$name];
+				} else {
+					return stripslashes($_POST[$name]);
+				}
 			} else {
 				$controller = Dispatcher::getController();
-				if(@isset($controller->$name)){
+				if(isset($controller->$name)){
 					return $controller->$name;
 				} else {
 					return "";
