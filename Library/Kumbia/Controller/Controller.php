@@ -467,6 +467,11 @@ class Controller extends ControllerBase {
 				View::setRenderLevel(View::LEVEL_NO_RENDER);
 				$response->setResponseAdapter('json');
 				break;
+			case 'rss':
+				View::setRenderLevel(View::LEVEL_NO_RENDER);
+				$response->setResponseType(ControllerResponse::RESPONSE_OTHER);
+				$response->setResponseAdapter('rss');
+				break;
 		}
 	}
 
@@ -478,44 +483,6 @@ class Controller extends ControllerBase {
 	 */
 	protected function exceptions($exception){
 		throw $exception;
-	}
-
-	/**
-	 * Borra las vistas almacenadas en el cache de la sesion actual
-	 *
-	 * @access protected
-	 * @param string $type
-	 */
-	protected function deleteCache($type){
-
-		switch($type){
-			case 'all':
-				foreach(scandir('cache/') as $cache_dir){
-					if($cache_dir!='.'&&$cache_dir!='..'){
-						if(is_dir('cache/'.$cache_dir)){
-							foreach(scandir('cache/'.$cache_dir) as $cache_controller_dir){
-								if($cache_controller_dir!='.'&&$cache_controller_dir!='..'){
-									if(is_dir('cache/'.$cache_dir."/".$cache_controller_dir)){
-										foreach(scandir('cache/'.$cache_dir."/".$cache_controller_dir) as $cache_file){
-											if($cache_file != '.' && $cache_file != '..'){
-												unlink('cache/'.$cache_dir."/".$cache_controller_dir.'/'.$cache_file);
-											}
-										}
-										rmdir('cache/'.$cache_dir."/".$cache_controller_dir);
-									} else {
-										unlink('cache/'.$cache_dir."/".$cache_controller_dir);
-									}
-								}
-							}
-						}
-						rmdir('cache/'.$cache_dir);
-					}
-				}
-			break;
-			default:
-				throw new ControllerException("Opcion '$type' indefinida para delete_cache");
-		}
-
 	}
 
 	/**

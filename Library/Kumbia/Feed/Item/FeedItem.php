@@ -49,6 +49,13 @@ class FeedItem {
 	private $_link;
 
 	/**
+	 * Enlace del item
+	 *
+	 * @var string
+	 */
+	private $_description;
+
+	/**
 	 * TTL del item
 	 *
 	 * @var string
@@ -61,6 +68,13 @@ class FeedItem {
 	 * @var string
 	 */
 	private $_language;
+
+	/**
+	 * Establece el ID unico del item
+	 *
+	 * @var string
+	 */
+	private $_guid;
 
 	/**
 	 * Fecha de públicación del item
@@ -114,6 +128,42 @@ class FeedItem {
 	}
 
 	/**
+	 * Establece la descripción del item
+	 *
+	 * @param string $description
+	 */
+	public function setDescription($description){
+		$this->_description = $description;
+	}
+
+	/**
+	 * Obtiene ña descripción del item
+	 *
+	 * @return string
+	 */
+	public function getDescription(){
+		return $this->_description;
+	}
+
+	/**
+	 * Establece el guid del item
+	 *
+	 * @param string $guid
+	 */
+	public function setGuid($guid){
+		$this->_guid = $guid;
+	}
+
+	/**
+	 * Obtiene el guid del item
+	 *
+	 * @return string
+	 */
+	public function getGuid(){
+		return $this->_guid;
+	}
+
+	/**
 	 * Establece la fecha de públicación del del item
 	 *
 	 * @param string $pubDate
@@ -129,6 +179,20 @@ class FeedItem {
 	 */
 	public function getPubDate(){
 		return $this->_pubDate;
+	}
+
+	/**
+	 * Devuelve la información del item como un array
+	 *
+	 * @return array
+	 */
+	public function getElementsAsArray(){
+		$elements = array('title', 'link', 'description', 'guid', 'pubDate');
+		$elementsArray = array();
+		foreach($elements as $element){
+			$elementsArray[$element] = $this->{'_'.$element};
+		}
+		return $elementsArray;
 	}
 
 }
