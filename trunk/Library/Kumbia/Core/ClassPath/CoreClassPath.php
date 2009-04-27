@@ -116,6 +116,7 @@ abstract class CoreClassPath {
 		'EventManager' => 'Event/EventManager',
 		'Facility' => 'Facility/Facility',
 		'Feed' => 'Feed/Feed',
+		'FeedItem' => 'Feed/Item/FeedItem',
 		'FileLogger' => 'Logger/Adapters/File',
 		'Filter' => 'Filter/Filter',
 		'FilterException' => 'Filter/FilterException',

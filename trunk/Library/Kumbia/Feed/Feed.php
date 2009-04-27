@@ -49,19 +49,59 @@ class Feed {
 	 */
 	public function __construct($version='1.0', $encoding='UTF-8'){
 		$this->_dom = new DOMDocument($version, $encoding);
-		$root = $this->_dom->createElement('feed');
-		$namespaces = array(
-			'xmlns:openSearch' => "http://a9.com/-/spec/opensearch/1.1/",
-			'xmlns:georss' => 'http://www.georss.org/georss',
-			'xmlns:gd' => 'http://schemas.google.com/g/2005',
-			'xmlns:feedburner' => 'http://rssnamespace.org/feedburner/ext/1.0',
-			'gd:etag' => 'W/&quot;CU8FRX44eCp7ImA9WxVbF08.&quot;"'
-		);
-		foreach($namespaces as $namespace => $value){
-			$root->setAttribute($namespace, $value);
+	}
+
+	/**
+	 * Lee un recurso RSS apartir de su ubicación
+	 *
+	 * @param string $url
+	 * @return boolean
+	 */
+	public function readRss($url){
+		$rssContent = file_get_contents($url);
+		if($rssContent!==false){
+			$this->readRssString($rssContent);
+			return true;
+		} else {
+			return false;
 		}
-		$this->_dom->appendChild($root);
-		print $this->_dom->saveXML();
+	}
+
+	/**
+	 * Lee un recurso RSS apartir de un string XML
+	 *
+	 * @param string $rssString
+	 */
+	public function readRssString($rssString){
+		$this->_dom->loadXML($rssString);
+	}
+
+	/**
+	 * Devuelve los items del RSS
+	 *
+	 * @return array
+	 */
+	public function getItems(){
+		$items = $this->_dom->getElementsByTagName('item');
+		$feedItems = array();
+		foreach($items as $item){
+			$feedItem = new FeedItem();
+			foreach($item->childNodes as $child){
+				switch($child->localName){
+					case 'title':
+						$feedItem->setTitle($child->nodeValue);
+						break;
+					case 'link':
+						$feedItem->setLink($child->nodeValue);
+						break;
+					case 'pubDate':
+						$feedItem->setPubDate($child->nodeValue);
+						break;
+				}
+			}
+			$feedItems[] = $feedItem;
+		}
+		return $feedItems;
 	}
 
 }
