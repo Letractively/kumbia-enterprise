@@ -87,15 +87,45 @@ class Date extends Object {
 	private $_locale;
 
 	/**
-	 * Intervalos para operaciones
+	 * Intervalo para Segundos
 	 *
 	 */
 	const INTERVAL_SECOND = -3;
+
+	/**
+	 * Intervalo para Minutos
+	 *
+	 */
 	const INTERVAL_MINUTE = -2;
+
+	/**
+	 * Intervalo para Horas
+	 *
+	 */
 	const INTERVAL_HOUR = -1;
+
+	/**
+	 * Intervalo para Dias
+	 *
+	 */
 	const INTERVAL_DAY = 0;
+
+	/**
+	 * Intervalo para Meses
+	 *
+	 */
 	const INTERVAL_MONTH = 1;
+
+	/**
+	 * Intervalo para Años
+	 *
+	 */
 	const INTERVAL_YEAR = 2;
+
+	/**
+	 * Intervalo para Semanas
+	 *
+	 */
 	const INTERVAL_WEEK = 3;
 
 	/**
@@ -1164,6 +1194,60 @@ class Date extends Object {
 			$fecha = $dateParts['year'].'-'.sprintf('%02s', $dateParts['mon']).'-'.sprintf('%02s', $dateParts['mday']);
 			return new Date($fecha);
 		}
+	}
+
+	/**
+	 * Crea una fecha apartir de un formato RFC822
+	 *
+	 * @param string $rfcDate
+	 * @return Date
+	 * @static
+	 */
+	static public function getDateFromRFC822($rfcDate){
+		$day = substr($rfcDate, 5, 2);
+		$monthName = substr($rfcDate, 8, 3);
+		$year = substr($rfcDate, 12, 4);
+		switch($monthName){
+			case 'Jan':
+				$month = '01';
+				break;
+			case 'Feb':
+				$month = '02';
+				break;
+			case 'Mar':
+				$month = '03';
+				break;
+			case 'Apr':
+				$month = '04';
+				break;
+			case 'May':
+				$month = '05';
+				break;
+			case 'Jun':
+				$month = '06';
+				break;
+			case 'Jul':
+				$month = '07';
+				break;
+			case 'Aug':
+				$month = '08';
+				break;
+			case 'Sep':
+				$month = '09';
+				break;
+			case 'Oct':
+				$month = '10';
+				break;
+			case 'Nov':
+				$month = '11';
+				break;
+			case 'Dic':
+				$month = '12';
+				break;
+			default:
+				throw new DateException('La fecha no tiene un formato RFC822 correcto');
+		}
+		return new Date($year.'-'.$month.'-'.$day);
 	}
 
 	/**
