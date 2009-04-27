@@ -610,13 +610,9 @@ class Date extends Object {
 	 * @return string
 	 */
 	public function getRFC2822Date(){
-		if($this->_year>1970&&$this->_year<2038){
-			return date('r', $this->_timestamp);
-		} else {
-			//No se puede determinar el timezone
-			return $this->getAbrevDayOfWeek().', '.sprintf('%02s', $this->getDay()).' '.
-				   $this->getAbrevMonthName().' '.$this->getYear().' 00:00:00 -0000';
-		}
+		//determinar el timezone?
+		return $this->getAbrevDayOfWeek().', '.sprintf('%02s', $this->getDay()).' '.
+			$this->getAbrevMonthName().' '.$this->getYear().' 00:00:00 +0000';
 	}
 
 	/**
@@ -1248,6 +1244,18 @@ class Date extends Object {
 				throw new DateException('La fecha no tiene un formato RFC822 correcto');
 		}
 		return new Date($year.'-'.$month.'-'.$day);
+	}
+
+	/**
+	 * Crea una fecha apartir de un string datetime
+	 *
+	 * @param string $datetime
+	 * @return Date
+	 * @static
+	 */
+	static public function fromDateTime($datetime){
+		$dateParts = explode(' ', $datetime);
+		return new Date($dateParts[0]);
 	}
 
 	/**

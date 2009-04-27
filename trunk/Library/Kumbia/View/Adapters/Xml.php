@@ -44,13 +44,13 @@ class XmlViewResponse {
 	 */
 	public function render($controllerResponse, $valueReturned){
 
-		$controllerResponse->setHeader("X-Content-Type: text/xml", true);
-		$controllerResponse->setHeader("Content-Type: text/xml", true);
-		$controllerResponse->setHeader("Pragma: no-cache", true);
-		$controllerResponse->setHeader("Expires: 0", true);
+		$controllerResponse->setHeader('X-Content-Type: text/xml', true);
+		$controllerResponse->setHeader('Content-Type: text/xml', true);
+		$controllerResponse->setHeader('Pragma: no-cache', true);
+		$controllerResponse->setHeader('Expires: 0', true);
 
 		if(!is_null($valueReturned)){
-			require "Library/Kumbia/Xml/Xml.php";
+			require 'Library/Kumbia/Xml/Xml.php';
 			$xml = new SimpleXMLResponse();
 			$xml->addData($valueReturned);
 			$xml->outXMLResponse();
