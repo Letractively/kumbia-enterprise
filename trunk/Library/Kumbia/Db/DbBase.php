@@ -385,7 +385,7 @@ class DbBase extends Object {
 			if(is_array($fields)==true){
 				$insertSQL = 'INSERT INTO '.$table.' ('.join(', ', $fields).') VALUES ('.join(', ', $values).')';
 			} else {
-				$insertSQL = 'INSERT INTO '.$table.' ('.join(', ', $values).')';
+				$insertSQL = 'INSERT INTO '.$table.' VALUES ('.join(', ', $values).')';
 			}
 			return $this->query($insertSQL);
 		} else{
