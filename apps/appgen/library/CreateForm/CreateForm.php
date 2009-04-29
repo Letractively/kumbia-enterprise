@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Kumbia Enterprise Framework
+ * Louder Application Forms
  *
  * LICENSE
  *
@@ -10,56 +10,66 @@
  *
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to kumbia@kumbia.org so we can send you a copy immediately.
+ * to license@loudertechnology.com so we can send you a copy immediately.
  *
- * @category Kumbia
- * @copyright Copyright (c) 2008-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @category 	Louder
+ * @package 	Louder
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright  	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @copyright	Copyright (c) 2008-2009 Oscar Garavito (game013@gmail.com)
+ * @license 	New BSD License
+ * @version 	$Id$
  */
 
 /**
+ * CreateForm
+ *
  * Genera formularios de varias clases.
  *
- * @category Kumbia
- * @copyright Copyright (c) 2008-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @category 	Louder
+ * @package 	Louder
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright  	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @copyright	Copyright (c) 2008-2009 Oscar Garavito (game013@gmail.com)
+ * @license 	New BSD License
  */
-class CreateForm extends Object {
+abstract class CreateForm {
 
-	protected static $attributes;
+	/**
+	 * Atributos
+	 *
+	 * @var ActiveRecordResultset
+	 */
+	protected static $_attributes;
 
 	/**
 	 * Crea un nuevo Formulario con todas las caracteristicas deseadas.
 	 *
-	 * @param String $controlador
-	 * @param String $extappname
-	 * @param String $source
-	 * @param String $titulo
+	 * @param 	DbBase $connection
+	 * @param 	string $controlador
+	 * @param 	string $extappname
+	 * @param 	string $source
+	 * @param 	string $titulo
 	 */
-	public static function newForm($controlador,$extappname,$source,$titulo) {
+	public static function newForm($connection, $controlador, $extappname, $source, $titulo) {
 		$conditions = "app_name = '{$extappname}' AND table_name='{$source}' AND component = 'CR'";
+		$modelsDir = "apps/{$extappname}/models";
 		$atts = new Attributes();
 		if($atts->count($conditions)>0){
 			$attributes = $atts->find($conditions);
 			foreach($attributes as $attribute){
 				$relation = $attribute->getRelations();
-				$path = "apps/{$extappname}/models/{$relation->getTableRelation()}.php";
-				$className = Utils::camelize($relation->getTableRelation());
-				$modelCode = "<?php class $className extends ActiveRecord { }";
-				file_put_contents($path, $modelCode);
+				ComponentBuilder::createModel($connection, $modelsDir, $relation->getTableRelation());
 			}
 		}
-
-		$path = "apps/{$extappname}/models/{$source}.php";
-		$model = Utils::camelize($source);
-		$modelCode = "<?php class $model extends ActiveRecord { }";
-		file_put_contents($path, $modelCode);
+		$path = 'apps/'.$extappname.'/models/'.$source.'.php';
+		ComponentBuilder::createModel($connection, $modelsDir, $source);
 
 		@mkdir("apps/{$extappname}/views/{$controlador}");
 
 		$conditions = "app_name = '{$extappname}' AND table_name='{$source}'";
 		$atts = new Attributes();
-		CreateForm::$attributes = $atts->find($conditions);
+		self::$_attributes = $atts->find($conditions);
 
 		file_put_contents("apps/{$extappname}/views/{$controlador}/index.phtml",
 			CreateForm::getIndexViewCode($controlador,$titulo));
@@ -77,12 +87,13 @@ class CreateForm extends Object {
 	/**
 	 * Retorna una cadena de caracteres en la cual esta el contenido del archivo de la vista Index.
 	 *
-	 * @param String $controlador
-	 * @param String $titulo
-	 * @return String Contenido del archivo de la vista Index.
+	 * @param 	string $controlador
+	 * @param 	string $titulo
+	 * @return 	string
 	 */
 	protected static function getIndexViewCode($controlador,$titulo) {
-		$indexview = "<?php echo View::getContent(); ?>";
+		$indexview = "<div id='mainContent'>\n\n";
+		$indexview.= "<?php echo View::getContent(); ?>\n";
 		$indexview.= "<h1>{$titulo}</h1>\n\n";
 		$indexview.= "<?php echo Tag::form(\"$controlador/buscar\",'autocomplete: off'); ?>\n";
 		$indexview.= "<div class='userStatus'>Estado: Buscar un {$titulo}</div>\n\n";
@@ -90,8 +101,9 @@ class CreateForm extends Object {
 		$indexview.= "\t<?php echo Tag::buttonToAction(\"Nuevo\", \"$controlador/nuevo\") ?>\n";
 		$indexview.= "</div>\n";
 		$indexview.= "<table class='tableFormSearch' cellspacing='0'>\n";
-		foreach(CreateForm::$attributes as $attribute){
-			$labelCode = "\t<tr>\n\t\t<td align='right'><label for='{$attribute->getFieldName()}'><b>"
+		foreach(self::$_attributes as $attribute){
+			$fieldName = Utils::lcfirst(Utils::camelize($attribute->getFieldName()));
+			$labelCode = "\t<tr>\n\t\t<td align='right'><label for='{$fieldName}'><b>"
 				.$attribute->getLabel()."</b>:</label></td>\n";
 			$size = $attribute->getSize();
 			if($size!=""){
@@ -101,23 +113,26 @@ class CreateForm extends Object {
 			if($maxlength!=""){
 				$maxlength = ", \"maxlength: $maxlength\"";
 			}
+			//Caja de Texto
 			if($attribute->getComponent()=='TE'){
-				$componentCode = "\t\t<td><?php echo Tag::textField(\"{$attribute->getFieldName()}\"{$size}"
+				$componentCode = "\t\t<td><?php echo Tag::textField(\"{$fieldName}\"{$size}"
 					."{$maxlength}) ?></td>\n";
 			}
+			//Caja Numérica
 			if($attribute->getComponent()=='TN'){
-				$componentCode = "\t\t<td><?php echo Tag::numericField(\"{$attribute->getFieldName()}\"{$size}"
+				$componentCode = "\t\t<td><?php echo Tag::numericField(\"{$fieldName}\"{$size}"
 					."{$maxlength}) ?></td>\n";
 			}
+			//Campo Fecha
 			if($attribute->getComponent()=='DA'){
-				$componentCode = "\t\t<td><?php echo Tag::dateField(\"{$attribute->getFieldName()}\") ?></td>\n";
+				$componentCode = "\t\t<td><?php echo Tag::dateField(\"{$fieldName}\") ?></td>\n";
 			}
 			if($attribute->getComponent()=='CR'){
 				$relation = $attribute->getRelations();
 				$relationsList = $relation->getRelationsList();
 				$className = Utils::camelize($relation->getTableRelation());
 				foreach($relationsList as $relationList){
-					$componentCode = "\t\t<td><?php echo Tag::select(\"{$attribute->getFieldName()}\", "
+					$componentCode = "\t\t<td><?php echo Tag::select(\"{$fieldName}\", "
 						."\${$className}->find(\"order: {$relation->getFieldOrder()}\"), \"using: "
 						."{$relationList->getFieldName()},{$relation->getFieldDetail()}\", \"use_dummy: "
 						."yes\") ?></td>\n";
@@ -133,6 +148,7 @@ class CreateForm extends Object {
 		$indexview.= "\t<tr>\n\t\t<td></td>\n\t\t<td><?php echo Tag::submitButton('Buscar') ?></td>\n\t</tr>\n";
 		$indexview.= "</table>\n";
 		$indexview.= "<?php echo Tag::endForm(); ?>\n";
+		$indexview.= "</div>";
 		return $indexview;
 	}
 
@@ -144,19 +160,22 @@ class CreateForm extends Object {
 	 * @return String Contenido del archivo de la vista Buscar.
 	 */
 	protected static function getSearchViewCode($controlador,$titulo) {
-		$searchview = "<?php echo View::getContent(); ?>";
+		$searchview = "<div id='mainContent'>\n\n";
+		$searchview.= "<?php echo View::getContent(); ?>";
 		$searchview.= "<h1>Buscar : {$titulo}</h1>\n\n";
 		$searchview.= "<div class='userStatus'>Estado: Visualizar un {$titulo}</div>\n\n";
 		$searchview.= "<table cellspacing='0' class='tableResults'>\n";
 		$searchview.= "\t<tr>\n";
 		$searchview.= "\t\t<thead>\n";
-		foreach(CreateForm::$attributes as $attribute){
+		foreach(self::$_attributes as $attribute){
 			$fieldName = Utils::lcfirst(Utils::camelize($attribute->getFieldName()));
 			if($attribute->getBrowse()=='Y'){
-				$searchview.= "\t\t\t<th><?php echo Tag::linkTo(\"$controlador/visualizar?ordenar={$fieldName}"
-					."\", \"{$attribute->getLabel()}\") ?></th>\n";
+				$searchview.= "\t\t\t<th><?php echo Tag::linkTo(\"$controlador/visualizar?ordenar={$fieldName}".
+					"\", \"{$attribute->getLabel()}\") ?></th>\n";
 			}
 		}
+		$searchview.="\t\t\t<th width=\"7%\"></th>\n";
+		$searchview.="\t\t\t<th width=\"7%\"></th>\n";
 		$searchview.= "\t\t</thead>\n";
 		$searchview.= "\t</tr>\n";
 		$searchview.= "\t<?php\n";
@@ -166,18 +185,19 @@ class CreateForm extends Object {
 		$searchview.= "\t\t\techo Tag::trClassName(array('trResults1', 'trResults2'));\n";
 		$browseNumber = 0;
 		$primaryKey = array();
-		foreach(CreateForm::$attributes as $attribute){
+		foreach(self::$_attributes as $attribute){
 			if($attribute->getPrimaryKey()=='Y'){
 				$primaryKey[] = $attribute->getFieldName();
 			}
 			if($attribute->getBrowse()=='Y'){
+				$fieldName = Utils::camelize($attribute->getFieldName());
 				$browseNumber++;
 				if(strpos($attribute->getType(), "char")!==false){
-					$searchview.="\t\t\tprint \"<td>\".\$resultado->get".ucfirst($attribute->getFieldName())
+					$searchview.="\t\t\tprint \"<td>\".\$resultado->get".$fieldName
 						."().\"</td>\";\n";
 				} else {
 					$searchview.="\t\t\tprint \"<td align='right'>\".\$resultado->get"
-						.ucfirst($attribute->getFieldName())."().\"</td>\";\n";
+						.$fieldName."().\"</td>\";\n";
 				}
 			}
 		}
@@ -231,6 +251,7 @@ class CreateForm extends Object {
 		$searchview.= "<div align='right' class='backButtonDiv'>\n";
 		$searchview.= "\t<?php echo Tag::buttonToAction(\"Volver\", \"$controlador/index\") ?>\n";
 		$searchview.= "</div>\n";
+		$searchview.= "</div>\n";
 		return $searchview;
 	}
 
@@ -242,12 +263,13 @@ class CreateForm extends Object {
 	 * @return String Contenido del archivo de la vista Nuevo.
 	 */
 	protected static function getNewViewCode($controlador,$titulo) {
-		$nuevoview = "<?php echo View::getContent(); ?>";
+		$nuevoview = "<div id='mainContent'>\n\n";
+		$nuevoview.= "<?php echo View::getContent(); ?>\n";
 		$nuevoview.= "<h1>{$titulo}</h1>\n\n";
 		$nuevoview.= "<div class='userStatus'>Estado: Creando un {$titulo}</div>\n\n";
 		$nuevoview.= "<?php echo Tag::form(\"$controlador/guardar\",'autocomplete: off'); ?>\n";
 		$nuevoview.= "<table class='tableFormNuevo' cellspacing='0'>\n";
-		foreach(CreateForm::$attributes as $attribute){
+		foreach(self::$_attributes as $attribute){
 			$labelCode = "\t<tr>\n\t\t<td align='right'><label for='{$attribute->getFieldName()}'><b>"
 				.$attribute->getLabel()."</b>:</label></td>\n";
 			$size = $attribute->getSize();
@@ -290,6 +312,7 @@ class CreateForm extends Object {
 		<?php echo Tag::linkTo(\"$controlador/index\", \"Cancelar\") ?></td>\n\t</tr>\n";
 		$nuevoview.= "</table>\n";
 		$nuevoview.= "<?php echo Tag::endForm(); ?>\n";
+		$nuevoview.= "</div>\n";
 		return $nuevoview;
 	}
 
@@ -306,7 +329,7 @@ class CreateForm extends Object {
 		$editarview.= "<div class='userStatus'>Estado: Editando un {$titulo}</div>\n\n";
 		$editarview.= "<?php echo Tag::form(\"$controlador/guardar/true\",'autocomplete: off'); ?>\n";
 		$editarview.= "<table class='tableFormEditar' cellspacing='0'>\n";
-		foreach(CreateForm::$attributes as $attribute){
+		foreach(self::$_attributes as $attribute){
 			$labelCode = "\t<tr>\n\t\t<td align='right'><label for='{$attribute->getFieldName()}'><b>"
 				.$attribute->getLabel()."</b>:</label></td>\n";
 			$size = $attribute->getSize();
@@ -354,11 +377,14 @@ class CreateForm extends Object {
 	/**
 	 * Retorna una cadena de caracteres que contiene el archivo del Controlador.
 	 *
-	 * @param String $controlador
-	 * @param String $source
-	 * @return String Contiene el archivo del Controlador.
+	 * @param 	string $controlador
+	 * @param 	string $source
+	 * @return 	string
+	 * @static
 	 */
-	protected static function getControllerCode($controlador,$source){
+	protected static function getControllerCode($controlador, $source){
+
+		$controladorVar = Utils::lcfirst(Utils::camelize($controlador));
 		$model = Utils::camelize($source);
 		$controller = "<?php\n\n";
 		$controller.= "/**\n";
@@ -370,8 +396,7 @@ class CreateForm extends Object {
 		$controller.= "class ".ucfirst($controlador)."Controller extends ApplicationController {\n\n";
 
 		$icontroller = '';
-
-		foreach(CreateForm::$attributes as $attribute){
+		foreach(self::$_attributes as $attribute){
 			$fieldName = Utils::lcfirst(Utils::camelize($attribute->getFieldName()));
 			$controller.= "\t/**\n";
 			$controller.= "\t * ".$attribute->getFieldName()."\n";
@@ -382,31 +407,34 @@ class CreateForm extends Object {
 			if(strpos($attribute->getType(), "decimal")!==false){
 				$controller.= "\t * @var double\n";
 			}
+			if(strpos($attribute->getType(), "number")!==false){
+				$controller.= "\t * @var double\n";
+			}
 			if(strpos($attribute->getType(), "char")!==false){
 				$controller.= "\t * @var string\n";
 			}
 			$controller.= "\t */\n";
 			$controller.= "\tpublic \$$fieldName;\n\n";
 			$icontroller.= "\t\t\$this->$fieldName = '';\n";
-			$icontroller.= "\t\t\$this->setRequest('$fieldName','');\n";
+			$icontroller.= "\t\tTag::displayTo('$fieldName', '');\n";
 		}
 
 		$controller.= "\t/**\n";
-		$controller.= "\t * Condiciones de busqueda temporales\n";
+		$controller.= "\t * Condiciones de búsqueda temporales\n";
 		$controller.= "\t *\n";
 		$controller.= "\t * @var string\n";
 		$controller.= "\t */\n";
 		$controller.= "\tpublic \$condiciones;\n\n";
 
 		$controller.= "\t/**\n";
-		$controller.= "\t * Ordenamiento de la visualizacion\n";
+		$controller.= "\t * Ordenamiento de la visualización\n";
 		$controller.= "\t *\n";
 		$controller.= "\t * @var string\n";
 		$controller.= "\t */\n";
 		$controller.= "\tpublic \$ordenamiento;\n\n";
 
 		$controller.= "\t/**\n";
-		$controller.= "\t * Pagina actual en la visualizacion\n";
+		$controller.= "\t * Página actual en la visualización\n";
 		$controller.= "\t *\n";
 		$controller.= "\t * @var int\n";
 		$controller.= "\t */\n";
@@ -421,10 +449,10 @@ class CreateForm extends Object {
 		$controller.= "\t}\n\n";
 
 		$controller.= "\t/**\n";
-		$controller.= "\t * Accion por defecto del controlador/\n";
+		$controller.= "\t * Acción por defecto del controlador/\n";
 		$controller.= "\t *\n";
 		$controller.= "\t */\n";
-		$controller.= "\tpublic function indexAction(){\n\n";
+		$controller.= "\tpublic function indexAction(){\n";
 		$controller.= $icontroller;
 		$controller.= "\t}\n\n";
 
@@ -450,21 +478,26 @@ class CreateForm extends Object {
 
 		$localcodeuf = array();
 		$editcode = '';
-		foreach(CreateForm::$attributes as $attribute){
+		foreach(self::$_attributes as $attribute){
 			$fieldName = Utils::lcfirst(Utils::camelize($attribute->getFieldName()));
 			$filters = array();
-			if(strpos($attribute->getType(), "int")!==false){
+			print $attribute->getType();
+			if(stripos($attribute->getType(), "int")!==false){
 				$filters[] = "\"int\"";
 			}
-			if(strpos($attribute->getType(), "decimal")!==false){
+			if(stripos($attribute->getType(), "decimal")!==false){
 				$filters[] = "\"double\"";
 			}
-			if(strpos($attribute->getType(), "char")!==false&&$attribute->getSize()>1){
-				$filters[] = "\"striptags\"";
-				$filters[] = "\"extraspaces\"";
+			if(stripos($attribute->getType(), "number")!==false){
+				$filters[] = "\"double\"";
 			}
-			if(strpos($attribute->getType(), "char")!==false&&$attribute->getSize()==1){
+			if(stripos($attribute->getType(), "char")!==false&&$attribute->getSize()==1){
 				$filters[] = "\"onechar\"";
+			} else {
+				if(stripos($attribute->getType(), "char")!==false){
+					$filters[] = "\"striptags\"";
+					$filters[] = "\"extraspaces\"";
+				}
 			}
 			if(count($filters)>0){
 				$localcode = "\t\t\$$fieldName = \$this->getPostParam(\"$fieldName\");\n";
@@ -485,12 +518,12 @@ class CreateForm extends Object {
 		$controller.="\n";
 		$controller.="\t\t\$condiciones = array();\n";
 
-		$gcontroller.="\t\t\$$controlador = new ".ucfirst($controlador)."();\n";
+		$gcontroller.="\t\t\$$controladorVar = new ".Utils::camelize($controlador)."();\n";
 
 		$primaryKey = array();
 		$editUrlItems = array();
 		$findItems = array();
-		foreach(CreateForm::$attributes as $attribute){
+		foreach(self::$_attributes as $attribute){
 			if($attribute->getPrimaryKey()=='Y'){
 				$primaryKey[] = $attribute->getFieldName();
 				$editUrlItems[] = "\${$attribute->getFieldName()}=null";
@@ -516,7 +549,7 @@ class CreateForm extends Object {
 				}
 				$controller.="\t\t}\n";
 			}
-			$gcontroller.= "\t\t\${$controlador}->set".ucfirst($fieldName)."(\$$fieldName);\n";
+			$gcontroller.= "\t\t\${$controladorVar}->set".ucfirst($fieldName)."(\$$fieldName);\n";
 		}
 
 		$econtroller = "\t/**\n";
@@ -527,9 +560,9 @@ class CreateForm extends Object {
 		$econtroller.= "\tpublic function editarAction($eurl){\n\n";
 		$econtroller.= "\t\t\$filter = new Filter();\n";
 		$econtroller.= $editcode;
-		$econtroller.= "\t\t\$$controlador = \$this->".ucfirst($controlador)."->findFirst($"
+		$econtroller.= "\t\t\$$controladorVar = \$this->".ucfirst($controlador)."->findFirst($"
 			.join(',$',$primaryKey).");\n";
-		$econtroller.= "\t\tif (\$$controlador) {\n";
+		$econtroller.= "\t\tif(\$$controlador){\n";
 
 		$dcontroller = "\t/**\n";
 		$dcontroller.= "\t * Eliminar el $model\n";
@@ -540,11 +573,11 @@ class CreateForm extends Object {
 		$dcontroller.= $editcode;
 		$dcontroller.= "\t\t\$$controlador = \$this->".ucfirst($controlador)."->count("
 			.join(' AND ',$findItems).");\n";
-		$dcontroller.= "\t\tif (\$$controlador == 1) {\n";
+		$dcontroller.= "\t\tif(\$$controlador==1){\n";
 		$dcontroller.= "\t\t\tif(!\$this->".ucfirst($controlador)."->delete(".join(' AND ',$findItems).")){\n";
-		$dcontroller.= "\t\t\t\tFlash::error('El Registro no pudo ser eliminado.');\n";
+		$dcontroller.= "\t\t\t\tFlash::error('El registro no pudo ser eliminado.');\n";
 		$dcontroller.= "\t\t\t}else {\n";
-		$dcontroller.= "\t\t\t\tFlash::success('El Registro fue eliminado correctamente.');\n";
+		$dcontroller.= "\t\t\t\tFlash::success('El registro fue eliminado correctamente.');\n";
 		$dcontroller.= "\t\t\t}\n";
 		$dcontroller.= "\t\t}else {\n";
 		$dcontroller.= "\t\t\tFlash::error('Registro no encontrado.');\n";
@@ -552,10 +585,10 @@ class CreateForm extends Object {
 		$dcontroller.= "\t\t\$this->routeTo('action: index');\n";
 		$dcontroller.= "\t}\n";
 
-		$gcontroller.= "\t\tif (!\${$controlador}->save()) {\n";
+		$gcontroller.= "\t\tif(\${$controlador}->save()==false){\n";
 		$gcontroller.= "\t\t\tFlash::error('Hubo un error guardando el registro.');\n";
 		$gcontroller.= "\t\t}else {\n";
-		$gcontroller.= "\t\t\tFlash::success('Registro guardado con &eacute;xito.');\n";
+		$gcontroller.= "\t\t\tFlash::success('Registro guardado con éxito.');\n";
 		$gcontroller.= "\t\t}\n\n";
 		$gcontroller.= "\t\t\$this->routeTo('action: '.(\$isEdit==true ? 'index' : 'nuevo'));\n";
 		$gcontroller.= "\t}\n\n";
@@ -579,12 +612,12 @@ class CreateForm extends Object {
 		$controller.="\t\tif(\$controllerRequest->isSetQueryParam(\"ordenar\")){\n";
 		$controller.="\t\t\t\$posibleOrdenar = array(\n";
 		$posibleOrdenar = array();
-		foreach(CreateForm::$attributes as $attribute){
+		foreach(self::$_attributes as $attribute){
 			if($attribute->getBrowse()=='Y'){
 				$fieldName = Utils::lcfirst(Utils::camelize($attribute->getFieldName()));
 				$posibleOrdenar[] = "\t\t\t\t\"$fieldName\" => \"{$attribute->getFieldName()}\"";
 			}
-			$econtroller.= "\t\t\tTag::displayTo('$fieldName',\${$controlador}->get".ucfirst($fieldName)
+			$econtroller.= "\t\t\tTag::displayTo('$fieldName', \${$controladorVar}->get".ucfirst($fieldName)
 				."());\n";
 		}
 

@@ -39,13 +39,6 @@
 class DbOracle extends DbBase implements DbBaseInterface  {
 
 	/**
-	 * NUmero de filas devueltas
-	 *
-	 * @var boolean
-	 */
-	protected $_numRows = false;
-
-	/**
 	 * Ultimo mensaje de error
 	 *
 	 * @var array
@@ -158,7 +151,6 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 				return false;
 			}
 		}
-		$this->_numRows = false;
 		$this->_lastQuery = $sqlQuery;
 		$resultQuery = @oci_parse($this->_idConnection, $sqlQuery);
 		if($resultQuery){
@@ -256,29 +248,25 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 		if(!$this->_idConnection){
 			return false;
 		}
-		if(!$resultQuery){
-			$resultQuery = $this->_lastResultQuery;
-			if(!$resultQuery){
-				throw new DbException($this->error('Resource invalido para db::numRows'), $this->noError());
+		$sql = $this->_lastQuery;
+		$fromPosition = stripos($sql, 'FROM');
+		if($fromPosition===false){
+			return 0;
+		} else {
+			$sqlQuery = 'SELECT COUNT(*) '.substr($sql, $fromPosition);
+			$resultQuery = @oci_parse($this->_idConnection, $sqlQuery);
+			if($this->_autoCommit==true){
+				$commit = OCI_COMMIT_ON_SUCCESS;
+			} else {
+				$commit = OCI_DEFAULT;
+			}
+			if(@oci_execute($resultQuery, $commit)){
+				$count = oci_fetch_array($resultQuery, OCI_NUM);
+				return $count[0];
+			} else {
 				return false;
 			}
 		}
-		if($this->_autoCommit){
-			$commit = OCI_COMMIT_ON_SUCCESS;
-		} else {
-			$commit = OCI_DEFAULT;
-		}
-		if(!@oci_execute($resultQuery, $commit)){
-			$this->_lastResultQuery = false;
-			$errorCode = $this->noError();
-			throw new DbException($this->error($php_errormsg." al ejecutar <i>'{$this->lastQuery}'</i>"), $this->noError());
-			return false;
-		}
-		$tmp = array();
-		$this->_numRows = oci_fetch_all($resultQuery, $tmp);
-		unset($tmp);
-		@oci_execute($resultQuery, $commit);
-		return $this->_numRows;
 	}
 
 	/**
@@ -330,7 +318,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			$commit = OCI_DEFAULT;
 		}
 		if(!@oci_execute($resultQuery, $commit)){
-			$errorMessage = $php_errormsg." al ejecutar <i>'{$this->lastQuery}'</i>";
+			$errorMessage = $php_errormsg." al ejecutar <i>'{$this->_lastQuery}'</i>";
 			throw new DbException($this->error($errorMessage), $this->noError());
 			return false;
 		}
@@ -754,10 +742,14 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 		$fields = array();
 		foreach($describe as $key => $value){
 			if(!in_array($value['field'], $fields)){
-				if($value['data_scale']==0){
-					$type = $value['type'].'('.$value['data_precision'].')';
+				if($value['data_precision']!=''){
+					if($value['data_scale']==0){
+						$type = $value['type'].'('.$value['data_precision'].')';
+					} else {
+						$type = $value['type'].'('.$value['data_precision'].','.$value['data_scale'].')';
+					}
 				} else {
-					$type = $value['type'].'('.$value['data_precision'].','.$value['data_scale'].')';
+					$type = $value['type'];
 				}
 				$finalDescribe[] = array(
 					'Field' => $value['field'],

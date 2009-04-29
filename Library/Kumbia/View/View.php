@@ -776,6 +776,23 @@ abstract class View {
 	}
 
 	/**
+	 * Consulta si una vista de accion existe
+	 *
+	 * @param string $name
+	 * @param string $controllerName
+	 * @return boolean
+	 * @static
+	 */
+	public static function existsActionView($name, $controllerName=''){
+		if($controllerName==''){
+			$controllerName = Router::getController();
+		}
+		$_viewsDir = Core::getActiveViewsDir();
+		print $path = $_viewsDir.'/'.$controllerName.'/'.$name.'.phtml';
+		return Core::fileExists($path);
+	}
+
+	/**
 	 * Inserta un documento XHTML antes de una salida en buffer
 	 *
 	 * @access public
