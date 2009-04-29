@@ -1,5 +1,38 @@
 <?php
 
+/**
+ * Louder Application Forms
+ *
+ * LICENSE
+ *
+ * This source file is subject to the New BSD License that is bundled
+ * with this package in the file docs/LICENSE.txt.
+ *
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@loudertechnology.com so we can send you a copy immediately.
+ *
+ * @category 	Louder
+ * @package 	Louder
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright  	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @copyright	Copyright (c) 2008-2009 Oscar Garavito (game013@gmail.com)
+ * @license 	New BSD License
+ * @version 	$Id$
+ */
+
+/**
+ * CreateController
+ *
+ * Controlador que administra la creación de formularios
+ *
+ * @category 	Kumbia
+ * @package 	Kumbia
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright  	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @copyright	Copyright (c) 2008-2009 Oscar Garavito (game013@gmail.com)
+ * @license 	New BSD License
+ */
 class CreateController extends ApplicationController {
 
 	/**
@@ -18,10 +51,10 @@ class CreateController extends ApplicationController {
 
 	private function _checkRequiredPHPExtensions(){
 		if(!extension_loaded("pdo")){
-			throw new AsAdminException("Debe cargar la extensi&oacute;n de PHP llamada 'pdo' para usar esta aplicaci&oacute;n");
+			throw new AsAdminException("Debe cargar la extensión de PHP llamada 'pdo' para usar esta aplicación");
 		}
 		if(!extension_loaded("pdo_sqlite")){
-			throw new AsAdminException("Debe cargar la extensi&oacute;n de PHP llamada 'pdo' para usar esta aplicaci&oacute;n");
+			throw new AsAdminException("Debe cargar la extensión de PHP llamada 'pdo' para usar esta aplicación");
 		}
 	}
 
@@ -47,42 +80,42 @@ class CreateController extends ApplicationController {
 			$this->extappname = "@";
 		}
 		$applications = array();
-		foreach(scandir("apps/") as $app){
-			if(!in_array($app, array(".", "..", "admin", "appgen"))){
-				if(is_dir("apps/".$app)){
+		foreach(scandir('apps/') as $app){
+			if(!in_array($app, array('.', '..', 'admin', 'appgen'))){
+				if(is_dir('apps/'.$app)){
 					$applications[$app] = $app;
 				}
 			}
 		}
 		$environments = array(
-			"D" => "DEVELOPMENT",
-			"P" => "PRODUCTION",
-			"T" => "TEST",
-			"A" => "USAR ENTORNO ACTIVO",
+			'D' => 'DEVELOPMENT',
+			'P' => 'PRODUCTION',
+			'T' => 'TEST',
+			'A' => 'USAR ENTORNO ACTIVO',
 		);
-		$this->setParamToView("environments", $environments);
-		$this->setParamToView("applications", $applications);
+		$this->setParamToView('environments', $environments);
+		$this->setParamToView('applications', $applications);
 	}
 
 	public function componentAction(){
 		$this->newappname = "";
 		$controllerRequest = ControllerRequest::getInstance();
-		if($controllerRequest->isSetPostParam("environ")){
-			if($controllerRequest->getParamPost("environ")=="@"){
-				Flash::error("Debe indicar el entorno a utilizar");
-				$this->routeTo("action: index");
+		if($controllerRequest->isSetPostParam('environ')){
+			if($controllerRequest->getParamPost('environ')=='@'){
+				Flash::error('Debe indicar el entorno a utilizar');
+				return $this->routeTo('action: index');
 			}
-			$this->environ = $controllerRequest->getParamPost("environ", "onechar");
+			$this->environ = $controllerRequest->getParamPost('environ', 'onechar');
 		}
-		if($controllerRequest->isSetPostParam("extappname")){
-			if($controllerRequest->getParamPost("extappname")=="@"){
-				$appName = $controllerRequest->getParamPost("newappname", "identifier");
-				if($appName==""){
-					Flash::error("Debe indicar el nombre de la aplicaci&oacute;n");
-					$this->routeTo("action: index");
+		if($controllerRequest->isSetPostParam('extappname')){
+			if($controllerRequest->getParamPost('extappname')=='@'){
+				$appName = $controllerRequest->getParamPost('newappname', 'identifier');
+				if($appName==''){
+					Flash::error('Debe indicar el nombre de la aplicación');
+					$this->routeTo('action: index');
 				} else {
 					if(Core::fileExists("apps/$appName")==true){
-						Flash::notice("La aplicaci&oacute;n '$appName' ya existe");
+						Flash::notice("La aplicación '$appName' ya existe");
 						$this->extappname = $appName;
 						$this->newappname = "";
 					} else {
@@ -111,13 +144,13 @@ class CreateController extends ApplicationController {
 	public function crearAplicacionAction(){
 		$controllerRequest = ControllerRequest::getInstance();
 		if($controllerRequest->getParamPost("resumen")==""){
-			Flash::error("El campo res&uacute;men no puede ser nulo");
+			Flash::error("El campo resúmen no puede ser nulo");
 			return $this->routeTo("action: nueva");
 		}
 
 		if(file_exists("apps/{$this->newappname}")==false){
 			try {
-				Flash::notice("Se cre&oacute; el directorio apps/{$this->newappname}");
+				Flash::notice("Se creó el directorio apps/{$this->newappname}");
 				ComponentBuilder::createApplication($this->newappname);
 			}
 			catch(ComponentBuilderException $e){
@@ -129,8 +162,8 @@ class CreateController extends ApplicationController {
 		if($application==false){
 			$application = new Applications();
 		}
-		$application->setResume($this->getPostParam("resumen", "striptags", "extraspaces"));
-		$application->setDescription($this->getPostParam("descripcion", "striptags", "extraspaces"));
+		$application->setResume($this->getPostParam('resumen', 'striptags', 'extraspaces'));
+		$application->setDescription($this->getPostParam('descripcion', 'striptags', 'extraspaces'));
 		$application->setName($this->newappname);
 		if($application->save()==false){
 			foreach($application->getMessages() as $message){
@@ -139,10 +172,10 @@ class CreateController extends ApplicationController {
 			return $this->routeTo("action: nueva");
 		}
 		if($application->operationWasInsert()){
-			Flash::success("Se cre&oacute; la aplicaci&oacute;n '{$this->newappname}' correctamente");
+			Flash::success("Se creó la aplicación '{$this->newappname}' correctamente");
 		}
 		if($application->operationWasUpdate()){
-			Flash::success("Se actualiz&oacute; la aplicaci&oacute;n '{$this->newappname}' correctamente");
+			Flash::success("Se actualizó la aplicación '{$this->newappname}' correctamente");
 		}
 		$this->extappname = $this->newappname;
 		$this->newappname = "";
@@ -150,22 +183,22 @@ class CreateController extends ApplicationController {
 	}
 
 	public function sourceAction(){
-		$environment = CoreConfig::getConfigurationFrom($this->extappname, "environment.ini");
+		$environment = CoreConfig::getConfigurationFrom($this->extappname, 'environment.ini');
 
 		$descriptor = array();
-		$environ = "";
+		$environ = '';
 		if($this->environ=='D'){
-			$environ = "development";
+			$environ = 'development';
 		}
 		if($this->environ=='P'){
-			$environ = "production";
+			$environ = 'production';
 		}
 		if($this->environ=='T'){
-			$environ = "test";
+			$environ = 'test';
 		}
 
 		if(!isset($environment->$environ)){
-			Flash::error('No existe el entorno '.$environ.' en el environment.ini de la aplicaci&oacute;n '.$this->extappname);
+			Flash::error('No existe el entorno '.$environ.' en el environment.ini de la aplicación '.$this->extappname);
 			return $this->routeTo("action: form");
 		} else {
 			$activeEnv = $environment->{$environ};
@@ -177,28 +210,20 @@ class CreateController extends ApplicationController {
 			return $this->routeTo("action: form");
 		}
 
-		if(isset($activeEnv->{"database.host"})){
-			$descriptor["host"] = $activeEnv->{"database.host"};
-		}
-
-		if(isset($activeEnv->{"database.username"})){
-			$descriptor["username"] = $activeEnv->{"database.username"};
-		}
-
-		if(isset($activeEnv->{"database.password"})){
-			$descriptor["password"] = $activeEnv->{"database.password"};
-		}
-
-		if(isset($activeEnv->{"database.name"})){
-			$descriptor["name"] = $activeEnv->{"database.name"};
+		$parameters = array('host', 'username', 'password', 'name', 'instance', 'layer', 'dsn');
+		foreach($parameters as $parameter){
+			if(isset($activeEnv->{"database.$parameter"})){
+				$descriptor["$parameter"] = $activeEnv->{"database.$parameter"};
+			}
 		}
 
 		try {
 			$connection = DbLoader::factory($dbtype, $descriptor);
 		}
 		catch(DbException $e){
-			Flash::error("Error: No se pudo efectuar una conexi&oacute;n al gestor relacional con los par&aacute;metros de conexi&oacute;n
-			en el entorno '$environ' de la aplicaci&oacute;n '{$this->extappname}'");
+			Flash::error($e->getMessage());
+			Flash::error("Error: No se pudo efectuar una conexión al gestor relacional con los par&aacute;metros de conexión
+			en el entorno '$environ' de la aplicación '{$this->extappname}'");
 			return $this->routeTo("action: form");
 		}
 
@@ -208,9 +233,9 @@ class CreateController extends ApplicationController {
 		$tables = $connection->listTables();
 		$sources = array();
 		foreach($tables as $table){
-			$sources[$table] = $table;
+			$sources[$table] = strtolower($table);
 		}
-		$this->setParamToView("sources", $sources);
+		$this->setParamToView('sources', $sources);
 
 	}
 
@@ -220,38 +245,38 @@ class CreateController extends ApplicationController {
 			$connection = DbLoader::factory($this->dbtype, $this->descriptor);
 		}
 		catch(DbException $e){
-			Flash::error("Error: No se pudo efectuar una conexi&oacute;n al gestor relacional con los par&aacute;metros de conexi&oacute;n
-			de la aplicaci&oacute;n '{$this->extappname}'");
+			Flash::error("Error: No se pudo efectuar una conexión al gestor relacional con los par&aacute;metros de conexión
+			de la aplicación '{$this->extappname}'");
 			return $this->routeTo("action: form");
 		}
-		if($controllerRequest->isSetPostParam("source")){
-			$source = $controllerRequest->getParamPost("source", "identifier");
-			$this->source = $source;
-			$this->controlador = "";
-			$this->titulo = "";
+		if($controllerRequest->isSetPostParam('source')){
+			$source = $controllerRequest->getParamPost('source', 'identifier');
+			$this->source = strtolower($source);
+			$this->controlador = '';
+			$this->titulo = '';
 		}
-		if($controllerRequest->isSetPostParam("etiqueta")){
-			$etiqueta = $controllerRequest->getParamPost("etiqueta");
+		if($controllerRequest->isSetPostParam('etiqueta')){
+			$etiqueta = $controllerRequest->getParamPost('etiqueta');
 		} else {
 			$etiqueta = array();
 		}
-		if($controllerRequest->isSetPostParam("size")){
-			$sizes = $controllerRequest->getParamPost("size");
+		if($controllerRequest->isSetPostParam('size')){
+			$sizes = $controllerRequest->getParamPost('size');
 		} else {
 			$sizes = array();
 		}
-		if($controllerRequest->isSetPostParam("component")){
-			$components = $controllerRequest->getParamPost("component");
+		if($controllerRequest->isSetPostParam('component')){
+			$components = $controllerRequest->getParamPost('component');
 		} else {
 			$components = array();
 		}
-		if($controllerRequest->isSetPostParam("search")){
-			$search = $controllerRequest->getParamPost("search");
+		if($controllerRequest->isSetPostParam('search')){
+			$search = $controllerRequest->getParamPost('search');
 		} else {
 			$search = array();
 		}
-		if($controllerRequest->isSetPostParam("browse")){
-			$browse = $controllerRequest->getParamPost("browse");
+		if($controllerRequest->isSetPostParam('browse')){
+			$browse = $controllerRequest->getParamPost('browse');
 		} else {
 			$browse = array();
 		}
@@ -264,44 +289,44 @@ class CreateController extends ApplicationController {
 			$conditions = "app_name = '{$this->extappname}' AND table_name='{$this->source}' AND field_name = '{$field['Field']}'";
 			$attribute = $this->Attributes->findFirst($conditions);
 			if($attribute==false){
-				$label = ucwords(str_replace("_", " ", str_replace("_id", "", $field['Field'])));
-				$attribute = EntityManager::getEntityInstance("Attributes");
+				$label = ucwords(str_replace('_', ' ', str_replace('_id', '', $field['Field'])));
+				$attribute = EntityManager::getEntityInstance('Attributes');
 				$attribute->setAppName($this->extappname);
 				$attribute->setTableName($this->source);
 				$attribute->setFieldName($field['Field']);
 				$attribute->setType($field['Type']);
-				$attribute->setAllowNull($field['Null'] == "YES" ? "Y" : "N");
+				$attribute->setAllowNull($field['Null'] == 'YES' ? 'Y' : 'N');
 				$attribute->setLabel($label);
-				$attribute->setHidden("N");
-				$attribute->setBrowse("Y");
-				$attribute->setReport("Y");
-				$attribute->setSearch("Y");
-				$attribute->setReadOnly("N");
-				if($field['Key']=="PRI"){
-					$attribute->setPrimaryKey("Y");
+				$attribute->setHidden('N');
+				$attribute->setBrowse('Y');
+				$attribute->setReport('Y');
+				$attribute->setSearch('Y');
+				$attribute->setReadOnly('N');
+				if($field['Key']=='PRI'){
+					$attribute->setPrimaryKey('Y');
 				} else {
-					$attribute->setPrimaryKey("N");
+					$attribute->setPrimaryKey('N');
 				}
-				$component = "TE";
-				if(strpos($field['Type'], "int")!==false||strpos($field['Type'], "decimal")!==false){
-					$component = "TN";
+				$component = 'TE';
+				if(strpos($field['Type'], 'int')!==false||strpos($field['Type'], 'decimal')!==false){
+					$component = 'TN';
 				}
 				if($field['Type']=='text'){
-					$component = "TA";
+					$component = 'TA';
 				}
 				if($field['Field']=='email'){
-					$component = "EM";
+					$component = 'EM';
 				}
 				if($field['Type']=='date'){
-					$component = "DA";
+					$component = 'DA';
 				}
 				if(preg_match('/([a-zA-Z0-9_]+)_id$/', $field['Field'])){
 					$component = 'CR';
 				}
 				$size = 0;
-				if($pos = strpos(" ".$field['Type'], "(")){
+				if($pos = strpos(' '.$field['Type'], '(')){
 					$size = substr($field['Type'], $pos);
-					$size = substr($size, 0, strpos($size, ")"));
+					$size = substr($size, 0, strpos($size, ')'));
 					$size = (int) $size;
 				}
 				$attribute->setSize($size);
@@ -363,7 +388,7 @@ class CreateController extends ApplicationController {
 							Flash::error($message->getMessage());
 						}
 					} else {
-						$messages[] = "Se actualiz&oacute; correctamente el campo '{$field['Field']}'";
+						$messages[] = "Se actualizó correctamente el campo '{$field['Field']}'";
 					}
 				}
 			}
@@ -436,8 +461,8 @@ class CreateController extends ApplicationController {
 			return $connection;
 		}
 		catch(DbException $e){
-			Flash::error("Error: No se pudo efectuar una conexi&oacute;n al gestor relacional con los par&aacute;metros de conexi&oacute;n
-			de la aplicaci&oacute;n '{$this->extappname}'");
+			Flash::error("Error: No se pudo efectuar una conexión al gestor relacional con los par&aacute;metros de conexión
+			de la aplicación '{$this->extappname}'");
 			return $this->routeTo("action: index");
 		}
 	}
@@ -447,7 +472,7 @@ class CreateController extends ApplicationController {
 		$id = $this->filter($id, "int");
 		$relation = $this->Relations->findFirst($id);
 		if($relation==false){
-			Flash::error("La relaci&oacute;n no existe");
+			Flash::error("La relación no existe");
 			return;
 		} else {
 			$connection = $this->_getConnection();
@@ -469,32 +494,32 @@ class CreateController extends ApplicationController {
 
 	public function saveRelationAction($id){
 		$controllerRequest = ControllerRequest::getInstance();
-		$id = $this->filter($id, "int");
+		$id = $this->filter($id, 'int');
 		$relation = $this->Relations->findFirst($id);
 		if($relation==false){
-			Flash::error("La relaci&oacute;n no existe");
+			Flash::error('La relación no existe');
 			return;
 		} else {
-			$fieldDetail = $controllerRequest->getParamPost("fieldDetail", "identifier");
+			$fieldDetail = $controllerRequest->getParamPost('fieldDetail', 'identifier');
 			$relation->setFieldDetail($fieldDetail);
-			$fieldOrder = $controllerRequest->getParamPost("fieldOrder", "identifier");
+			$fieldOrder = $controllerRequest->getParamPost('fieldOrder', 'identifier');
 			$relation->setFieldOrder($fieldOrder);
 			if($relation->save()==false){
 				foreach($relation->getMessages() as $message){
 					Flash::error($message->getMessage());
 				}
-				$this->routeTo("action: editRelation");
+				$this->routeTo('action: editRelation');
 			} else {
-				Flash::success("Se guard&oacute; correctamente la relaci&oacute;n");
-				$this->routeTo("action: relations");
+				Flash::success('Se guardó correctamente la relación');
+				$this->routeTo('action: relations');
 			}
 		}
 	}
 
 	public function formOptionsAction(){
 		if($this->controlador==""){
-			$this->controlador = $this->source;
-			$this->titulo = ucwords($this->source);
+			$this->controlador = strtolower($this->source);
+			$this->titulo = ucwords(strtolower(str_replace('_', ' ', $this->source)));
 		}
 	}
 
@@ -524,13 +549,14 @@ class CreateController extends ApplicationController {
 	}
 
 	public function crearFormAction(){
-		CreateForm::newForm($this->controlador,$this->extappname,$this->source,$this->titulo);
-		$this->redirect("create/index");
+		$connection = $this->_getConnection();
+		CreateForm::newForm($connection, $this->controlador, $this->extappname, $this->source, $this->titulo);
+		#$this->redirect("create/index");
 	}
 
 	public function getFieldsAction(){
 		$this->setResponse('json');
-		$table = $this->getPostParam("table", "identifier");
+		$table = $this->getPostParam('table', 'identifier');
 		$connection = $this->_getConnection();
 		$fields = $connection->describeTable($table);
 		$rfields = array();
@@ -542,19 +568,19 @@ class CreateController extends ApplicationController {
 
 	public function addRelationAction(){
 		$this->setResponse('ajax');
-		$field = $this->getPostParam("field", "identifier");
-		$tableRelation = $this->getPostParam("tableRelation", "identifier");
-		$fieldRelation = $this->getPostParam("fieldRelation", "identifier");
-		$fieldOrder = $this->getPostParam("fieldOrder", "identifier");
-		$fieldDetail = $this->getPostParam("fieldDetail", "identifier");
+		$field = $this->getPostParam('field', 'identifier');
+		$tableRelation = $this->getPostParam('tableRelation', 'identifier');
+		$fieldRelation = $this->getPostParam('fieldRelation', 'identifier');
+		$fieldOrder = $this->getPostParam('fieldOrder', 'identifier');
+		$fieldDetail = $this->getPostParam('fieldDetail', 'identifier');
 		$conditions = "app_name = '{$this->extappname}' AND table_name='{$this->source}' AND field_name = '$field'";
 		$attribute = $this->Attributes->findFirst($conditions);
 		if($attribute==false){
 			Flash::error("No existe el campo '$field' en la tabla '{$this->source}'");
 		} else {
-			$relation = ActiveRecord::getInstance("Relations", array(
-				"attributes_id" => $attribute->getId(),
-				"table_relation" => $tableRelation
+			$relation = ActiveRecord::getInstance('Relations', array(
+				'attributes_id' => $attribute->getId(),
+				'table_relation' => $tableRelation
 			));
 			$relation->setFieldDetail($fieldDetail);
 			$relation->setFieldOrder($fieldOrder);

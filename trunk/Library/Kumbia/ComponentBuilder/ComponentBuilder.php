@@ -90,7 +90,8 @@ $str = "; Kumbia Enterprise Framework Configuration
 
 ; Parametros de base de datos
 ; Utiliza el nombre del controlador nativo en database.type (mysql, pgsql, oracle, informix)
-; Colocar database.pdo = On si se usa PHP Data Objects
+; Colocar database.layer = \"pdo\" si se usa PHP Data Objects
+; Colocar database.layer = \"jdbc\" si se usa JDBC
 
 [development]
 database.type = mysql
@@ -183,6 +184,26 @@ class ControllerBase {
 	}
 
 	/**
+	 * Devuelve el tipo PHP asociado
+	 *
+	 * @param string $type
+	 * @return string
+	 * @static
+	 */
+	public static function _getPHPType($type){
+		if(stripos($type, 'int')!==false){
+			return 'integer';
+		}
+		if(stripos($type, 'decimal')!==false){
+			return 'double';
+		}
+		if(strtolower($type)=='date'){
+			return 'Date';
+		}
+		return 'string';
+	}
+
+	/**
 	 * Crea una aplicacion
 	 *
 	 * @param string $name
@@ -203,6 +224,46 @@ class ControllerBase {
 		self::createModelBase($name);
 		self::createIndexView($name);
 		self::createControllerBase($name);
+	}
+
+	/**
+	 * Crea un modelo
+	 *
+	 * @param DbBase $db
+	 * @param string $modelsDir
+	 * @param string $name
+	 * @param string $schema
+	 */
+	public static function createModel($db, $modelsDir, $name, $schema=''){
+		$initialize = array();
+		if($schema){
+			$initialize[] = "\t\t\$this->setSchema(\"$schema\");";
+		}
+		$table = $name;
+		if($db->tableExists($table, $schema)){
+			$fields = $db->describeTable($name, $schema);
+			$attributes = array();
+			$setters = array();
+			$getters = array();
+			foreach($fields as $field){
+				$type = self::_getPHPType($field['Type']);
+				$attributes[] = "\t/**\n\t * @var $type\n\t */\n\tprotected \${$field['Field']};\n";
+				$setterName = Utils::camelize($field['Field']);
+				$setters[] = "\t/**\n\t * Método para establecer el valor del campo {$field['Field']}\n\t * @param $type \${$field['Field']}\n\t */\n\tpublic function set$setterName(\${$field['Field']}){\n\t\t\$this->{$field['Field']} = \${$field['Field']};\n\t}\n";
+				if($type=="Date"){
+					$getters[] = "\t/**\n\t * Devuelve el valor del campo {$field['Field']}\n\t * @return $type\n\t */\n\tpublic function get$setterName(){\n\t\treturn new Date(\$this->{$field['Field']});\n\t}\n";
+				} else {
+					$getters[] = "\t/**\n\t * Devuelve el valor del campo {$field['Field']}\n\t * @return $type\n\t */\n\tpublic function get$setterName(){\n\t\treturn \$this->{$field['Field']};\n\t}\n";
+				}
+			}
+			if(count($initialize)>0){
+				$initCode = "\n\t/**\n\t * Método inicializador de la Entidad\n\t */\n\tprotected function initialize(){\t\t\n".join(";\n", $initialize)."\n\t}\n";
+			} else {
+				$initCode = "";
+			}
+			$code = "<?php\n\nclass ".Utils::camelize($name)." extends ActiveRecord {\n\n".join("\n", $attributes)."\n\n".join("\n", $setters)."\n\n".join("\n", $getters)."$initCode\n}\n\n";
+			file_put_contents("$modelsDir/$name.php", $code);
+		}
 	}
 
 }
