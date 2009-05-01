@@ -39,7 +39,7 @@ abstract class Core {
 	 * Version del Framework
 	 *
 	 */
-	const FRAMEWORK_VERSION = '1.0.17GA';
+	const FRAMEWORK_VERSION = '1.0.17aGA';
 
 	/**
 	 * PATH donde esta instalada la instancia del framework
