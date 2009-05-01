@@ -53,6 +53,13 @@ class FeedItem {
 	 *
 	 * @var string
 	 */
+	private $_author;
+
+	/**
+	 * Enlace del item
+	 *
+	 * @var string
+	 */
 	private $_description;
 
 	/**
@@ -128,6 +135,24 @@ class FeedItem {
 	}
 
 	/**
+	 * Establece el author del item
+	 *
+	 * @param string $author
+	 */
+	public function setauthor($author){
+		$this->_author = $author;
+	}
+
+	/**
+	 * Obtiene el author del item
+	 *
+	 * @return string
+	 */
+	public function getauthor(){
+		return $this->_author;
+	}
+
+	/**
 	 * Establece la descripción del item
 	 *
 	 * @param string $description
@@ -187,7 +212,7 @@ class FeedItem {
 	 * @return array
 	 */
 	public function getElementsAsArray(){
-		$elements = array('title', 'link', 'description', 'guid', 'pubDate');
+		$elements = array('title', 'link', 'description', 'guid', 'pubDate', 'author');
 		$elementsArray = array();
 		foreach($elements as $element){
 			$elementsArray[$element] = $this->{'_'.$element};

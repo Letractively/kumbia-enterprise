@@ -33,7 +33,7 @@
  * @copyright	Copyright (c) 2008-2009 Oscar Garavito (game013@gmail.com)
  * @license 	New BSD License
  */
-abstract class CreateForm {
+abstract class CreateForm extends UserComponent {
 
 	/**
 	 * Atributos

@@ -43,7 +43,6 @@ require 'Library/Kumbia/Db/Adapters/Pdo/Interface.php';
  * @license		New BSD License
  * @link		http://www.php.net/manual/es/book.pdo.php
  * @access		Public
- *
  */
 abstract class DbPDO extends DbBase implements DbPDOInterface  {
 
@@ -434,6 +433,15 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 			$number = $error[1];
 		}
 		return $number;
+	}
+
+	/**
+	 * Obtiene el tipo de error generado
+	 *
+	 * @param int $errorCode
+	 */
+	protected function _getErrorType($errorCode){
+		return self::EX_DEFAULT;
 	}
 
 	/**
