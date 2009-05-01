@@ -110,7 +110,7 @@ abstract class Scriptaculous {
 				throw new ScriptaculousException('Tipo de dato no soportado por el autocomplete');
 			}
 		}
-		$code.= '<ul>';
+		$code.= '</ul>';
 		return $code;
 	}
 }

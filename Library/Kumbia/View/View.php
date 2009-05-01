@@ -624,7 +624,12 @@ abstract class View {
 		self::$_renderLevel = $level;
 	}
 
-
+	/**
+	 * Establece el proxy provider para las vistas
+	 *
+	 * @param string $proxy
+	 * @param array $options
+	 */
 	public static function setProxyProvider($proxy, $options){
 		self::$_proxyProvider = $proxy;
 		self::$_proxyOptions = $options;
@@ -778,9 +783,9 @@ abstract class View {
 	/**
 	 * Consulta si una vista de accion existe
 	 *
-	 * @param string $name
-	 * @param string $controllerName
-	 * @return boolean
+	 * @param 	string $name
+	 * @param 	string $controllerName
+	 * @return	boolean
 	 * @static
 	 */
 	public static function existsActionView($name, $controllerName=''){
@@ -788,7 +793,7 @@ abstract class View {
 			$controllerName = Router::getController();
 		}
 		$_viewsDir = Core::getActiveViewsDir();
-		print $path = $_viewsDir.'/'.$controllerName.'/'.$name.'.phtml';
+		$path = $_viewsDir.'/'.$controllerName.'/'.$name.'.phtml';
 		return Core::fileExists($path);
 	}
 

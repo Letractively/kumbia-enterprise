@@ -207,8 +207,10 @@ class Feed {
 	/**
 	 * Obtiene el XML del Feed
 	 *
+	 * @return string
 	 */
 	public function getXMLFeed(){
+		$this->_initializeRSS();
 		return $this->_dom->saveXML();
 	}
 

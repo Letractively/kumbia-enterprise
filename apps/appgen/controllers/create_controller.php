@@ -294,6 +294,9 @@ class CreateController extends ApplicationController {
 				$attribute->setAppName($this->extappname);
 				$attribute->setTableName($this->source);
 				$attribute->setFieldName($field['Field']);
+				if(strpos($field['Type'], 'enum')!==false){
+					$field['Type'] = "char";
+				}
 				$attribute->setType($field['Type']);
 				$attribute->setAllowNull($field['Null'] == 'YES' ? 'Y' : 'N');
 				$attribute->setLabel($label);

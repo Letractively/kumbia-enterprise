@@ -705,6 +705,20 @@ abstract class Router {
 	}
 
 	/**
+	 * Obtiene el URL dentro de la aplicación actual
+	 *
+	 * @access public
+	 * @static
+	 */
+	static public function getApplicationURL(){
+		if(self::$_application!=''){
+			return substr(self::$_url, strlen(self::$_application)+1);
+		} else {
+			return self::$_url;
+		}
+	}
+
+	/**
 	 * Redirecciona el flujo de ejecucion a otra aplicacion
 	 * en la misma instancia del framework
 	 *
