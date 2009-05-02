@@ -57,9 +57,10 @@ abstract class TransactionManager implements TransactionManagerInterface {
 	/**
 	 * Devuelve la ultima creada o crea una transaccion
 	 *
-	 * @access public
-	 * @param $definition
-	 * @return ActiveRecordTransaction
+	 * @access	public
+	 * @param  	TransactionDefinition $definition
+	 * @return 	ActiveRecordTransaction
+	 * @static
 	 */
 	public static function getUserTransaction($definition=''){
 		if($definition!==''){

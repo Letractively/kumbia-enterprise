@@ -18,9 +18,8 @@
  * @license New BSD License
  */
 
-require "Library/Kumbia/Core/ClassPath/CoreClassPath.php";
-require "Library/Kumbia/Autoload.php";
-spl_autoload_register("Autoload");
+require 'Library/Kumbia/Core/ClassPath/CoreClassPath.php';
+require 'Library/Kumbia/Autoload.php';
 
 class Package extends Script {
 
@@ -76,19 +75,19 @@ class Package extends Script {
 			$outputDir = "deploy/";
 		}
 		$includeDirectories = array(
-			"apps/admin",
+			#"apps/admin",
 			"apps/$application",
 			"config",
 			"languages",
 			"Library",
 			"scripts",
 			"public/img/upload",
-			"public/javascript/admin",
+			#"public/javascript/admin",
 			"public/javascript/core",
-			"public/javascript/ext",
-			"public/javascript/scriptaculous",
+			"public/javascript/core/framework/ext",
+			"public/javascript/core/framework/scriptaculous",
 			"public/css/ext",
-			"public/css/admin",
+			#"public/css/admin",
 			"public/files",
 			"public/temp"
 		);

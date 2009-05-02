@@ -12,22 +12,28 @@
  * obtain it through the world-wide-web, please send an email
  * to kumbia@kumbia.org so we can send you a copy immediately.
  *
- * @category Kumbia
- * @package Scripts
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @category 	Kumbia
+ * @package 	Scripts
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @license 	New BSD License
+ * @version 	$Id$
  */
 
 require 'Library/Kumbia/Core/ClassPath/CoreClassPath.php';
 require 'Library/Kumbia/Autoload.php';
 
 /**
+ * CreateModel
+ *
  * Permite crear un modelo por linea de comandos
  *
- * @category Kumbia
- * @package Scripts
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @category 	Kumbia
+ * @package 	Scripts
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @license 	New BSD License
+ * @version 	$Id$
  */
 class CreateModel extends Script {
 
@@ -53,7 +59,7 @@ class CreateModel extends Script {
 	public function __construct(){
 
 		$posibleParameters = array(
-			'table-name=s' => '--name nombre \t\tNombre de la tabla source del modelo',
+			'table-name=s' => '--table-name nombre \t\tNombre de la tabla source del modelo',
 			'schema=s' => '--schema nombre \tNombre del schema donde est&aacute; la tabla si este difiere del schema por defecto [opcional]',
 			'application=s' => '--application nombre \tNombre de la aplicaci&oacute;n [opcional]',
 			'force' => '--force \t\tForza a que se reescriba el modelo [opcional]',

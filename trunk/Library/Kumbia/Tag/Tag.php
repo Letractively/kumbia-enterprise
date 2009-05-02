@@ -1226,6 +1226,28 @@ abstract class Tag {
 	}
 
 	/**
+	 * Agrega al final un texto del titulo actual del documento HTML
+	 *
+	 * @access public
+	 * @param string $title
+	 * @static
+	 */
+	public static function appendDocumentTitle($title){
+		self::$_documentTitle.= $title;
+	}
+
+	/**
+	 * Agrega al prinicipio un texto del titulo actual del documento HTML
+	 *
+	 * @access public
+	 * @param string $title
+	 * @static
+	 */
+	public static function prependDocumentTitle($title){
+		self::$_documentTitle = $title.self::$_documentTitle;
+	}
+
+	/**
 	 * Devuelve el titulo del documento HTML
 	 *
 	 * @access public

@@ -176,7 +176,7 @@ abstract class View {
 					if(!interface_exists('ViewResponseInterface')){
 						require 'Library/Kumbia/View/Interface.php';
 					}
-					$path = "Library/Kumbia/View/Adapters/$adapter.php";
+					$path = 'Library/Kumbia/View/Adapters/'.$adapter.'.php';
 					if(Core::fileExists($path)==true){
 						require $path;
 					}
@@ -516,8 +516,9 @@ abstract class View {
 	/**
 	 * Permite visualizar una vista parcial
 	 *
-	 * @param string $partialView
-	 * @param string $partialValue
+	 * @access	public
+	 * @param	string $_partialView
+	 * @param	string $_partialValue
 	 * @static
 	 */
 	public static function renderPartial($_partialView, $_partialValue=''){
@@ -553,8 +554,8 @@ abstract class View {
 	/**
 	 * Permite renderizar una vista del controlador actual
 	 *
-	 * @access public
-	 * @param string $view
+	 * @access 	public
+	 * @param	string $_view
 	 * @static
 	 */
 	static public function renderView($_view){
@@ -579,7 +580,9 @@ abstract class View {
 	/**
 	 * Devuelve los mensajes de validacion generados en el controlador
 	 *
-	 * @return array
+	 * @access	public
+	 * @return	array
+	 * @static
 	 */
 	public static function getValidationMessages(){
 		$controller = Dispatcher::getController();
@@ -589,7 +592,9 @@ abstract class View {
 	/**
 	 * Permite definir el contenido de salida
 	 *
-	 * @param string $content
+	 * @access 	public
+	 * @param 	string $content
+	 * @static
 	 */
 	public static function setContent($content){
 		self::$_content = $content;
@@ -598,8 +603,9 @@ abstract class View {
 	/**
 	 * Establece una variable de vista
 	 *
-	 * @param string $index
-	 * @param string $value
+	 * @access 	public
+	 * @param	string $index
+	 * @param 	string $value
 	 */
 	public static function setViewParam($index, $value){
 		self::$_data[$index] = $value;
@@ -608,7 +614,9 @@ abstract class View {
 	/**
 	 * Devuelve las variables de vistas
 	 *
-	 * @return array
+	 * @access	public
+	 * @return	array
+	 * @static
 	 */
 	public static function getViewParams(){
 		return self::$_data;
@@ -617,7 +625,8 @@ abstract class View {
 	/**
 	 * Establece el nivel de profundidad de la visualización
 	 *
-	 * @param int $level
+	 * @access 	public
+	 * @param 	int $level
 	 * @static
 	 */
 	public static function setRenderLevel($level){
@@ -627,8 +636,10 @@ abstract class View {
 	/**
 	 * Establece el proxy provider para las vistas
 	 *
-	 * @param string $proxy
-	 * @param array $options
+	 * @access 	public
+	 * @param 	string $proxy
+	 * @param 	array $options
+	 * @static
 	 */
 	public static function setProxyProvider($proxy, $options){
 		self::$_proxyProvider = $proxy;
@@ -638,7 +649,8 @@ abstract class View {
 	/**
 	 * Reenvia las peticiones de vistas a otros componentes de terceros
 	 *
-	 * @param string $proxy
+	 * @access public
+	 * @static
 	 */
 	public static function proxyHandler(){
 		//Cargar el ProxyProvider

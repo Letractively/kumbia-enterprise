@@ -24,7 +24,9 @@
 /**
  * Utils
  *
- * Funciones de Utilidades
+ * Utils es un componente que principalmente es utilizado por el framework para centralizar
+ * funciones auxiliares de propósito general, su funcionalidad también
+ * está disponible al desarrollador.
  *
  * @category 	Kumbia
  * @package 	Utils
@@ -32,8 +34,9 @@
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright  	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
  * @license 	New BSD License
+ * @abstract
  */
-abstract class Utils extends Object {
+abstract class Utils {
 
 	/**
 	 * Merge Two Arrays Overwriting Values $a1
@@ -126,9 +129,10 @@ abstract class Utils extends Object {
 	/**
  	 * Convierte los parametros de una funcion o metodo a parametros por nombre
 	 *
-	 * @param array $params
-	 * @param int $numberArgs
-	 * @return array
+	 * @access 	public
+	 * @param 	array $params
+	 * @param 	int $numberArgs
+	 * @return 	array
 	 */
 	public static function getParams($params, $numberArgs){
 		if(isset($params[0])&&is_array($params[0])&&$numberArgs==1){
@@ -151,8 +155,9 @@ abstract class Utils extends Object {
 	/**
 	 * Convierte un parametro por nombre en un array
 	 *
-	 * @param string $param
-	 * @return array
+	 * @access 	public
+	 * @param 	string $param
+	 * @return 	array
 	 * @static
 	 */
 	public static function getParam($param){
@@ -167,8 +172,9 @@ abstract class Utils extends Object {
 	/**
 	 * Cameliza una cadena
 	 *
-	 * @param string $str
-	 * @return string
+	 * @access	public
+	 * @param	string $str
+	 * @return	string
 	 * @static
 	 */
 	static public function camelize($str) {
@@ -178,8 +184,9 @@ abstract class Utils extends Object {
 	/**
 	 * Descameliza una cadena camelizada
 	 *
-	 * @param string $s
-	 * @return string
+	 * @access 	public
+	 * @param 	string $str
+	 * @return 	string
 	 * @static
 	 */
 	static public function uncamelize($str){
@@ -205,8 +212,9 @@ abstract class Utils extends Object {
 	/**
      * Coloca la primera letra en minuscula
      *
-     * @param string $s
-     * @return string
+     * @access 	public
+     * @param 	string $s
+     * @return 	string
      * @static
      **/
     public static function lcfirst($s){
@@ -216,8 +224,9 @@ abstract class Utils extends Object {
 	/**
 	 * Devuelve una URL adecuada de Kumbia
 	 *
-	 * @param string $url
-	 * @return string
+	 * @access 	public
+	 * @param	string $url
+	 * @return	string
 	 * @static
 	 */
 	static public function getKumbiaUrl($url){
@@ -257,8 +266,10 @@ abstract class Utils extends Object {
 	/**
 	 * Devuelve el array enviado como parametro con cada elemento con comillas
 	 *
-	 * @param array $list
-	 * @return array
+	 * @access 	public
+	 * @param 	array $toQuoteArray
+	 * @param 	string $quoteChar
+	 * @return 	array
 	 */
 	public static function getQuotedArray($toQuoteArray, $quoteChar="'"){
 		$returnedArray = array();
@@ -271,12 +282,12 @@ abstract class Utils extends Object {
 	/**
 	 * Cambia la primera letra de las palabras a mayusculas
 	 *
-	 * @param string $words
-	 * @return string
+	 * @access 	public
+	 * @param 	string $words
+	 * @return 	string
 	 */
 	public static function ucwords($words){
 		return ucwords(i18n::strtolower($words));
 	}
 
 }
-

@@ -156,7 +156,7 @@ abstract class Core {
 			}
 		}
 		if(date_default_timezone_set($timezone)==false){
-			throw new CoreException('Timezone inv&aaacute;lido \''.$timezone.'\'');
+			throw new CoreException('Timezone inválido \''.$timezone.'\'');
 		}
 	}
 
@@ -744,6 +744,7 @@ abstract class Core {
 	 * Realiza un require en forma condicional
 	 *
 	 * @param string $file
+	 * @static
 	 */
 	public static function requireFile($file){
 		require 'Library/Kumbia/'.$file.'.php';
@@ -752,7 +753,8 @@ abstract class Core {
 	/**
 	 * Realiza un require en forma condicional
 	 *
-	 * @param string $file
+	 * @param string $className
+	 * @static
 	 */
 	public static function requireLogicalFile($className){
 		if(self::$_isWebSphere==true){
@@ -778,9 +780,9 @@ abstract class Core {
 	/**
 	 * Permite lanzar excepciones de PHP o externas a Kumbia como propias
 	 *
-	 * @access public
-	 * @param Exception $exception
-	 * @throws CoreException
+	 * @access	public
+	 * @param 	Exception $exception
+	 * @throws 	CoreException
 	 * @static
 	 */
 	public static function manageExceptions($exception){
@@ -788,11 +790,15 @@ abstract class Core {
 	}
 
 	/**
-	 * Permite lanzar errores con excepciones
+	 * Permite lanzar errores, warnings, notices con excepciones
 	 *
-	 * @access public
-	 * @param Exception $exception
-	 * @throws CoreException
+	 * @access	public
+	 * @param 	int $number
+	 * @param 	string $message
+	 * @param 	string $file
+	 * @param 	int	$num
+	 * @param 	array $enviroment
+	 * @throws 	CoreException
 	 * @static
 	 */
 	public static function manageErrors($number, $message, $file, $num, $enviroment){
@@ -849,9 +855,9 @@ abstract class Core {
 	/**
 	 * Indica si una aplicacion existe
 	 *
-	 * @access public
-	 * @param string $application
-	 * @return boolean
+	 * @access	public
+	 * @param	string $application
+	 * @return	boolean
 	 * @static
 	 */
 	public static function applicationExists($application){

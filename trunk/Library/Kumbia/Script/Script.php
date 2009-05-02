@@ -62,13 +62,13 @@ abstract class Script extends Object {
 			if(strpos($parameter, "=")!==false){
 				$parameterParts = explode("=", $parameter);
 				if(count($parameterParts)!=2){
-					throw new ScriptException("Definici&oacute;n invalida para el par&aacute;metro '$parameter'");
+					throw new ScriptException("Definición invalida para el parámetro '$parameter'");
 				}
 				if(strlen($parameterParts[0])==""){
-					throw new ScriptException("Definici&oacute;n invalida para el par&aacute;metro '$parameter'");
+					throw new ScriptException("Definición invalida para el parámetro '$parameter'");
 				}
 				if(!in_array($parameterParts[1], array('s', 'i'))){
-					throw new ScriptException("Tipo de dato incorrecto en par&aacute;metro '$parameter'");
+					throw new ScriptException("Tipo de dato incorrecto en parámetro '$parameter'");
 				}
 				$posibleArguments[] = $parameterParts[0];
 				$arguments[$parameterParts[0]] = array(
@@ -80,13 +80,13 @@ abstract class Script extends Object {
 				if(strpos($parameter, "=")!==false){
 					$parameterParts = explode("=", $parameter);
 					if(count($parameterParts)!=2){
-						throw new ScriptException("Definici&oacute;n invalida para el par&aacute;metro '$parameter'");
+						throw new ScriptException("Definición invalida para el parámetro '$parameter'");
 					}
 					if(strlen($parameterParts[0])==""){
-						throw new ScriptException("Definici&oacute;n invalida para el par&aacute;metro '$parameter'");
+						throw new ScriptException("Definición invalida para el parámetro '$parameter'");
 					}
 					if(!in_array($parameterParts[1], array('s', 'i'))){
-						throw new ScriptException("Tipo de dato incorrecto en par&aacute;metro '$parameter'");
+						throw new ScriptException("Tipo de dato incorrecto en parámetro '$parameter'");
 					}
 					$posibleArguments[] = $parameterParts[0];
 					$arguments[$parameterParts[0]] = array(
@@ -102,7 +102,7 @@ abstract class Script extends Object {
 							'option-required' => false
 						);
 					} else {
-						throw new ScriptException("Pa&aacute;metro invalido '$parameter'");
+						throw new ScriptException("Paámetro invalido '$parameter'");
 					}
 				}
 			}
@@ -117,16 +117,16 @@ abstract class Script extends Object {
 			if(substr($argv, 0, 2)=="--"){
 				$parameter = substr($argv, 2);
 				if(!in_array($parameter, $posibleArguments)){
-					throw new ScriptException("Par&aacute;metro desconocido '$parameter'");
+					throw new ScriptException("Parámetro desconocido '$parameter'");
 				}
 				if(!strlen($parameter)){
-					throw new ScriptException("Par&aacute;metro de Script inv&aacute;lido en la posici&oacute;n $i");
+					throw new ScriptException("Parámetro de Script inválido en la posición $i");
 				} else {
 					if($paramName!=""){
 						if(isset($arguments[$parameter])){
 							if($param==""){
 								if($arguments[$paramName]['have-option']==true){
-									throw new ScriptException("El par&aacute;metro '$paramName' requiere una opci&oacute;n");
+									throw new ScriptException("El parámetro '$paramName' requiere una opción");
 								}
 							}
 						}
@@ -142,7 +142,7 @@ abstract class Script extends Object {
 					if(isset($arguments[$paramName])){
 						if($param==""){
 							if($arguments[$paramName]['have-option']==true){
-								throw new ScriptException("El par&aacute;metro '$paramName' requiere una opci&oacute;n");
+								throw new ScriptException("El parámetro '$paramName' requiere una opción");
 							}
 						}
 					}
@@ -176,7 +176,7 @@ abstract class Script extends Object {
 	public function checkRequired($required){
 		foreach($required as $fieldRequired){
 			if(!isset($this->_parameters[$fieldRequired])){
-				throw new ScriptException("El par&aacute;metro '$fieldRequired' es requerido por este script");
+				throw new ScriptException("El parámetro '$fieldRequired' es requerido por este script");
 			}
 		}
 	}

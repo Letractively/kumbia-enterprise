@@ -28,7 +28,8 @@ require 'Library/Kumbia/Plugin/Abstract/Plugin.php';
 /**
  * PluginManager
  *
- * Permite administrar los plugins cargados
+ * Este componente permite administrar los plugins cargados en una aplicación
+ * facilitando  el agregar ó quitar dinámicamente plug-ins.
  *
  * @category 	Kumbia
  * @package 	Plugin
@@ -258,7 +259,8 @@ abstract class PluginManager {
 	 * Notifica un evento de los controladores a los plugins
 	 *
 	 * @param string $event
-	 * @param Controller $controller
+	 * @param ControllerResponse $controllerResponse
+	 * @static
 	 */
 	static public function notifyFromView($event, $controllerResponse){
 		if(count(self::$_pluginsView)>0){
@@ -273,9 +275,11 @@ abstract class PluginManager {
 	/**
 	 * Notifica un evento desde un componente
 	 *
-	 * @param string $component
-	 * @param string $event
-	 * @param string $reference
+	 * @access 	public
+	 * @param 	string $component
+	 * @param 	string $event
+	 * @param 	string $reference
+	 * @static
 	 */
 	static public function notifyFrom($component, $event, $reference){
 		if(count(self::$_pluginsComponents)>0){
@@ -285,6 +289,51 @@ abstract class PluginManager {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Registra dinámicamente un plugin de controlador
+	 *
+	 * @access 	public
+	 * @param 	ControllerPlugin $plugin
+	 * @static
+	 */
+	static public function registerControllerPlugin($plugin){
+		self::$_plugins[] = $plugin;
+		self::$_pluginsController[] = $plugin;
+	}
+
+	/**
+	 * Registra dinámicamente un plugin de aplicacion
+	 *
+	 * @access 	public
+	 * @param 	ApplicationPlugin $plugin
+	 * @static
+	 */
+	static public function registerApplicationPlugin($plugin){
+		self::$_plugins[] = $plugin;
+		self::$_pluginsApplication[] = $plugin;
+	}
+
+	/**
+	 * Registra dinámicamente un plugin de View
+	 *
+	 * @access 	public
+	 * @param 	ViewPlugin $plugin
+	 * @static
+	 */
+	static public function registerViewPlugin($plugin){
+		self::$_plugins[] = $plugin;
+		self::$_pluginsApplication[] = $plugin;
+	}
+
+	/**
+	 * Deshabilita un plugin por su nombre de clase
+	 *
+	 * @param string $pluginName
+	 */
+	static public function disablePlugin($pluginName){
+
 	}
 
 }
