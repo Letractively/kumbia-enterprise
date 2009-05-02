@@ -132,56 +132,6 @@ abstract class Helpers {
 	}
 
 	/**
-	 * Escribe un numero usando formato numerico
-	 *
-	 * @param string $number
-	 * @param integer $n
-	 * @return string
-	 */
-	static public function money($number, $n=2){
-		$number = my_round($number, $n);
-		return "$&nbsp;".number_format($number, $n, ",", ".");
-	}
-
-	/**
-	 * Redondea un numero
-	 *
-	 * @param numeric $n
-	 * @param integer $d
-	 * @return string
-	 */
-	static public function roundnumber($n, $d = 0) {
-		$n = $n - 0;
-		if($d===NULL){
-			$d = 2;
-		}
-		$f = pow(10, $d);
-		$n += pow(10, - ($d + 1));
-		$n = round($n * $f) / $f;
-		$n += pow(10, - ($d + 1));
-		$n += '';
-		if($d==0){
-			return substr($n, 0, strpos($n, '.'));
-		} else {
-			return substr($n, 0, strpos($n, '.') + $d + 1);
-		}
-	}
-
-	/**
-	 * Realiza un redondeo usando la funcion round de la base
-	 * de datos.
-	 *
-	 * @param numeric $number
-	 * @param integer $n
-	 * @return numeric
-	 */
-	static public function myRound($number, $n=2){
-		$number = (float) $number;
-		$n = (int) $n;
-		return ActiveRecord::staticSelectOne("round($number, $n)");
-	}
-
-	/**
 	 * Una version avanzada de trim
 	 *
 	 * @param string $word
