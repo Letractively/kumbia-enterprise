@@ -162,7 +162,9 @@ abstract class EntityManager {
 	/**
 	 * Establece si los modelos se autoinicializaron al iniciar la peticion
 	 *
-	 * @param boolean $autoInitialize
+	 * @access 	public
+	 * @param 	boolean $autoInitialize
+	 * @static
 	 */
 	public static function setAutoInitialize($autoInitialize){
 		self::$_autoInitialize = $autoInitialize;
@@ -171,7 +173,9 @@ abstract class EntityManager {
 	/**
 	 * Devuevle si los modelos se autoinicializaron al iniciar la peticion
 	 *
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
+	 * @static
 	 */
 	public static function getAutoInitialize(){
 		return self::$_autoInitialize;
@@ -189,9 +193,9 @@ abstract class EntityManager {
 	/**
 	 * Devuelve la instancia de un modelo
 	 *
-	 * @param string $entityName
-	 * @param boolean $newInstance
-	 * @return mixed
+	 * @param 	string $entityName
+	 * @param 	boolean $newInstance
+	 * @return 	mixed
 	 */
 	public static function getEntityInstance($entityName, $newInstance=true){
 		if(self::$_autoInitialize==true){
@@ -273,8 +277,8 @@ abstract class EntityManager {
 	/**
 	 * Inicializa los modelos en el directorio models de forma recursiva
 	 *
-	 * @access public
-	 * @param string $modelsDir
+	 * @access 	public
+	 * @param 	string $modelsDir
 	 * @static
 	 */
 	public static function initModels($modelsDir){
@@ -295,9 +299,9 @@ abstract class EntityManager {
 	/**
 	 * Verifica si $entityName es una entidad en la aplicacion
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @return 	boolean
 	 * @static
 	 */
 	static public function isEntity($entityName){
@@ -310,9 +314,9 @@ abstract class EntityManager {
 	/**
 	 * Verifica si $model es un modelo de la Aplicacion
 	 *
-	 * @access public
-	 * @param string $model
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $modelName
+	 * @return 	boolean
 	 * @static
 	 */
 	static public function isModel($modelName){
@@ -340,8 +344,9 @@ abstract class EntityManager {
 	/**
 	 * Devuelve el nombre de modelo de la entidad $model
 	 *
-	 * @param string $model
-	 * @return string
+	 * @access 	public
+	 * @param 	string $model
+	 * @return 	string
 	 * @static
 	 */
 	static public function getEntityName($model){
@@ -354,10 +359,10 @@ abstract class EntityManager {
 	/**
 	 * Indica si hay una relacion tipo belongsTo en la entidad solicitada
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @param string $relationRequested
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $relationRequested
+	 * @return 	boolean
 	 * @static
 	 */
 	 static public function existsBelongsTo($entityName, $relationRequested){
@@ -367,10 +372,10 @@ abstract class EntityManager {
 	/**
 	 * Indica si hay una relacion tipo hasMany en la entidad solicitada
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @param string $relationRequested
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $relationRequested
+	 * @return 	boolean
 	 * @static
 	 */
 	static public function existsHasMany($entityName, $relationRequested){
@@ -380,10 +385,10 @@ abstract class EntityManager {
 	/**
 	 * Indica si hay una relacion tipo hasOne en la entidad solicitada
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @param string $relationRequested
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $relationRequested
+	 * @return 	boolean
 	 * @static
 	 */
 	static public function existsHasOne($entityName, $relationRequested){
@@ -393,11 +398,11 @@ abstract class EntityManager {
 	/**
 	 * Devuelve los registros de la relacion 1-1 ó n-1
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @param string $relationRequested
-	 * @param ActiveRecord $record
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $relationRequested
+	 * @param 	ActiveRecord $record
+	 * @return 	boolean
 	 * @static
 	 */
 	static public function getBelongsToRecords($entityName, $relationRequested, $record){
@@ -433,11 +438,11 @@ abstract class EntityManager {
 	/**
 	 * Devuelve los registros de la relacion 1-1
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @param string $relationRequested
-	 * @param ActiveRecord $record
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $relationRequested
+	 * @param 	ActiveRecord $record
+	 * @return 	boolean
 	 * @static
 	 */
 	static public function getHasOneRecords($entityName, $relationRequested, $record){
@@ -473,11 +478,11 @@ abstract class EntityManager {
 	/**
 	 * Devuelve los registros de la relacion n-1
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @param string $relationRequested
-	 * @param ActiveRecord $record
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $relationRequested
+	 * @param 	ActiveRecord $record
+	 * @return 	boolean
 	 * @static
 	 */
 	static public function getHasManyRecords($entityName, $relationRequested, $record){
@@ -529,12 +534,12 @@ abstract class EntityManager {
 	/**
 	 * Agrega una nueva relacion n-1
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @param string $fields
-	 * @param string $referenceTable
-	 * @param string $referencedFields
-	 * @param string $relationName
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $fields
+	 * @param 	string $referenceTable
+	 * @param 	string $referencedFields
+	 * @param 	string $relationName
 	 * @static
 	 */
 	public static function addBelongsTo($entityName, $fields='', $referenceTable='', $referencedFields='', $relationName=''){
@@ -587,11 +592,11 @@ abstract class EntityManager {
 	/**
 	 * Agrega una nueva relacion n-1
 	 *
-	 * @access public
-	 * @param mixed $fields
-	 * @param string $entityName
-	 * @param string $referenceTable
-	 * @param mixed $referencedFields
+	 * @access 	public
+	 * @param 	mixed $fields
+	 * @param 	string $entityName
+	 * @param 	string $referenceTable
+	 * @param 	mixed $referencedFields
 	 * @static
 	 */
 	public static function addHasMany($entityName, $fields='', $referenceTable='', $referencedFields=''){
@@ -640,11 +645,11 @@ abstract class EntityManager {
 	/**
 	 * Agrega una nueva relacion 1-1
 	 *
-	 * @access public
-	 * @param mixed $fields
-	 * @param string $entityName
-	 * @param string $referenceTable
-	 * @param mixed $referencedFields
+	 * @access 	public
+	 * @param 	mixed $fields
+	 * @param 	string $entityName
+	 * @param 	string $referenceTable
+	 * @param 	mixed $referencedFields
 	 * @static
 	 */
 	public static function addHasOne($entityName, $fields='', $referenceTable='', $referencedFields=''){
@@ -693,9 +698,9 @@ abstract class EntityManager {
 	/**
 	 * Establece campos tipo Trasient de las entidades
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @param string $attribute
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $attribute
 	 * @static
 	 */
 	public static function addTrasientAttribute($entityName, $attribute){
@@ -710,8 +715,9 @@ abstract class EntityManager {
 	/**
 	 * Devuelve las relaciones de una entidad
 	 *
-	 * @access public
-	 * @param string $entityName
+	 * @access	public
+	 * @param 	string $entityName
+	 * @return 	array
 	 * @static
 	 */
 	public static function getRelationsOf($entityName){
@@ -725,15 +731,18 @@ abstract class EntityManager {
 		if(isset(self::$_hasMany[$entityName])){
 			$relations['hasMany'] = self::$_hasMany[$entityName];
 		}
+		if(isset(self::$_hasOne[$entityName])){
+			$relations['hasOne'] = self::$_hasOne[$entityName];
+		}
 		return $relations;
 	}
 
 	/**
 	 * Indica si un modelo temporal existe
 	 *
-	 * @access public
-	 * @param string $entityName
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @return 	boolean
 	 * @static
 	 */
 	public static function existsTemporaryEntity($entityName){
@@ -756,7 +765,8 @@ abstract class EntityManager {
 	/**
 	 * Elimina una entidad temporal del administrador
 	 *
-	 * @param string $entityName
+	 * @access 	public
+	 * @param 	string $entityName
 	 * @static
 	 */
 	public static function destroyTemporaryEntity($entityName){
@@ -782,9 +792,10 @@ abstract class EntityManager {
 	/**
 	 * Administra las entidades temporales en cada conexion
 	 *
-	 * @param DbBase $connection
-	 * @param string $entityName
-	 * @return boolean
+	 * @access 	public
+	 * @param 	DbBase $connection
+	 * @param 	string $entityName
+	 * @return	boolean
 	 * @static
 	 */
 	public static function isCreatedTemporaryEntity($connection, $entityName){
@@ -818,7 +829,8 @@ abstract class EntityManager {
 	/**
 	 * Agrega una entidad al administrador por su nombre de clase
 	 *
-	 * @param string $entityClass
+	 * @access 	public
+	 * @param 	string $entityClass
 	 * @static
 	 */
 	public static function addEntityByClass($entityClass){
@@ -829,7 +841,11 @@ abstract class EntityManager {
 	/**
 	 * Establece el generador y sus parametros a usar en una determinada entidad
 	 *
-	 * @param string $entityName
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	string $adapter
+	 * @param 	string $column
+	 * @param 	array $options
 	 * @static
 	 */
 	public static function setEntityGenerator($entityName, $adapter, $column, $options){
@@ -846,6 +862,8 @@ abstract class EntityManager {
 	/**
 	 * Indica si se ha establecido un generador especial para una entidad
 	 *
+	 * @access public
+	 * @param  string $entityName
 	 * @return boolean
 	 * @static
 	 */
@@ -901,11 +919,13 @@ abstract class EntityManager {
 	/**
 	 * Agrega una llave foranea al administrador
 	 *
-	 * @param string $entityName
-	 * @param array $fields
-	 * @param string $referenceTable
-	 * @param array $referencedFields
-	 * @param array $options
+	 * @access 	public
+	 * @param 	string $entityName
+	 * @param 	array $fields
+	 * @param 	string $referenceTable
+	 * @param 	array $referencedFields
+	 * @param 	array $options
+	 * @static
 	 */
 	public static function addForeignKey($entityName, $fields='', $referenceTable='', $referencedFields='', $options=array()){
 		if(!isset(self::$_foreignKeys[$entityName])){
@@ -937,7 +957,7 @@ abstract class EntityManager {
 			}
 			if(is_array($referencedFields)){
 				if(count($fields)!=count($referencedFields)){
-					throw new EntityManagerException('El n&uacute;mero de campos referenciados no es el mismo');
+					throw new EntityManagerException('El número de campos referenciados no es el mismo');
 				}
 			}
 			self::$_foreignKeys[$entityName][$indexKey] = array(
@@ -954,9 +974,10 @@ abstract class EntityManager {
 	/**
 	 * Devuelve las llaves foraneas de una entidad
 	 *
-	 * @param string $entityName
-	 * @param string $indexKey
-	 * @return array
+	 * @param 	string $entityName
+	 * @param 	string $indexKey
+	 * @return 	array
+	 * @static
 	 */
 	public static function getForeignKeys($entityName){
 		if(isset(self::$_foreignKeys[$entityName])){
@@ -971,6 +992,7 @@ abstract class EntityManager {
 	 *
 	 * @param string $entityName
 	 * @return boolean
+	 * @static
 	 */
 	public static function hasForeignKeys($entityName){
 		return isset(self::$_foreignKeys[$entityName]);

@@ -31,7 +31,16 @@ while($_c = fgets($fp)){
 	if(rtrim($_c)=="quit"){
 		exit;
 	}
-	try {
+	if(rtrim($_c)=='entonces que parce'){
+		print 'que mas'."\n";
+	}
+	if(rtrim($_c)=='que hay pa hacer'){
+		print 'no se pero yo me apunto!'."\n";
+	}
+	if(rtrim($_c)=='bueno nos vemos'){
+		print 'listo marik'."\n";
+	}
+	/*try {
 		if(trim($_c)){
 			$_a = eval("return ".trim($_c).";");
 			if($_a===null){
@@ -65,6 +74,7 @@ while($_c = fgets($fp)){
 			}
 			$i++;
 		}
-	}
+	}*/
+	print "iphp> ";
 }
 fclose($fp);
