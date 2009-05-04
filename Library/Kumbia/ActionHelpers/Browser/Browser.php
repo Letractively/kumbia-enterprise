@@ -40,7 +40,8 @@ abstract class Browser {
 	/**
 	 * Indica si el Browser utilizado es Mozilla Firefox
 	 *
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
 	 * @static
 	 */
 	public static function isFirefox(){
@@ -50,7 +51,8 @@ abstract class Browser {
 	/**
 	 * Indica si el Browser utilizado es Camino
 	 *
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
 	 * @static
 	 */
 	public static function isCamino(){
@@ -60,7 +62,8 @@ abstract class Browser {
 	/**
 	 * Indica si el Browser utilizado es Safari
 	 *
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
 	 * @static
 	 */
 	public static function isSafari(){
@@ -70,7 +73,8 @@ abstract class Browser {
 	/**
 	 * Indica si el Browser utilizado es Opera
 	 *
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
 	 * @static
 	 */
 	public static function isOpera(){
@@ -80,6 +84,7 @@ abstract class Browser {
 	/**
 	 * Indica si el Browser utilizado es Microsoft Internet Explorer
 	 *
+	 * @access public
 	 * @return boolean
 	 * @static
 	 */
@@ -90,6 +95,7 @@ abstract class Browser {
 	/**
 	 * Indica si el motor de renderizado del Browser utilizado es Internet Explorer Mobile
 	 *
+	 * @access public
 	 * @return boolean
 	 * @static
 	 */
@@ -100,6 +106,7 @@ abstract class Browser {
 	/**
 	 * Indica si el motor de renderizado del Browser utilizado es Opera Mobile
 	 *
+	 * @access public
 	 * @return boolean
 	 * @static
 	 */
@@ -110,6 +117,7 @@ abstract class Browser {
 	/**
 	 * Indica si el Browser utilizado es Mobile Safari
 	 *
+	 * @access public
 	 * @return boolean
 	 * @static
 	 */
@@ -120,17 +128,23 @@ abstract class Browser {
 	/**
 	 * Indica si es un explorador movil
 	 *
-	 * @return boolean
+	 * @access	public
+	 * @return	boolean
 	 * @static
 	 */
 	public static function isMobile(){
-		return (self::isIEMobile()||self::isMobileSafari()||self::isOperaMobile());
+		if(strpos($_SERVER['HTTP_USER_AGENT'], 'Mobile')!==false){
+			return true;
+		} else {
+			return (self::isIEMobile()||self::isMobileSafari()||self::isOperaMobile());
+		}
 	}
 
 	/**
 	 * Devuelve la versión del explorador utilizado
 	 *
-	 * @return string
+	 * @access 	public
+	 * @return 	string
 	 * @static
 	 */
 	public static function getVersion(){
@@ -166,7 +180,8 @@ abstract class Browser {
 	/**
 	 * Indica si el motor de renderizado del Browser utilizado es Gecko
 	 *
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
 	 * @static
 	 */
 	public static function isGecko(){
@@ -176,7 +191,8 @@ abstract class Browser {
 	/**
 	 * Indica si el motor de renderizado del Browser utilizado es WebKit
 	 *
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
 	 * @static
 	 */
 	public static function isWebKit(){
@@ -186,7 +202,8 @@ abstract class Browser {
 	/**
 	 * Devuelve el User/Agent del cliente
 	 *
-	 * @return string
+	 * @access 	public
+	 * @return 	string
 	 * @static
 	 */
 	public static function getUserAgent(){
@@ -196,7 +213,8 @@ abstract class Browser {
 	/**
 	 * Devuelve el Accept Encoding del explorador
 	 *
-	 * @return string
+	 * @access 	public
+	 * @return 	string
 	 * @static
 	 */
 	public static function getAcceptEncoding(){
@@ -206,7 +224,8 @@ abstract class Browser {
 	/**
 	 * Devuelve el idioma del explorador
 	 *
-	 * @return string
+	 * @access 	public
+	 * @return 	string
 	 * @static
 	 */
 	public static function getAcceptLanguage(){
@@ -216,7 +235,8 @@ abstract class Browser {
 	/**
 	 * Indica si el explorador acepta salida comprimida
 	 *
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
 	 * @static
 	 */
 	public static function acceptCompressedOutput(){

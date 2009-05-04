@@ -58,6 +58,8 @@ abstract class i18n {
 	/**
 	 * Permite determinar si es posible realizar operaciones de cadenas en Unicode
 	 *
+	 * @access public
+	 * @static
 	 */
 	static public function isUnicodeEnabled(){
 		if(self::$_unicodeEnabled!==null){
@@ -76,8 +78,10 @@ abstract class i18n {
 	/**
 	 * Cambia una cadena de caracteres a minúsculas
 	 *
-	 * @param string $str
-	 * @return string
+	 * @access	public
+	 * @param 	string $str
+	 * @return 	string
+	 * @static
 	 */
 	static public function strtolower($str){
 		if(self::$_multiByteEnabled==false){
@@ -90,8 +94,10 @@ abstract class i18n {
 	/**
 	 * Cambia una cadena de caracteres a minúsculas
 	 *
-	 * @param string $str
-	 * @return string
+	 * @access 	public
+	 * @param 	string $str
+	 * @return 	string
+	 * @static
 	 */
 	static public function strtoupper($str){
 		if(self::$_multiByteEnabled==false){
@@ -104,9 +110,11 @@ abstract class i18n {
 	/**
 	 * Reemplaza en una cadena de caracteres mediante una expresion regular
 	 *
-	 * @param string $pattern
-	 * @param string $replacement
-	 * @param array $regs
+	 * @access 	public
+	 * @param 	string $pattern
+	 * @param 	string $replacement
+	 * @param 	array $regs
+	 * @static
 	 */
 	static public function eregReplace($pattern, $replacement, &$regs){
 		if(self::$_multiByteEnabled==false){
