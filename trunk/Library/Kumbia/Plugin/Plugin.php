@@ -40,6 +40,13 @@ require 'Library/Kumbia/Plugin/Abstract/Plugin.php';
 abstract class PluginManager {
 
 	/**
+	 * Indica si los plug-ins deben ser autoinicializados
+	 *
+	 * @var boolean
+	 */
+	static private $_autoInitialize = true;
+
+	/**
 	 * Array de todos los plugins
 	 *
 	 * @var array
@@ -89,6 +96,43 @@ abstract class PluginManager {
 	static private $_pluginClasses = array();
 
 	/**
+	 * Carga los plugins de la aplicacion activa
+	 *
+	 * @access 	public
+	 * @return 	array
+	 * @static
+	 */
+	static public function loadApplicationPlugins(){
+
+		//Leer configuracion
+		$config = CoreConfig::readFromActiveApplication('config.ini');
+
+		//Esta variable permite que no se inicialicen los plug-ins
+		if(!isset($config->plugins->autoInitialize)||$config->plugins->autoInitialize==true){
+
+			//Aplicacion activa
+			$activeApp = Router::getApplication();
+
+			//Obtener las ruta a los plugins
+			if(isset($config->application->pluginsDir)){
+				$pluginsDir = 'apps/'.$config->application->pluginsDir;
+			} else {
+				$pluginsDir = 'apps/'.$activeApp.'/plugins';
+			}
+			self::$_pluginClasses = array();
+			if(Core::fileExists($pluginsDir)){
+				foreach(scandir($pluginsDir) as $plugin){
+					if(strpos($plugin, '.php')){
+						self::$_pluginClasses[] = str_replace('.php', '', $plugin).'Plugin';
+						require $pluginsDir.'/'.$plugin;
+					}
+				}
+			}
+
+		}
+	}
+
+	/**
 	 * Inicializa los plugins cargados
 	 *
 	 * @access public
@@ -108,7 +152,7 @@ abstract class PluginManager {
 			if(class_exists($pluginClass)){
 				$plugIn = new $pluginClass();
 			} else {
-				throw new PluginException("No existe la clase plug-in '$pluginClass' en el archivo $pluginClass.php");
+				throw new PluginException('No existe la clase plug-in "'.$pluginClass.'" en el archivo '.$pluginClass.'.php');
 			}
 			if(is_subclass_of($plugIn, 'Plugin')){
 				$plugins[] = $plugIn;
@@ -140,40 +184,6 @@ abstract class PluginManager {
 		self::$_pluginsModel = $pluginsModel;
 		self::$_pluginsView = $pluginsView;
 		self::$_pluginsComponents = $pluginsComponents;
-	}
-
-	/**
-	 * Carga los plugins de la aplicacion activa
-	 *
-	 * @access public
-	 * @return array
-	 * @static
-	 */
-	static public function loadApplicationPlugins(){
-
-		/**
-		 * Aplicacion Activa
-		 */
-		$activeApp = Router::getApplication();
-
-		/**
-		 * Rutas a Plugins
-		 */
-		$config = CoreConfig::readFromActiveApplication('config.ini');
-		if(isset($config->application->pluginsDir)){
-			$pluginsDir = 'apps/'.$config->application->pluginsDir;
-		} else {
-			$pluginsDir = 'apps/'.$activeApp.'/plugins';
-		}
-		self::$_pluginClasses = array();
-		if(Core::fileExists($pluginsDir)){
-			foreach(scandir($pluginsDir) as $plugin){
-				if(strpos($plugin, '.php')){
-					self::$_pluginClasses[] = str_replace('.php', '', $plugin).'Plugin';
-					require $pluginsDir.'/'.$plugin;
-				}
-			}
-		}
 	}
 
 	/**

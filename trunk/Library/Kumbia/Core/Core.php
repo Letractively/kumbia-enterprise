@@ -258,14 +258,14 @@ abstract class Core {
 	/**
 	 * Ejecuta el evento de inicializar la aplicacion
 	 *
-	 * @access public
+	 * @access 	public
 	 * @static
 	 */
 	public static function runStartApplicationEvent(){
 		PluginManager::notifyFromApplication('beforeStartApplication');
 		if(class_exists('ControllerBase')){
 			$controllerBase = new ControllerBase();
-			if(method_exists($controllerBase, "onStartApplication")){
+			if(method_exists($controllerBase, 'onStartApplication')){
 				$controllerBase->onStartApplication();
 			}
 		}
@@ -292,7 +292,9 @@ abstract class Core {
 	/**
 	 * Devuelve el PATH donde esta instalada la instancia despues del DOCUMENT ROOT
 	 *
-	 * @return string
+	 * @access 	public
+	 * @return 	string
+	 * @static
 	 */
 	public static function getInstancePath(){
 		$instance = self::getInstanceName();
@@ -306,8 +308,8 @@ abstract class Core {
 	/**
 	 * Obtener el nombre de la aplicacion activa
 	 *
-	 * @access public
-	 * @return string
+	 * @access 	public
+	 * @return 	string
 	 * @static
 	 */
 	public static function getActiveApplication(){
@@ -315,52 +317,28 @@ abstract class Core {
 	}
 
 	/**
-	 * Función Principal donde se inicia el flujo de ejecucion
+	 * Inicializa las rutas MVC para hacerlas disponibles a todos los componentes
 	 *
-	 * @access public
-	 * @return boolean
-	 * @throws CoreException
+	 * @access 	private
+	 * @param 	Config $config
 	 * @static
 	 */
-	public static function main(){
-
-		self::requireFile('CommonEvent/CommonEventManager');
-		self::requireFile('Dispatcher/Dispatcher');
-		self::requireFile('EntityManager/EntityManager');
-		self::requireFile('Transactions/TransactionManager');
-		self::requireFile('Db/Loader/DbLoader');
-		self::requireFile('Db/DbBase');
-		self::requireFile('ActiveRecord/Base/ActiveRecordBase');
-		self::requireFile('Security/Security');
-		self::requireFile('Facility/Facility');
-		self::requireFile('View/View');
-		self::requireFile('i18n/i18n');
-		self::requireFile('Controller/ControllerResponse');
-		self::requireFile('Utils/Utils');
-
-		/**
-		 * Rutas Base
-		 */
-		$config = CoreConfig::readFromActiveApplication('config.ini');
+	private static function _initializeMVCRoutes($config){
 
 		//Aplicacion Activa
 		self::$_activeApp = Router::getApplication();
 
 		//Directorio de controladores Activo
 		if(isset($config->application->controllersDir)){
-			$controllersDir = 'apps/'.$config->application->controllersDir;
-			self::$_activeControllersDir = "apps/".$config->application->controllersDir;
+			self::$_activeControllersDir = 'apps/'.$config->application->controllersDir;
 		} else {
-			$controllersDir = 'apps/'.self::$_activeApp.'/controllers';
 			self::$_activeControllersDir = 'apps/'.self::$_activeApp.'/controllers';
 		}
 
 		//Directorio de modelos activo
 		if(isset($config->application->modelsDir)){
-			$modelsDir = 'apps/'.$config->application->modelsDir;
 			self::$_activeModelsDir = 'apps/'.$config->application->modelsDir;
 		} else {
-			$modelsDir = 'apps/'.self::$_activeApp.'/models';
 			self::$_activeModelsDir = 'apps/'.self::$_activeApp.'/models';
 		}
 
@@ -375,10 +353,81 @@ abstract class Core {
 		 * @see ControllerBase
 		 */
 		if(class_exists('ControllerBase', false)==false){
-			require $controllersDir.'/application.php';
+			require self::$_activeControllersDir.'/application.php';
 		}
 
+	}
+
+	/**
+	 * Invoca el GarbageCollector de Sesion
+	 *
+	 * @access 	public
+	 * @param 	Config $config
+	 * @static
+	 */
+	private static function _executeGarbageCollector($config){
+		if(isset($config->collector)){
+			if(class_exists('GarbageCollector')==false){
+				self::requireFile('GarbageCollector/GarbageCollector');
+			}
+			if(isset($config->collector->probability)){
+				GarbageCollector::setProbability($config->collector->probability);
+			}
+			if(isset($config->collector->collectTime)){
+				GarbageCollector::setCollectTime($config->collector->collectTime);
+			}
+			if(isset($config->collector->compressTime)){
+				GarbageCollector::setCompressTime($config->collector->compressTime);
+			}
+			GarbageCollector::startCollect();
+		}
+	}
+
+	/**
+	 * Inicializa componentes comunes
+	 *
+	 * @access private
+	 * @static
+	 */
+	private static function _initializeCommonComponents(){
+		self::requireFile('CommonEvent/CommonEventManager');
+		self::requireFile('Dispatcher/Dispatcher');
+		self::requireFile('EntityManager/EntityManager');
+		self::requireFile('Transactions/TransactionManager');
+		self::requireFile('Db/Loader/DbLoader');
+		self::requireFile('Db/DbBase');
+		self::requireFile('ActiveRecord/Base/ActiveRecordBase');
+		self::requireFile('Security/Security');
+		self::requireFile('Facility/Facility');
+		self::requireFile('View/View');
+		self::requireFile('i18n/i18n');
+		self::requireFile('Controller/ControllerResponse');
+		self::requireFile('Utils/Utils');
+	}
+
+	/**
+	 * Función Principal donde se inicia el flujo de ejecucion
+	 *
+	 * @access 	public
+	 * @return 	boolean
+	 * @throws 	CoreException
+	 * @static
+	 */
+	public static function main(){
+
+		//Inicializa componentes comunes
+		self::_initializeCommonComponents();
+
+		//Leer configuracion de la aplicación
+		$config = CoreConfig::readFromActiveApplication('config.ini');
+
+		//Inicializa las rutas MVC
+		self::_initializeMVCRoutes($config);
+
 		try {
+
+			//Inicializa la respuesta
+			$controller = null;
 
 			/**
 			 * Iniciar el buffer de salida
@@ -392,59 +441,30 @@ abstract class Core {
 				return false;
 			}
 
-			/**
-			 * Inicializa el modelo base
-			 */
-			EntityManager::initModelBase($modelsDir);
+			// Inicializa el modelo base
+			EntityManager::initModelBase(self::$_activeModelsDir);
 			if(isset($config->entities->autoInitialize)&&$config->entities->autoInitialize==false){
 				EntityManager::setAutoInitialize(false);
-				EntityManager::setModelsDirectory($modelsDir);
+				EntityManager::setModelsDirectory(self::$_activeModelsDir);
 			} else {
-				/**
-				 * Los demas modelos estan en el directorio de modelos
-				 */
-				EntityManager::initModels($modelsDir);
+				//Los demas modelos estan en el directorio de modelos
+				EntityManager::initModels(self::$_activeModelsDir);
 			}
 
-			/**
-			 * Inicializa el administrador de transacciones
-			 */
+			// Inicializa el administrador de transacciones
 			TransactionManager::initializeManager();
 
-			/**
-		 	 * Inicializa el administrador de acceso
-		 	 */
+		 	//Inicializa el administrador de acceso
 			Security::initAccessManager();
 
-			/**
-			 * Atiende la peticion
-			 */
+			// Atiende la peticion
 			$controller = self::handleRequest();
 
-			/**
-			 * Invoca el GarbageCollector
-			 */
-			if(isset($config->collector)){
-				if(class_exists('GarbageCollector')==false){
-					Core::requireFile('GarbageCollector/GarbageCollector');
-				}
-				if(isset($config->collector->probability)){
-					GarbageCollector::setProbability($config->collector->probability);
-				}
-				if(isset($config->collector->collectTime)){
-					GarbageCollector::setCollectTime($config->collector->collectTime);
-				}
-				if(isset($config->collector->compressTime)){
-					GarbageCollector::setCompressTime($config->collector->compressTime);
-				}
-				GarbageCollector::startCollect();
-			}
+			//Ejecuta el GC
+			self::_executeGarbageCollector($config);
 
 		}
 		catch(CoreException $e){
-			if(!isset($controller)){
-				$controller = null;
-			}
 			return self::handleException($e, $controller);
 		}
 		catch(Exception $e){
@@ -469,12 +489,9 @@ abstract class Core {
 				} else {
 					$backtrace = $e->getTrace();
 				}
-				throw new CoreException($e->getMessage(), $e->getCode(), true, $backtrace);
+				throw new CoreException($e->getMessage().' ('.get_class($e).')', $e->getCode(), true, $backtrace);
 			}
 			catch(CoreException $e){
-				if(!isset($controller)){
-					$controller = null;
-				}
 				return self::handleException($e, $controller);
 			}
 		}
@@ -555,9 +572,7 @@ abstract class Core {
 
 			Router::ifRouted();
 
-			/**
-			 * Ejectutar Plugin::afterDispatch()
-			 */
+			// Ejectutar Plugin::afterDispatch()
 			$controllerName = PluginManager::notifyFromController('afterDispatch', $controller);
 
 		}
@@ -615,38 +630,25 @@ abstract class Core {
 	}
 
 	/**
-	 * Carga Librerias JavaScript Importantes en el Framework
+	 * Carga el framework javascript y funciones auxiliares
 	 *
-	 * @access public
+	 * @access 		public
 	 * @static
+	 * @deprecated
 	 */
 	public static function javascriptBase(){
-
-		$application = Router::getActiveApplication();
-		$controllerName = Router::getController();
-		$actionName = Router::getAction();
-		$module = Router::getModule();
-		$id = Router::getId();
-		$path = Core::getInstancePath();
-
-		print "<script type='text/javascript' src='".$path."javascript/core/base.js'></script>\r\n";
-		print "<script type='text/javascript' src='".$path."javascript/core/validations.js'></script>\r\n";
-		print "<script type='text/javascript' src='".$path."javascript/core/main.php?app=$application&module=$module&path=".urlencode($path)."&controller=$controllerName&action=$actionName&id=$id'></script>\r\n";
+		print Tag::javascriptBase();
 	}
 
 	/**
 	 * Imprime los CSS cargados mediante Tag::stylesheetLink
 	 *
-	 * @access public
+	 * @access 		public
 	 * @static
+	 * @deprecated
 	 */
 	public static function stylesheetLinkTags(){
-		$styleSheets = MemoryRegistry::get('CORE_CSS_IMPORTS');
-		if(is_array($styleSheets)){
-			foreach($styleSheets as $css){
-				print $css;
-			}
-		}
+		echo Tag::stylesheetLinkTags();
 	}
 
 	/**
@@ -657,9 +659,10 @@ abstract class Core {
 	 * Core::routeTo("controller: nombre", ["action: accion"], ["id: id"])
 	 * </code>
 	 *
-	 * @access public
+	 * @access 		public
 	 * @static
-	 * @return null
+	 * @return 		null
+	 * @deprecated
 	 */
 	public static function routeTo(){
 		$args = func_get_args();
@@ -669,35 +672,12 @@ abstract class Core {
 	/**
 	 * Metodo que muestra información del Framework y la licencia
 	 *
-	 * @access public
+	 * @access 		public
 	 * @static
+	 * @deprecated
 	 */
 	public static function info(){
-		ob_start();
-
-		self::setInstanceName();
-
-		echo self::javascriptBase();
-
-		Tag::stylesheetLink('info');
-
-		print "<div id='kumbia-info-content'><span id='kumbia-info-header'>Kumbia Enterprise Admin ".self::FRAMEWORK_VERSION."</span>
-		<h2>Kumbia Enterprise Framework Instance (".self::getInstanceName()."/".Router::getApplication().") funciona!</h2><div>Para reemplazar esta p&aacute;gina
-		edite el archivo <i>apps/default/controllers/application.php</i> en el DocumentRoot del servidor
-		web <i>(".(isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : getcwd())."/".self::getInstanceName().")</i>.<br><br>
-		Está invitado a registrarse. El registro es opcional, al hacerlo usted obtiene:
-		<ul>
-			<li>Recibir información actualizada sobre proyectos y servicios</li>
-			<li>Recibir información de ofertas y promociones</li>
-			<li>Públicar temas y mensajes en los foros</li>
-			<li>Descargar previews de proyectos y documentación</li>
-		</ul></div>
-		<hr color='#eaeaea'><div align='center' id='kumbia-info-footer'>
-		<a href='http://www.loudertechnology.com/site/projects/license'>Licencia</a> |
-		<a href='http://www.loudertechnology.com/'>Louder Technology</a> ".date("Y")."</div>";
-		View::setContent(ob_get_contents());
-		ob_end_clean();
-		View::xhtmlTemplate();
+		CoreInfo::showInfoScreen();
 	}
 
 	/**
@@ -718,7 +698,7 @@ abstract class Core {
 	 * @param string $dir
 	 */
 	public static function importFromActiveApp($dir){
-		require_once 'apps/'.Router::getApplication()."/$dir";
+		require_once 'apps/'.Router::getApplication().'/'.$dir;
 	}
 
 	/**
@@ -727,14 +707,16 @@ abstract class Core {
 	 * @param string $path
 	 */
 	public static function fileExistsOnActiveApp($path){
-		return self::fileExists("apps/".Router::getApplication()."/$path");
+		return self::fileExists('apps/'.Router::getApplication().'/'.$path);
 	}
 
 	/**
 	 * Importa un archivo de una libreria en Library/
 	 *
-	 * @param string $libraryName
-	 * @param string $dir
+	 * @access 	public
+	 * @param 	string $libraryName
+	 * @param 	string $dir
+	 * @static
 	 */
 	public static function importFromLibrary($libraryName, $dir){
 		require_once 'Library/'.$libraryName.'/'.$dir;
@@ -753,7 +735,7 @@ abstract class Core {
 	/**
 	 * Realiza un require en forma condicional
 	 *
-	 * @param string $className
+	 * @param 	string $className
 	 * @static
 	 */
 	public static function requireLogicalFile($className){
@@ -769,8 +751,8 @@ abstract class Core {
 	/**
 	 * Devuelve el buffer de salida
 	 *
-	 * @access public
-	 * @return string
+	 * @access 	public
+	 * @return	string
 	 * @static
 	 */
 	public static function getContent(){

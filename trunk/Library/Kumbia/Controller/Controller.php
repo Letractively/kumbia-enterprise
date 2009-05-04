@@ -645,8 +645,8 @@ class Controller extends ControllerBase {
 	/**
 	 * Establece el/los template(s) que se insertan despues del layout del controlador
 	 *
-	 * @access public
-	 * @param string|array $template
+	 * @access 	public
+	 * @param 	string|array $template
 	 */
 	public final function setTemplateAfter($template){
 		$this->_templateAfter = $template;
@@ -674,8 +674,8 @@ class Controller extends ControllerBase {
 	/**
 	 * Devuelve el/los nombre(s) del Template After Actual
 	 *
-	 * @access public
-	 * @return string|array
+	 * @access 	public
+	 * @return 	string|array
 	 */
 	public final function getTemplateAfter(){
 		return $this->_templateAfter;
@@ -685,8 +685,8 @@ class Controller extends ControllerBase {
 	 * Devuelve un callback que administrara la forma en que se presente
 	 * la vista del controlador
 	 *
-	 * @access public
-	 * @return array
+	 * @access 	public
+	 * @return 	array
 	 */
 	public function getViewExceptionHandler(){
 		return array('View', 'handleViewExceptions');
@@ -695,8 +695,8 @@ class Controller extends ControllerBase {
 	/**
 	 * Devuelve la instancia del Objeto Request
 	 *
-	 * @access public
-	 * @return ControllerRequest
+	 * @access 	public
+	 * @return 	ControllerRequest
 	 */
 	public function getRequestInstance(){
 		return ControllerRequest::getInstance();
@@ -705,8 +705,8 @@ class Controller extends ControllerBase {
 	/**
 	 * Devuelve la instancia del Objeto Response
 	 *
-	 * @access public
-	 * @return ControllerResponse
+	 * @access 	public
+	 * @return 	ControllerResponse
 	 */
 	public function getResponseInstance(){
 		return ControllerResponse::getInstance();
@@ -715,9 +715,9 @@ class Controller extends ControllerBase {
 	/**
 	 * Establece una variable de la vista directamente
 	 *
-	 * @access public
-	 * @param string $index
-	 * @param string $value
+	 * @access 	public
+	 * @param 	string $index
+	 * @param 	string $value
 	 */
 	public function setParamToView($index, $value){
 		View::setViewParam($index, $value);
@@ -740,11 +740,21 @@ class Controller extends ControllerBase {
 	/**
 	 * Establece el control de acceso a las propiedades del controlador
 	 *
-	 * @access public
-	 * @param boolean $lock
+	 * @access 	public
+	 * @param 	boolean $lock
 	 */
 	public function setSettingLock($lock){
 		$this->_settingLock = $lock;
+	}
+
+	/**
+	 * La definición de este metodo indica si se debe exportar las variables publicas
+	 *
+	 * @access 	public
+	 * @return 	boolean
+	 */
+	public function isExportable(){
+		return false;
 	}
 
 	/**
@@ -785,12 +795,14 @@ class Controller extends ControllerBase {
 	}
 
 	/**
-	 * La definicion de este metodo indica si se debe exportar las variables publicas
+	 * Obtiene una instancia de un servicio web del contenedor ó mediante Naming Directory
 	 *
-	 * @return true
+	 * @param 	string $serviceName
+	 * @return  WebServiceClient
 	 */
-	public function isExportable(){
-		return false;
+	public function getService($serviceName){
+		$service = Resolver::lookUp($serviceName);
+		return $service;
 	}
 
 }

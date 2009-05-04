@@ -49,29 +49,28 @@ class WebServiceClient extends SoapClient {
 			$options['wsdl'] = null;
 		}
 		if(!isset($options['uri'])){
-			$options['uri'] = "http://app-services";
+			$options['uri'] = 'http://app-services';
 		}
 		if(!isset($options['encoding'])){
-			$options['encoding'] = "UTF-8";
+			$options['encoding'] = 'UTF-8';
 		}
 		if(!isset($options['compression'])){
 			$options['compression'] = SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP;
 		}
-		#$options['trace'] = true;
+		$options['trace'] = true;
 		parent::__construct($options['wsdl'], $options);
 	}
 
 	/**
 	 * Realiza una peticion SOAP
 	 *
-	 * @param string $request
-	 * @param string $location
-	 * @param string $action
-	 * @param int $version
+	 * @param 	string $request
+	 * @param 	string $location
+	 * @param 	string $action
+	 * @param 	int $version
 	 **/
 	public function __doRequest($request, $location, $action, $version){
 		return @parent::__doRequest($request, $location, $action, $version);
 	}
 
 }
-

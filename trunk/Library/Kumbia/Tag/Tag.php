@@ -71,7 +71,7 @@ abstract class Tag {
 	 */
 	public static function displayTo($id, $value){
 		if(is_object($value)||is_array($value)||is_resource($value)){
-			throw new TagException("Solo valores escalares pueden ser asiganados a los componentes UI");
+			throw new TagException('Solo valores escalares pueden ser asiganados a los componentes UI');
 		}
 		self::$_displayValues[$id] = $value;
 	}
@@ -963,6 +963,26 @@ abstract class Tag {
 	}
 
 	/**
+	 * Carga el framework javascript y funciones auxiliares
+	 *
+	 * @access public
+	 * @return string
+	 * @static
+	 */
+	public static function javascriptBase(){
+		$application = Router::getActiveApplication();
+		$controllerName = Router::getController();
+		$actionName = Router::getAction();
+		$module = Router::getModule();
+		$id = Router::getId();
+		$path = Core::getInstancePath();
+		$code = "<script type='text/javascript' src='".$path."javascript/core/base.js'></script>\r\n";
+		$code.= "<script type='text/javascript' src='".$path."javascript/core/validations.js'></script>\r\n";
+		$code.= "<script type='text/javascript' src='".$path."javascript/core/main.php?app=$application&module=$module&path=".urlencode($path)."&controller=$controllerName&action=$actionName&id=$id'></script>\r\n";
+		return $code;
+	}
+
+	/**
 	 * Genera una etiqueta script que apunta a un archivo JavaScript
 	 * respetando las rutas y convenciones de Kumbia
  	 *
@@ -1283,6 +1303,22 @@ abstract class Tag {
 			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css/$src.css' />\r\n";
 		}
 		MemoryRegistry::prepend('CORE_CSS_IMPORTS', $code);
+		return $code;
+	}
+
+	/**
+	 * Imprime los CSS cargados mediante Tag::stylesheetLink
+	 *
+	 * @return unknown
+	 */
+	public static function stylesheetLinkTags(){
+		$styleSheets = MemoryRegistry::get('CORE_CSS_IMPORTS');
+		$code = '';
+		if(is_array($styleSheets)){
+			foreach($styleSheets as $css){
+				$code.= $css;
+			}
+		}
 		return $code;
 	}
 
@@ -1765,8 +1801,8 @@ abstract class Tag {
 	/**
 	 * Intercala entre llamados una lista de colores para etiquetas TR
 	 *
-	 * @access public
-	 * @param array $colors
+	 * @access 	public
+	 * @param 	array $colors
 	 * @static
 	 */
 	public static function trColor($colors){
@@ -1888,8 +1924,10 @@ abstract class Tag {
 	 * usando una accion ajax que cambia dependiendo del id
 	 * selecionado en el select
 	 *
-	 * @param string $id
-	 * @return code
+	 * @access 	public
+	 * @param 	string $id
+	 * @return 	string
+	 * @static
 	 */
 	public static function updaterSelect($id){
 		$numberArguments = func_num_args();
