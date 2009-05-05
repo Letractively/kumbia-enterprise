@@ -4,11 +4,14 @@
  <head>
   <meta http-equiv='Content-type' content='text/html; charset=UTF-8' />
   <title>Application Title</title>
+  <!-- Cargando estilos CSS -->
   <?php Tag::stylesheetLink('style', true) ?>
-  <?php echo Core::stylesheetLinkTags() ?>
-  <?php echo Core::javascriptBase() ?>
+  <?php echo Tags::stylesheetLinkTags() ?>
+  <!-- Cargando frameworks Javascript -->
+  <?php echo Tag::javascriptLibrary('framework/scriptaculous/protoculous') ?>
+  <?php echo Tags::javascriptBase() ?>
  </head>
  <body>
-  <?php print View::getContent(); ?>
+  <?php View::getContent(); ?>
  </body>
 </html>

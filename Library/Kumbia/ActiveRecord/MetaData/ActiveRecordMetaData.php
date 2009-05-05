@@ -47,7 +47,7 @@
  * @license		New BSD License
  * @access		public
  */
-abstract class ActiveRecordMetaData extends Object {
+abstract class ActiveRecordMetaData {
 
 	/**
 	 * Persistance Models Meta-data

@@ -124,10 +124,18 @@ abstract class View {
 	static private $_proxyOptions;
 
 	/**
+	 * Componente usado como PluginManager
+	 *
+	 * @var array
+	 */
+	static private $_pluginManager = 'PluginManager';
+
+	/**
 	 * Envia la salida en buffer al navegador
 	 *
-	 * @param boolean $returnContent
-	 * @return string
+	 * @access 	public
+	 * @param 	boolean $returnContent
+	 * @return 	string
 	 * @static
 	 */
 	public static function getContent($returnContent=false){
@@ -140,17 +148,32 @@ abstract class View {
 	}
 
 	/**
+	 * Establece el componente que será usado como PluginManager
+	 *
+	 * @access 	public
+	 * @param 	array $pluginManager
+	 * @static
+	 */
+	public static function setPluginManager($pluginManager){
+		self::$_pluginManager = $pluginManager;
+	}
+
+	/**
 	 * Inicializa la salida
 	 *
+	 * @access 	private
+	 * @param 	$controllerName
+	 * @param 	$actionName
+	 * @static
 	 */
 	static private function _startResponse($controllerName, $actionName){
 		$controllerResponse = ControllerResponse::getInstance();
 		//Establece una salida normal
 		$controllerResponse->setHeader('X-Application-State: OK', true);
 		//Establece la ubicacion actual
-		$location = $controllerName."/".$actionName;
+		$location = $controllerName.'/'.$actionName;
 		$controllerResponse->setHeader('X-Application-Location: '.$location, true);
-		PluginManager::notifyFromView('beforeRender', $controllerResponse);
+		call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('beforeRender', $controllerResponse));
 	}
 
 	/**
@@ -184,7 +207,7 @@ abstract class View {
 				$responseHandler = new $adapterClassName();
 				$responseHandler->render($controllerResponse, $_valueReturned);
 			}
-			PluginManager::notifyFromView('afterRender', $controllerResponse);
+			call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
 			return;
 		}
 
@@ -230,12 +253,12 @@ abstract class View {
 				 * Crear los directorios de cache si es necesario
 				 */
 				if($controller->getViewCache()||$controller->getLayoutCache()){
-					$viewCacheDir = "cache/".session_id()."/";
-					if(!Core::fileExists("cache/".session_id()."/")){
+					$viewCacheDir = 'cache/'.session_id().'/';
+					if(!Core::fileExists('cache/'.session_id().'/')){
 						mkdir($viewCacheDir);
 					}
 
-					$viewCacheDir.=$activeApp."_".$controllerName;
+					$viewCacheDir.=$activeApp.'_'.$controllerName;
 					if(!Core::fileExists($viewCacheDir)){
 						mkdir($viewCacheDir);
 					}
@@ -253,7 +276,7 @@ abstract class View {
 						if($controller->getViewCache()>0){
 							/**
 					 		 * Busca el archivo en el directorio de cache que se crea
-					 		 * a partir del valor $_SESSION['SID'] para que sea &uacute;nico
+					 		 * a partir del valor $_SESSION['SID'] para que sea único
 					 		 * para cada sesi&oacute;n
 					 		 */
 							if(Core::fileExists($viewCacheDir."/$actionName")==false){
@@ -290,7 +313,7 @@ abstract class View {
 								if($controller->getLayoutCache()){
 									/**
 							   		 * Busca el archivo en el directorio de cache que se crea
-							 	 	 * a partir del valor session_id() para que sea &uacute;nico
+							 	 	 * a partir del valor session_id() para que sea único
 							 	 	 * para cada sesion
 							 	 	 */
 									if(!Core::fileExists($viewCacheDir."/layout")){
@@ -322,7 +345,7 @@ abstract class View {
 									if($controller->getLayoutCache()){
 										/**
 								   		 * Busca el archivo en el directorio de cache que se crea
-								 	 	 * a partir del valor session_id() para que sea &uacute;nico
+								 	 	 * a partir del valor session_id() para que sea único
 								 	 	 * para cada sesion
 								 	 	 */
 										if(!Core::fileExists($viewCacheDir."/layout")){
@@ -358,23 +381,23 @@ abstract class View {
 						if($controller->getLayoutCache()){
 							/**
 				 			 * Busca el archivo en el directorio de cache que se crea
-				 	 		 * a partir del valor session_id() para que sea &uacute;nico
+				 	 		 * a partir del valor session_id() para que sea único
 				 	 		 * para cada sesion
 				 	 		 */
 							if(!Core::fileExists($viewCacheDir.'/layout')){
-								include "$_viewsDir/layouts/$controllerName.phtml";
-								file_put_contents($viewCacheDir."/layout", ob_get_contents());
+								include $_viewsDir.'/layouts/'.$controllerName.'.phtml';
+								file_put_contents($viewCacheDir.'/layout', ob_get_contents());
 							} else {
 								$time_cache = $controller->getLayoutCache();
-								if((time()-$time_cache*60)<filemtime($viewCacheDir."/layout")){
-									include $viewCacheDir."/layout";
+								if((time()-$time_cache*60)<filemtime($viewCacheDir.'/layout')){
+									include $viewCacheDir.'/layout';
 								} else {
-									include "$_viewsDir/layouts/".$controllerName.".phtml";
-									file_put_contents($viewCacheDir."/layout", ob_get_contents());
+									include $_viewsDir.'/layouts/'.$controllerName.'.phtml';
+									file_put_contents($viewCacheDir.'/layout', ob_get_contents());
 								}
 							}
 						} else {
-							include "$_viewsDir/layouts/$controllerName.phtml";
+							include $_viewsDir.'/layouts/'.$controllerName.'.phtml';
 						}
 						self::$_content = ob_get_contents();
 					}
@@ -391,16 +414,16 @@ abstract class View {
 						/**
 						 * Aqui verifica si existe un valor en minutos para el cache
 						 */
-						if(Core::fileExists("$_viewsDir/layouts/".$controller->getTemplateAfter().".phtml")){
+						if(Core::fileExists($_viewsDir.'/layouts/'.$controller->getTemplateAfter().'.phtml')){
 							ob_clean();
 							if($controller->getLayoutCache()){
 								/**
 							   	 * Busca el archivo en el directorio de cache que se crea
-							 	 * a partir del valor session_id() para que sea &uacute;nico
+							 	 * a partir del valor session_id() para que sea único
 							 	 * para cada sesion
 							 	 */
-								if(!Core::fileExists($viewCacheDir."/layout")){
-									include "$_viewsDir/layouts/".$controller->getTemplateAfter().".phtml";
+								if(!Core::fileExists($viewCacheDir.'/layout')){
+									include $_viewsDir.'/layouts/'.$controller->getTemplateAfter().".phtml";
 									file_put_contents($viewCacheDir."/layout", ob_get_contents());
 								} else {
 									$time_cache = $controller->getLayoutCache();
@@ -428,23 +451,23 @@ abstract class View {
 								if($controller->getLayoutCache()){
 									/**
 								   	 * Busca el archivo en el directorio de cache que se crea
-								 	 * a partir del valor session_id() para que sea &uacute;nico
+								 	 * a partir del valor session_id() para que sea único
 								 	 * para cada sesion
 								 	 */
-									if(!Core::fileExists($viewCacheDir."/layout")){
-										include "$_viewsDir/layouts/$_singleTemplate.phtml";
-										file_put_contents($viewCacheDir."/layout", ob_get_contents());
+									if(!Core::fileExists($viewCacheDir.'/layout')){
+										include $_viewsDir.'/layouts/'.$_singleTemplate.'.phtml';
+										file_put_contents($viewCacheDir.'/layout', ob_get_contents());
 									} else {
 										$time_cache = $controller->getLayoutCache();
-										if((time()-$time_cache*60)<filemtime($viewCacheDir."/layout")){
-											include $viewCacheDir."/layout";
+										if((time()-$time_cache*60)<filemtime($viewCacheDir.'/layout')){
+											include $viewCacheDir.'/layout';
 										} else {
-											include "$_viewsDir/layouts/$_singleTemplate.phtml";
-											file_put_contents($viewCacheDir."/layout", ob_get_contents());
+											include $_viewsDir.'/layouts/'.$_singleTemplate.'.phtml';
+											file_put_contents($viewCacheDir.'/layout', ob_get_contents());
 										}
 									}
 								} else {
-									include "$_viewsDir/layouts/$_singleTemplate.phtml";
+									include $_viewsDir.'/layouts/'.$_singleTemplate.'.phtml';
 								}
 								self::$_content = ob_get_contents();
 							} else {
@@ -472,14 +495,16 @@ abstract class View {
 				ob_end_flush();
 			}
 		}
-		PluginManager::notifyFromView('afterRender', $controllerResponse);
+		call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
 	}
 
 	/**
-	 * Administra la presentacion cuando se genera una excepcion en la presentacion
+	 * Administra la presentación cuando se genera una excepción en la presentación
 	 *
-	 * @param Exception $e
-	 * @param Controller $controller
+	 * @access 	public
+	 * @param 	Exception $e
+	 * @param 	Controller $controller
+	 * @static
 	 */
 	static public function handleViewExceptions($e, $controller){
 		if(Core::isTestingMode()==false){
@@ -530,7 +555,7 @@ abstract class View {
 			$controllerName = $params['controller'];
 		}
 		$_viewsDir = Core::getActiveViewsDir();
-		if(Core::fileExists("$_viewsDir/$controllerName/_$_partialView.phtml")){
+		if(Core::fileExists($_viewsDir.'/'.$controllerName.'/_'.$_partialView.'.phtml')){
 			foreach(EntityManager::getEntities() as $_entityName => $_entity){
 				$$_entityName = $_entity;
 			}
@@ -545,7 +570,7 @@ abstract class View {
 				$id = $controller->getId();
 			}
 			$$_partialView = $_partialValue;
-			include "$_viewsDir/$controllerName/_$_partialView.phtml";
+			include $_viewsDir.'/'.$controllerName.'/_'.$_partialView.'.phtml';
 		} else {
 			throw new ViewException('No se puede encontrar la vista parcial: "'.$_partialView.'"', 0);
 		}
@@ -560,9 +585,9 @@ abstract class View {
 	 */
 	static public function renderView($_view){
 		$_viewsDir = Core::getActiveViewsDir();
-		if(Core::fileExists("$_viewsDir/$_view.phtml")){
+		if(Core::fileExists($_viewsDir.'/'.$_view.'.phtml')){
 			$_controller = Dispatcher::getController();
-			if(is_subclass_of($_controller, "ApplicationController")){
+			if($_controller->isExportable()){
 				foreach($_controller as $_var => $_value) {
 					$$_var = $_value;
 				}
@@ -571,9 +596,9 @@ abstract class View {
 				}
 				$id = $_controller->getId();
 			}
-			include "$_viewsDir/$_view.phtml";
-		} else{
-			throw new ViewException("La vista '$_view' no existe o no se puede cargar");
+			include $_viewsDir.'/'.$_view.'.phtml';
+		} else {
+			throw new ViewException("La vista '$_view' no existe o no se puede cargar", 0);
 		}
 	}
 
@@ -786,7 +811,7 @@ abstract class View {
 			}
 
 			$controllerResponse = ControllerResponse::getInstance();
-			PluginManager::notifyFromView('afterRender', $controllerResponse);
+			call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
 		} else {
 			throw new ViewException('No existe el proxy a "'.self::$_proxyProvider.'"');
 		}

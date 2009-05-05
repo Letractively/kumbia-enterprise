@@ -64,14 +64,19 @@ class Validation {
 	/**
 	 * Agrega un mensaje de validación al buffer
 	 *
-	 * @param string $message
-	 * @param string $fieldName
+	 * @access 	public
+	 * @param 	string $message
+	 * @param 	string $fieldName
+	 * @static
 	 */
 	public static function addValidationMessage($message, $fieldName){
 		if(!isset(self::$_validationMessages[$fieldName])){
 			self::$_validationMessages[$fieldName] = array();
 		}
 		self::$_validationMessages[$fieldName][] = $message;
+		if(self::$_validationFailed==false){
+			self::$_validationFailed = true;
+		}
 	}
 
 	/**
@@ -87,8 +92,8 @@ class Validation {
 		self::cleanValidationMessages();
 		if(is_array($fields)){
 			if(!$base){
-				$base = 'Request';
-				$getMode = 'getParamRequest';
+				$base = 'Post';
+				$getMode = 'getParamPost';
 			}
 			$controllerRequest = ControllerRequest::getInstance();
 			foreach($fields as $fieldName => $config){
@@ -149,8 +154,11 @@ class Validation {
 	/**
 	 * Muestra mensajes de validación para un determinado campo
 	 *
-	 * @param string $field
-	 * @param array $callback
+	 * @access 	public
+	 * @param 	string $field
+	 * @param 	array $callback
+	 * @throws 	ValidationException
+	 * @static
 	 */
 	public static function showMessagesFor($field, $callback=array('Flash', 'error')){
 		if(isset(self::$_validationMessages[$field])){
@@ -166,12 +174,21 @@ class Validation {
 	/**
 	 * Indica si existen mensajes de validación
 	 *
-	 * @access public
-	 * @return boolean
+	 * @access 	public
+	 * @param 	string $fieldName
+	 * @return 	boolean
 	 * @static
 	 */
-	public static function hasMessages(){
-		return count(self::$_validationMessages)>0 ? true : false;
+	public static function hasMessages($fieldName=''){
+		if($fieldName==''){
+			return count(self::$_validationMessages)>0 ? true : false;
+		} else {
+			if(isset(self::$_validationMessages[$fieldName])){
+				return count(self::$_validationMessages[$fieldName])>0 ? true : false;
+			} else {
+				return false;
+			}
+		}
 	}
 
 	/**
@@ -201,6 +218,22 @@ class Validation {
 			}
 		}
 		return $messages;
+	}
+
+	/**
+	 * Obtiene el primer mensaje de validación para un determinado campo
+	 *
+	 * @access 	public
+	 * @param 	string $fieldName
+	 * @return 	ValidationMessage
+	 * @static
+	 */
+	public static function getFirstMessageFor($fieldName){
+		if(isset(self::$_validationMessages[$fieldName])){
+			return new ValidationMessage(self::$_validationMessages[$fieldName][0], $fieldName);
+		} else {
+			return false;
+		}
 	}
 
 }

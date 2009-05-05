@@ -36,25 +36,17 @@
 class ApplicationController extends Controller  {
 
 	/**
-	 * Mensajes de Validacion
-	 *
-	 * @var array
-	 */
-	private $_messages = array();
-
-	/**
 	 * Visualiza una vista en el controlador actual
 	 *
-	 * @access protected
-	 * @param string $view
+	 * @access 	protected
+	 * @param 	string $view
 	 */
 	protected function render($view){
 		$viewsDir = Core::getActiveViewsDir();
 		$path = $viewsDir.'/'.$view.'.phtml';
-		Debug::add($path);
 		if(Core::fileExists($path)){
-			foreach(EntityManager::getEntities() as $model_name => $model){
-				$$model_name = $model;
+			foreach(EntityManager::getEntities() as $modelName => $model){
+				$$modelName = $model;
 			}
 			foreach($this as $_var => $_value){
 				$$_var = $_value;
@@ -108,25 +100,25 @@ class ApplicationController extends Controller  {
 	 * @access protected
 	 */
 	protected function cleanValidationMessages(){
-		$this->_messages = array();
+		Validation::cleanValidationMessages();
 	}
 
 	/**
 	 * Agrega un mensaje a la lista de mensajes
 	 *
-	 * @access protected
-	 * @param string $field
-	 * @param string $message
+	 * @access 	protected
+	 * @param 	string $fieldName
+	 * @param 	string $message
 	 */
-	protected function addValidationMessage($message, $field=''){
-		Validation::addValidationMessage($message, $field);
+	protected function addValidationMessage($message, $fieldName=''){
+		Validation::addValidationMessage($message, $fieldName);
 	}
 
 	/**
 	 * Devuelve los mensajes de validación generados
 	 *
-	 * @access protected
-	 * @return array
+	 * @access 	protected
+	 * @return 	array
 	 */
 	public function getValidationMessages(){
 		return Validation::getMessages();
@@ -136,7 +128,8 @@ class ApplicationController extends Controller  {
 	 * La definición de este método indica si se debe exportar
 	 * las variables públicas
 	 *
-	 * @return true
+	 * @access 	public
+	 * @return 	true
 	 */
 	public function isExportable(){
 		return true;
