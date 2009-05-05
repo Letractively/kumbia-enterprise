@@ -75,13 +75,17 @@ class Config extends Object {
 			throw new ConfigException("No existe el archivo de configuración $file");
 		}
 		$iniSettings = @parse_ini_file(Core::getFilePath($file), true);
-		foreach($iniSettings as $conf => $value){
-			$config->$conf = new stdClass();
-			foreach($value as $cf => $val){
-				$config->$conf->$cf = $val;
+		if($iniSettings==false){
+			throw new ConfigException("El archivo de configuración '$file' tiene errores '$php_errormsg'");
+		} else {
+			foreach($iniSettings as $conf => $value){
+				$config->$conf = new stdClass();
+				foreach($value as $cf => $val){
+					$config->$conf->$cf = $val;
+				}
 			}
+			self::$_instance[$file] = $config;
 		}
-		self::$_instance[$file] = $config;
 		return $config;
 	}
 

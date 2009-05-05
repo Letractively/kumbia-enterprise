@@ -319,7 +319,7 @@ class Controller extends ControllerBase {
 	 * @param mixed $index
 	 * @param mixed $value
 	 */
-	protected function setRequest($index, $value){
+	protected function setRequestParam($index, $value){
 		$funcGetArgs = func_get_args();
 		return call_user_func_array(array($this->getRequestInstance(), 'setParamRequest'), $funcGetArgs);
 	}
@@ -331,7 +331,7 @@ class Controller extends ControllerBase {
 	 * @param mixed $index
 	 * @param mixed $value
 	 */
-	protected function setPost($index, $value){
+	protected function setPostParam($index, $value){
 		$funcGetArgs = func_get_args();
 		return call_user_func_array(array($this->getRequestInstance(), 'setParamPost'), $funcGetArgs);
 	}
@@ -343,9 +343,9 @@ class Controller extends ControllerBase {
 	 * @param mixed $index
 	 * @param mixed $value
 	 */
-	protected function setGetParam($index, $value){
+	protected function setQueryParam($index, $value){
 		$funcGetArgs = func_get_args();
-		return call_user_func_array(array($this->getRequestInstance(), 'setParamGet'), $funcGetArgs);
+		return call_user_func_array(array($this->getRequestInstance(), 'setParamQuery'), $funcGetArgs);
 	}
 
 	/**
@@ -401,8 +401,8 @@ class Controller extends ControllerBase {
 	 * en sesion y disponibles cada vez que se ejecute una accion
 	 * en el controlador
 	 *
-	 * @access public
-	 * @param boolean $value
+	 * @access 	public
+	 * @param 	boolean $value
 	 */
 	protected function setPersistance($value){
 		$this->_persistance = $value;
@@ -411,8 +411,8 @@ class Controller extends ControllerBase {
 	/**
 	 * Indica si el controlador es persistente o no
 	 *
-	 * @access public
-	 * @return unknown
+	 * @access	public
+	 * @return	boolean
 	 */
 	public function getPersistance(){
 		return $this->_persistance;

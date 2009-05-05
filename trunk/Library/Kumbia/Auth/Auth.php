@@ -221,7 +221,7 @@ class Auth extends Object {
     		header('HTTP/1.0 401 Unauthorized');
     		return false;
 		} else {
-			$options = array("username" => $_SERVER['PHP_AUTH_USER'], "password" => $_SERVER['PHP_AUTH_PW']);
+			$options = array('username' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']);
 			$this->_adapterObject->setParams($options);
 			return $this->authenticate();
 		}
@@ -349,6 +349,23 @@ class Auth extends Object {
 		} else {
 			self::$_activeIdentity = Session::get('AUTH_IDENTITY');
 			return self::$_activeIdentity;
+		}
+	}
+
+	/**
+	 * Establece programacionalmente la identidad actual
+	 *
+	 * @access 	public
+	 * @param 	array $identity
+	 * @static
+	 */
+	static public function setActiveIdentity($identity){
+		if(is_array($identity)||is_object($identity)){
+			Session::set('AUTH_IDENTITY', $identity);
+			self::$_activeIdentity = $identity;
+			Session::set('AUTH_VALID', true);
+		} else {
+			throw new AuthException('La identidad debe ser una variable array ó un objeto');
 		}
 	}
 

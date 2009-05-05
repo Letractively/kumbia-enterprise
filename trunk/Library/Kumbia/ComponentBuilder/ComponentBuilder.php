@@ -172,8 +172,9 @@ class ControllerBase {
   <meta http-equiv='Content-type' content='text/html; charset=UTF-8' />
   <title>Application Title</title>
   <?php Tag::stylesheetLink('style', true) ?>
-  <?php echo Core::stylesheetLinkTags() ?>
-  <?php echo Core::javascriptBase() ?>
+  <?php echo Tag::stylesheetLinkTags() ?>
+  <?php echo Tag::javascriptLibrary('framework/scriptaculous/protoculous') ?>
+  <?php echo Tag::javascriptBase() ?>
  </head>
  <body>
     <?php View::getContent(); ?>
