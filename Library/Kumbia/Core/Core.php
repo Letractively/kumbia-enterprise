@@ -938,14 +938,14 @@ abstract class Core {
 	 * @static
 	 */
 	public static function resetRequest(){
-		MemoryRegistry::reset('CORE_CSS_IMPORTS');
+		Tag::resetCssStylesheets();
 	}
 
 	/**
 	 * Obtener el valor de un Kumbia Naming and Directory Interface
 	 *
-	 * @access public
-	 * @param string $kumbiaNDI
+	 * @access 	public
+	 * @param 	string $kumbiaNDI
 	 * @static
 	 */
 	public static function getKumbiaNDI($kumbiaNDI){
@@ -972,8 +972,8 @@ abstract class Core {
 	/**
 	 * Indica si un archivo existe
 	 *
-	 * @param string $filePath
-	 * @return boolean
+	 * @param 	string $filePath
+	 * @return 	boolean
 	 */
 	public static function fileExists($filePath){
 		/*
