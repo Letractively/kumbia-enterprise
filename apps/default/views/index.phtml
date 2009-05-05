@@ -6,10 +6,10 @@
   <title>Application Title</title>
   <!-- Cargando estilos CSS -->
   <?php Tag::stylesheetLink('style', true) ?>
-  <?php echo Tags::stylesheetLinkTags() ?>
+  <?php echo Tag::stylesheetLinkTags() ?>
   <!-- Cargando frameworks Javascript -->
   <?php echo Tag::javascriptLibrary('framework/scriptaculous/protoculous') ?>
-  <?php echo Tags::javascriptBase() ?>
+  <?php echo Tag::javascriptBase() ?>
  </head>
  <body>
   <?php View::getContent(); ?>
