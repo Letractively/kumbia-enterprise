@@ -121,21 +121,23 @@ class DbPdoInformix extends DbPDO  {
 	/**
 	 * Devuelve un LIMIT valido para un SELECT del RBDM
 	 *
-	 * @param integer $number
-	 * @return string
+	 * @param 	integer $number
+	 * @return 	string
 	 */
 	public function limit($sql, $number){
-		/**
-		 * No esta soportado por Informix
-		 */
 		$number = (int) $number;
-		return "$sql -- LIMIT $number\n";
+		if($number==0){
+			$sql = str_ireplace('SELECT', 'SELECT * FROM (SELECT', $sql);
+			$sql .= ') WHERE 0 = 1';
+			$sql = str_ireplace('SELECT', 'SELECT FIRST '.$count, $sql);
+		}
+		return $sql;
 	}
 
 	/**
 	 * Devuelve la fecha actual del motor
 	 *
-	 *@return string
+	 * @return string
 	 */
 	public function getCurrentDate(){
 		return new DbRawValue("today");
@@ -159,7 +161,7 @@ class DbPdoInformix extends DbPDO  {
 	 * @return string
 	 */
 	public function forUpdate($sqlQuery){
-		return "$sqlQuery FOR UPDATE";
+		return $sqlQuery.' FOR UPDATE';
 	}
 
 	/**
@@ -169,7 +171,7 @@ class DbPdoInformix extends DbPDO  {
 	 * @return string
 	 */
 	public function sharedLock($sqlQuery){
-		return "$sqlQuery LOCK IN SHARE MODE";
+		return $sqlQuery.' LOCK IN SHARE MODE';
 	}
 
 	/**
@@ -182,13 +184,13 @@ class DbPdoInformix extends DbPDO  {
 	public function dropTable($table, $ifExists=true){
 		if($if_exists){
 			if($this->tableExists($table)==true){
-				return $this->query("DROP TABLE $table");
+				return $this->query('DROP TABLE '.$table);
 			} else {
 				return true;
 			}
 		} else {
 			$this->setReturnRows(false);
-			return $this->query("DROP TABLE $table");
+			return $this->query('DROP TABLE '.$table);
 		}
 	}
 
