@@ -210,14 +210,14 @@ class Validation {
 	 * @static
 	 */
 	public static function getMessages(){
-		$messages = array();
+		$validationMessages = array();
 		foreach(self::$_validationMessages as $fieldName => $messages){
 			foreach($messages as $message){
 				$validationMessage = new ValidationMessage($message, $fieldName);
 				$messages[] = $validationMessage;
 			}
 		}
-		return $messages;
+		return $validationMessages;
 	}
 
 	/**
