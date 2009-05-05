@@ -1307,9 +1307,11 @@ abstract class Tag {
 	}
 
 	/**
-	 * Imprime los CSS cargados mediante Tag::stylesheetLink
+	 * Devuelve los CSS cargados mediante Tag::stylesheetLink
 	 *
-	 * @return unknown
+	 * @access 	public
+	 * @return 	string
+	 * @static
 	 */
 	public static function stylesheetLinkTags(){
 		$styleSheets = MemoryRegistry::get('CORE_CSS_IMPORTS');
@@ -1320,6 +1322,16 @@ abstract class Tag {
 			}
 		}
 		return $code;
+	}
+
+	/**
+	 * Resetea los CSS cargados mediante Tag::styleSheetLink
+	 *
+	 * @access public
+	 * @static
+	 */
+	public static function resetStylesheetLinks(){
+		MemoryRegistry::reset('CORE_CSS_IMPORTS');
 	}
 
 	/**
@@ -1344,11 +1356,11 @@ abstract class Tag {
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
 		$id = Router::getId();
-		if($action==""){
-			$action = isset($params['action']) ? $params['action'] : "";
+		if($action==''){
+			$action = isset($params['action']) ? $params['action'] : '';
 		}
 		if(!isset($params['method'])||!$params['method']) {
-			$params['method'] = "post";
+			$params['method'] = 'post';
 		}
 		if(isset($params['confirm'])&&$params['confirm']){
 			$params['onsubmit'].=$params['onsubmit'].";if(!confirm(\"{$params['confirm']}\")) { return false; }";
