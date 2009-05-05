@@ -201,9 +201,9 @@ class DbPdoInformix extends DbPDO  {
 	 * - Falta que el parametro index funcione. Este debe listar indices compuestos multipes y unicos
 	 * - Soporte para llaves foraneas
 	 *
-	 * @param string $table
-	 * @param array $definition
-	 * @return boolean
+	 * @param 	string $table
+	 * @param 	array $definition
+	 * @return 	boolean
 	 */
 	public function createTable($table, $definition, $index=array(), $tableOptions=array()){
 		if(isset($tableOptions['temporary'])&&$tableOptions['temporary']==true){
@@ -211,8 +211,8 @@ class DbPdoInformix extends DbPDO  {
 		} else {
 			$createSQL = "CREATE TABLE $table (";
 		}
-		if(!is_array($definition)){
-			new DbException("Definici&oacute;n invalida para crear la tabla '$table'");
+		if(is_array($definition)==false){
+			new DbException("Definición invalida para crear la tabla '$table'");
 			return false;
 		}
 		$createLines = array();
@@ -221,43 +221,43 @@ class DbPdoInformix extends DbPDO  {
 		$primary = array();
 		$not_null = "";
 		$size = "";
-		foreach($definition as $field => $field_def){
-			if(isset($field_def['not_null'])){
-				$not_null = $field_def['not_null'] ? 'NOT NULL' : '';
+		foreach($definition as $field => $fieldDef){
+			if(isset($fieldDef['not_null'])){
+				$not_null = $fieldDef['not_null'] ? 'NOT NULL' : '';
 			} else {
 				$not_null = "";
 			}
-			if(isset($field_def['size'])){
-				$size = $field_def['size'] ? '('.$field_def['size'].')' : '';
+			if(isset($fieldDef['size'])){
+				$size = $fieldDef['size'] ? '('.$fieldDef['size'].')' : '';
 			} else {
 				$size = "";
 			}
-			if(isset($field_def['index'])){
-				if($field_def['index']){
+			if(isset($fieldDef['index'])){
+				if($fieldDef['index']){
 					$index[] = "INDEX($field)";
 				}
 			}
-			if(isset($field_def['unique_index'])){
-				if($field_def['unique_index']){
+			if(isset($fieldDef['unique_index'])){
+				if($fieldDef['unique_index']){
 					$index[] = "UNIQUE($field)";
 				}
 			}
-			if(isset($field_def['primary'])){
-				if($field_def['primary']){
+			if(isset($fieldDef['primary'])){
+				if($fieldDef['primary']){
 					$primary[] = "$field";
 				}
 			}
-			if(isset($field_def['auto'])){
-				if($field_def['auto']){
-					$field_def['type'] = "SERIAL";
+			if(isset($fieldDef['auto'])){
+				if($fieldDef['auto']){
+					$fieldDef['type'] = "SERIAL";
 				}
 			}
-			if(isset($field_def['extra'])){
-				$extra = $field_def['extra'];
+			if(isset($fieldDef['extra'])){
+				$extra = $fieldDef['extra'];
 			} else {
 				$extra = "";
 			}
-			$createLines[] = "$field ".$field_def['type'].$size.' '.$not_null.' '.$extra;
+			$createLines[] = "$field ".$fieldDef['type'].$size.' '.$not_null.' '.$extra;
 		}
 		$createSQL.= join(',', $createLines);
 		$lastLines = array();
