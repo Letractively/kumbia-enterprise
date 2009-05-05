@@ -214,7 +214,7 @@ class Validation {
 		foreach(self::$_validationMessages as $fieldName => $messages){
 			foreach($messages as $message){
 				$validationMessage = new ValidationMessage($message, $fieldName);
-				$messages[] = $validationMessage;
+				$validationMessages[] = $validationMessage;
 			}
 		}
 		return $validationMessages;
