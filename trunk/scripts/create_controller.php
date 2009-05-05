@@ -18,7 +18,7 @@
  * @license New BSD License
  */
 
-require 'Library/Kumbia/Core/CoreClassPath/CoreClassPath.php';
+require 'Library/Kumbia/Core/ClassPath/CoreClassPath.php';
 require 'Library/Kumbia/Autoload.php';
 
 class CreateController extends Script {
@@ -27,7 +27,7 @@ class CreateController extends Script {
 
 		$posibleParameters = array(
 			'name=s' => '--name nombre \t\tNombre del controlador',
-			'application=s' => '--application nombre \tNombre de la aplicaci&oacute;n [opcional]',
+			'application=s' => '--application nombre \tNombre de la aplicación [opcional]',
 			'force' => '--force \t\tForza a que se reescriba el controlador [opcional]',
 			'help' => '--help \t\t\tMuestra esta ayuda'
 		);
@@ -54,7 +54,7 @@ class CreateController extends Script {
 			if(!file_exists("$controllersDir/{$name}_controller.php")||$this->isReceivedOption('force')){
 				file_put_contents("$controllersDir/{$name}_controller.php", $code);
 			} else {
-	 			throw new ScriptException("Ya existe el nombre del controlador en la aplicaci&oacute;n '$application'");
+	 			throw new ScriptException("Ya existe el nombre del controlador en la aplicación '$application'");
 			}
 		} else {
 			throw new ScriptException("Debe indicar el nombre del controlador");
