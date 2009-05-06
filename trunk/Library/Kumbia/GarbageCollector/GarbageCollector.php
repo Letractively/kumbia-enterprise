@@ -154,4 +154,21 @@ class GarbageCollector {
 		}
 	}
 
+	/**
+	 * Resetea la persistencia de un controlador
+	 *
+	 * @access 	public
+	 * @param 	string $appController
+	 * @param 	string $module
+	 * @static
+	 */
+	static public function freeControllerData($appController, $module=''){
+		$instanceName = Core::getInstanceName();
+		$activeApp = Router::getApplication();
+		$appController.='Controller';
+		if(isset($_SESSION['KCON'][$instanceName][$activeApp][$module][$appController])){
+			unset($_SESSION['KCON'][$instanceName][$activeApp][$module][$appController]);
+		}
+	}
+
 }

@@ -39,7 +39,7 @@ abstract class Core {
 	 * Version del Framework
 	 *
 	 */
-	const FRAMEWORK_VERSION = '1.0.17bGA';
+	const FRAMEWORK_VERSION = '1.0.17cGA';
 
 	/**
 	 * PATH donde esta instalada la instancia del framework
@@ -601,8 +601,10 @@ abstract class Core {
 	/**
 	 * Administra el comportamiento del framework al generarse una excepcion
 	 *
-	 * @param string $e
-	 * @param Controller $controller
+	 * @access 	public
+	 * @param 	string $e
+	 * @param 	Controller $controller
+	 * @static
 	 */
 	private static function handleException($e, $controller){
 
