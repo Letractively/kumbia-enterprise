@@ -57,7 +57,7 @@ class WebServiceClient extends SoapClient {
 		if(!isset($options['compression'])){
 			$options['compression'] = SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP;
 		}
-		$options['trace'] = true;
+		#$options['trace'] = true;
 		parent::__construct($options['wsdl'], $options);
 	}
 

@@ -305,10 +305,7 @@ abstract class EntityManager {
 	 * @static
 	 */
 	static public function isEntity($entityName){
-		if($entityName==''){
-			return false;
-		}
-		return isset(self::$_entities[$entityName]);
+		return self::isModel($entityName);
 	}
 
 	/**

@@ -14,27 +14,51 @@
  *
  * @category 	Kumbia
  * @package 	Router
+ * @subpackage 	Adapters
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
- * @version 	$Id$
  */
 
 /**
- * RouterInterface
+ * DefaultRouter
  *
- * Interface que deben implementar todos los adaptadores de Router
+ * Adaptador por defecto para peticiones normales
  *
  * @category 	Kumbia
  * @package 	Router
+ * @subpackage 	Adapters
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
-interface RouterInterface {
+class DefaultRouter implements RouterInterface {
 
-	public function handleRouting();
-	public function getResponseHandler();
-	public function getExceptionResponseHandler();
+	/**
+	 * Administra la petición de enrutamiento
+	 *
+	 * @access public
+	 */
+	public function handleRouting(){
+
+	}
+
+	/**
+	 * Devuelve el administrador de la respuesta de la petición por defecto
+	 *
+	 * @access public
+	 * @return callback
+	 */
+	public function getResponseHandler(){
+		return array('View', 'handleViewRender');
+	}
+
+	/**
+	 * Devuelve el administrador de petición por defecto
+	 *
+	 * @access public
+	 * @return callback
+	 */
+	public function getExceptionResponseHandler(){
+		return array('View', 'handleViewExceptions');
+	}
 
 }

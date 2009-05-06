@@ -304,7 +304,7 @@ abstract class Dispatcher {
 				$applicationController = new ApplicationController();
 				if(self::executeNotFound($applicationController)==false){
 					//No se encontro el controlador
-					$message = CoreLocale::getErrorMessage(-102, $action);
+					$message = CoreLocale::getErrorMessage(-102, $controller);
 					self::throwException($message, self::NOT_FOUND_FILE_CONTROLLER);
 				} else {
 					self::$_controller = $applicationController;
@@ -377,8 +377,8 @@ abstract class Dispatcher {
 						Router::routeTo(array('action' => 'notFound', 'id' => $action));
 						return self::$_controller;
 					} else {
-						//Nos se encontro la acción
-						$message = CoreLocale::getErrorMessage(-101, $action, $controller, $action);
+						//No se encontró la acción
+						$message = CoreLocale::getErrorMessage(-100, $action, $controller, $action);
 						self::throwException($message, Dispatcher::NOT_FOUND_ACTION);
 					}
 				}
@@ -422,8 +422,7 @@ abstract class Dispatcher {
 				}
 			}
 
-			// Se clona el controlador y se serializan las propiedades que no
-			// sean instancias de modelos
+			// Se clona el controlador y se serializan las propiedades que no sean instancias de modelos
 			if(self::$_controller->getPersistance()==true){
 				$controller = clone self::$_controller;
 				try {

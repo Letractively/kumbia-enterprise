@@ -32,7 +32,7 @@
  * @license 	New BSD License
  * @abstract
  */
-abstract class Soap extends Object {
+abstract class Soap {
 
 	/**
 	 * Namespace de nodos Envelope
@@ -40,14 +40,14 @@ abstract class Soap extends Object {
 	 * @var string
 	 * @staticvar
 	 */
-	private static $_envelopeNS = "http://schemas.xmlsoap.org/soap/envelope/";
+	private static $_envelopeNS = 'http://schemas.xmlsoap.org/soap/envelope/';
 
 	/**
 	 * Namespace del XML Schema Instance (xsi)
 	 *
 	 * @var string
 	 */
-	private static $_xmlSchemaInstanceNS = "http://www.w3.org/2001/XMLSchema-instance";
+	private static $_xmlSchemaInstanceNS = 'http://www.w3.org/2001/XMLSchema-instance';
 
 	/**
 	 * DOMDocument Base
@@ -79,10 +79,10 @@ abstract class Soap extends Object {
 	 * @static
 	 */
 	static private function _createSOAPEnvelope(){
-		self::$_domDocument = new DOMDocument("1.0", "UTF-8");
-		self::$_rootElement = self::$_domDocument->createElementNS(self::$_envelopeNS, "SOAP-ENV:Envelope");
+		self::$_domDocument = new DOMDocument('1.0', 'UTF-8');
+		self::$_rootElement = self::$_domDocument->createElementNS(self::$_envelopeNS, 'SOAP-ENV:Envelope');
 		self::$_domDocument->appendChild(self::$_rootElement);
-		self::$_bodyElement = new DOMElement("Body", "", self::$_envelopeNS);
+		self::$_bodyElement = new DOMElement('Body', '', self::$_envelopeNS);
 		self::$_rootElement->appendChild(self::$_bodyElement);
 		return self::$_bodyElement;
 	}
@@ -116,16 +116,16 @@ abstract class Soap extends Object {
 			self::$_soapServer->handle();
 		}*/
 
-		$soapAction = explode("#", str_replace("\"", "", $_SERVER['HTTP_SOAPACTION'])); ;
-		$serviceNamespace = "http://app-services";
+		$soapAction = explode('#', str_replace('"', '', $_SERVER['HTTP_SOAPACTION'])); ;
+		$serviceNamespace = 'http://app-services';
 		$bodyElement = self::_createSOAPEnvelope();
-		self::$_domDocument->createAttributeNS($serviceNamespace, "ns1:dummy");
-		self::$_domDocument->createAttributeNS("http://www.w3.org/2001/XMLSchema", "xsd:dummy");
-		self::$_domDocument->createAttributeNS("http://schemas.xmlsoap.org/soap/encoding", "SOAP-ENC:dummy");
-		self::$_domDocument->createAttributeNS(self::$_xmlSchemaInstanceNS, "xsi:dummy");
-		self::$_rootElement->setAttributeNS(self::$_envelopeNS, "encondingStyle", "http://schemas.xmlsoap.org/soap/encoding/");
+		self::$_domDocument->createAttributeNS($serviceNamespace, 'ns1:dummy');
+		self::$_domDocument->createAttributeNS('http://www.w3.org/2001/XMLSchema', 'xsd:dummy');
+		self::$_domDocument->createAttributeNS('http://schemas.xmlsoap.org/soap/encoding', 'SOAP-ENC:dummy');
+		self::$_domDocument->createAttributeNS(self::$_xmlSchemaInstanceNS, 'xsi:dummy');
+		self::$_rootElement->setAttributeNS(self::$_envelopeNS, 'encondingStyle', 'http://schemas.xmlsoap.org/soap/encoding/');
 
-		$responseElement = self::$_domDocument->createElementNS($serviceNamespace, $soapAction[1]."Response");
+		$responseElement = self::$_domDocument->createElementNS($serviceNamespace, $soapAction[1].'Response');
 		$dataEncoded = self::_getDataEncoded();
 		if($dataEncoded!=null){
 			$responseElement->appendChild($dataEncoded);
@@ -155,32 +155,32 @@ abstract class Soap extends Object {
 	 * @return DOMElement
 	 * @static
 	 */
-	private static function _getDataEncoded($valueReturned=null, $nodeType="return"){
+	private static function _getDataEncoded($valueReturned=null, $nodeType='return'){
 		if($valueReturned===null){
 			$valueReturned = Dispatcher::getValueReturned();
 		}
 		if(!is_array($valueReturned)){
 			$element = self::$_domDocument->createElement($nodeType, $valueReturned);
 			if(is_integer($valueReturned)==true){
-				$element->setAttribute("xsi:type", "int");
+				$element->setAttribute('xsi:type', 'int');
 			}
 			if(is_string($valueReturned)==true){
-				$element->setAttribute("xsi:type", "string");
+				$element->setAttribute('xsi:type', 'string');
 			}
 			if(is_bool($valueReturned)==true){
-				$element->setAttribute("xsi:type", "boolean");
+				$element->setAttribute('xsi:type', 'boolean');
 				if($valueReturned===false){
-					$stringValue = "false";
+					$stringValue = 'false';
 				} else {
-					$stringValue = "boolean";
+					$stringValue = 'boolean';
 				}
 				$element->nodeValue = $stringValue;
 			}
 			return $element;
 		} else {
 			$element = self::$_domDocument->createElement($nodeType);
-			$dataType = "";
-			$oldDataType = "";
+			$dataType = '';
+			$oldDataType = '';
 			foreach($valueReturned as $key => $value){
 				if($dataType!='mixed'){
 					$dataType = gettype($value);
@@ -194,15 +194,15 @@ abstract class Soap extends Object {
 					}
 				}
 			}
-			$returnString = "";
+			$returnString = '';
 			if($dataType=='mixed'){
-				$element->setAttribute("SOAP-ENC:arrayType", "xsd:ur-type[".count($valueReturned)."]");
+				$element->setAttribute('SOAP-ENC:arrayType', 'xsd:ur-type['.count($valueReturned).']');
 			} else {
-				$element->setAttribute("SOAP-ENC:arrayType", "xsd:".self::_getDataXSD($dataType)."[".count($valueReturned)."]");
+				$element->setAttribute('SOAP-ENC:arrayType', 'xsd:'.self::_getDataXSD($dataType).'['.count($valueReturned).']');
 			}
-			$element->setAttribute("xsi:type", "SOAP-ENC:Array");
+			$element->setAttribute('xsi:type', 'SOAP-ENC:Array');
 			foreach($valueReturned as $key => $value){
-				$element->appendChild(self::_getDataEncoded($value, "item"));
+				$element->appendChild(self::_getDataEncoded($value, 'item'));
 			}
 			return $element;
 		}
@@ -211,29 +211,23 @@ abstract class Soap extends Object {
 	/**
 	 * Genera las fault exceptions del Servidor SOAP
 	 *
-	 * @access public
-	 * @param Exception $e
-	 * @param mixed $controller
+	 * @access 	public
+	 * @param 	Exception $e
+	 * @param 	mixed $controller
 	 * @static
 	 */
 	static public function faultSoapHandler($e, $controller){
 		$response = ControllerResponse::getInstance();
 		if(isset($_SERVER['HTTP_SOAPACTION'])){
-			$faultMessage = str_replace("\n", "", html_entity_decode($e->getMessage(), ENT_COMPAT, "UTF-8"));
+			$faultMessage = str_replace('\n', '', html_entity_decode($e->getMessage(), ENT_COMPAT, 'UTF-8'));
 			$response->setResponseType(ControllerResponse::RESPONSE_OTHER);
 			$response->setResponseAdapter('xml');
 			$bodyElement = self::_createSOAPEnvelope();
-			$faultElement = new DOMElement("Fault", "", self::$_envelopeNS);
+			$faultElement = new DOMElement('Fault', '', self::$_envelopeNS);
 			$bodyElement->appendChild($faultElement);
-			$faultElement->appendChild(new DOMElement("faultcode", $e->getCode()));
-			$faultElement->appendChild(new DOMElement("faultstring", $faultMessage));
+			$faultElement->appendChild(new DOMElement('faultcode', $e->getCode()));
+			$faultElement->appendChild(new DOMElement('faultstring', $faultMessage));
 			print self::$_domDocument->saveXML();
-		} else {
-			ob_clean();
-			$e->showMessage();
-			View::setContent(ob_get_contents());
-			ob_end_clean();
-			View::xhtmlTemplate('white');
 		}
 	}
 

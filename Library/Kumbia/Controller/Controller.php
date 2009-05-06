@@ -624,6 +624,17 @@ class Controller extends ControllerBase {
 	}
 
 	/**
+	 * Devuelve un callback que administrará la forma en que se presente
+	 * la vista del controlador
+	 *
+	 * @access 	public
+	 * @return 	callback
+	 */
+	public function getViewExceptionHandler(){
+		return array('View', 'handleViewExceptions');
+	}
+
+	/**
 	 * Establece el/los template(s) que se insertan antes del layout del controlador
 	 *
 	 * @access public
@@ -679,17 +690,6 @@ class Controller extends ControllerBase {
 	 */
 	public final function getTemplateAfter(){
 		return $this->_templateAfter;
-	}
-
-	/**
-	 * Devuelve un callback que administrara la forma en que se presente
-	 * la vista del controlador
-	 *
-	 * @access 	public
-	 * @return 	array
-	 */
-	public function getViewExceptionHandler(){
-		return array('View', 'handleViewExceptions');
 	}
 
 	/**

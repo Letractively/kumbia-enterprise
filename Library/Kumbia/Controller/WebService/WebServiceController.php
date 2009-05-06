@@ -83,7 +83,7 @@ class WebServiceController extends Controller {
 	}
 
 	/**
-	 * Establece el Soap::serverHandler como manejador de la presentaci&oacute;n
+	 * Establece el Soap::serverHandler como manejador de la presentación
 	 *
 	 */
 	public final function getViewHandler(){
