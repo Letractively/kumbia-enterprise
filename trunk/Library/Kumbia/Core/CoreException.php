@@ -118,7 +118,7 @@ class CoreException extends Exception {
 		Flash::error(get_class($this).": $this->message ({$this->getCode()})<br>
 		<span style='font-size:12px'>En el archivo <i>{$file}</i> en la l&iacute;nea: <i>{$this->getLine()}</i>");
 		$config = CoreConfig::readFromActiveApplication("config.ini");
-		$active_app = Core::getActiveApplication();
+		$activeApp = Router::getApplication();
 		if($this->show_trace==true){
 			if(isset($config->application->debug)&&$config->application->debug==true){
 				$requestTime = microtime(true);
@@ -298,16 +298,16 @@ class CoreException extends Exception {
 				print "<strong>Versión Framework:</strong> ".Core::FRAMEWORK_VERSION."<br>";
 				print "<strong>Nombre de la Instancia:</strong> ".$instanceName."<br>";
 				print "<strong>Fecha del Sistema:</strong> ".date("r")."<br>";
-				print "<strong>Aplicación actual:</strong> ".Core::getActiveApplication()."<br>";
+				print "<strong>Aplicación actual:</strong> ".Router::getApplication()."<br>";
 				print "<strong>Entorno actual:</strong> ".$config->application->mode."<br>";
 				$url = Router::getApplication()."/".Router::getController()."/".Router::getAction();
 				print "<strong>Ubicación actual:</strong> ".$url."<br>";
 				print "<strong>Modelos Cargados:</strong> ".join(", ", array_keys(EntityManager::getEntities()))."<br>";
-				if(isset($_SESSION['KMOD'][$instanceName][$active_app])){
-					print "<strong>Modulos Cargados:</strong> ".join(", ", $_SESSION['KMOD'][$instanceName][$active_app])."<br>";
+				if(isset($_SESSION['KMOD'][$instanceName][$activeApp])){
+					print "<strong>Modulos Cargados:</strong> ".join(", ", $_SESSION['KMOD'][$instanceName][$activeApp])."<br>";
 				}
-				if(isset($_SESSION['KPC'][$instanceName][$active_app])){
-					print "<strong>Plugins Cargados:</strong> ".join(", ", $_SESSION['KPC'][$instanceName][$active_app])."<br>";
+				if(isset($_SESSION['KPC'][$instanceName][$activeApp])){
+					print "<strong>Plugins Cargados:</strong> ".join(", ", $_SESSION['KPC'][$instanceName][$activeApp])."<br>";
 				}
 				if(isset($_SESSION['session_data'])){
 					if(is_array($_SESSION['session_data'])){

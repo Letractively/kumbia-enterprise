@@ -113,7 +113,7 @@ abstract class Router {
 	static private $_routedCyclic;
 
 	/**
-	 * Nombre de la acci&oacute;n por defecto
+	 * Nombre de la acción por defecto
 	 *
 	 * @var string
 	 */
@@ -124,7 +124,14 @@ abstract class Router {
 	 *
 	 * @var string
 	 */
-	static private $_routingAdapter = 'Default';
+	static private $_routingAdapterType = 'Default';
+
+	/**
+	 * Objeto de enrutamiento utilizado
+	 *
+	 * @var object
+	 */
+	static private $_routerAdapter;
 
 	/**
 	 * Indica si hay rutas estaticas
@@ -206,14 +213,14 @@ abstract class Router {
 			self::$_application = $activeApp;
 
 			if(!isset($appServerConfig->core)){
-				throw new RouterException("No existe la secci&oacute;n [core] en el archivo de configuraci&oacute;n de la instancia");
+				throw new RouterException("No existe la sección [core] en el archivo de configuración de la instancia");
 			}
 			if(!isset($appServerConfig->core->defaultApp)){
-				throw new RouterException("No se ha indicado la aplicaci&oacute;n por defecto en config/config.ini (defaultApp)");
+				throw new RouterException("No se ha indicado la aplicación por defecto en config/config.ini (defaultApp)");
 			}
 			$config = CoreConfig::getConfigurationFrom($activeApp, 'config.ini');
 			if(!isset($config->application)){
-				throw new RouterException("No existe la secci&oacute;n [application] en el config.ini de la aplicaci&oacute;n");
+				throw new RouterException("No existe la sección [application] en el config.ini de la aplicación");
 			}
 
 			/**
@@ -350,7 +357,7 @@ abstract class Router {
 				if(isset($routes->routes)){
 					foreach($routes->routes as $source => $destination){
 						if(count(explode('/', $source))!=3||count(explode('/', $destination))!=3){
-							throw new RouterException("Pol&iacute;tica de enrutamiento invalida '$source' a '$destination' en config/routes.ini");
+							throw new RouterException("Política de enrutamiento invalida '$source' a '$destination' en config/routes.ini");
 						} else {
 							list($controller_source,
 							$action_source,
@@ -420,7 +427,7 @@ abstract class Router {
 	}
 
 	/**
-	 * Devuelve el nombre de la aplicaci&oacute;n actual
+	 * Devuelve el nombre de la aplicación actual
 	 *
 	 * @access public
 	 * @return string
@@ -546,14 +553,14 @@ abstract class Router {
 	}
 
 	/**
-	 * Valida si el router se encuentra en une estado de ejecuci�n valido
+	 * Valida si el router se encuentra en une estado de ejecución valido
 	 *
 	 * @access public
 	 * @static
 	 */
 	static private function validateRouter(){
 		if(self::$_initialized==false){
-			throw new RouterException("Se esta tratando de hacer un enrutamiento en un estado de ejecuci&oacute;n invalido");
+			throw new RouterException("Se esta tratando de hacer un enrutamiento en un estado de ejecución invalido");
 		}
 	}
 
@@ -594,7 +601,7 @@ abstract class Router {
 	}
 
 	/**
-	 * Enruta el controlador actual a otro controlador, &oacute; a otra acci&oacute;n
+	 * Enruta el controlador actual a otro controlador, ó a otra acción
 	 * Ej:
 	 * <code>
 	 * Router::routeTo("controller: nombre", ["action: accion"], ["id: id"])
@@ -651,7 +658,7 @@ abstract class Router {
 	}
 
 	/**
-	 * Nombre de la aplicaci&oacute;n activa actual devuelve "" en caso de
+	 * Nombre de la aplicación activa actual devuelve "" en caso de
 	 * que la aplicacion sea default
 	 *
 	 * @access public
@@ -723,8 +730,8 @@ abstract class Router {
 	 * Redirecciona el flujo de ejecucion a otra aplicacion
 	 * en la misma instancia del framework
 	 *
-	 * @access public
-	 * @param string $uri
+	 * @access 	public
+	 * @param 	string $uri
 	 * @static
 	 */
 	static public function redirectToApplication($uri){
@@ -744,35 +751,43 @@ abstract class Router {
 			$_GET['_url'] = '';
 		}
 		Router::rewrite($_GET['_url']);
-		if(self::getRoutingType()==self::ROUTING_OTHER){
-			if(Core::fileExists('Library/Kumbia/Router/Adapters/'.self::$_routingAdapter.'.php')){
-				/**
-				 * @see RouterInterface
-				 */
-				require 'Library/Kumbia/Router/Interface.php';
-				require 'Library/Kumbia/Router/Adapters/'.self::$_routingAdapter.'.php';
-				$className = self::$_routingAdapter.'Router';
-				$router = new $className();
-				$router->handleRouting();
-			} else {
-				throw new RouterException("No existe el adaptador de enrutamiento");
+		if(self::_detectRoutingType()==self::ROUTING_OTHER){
+			if(Core::fileExists('Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php')==false){
+				throw new RouterException("No existe el adaptador de enrutamiento ".self::$_routingAdapterType);
 			}
 		}
+		/**
+		 * @see RouterInterface
+		 */
+		require 'Library/Kumbia/Router/Interface.php';
+		require 'Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php';
+		$className = self::$_routingAdapterType.'Router';
+		self::$_routerAdapter = new $className();
+		self::$_routerAdapter->handleRouting();
 	}
 
 	/**
-	 * Devuelve el tipo de enrutamiento que se debe hacer deacuerdo al tipo de peticion
+	 * Detecta el tipo de enrutamiento solicitado por el cliente
 	 *
-	 * @access public
-	 * @return string
-	 * @static
+	 * @return int
 	 */
-	static public function getRoutingType(){
+	static private function _detectRoutingType(){
 		if(isset($_SERVER['HTTP_SOAPACTION'])){
-			self::$_routingAdapter = 'Soap';
+			self::$_routingAdapterType = 'Soap';
 			return self::ROUTING_OTHER;
 		}
-		return '';
+		return self::ROUTING_DEFAULT;
+	}
+
+	/**
+	 * Devuelve el adaptador de enrutamiento utilizado
+	 *
+	 * @access 	public
+	 * @return 	object
+	 * @static
+	 */
+	static public function getRoutingAdapter(){
+		return self::$_routerAdapter;
 	}
 
 }

@@ -54,20 +54,6 @@ abstract class Core {
 	private static $_clusterId = null;
 
 	/**
-	 * Nombre del controlador actual
-	 *
-	 * @var string
-	 */
-	static private $_controller;
-
-	/**
-	 * Nombre de la aplicacion activa
-	 *
-	 * @var string
-	 */
-	static private $_activeApp;
-
-	/**
 	 * Directorio de controladores activo
 	 *
 	 * @var string
@@ -88,12 +74,6 @@ abstract class Core {
 	 */
 	private static $_activeViewsDir;
 
-	/**
-	 * Facility Actual
-	 *
-	 * @var integer
-	 */
-	private static $_facility;
 
 	/**
 	 * Establece si el framework se encuentra en modo Test
@@ -188,6 +168,7 @@ abstract class Core {
 		 * Crear el _INSTANCE_NAME
 		 */
 		$deleteSessionCache = false;
+		$exceptionThrown = false;
 		$path = substr(str_replace('/public/index.php', '', $_SERVER['PHP_SELF']), 1);
 		if(isset($_SESSION['_INSTANCE_NAME'])){
 			if($path!=$_SESSION['_INSTANCE_NAME']){
@@ -228,6 +209,7 @@ abstract class Core {
 		}
 		catch(Exception $e){
 			// Espera a que se defina _INSTANCE_NAME y lanza la excepcion
+			$exceptionThrown = true;
 		}
 		$_SESSION['_APPNAME'] = Router::getApplication();
 		$_SESSION['_INSTANCE_NAME'] = $path;
@@ -236,7 +218,7 @@ abstract class Core {
 		} else {
 			self::$_instanceName = '';
 		}
-		if(is_object($e)){
+		if($exceptionThrown==true){
 			throw $e;
 		}
 		return true;
@@ -249,7 +231,7 @@ abstract class Core {
 	 */
 	public static function getInstanceName(){
 		if(self::$_instanceName===null){
-			return join(array_slice(explode('/' ,dirname($_SERVER['PHP_SELF'])),1,-1),"/");
+			return join(array_slice(explode('/' ,dirname($_SERVER['PHP_SELF'])),1,-1),'/');
 		} else {
 			return self::$_instanceName;
 		}
@@ -306,17 +288,6 @@ abstract class Core {
 	}
 
 	/**
-	 * Obtener el nombre de la aplicacion activa
-	 *
-	 * @access 	public
-	 * @return 	string
-	 * @static
-	 */
-	public static function getActiveApplication(){
-		return self::$_activeApp;
-	}
-
-	/**
 	 * Inicializa las rutas MVC para hacerlas disponibles a todos los componentes
 	 *
 	 * @access 	private
@@ -326,27 +297,27 @@ abstract class Core {
 	private static function _initializeMVCRoutes($config){
 
 		//Aplicacion Activa
-		self::$_activeApp = Router::getApplication();
+		$activeApp = Router::getApplication();
 
 		//Directorio de controladores Activo
 		if(isset($config->application->controllersDir)){
 			self::$_activeControllersDir = 'apps/'.$config->application->controllersDir;
 		} else {
-			self::$_activeControllersDir = 'apps/'.self::$_activeApp.'/controllers';
+			self::$_activeControllersDir = 'apps/'.$activeApp.'/controllers';
 		}
 
 		//Directorio de modelos activo
 		if(isset($config->application->modelsDir)){
 			self::$_activeModelsDir = 'apps/'.$config->application->modelsDir;
 		} else {
-			self::$_activeModelsDir = 'apps/'.self::$_activeApp.'/models';
+			self::$_activeModelsDir = 'apps/'.$activeApp.'/models';
 		}
 
 		//Directorio de Vistas Activo
 		if(isset($config->application->viewsDir)){
 			self::$_activeViewsDir = 'apps/'.$config->application->viewsDir;
 		} else {
-			self::$_activeViewsDir = 'apps/'.self::$_activeApp.'/views';
+			self::$_activeViewsDir = 'apps/'.$activeApp.'/views';
 		}
 
 		/**
@@ -465,7 +436,7 @@ abstract class Core {
 
 		}
 		catch(CoreException $e){
-			return self::handleException($e, $controller);
+			return self::_handleException($e, $controller);
 		}
 		catch(Exception $e){
 			/**
@@ -492,7 +463,7 @@ abstract class Core {
 				throw new CoreException($e->getMessage().' ('.get_class($e).')', $e->getCode(), true, $backtrace);
 			}
 			catch(CoreException $e){
-				return self::handleException($e, $controller);
+				return self::_handleException($e, $controller);
 			}
 		}
 		return true;
@@ -546,7 +517,7 @@ abstract class Core {
 			/**
 			 * Si no hay controlador ejecuta ControllerBase::init()
 			 */
-			if(empty($controllerName)){
+			if($controllerName==null){
 				Dispatcher::initBase();
 			} else {
 
@@ -606,28 +577,20 @@ abstract class Core {
 	 * @param 	Controller $controller
 	 * @static
 	 */
-	private static function handleException($e, $controller){
+	private static function _handleException($e, $controller){
 
-		/**
-		 * Notifica la excepcion a los Plugins
-		 */
+		//Notifica la excepcion a los Plugins
 		PluginManager::notifyFromApplication('beforeUncaughtException', $e);
 
 		$controller = Dispatcher::getController();
 		Session::storeSessionData();
 		if($controller){
 			$exceptionHandler = $controller->getViewExceptionHandler();
-			call_user_func_array($exceptionHandler, array($e, $controller));
 		} else {
-			if(self::$_testingMode==false){
-				$e->showMessage();
-				View::setContent(ob_get_contents());
-				ob_end_clean();
-				View::xhtmlTemplate('white');
-			} else {
-				throw $e;
-			}
+			$routingAdapter = Router::getRoutingAdapter();
+			$exceptionHandler = $routingAdapter->getExceptionResponseHandler();
 		}
+		call_user_func_array($exceptionHandler, array($e, $controller));
 		return;
 	}
 
@@ -654,12 +617,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Enruta el controlador actual a otro controlador,
-	 * o otra accion
-	 * Ej:
-	 * <code>
-	 * Core::routeTo("controller: nombre", ["action: accion"], ["id: id"])
-	 * </code>
+	 * Proxy a Router::routeTo
 	 *
 	 * @access 		public
 	 * @static
@@ -680,18 +638,6 @@ abstract class Core {
 	 */
 	public static function info(){
 		CoreInfo::showInfoScreen();
-	}
-
-	/**
-	 * Importa un paquete recursivamente
-	 *
-	 * @access public
-	 * @static
-	 * @param string $package
-	 * @throws CoreException
-	 */
-	public static function import($package){
-		$packageParts = explode('.', $package);
 	}
 
 	/**
@@ -888,31 +834,9 @@ abstract class Core {
 	 * @static
 	 */
 	public static function reloadMVCLocations(){
-
 		//Aplicacion Activa
-		self::$_activeApp = Router::getApplication();
 		$config = CoreConfig::readFromActiveApplication('config.ini');
-
-		//Directorio de controladores Activo
-		if(isset($config->application->controllersDir)){
-			self::$_activeControllersDir = 'apps/'.$config->application->controllersDir;
-		} else {
-			self::$_activeControllersDir = 'apps/'.self::$_activeApp.'/controllers';
-		}
-
-		//Directorio de modelos activo
-		if(isset($config->application->modelsDir)){
-			self::$_activeModelsDir = 'apps/'.$config->application->modelsDir;
-		} else {
-			self::$_activeModelsDir = 'apps/'.self::$_activeApp.'/models';
-		}
-
-		//Directorio de Vistas Activo
-		if(isset($config->application->viewsDir)){
-			self::$_activeViewsDir = 'apps/'.$config->application->viewsDir;
-		} else {
-			self::$_activeViewsDir = 'apps/'.self::$_activeApp.'/views';
-		}
+		self::_initializeMVCRoutes($config);
 	}
 
 	/**

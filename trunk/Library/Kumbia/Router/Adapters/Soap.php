@@ -105,4 +105,33 @@ class SoapRouter implements RouterInterface {
 		}
 	}
 
+	/**
+	 * Obtiene el callback del administrador de excepciones
+	 *
+	 * @return callback
+	 */
+	public function getExceptionHandler(){
+		return array('Soap', 'faultSoapHandler');
+	}
+
+	/**
+	 * Devuelve el administrador de la respuesta de la petición por defecto
+	 *
+	 * @access public
+	 * @return callback
+	 */
+	public function getResponseHandler(){
+		return array('Soap', 'serverHandler');
+	}
+
+	/**
+	 * Devuelve el administrador de petición por defecto
+	 *
+	 * @access public
+	 * @return callback
+	 */
+	public function getExceptionResponseHandler(){
+		return array('Soap', 'faultSoapHandler');
+	}
+
 }
