@@ -12,14 +12,17 @@
  * obtain it through the world-wide-web, please send an email
  * to kumbia@kumbia.org so we can send you a copy immediately.
  *
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @license		New BSD License
+ * @version 	$Id$
  */
 
 $messages = array(
 	//Core
-	-10 => 'Debe tener instalado PHP version 5.20 &oacute; superior para utilizar este framework (Est&aacute; usando %s)',
+	-10 => 'Debe tener instalado PHP version 5.20 ó superior para utilizar este framework (Est&aacute; usando %s)',
 	-11 => 'El directorio public/temp no tiene permisos de escritura',
+
 	//CoreConfig
 	-12 => 'No ha establecido el entorno (mode) por defecto en el archivo config/config.ini',
 	-13 => 'El entorno \'%s\' no existe en config/enviroment.ini',
@@ -45,9 +48,17 @@ $messages = array(
 	-32 => 'El archivo con la lista AclXML no existe (%s)',
 	-33 => 'El constraint de la lista de acceso No. %s no ha definido el rol a aplicar',
 	-34 => 'El constraint de la lista de acceso No. %s no ha definido el recurso a aplicar',
-	-35 => 'El constraint de la lista de acceso No. %s no ha definido la acci&oacute;n a aplicar',
+	-35 => 'El constraint de la lista de acceso No. %s no ha definido la acción a aplicar',
 	-36 => 'El constraint de la lista de acceso No. %s no ha definido el tipo de regla a aplicar',
-	-37 => 'El tipo de regla del constraint de la lista de acceso No. %s es invalido'
+	-37 => 'El tipo de regla del constraint de la lista de acceso No. %s es invalido',
 	//ActiveRecord
+
+	//Dispatcher
+	-100 => 'No se encontró la Acción "%s". Es necesario definir un método en la clase controladora "%s" llamado "%sAction" para que esto funcione correctamente.',
+	-101 => 'No se encontró el Clase Controladora "%sController". Debe definir esta clase para poder trabajar este controlador',
+	-102 => 'No se encontró el Controlador "%s". Hubo un problema al cargar el controlador, probablemente el archivo no exista en el directorio de módulos ó exista algun error de sintaxis.',
+	-103 => 'No se encontró la Acción por defecto "init" Es necesario definir un m&eacute;todo en la clase controladora "ApplicationController" llamado "init" para que esto funcione correctamente.',
+	-104 => 'El método de la acción "%sAction" debe ser declarado con visibilidad pública para ser ejecutado externamente',
+	-105 => 'No se ha definido un valor para el parámetro "%s" de la acción "%s"'
 
 );

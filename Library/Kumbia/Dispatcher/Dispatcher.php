@@ -91,6 +91,13 @@ abstract class Dispatcher {
 	static private $_controllersDir;
 
 	/**
+	 * Lista de clases que no deben ser serializadas por el Dispatcher
+	 *
+	 * @var array
+	 */
+	static private $_notSerializableClasses = array('ActiveRecord', 'ActiveRecordResulset');
+
+	/**
 	 * Codigo de error cuando no encuentra la accion
 	 */
 	const NOT_FOUND_ACTION = 100;
@@ -136,10 +143,9 @@ abstract class Dispatcher {
 			$applicationController->init();
 		} else {
 			if(self::executeNotFound($applicationController)==false){
-				self::throwException("No se encontró la Acción por defecto \"init\"
-					Es necesario definir un m&eacute;todo en la clase controladora
-					'ApplicationController' llamado 'init' para que esto funcione correctamente.",
-					self::NOT_FOUND_INIT_ACTION);
+				//No se encontro el método init en la clase ControllerBase
+				$message = CoreLocale::getErrorMessage(-103);
+				self::throwException($message, self::NOT_FOUND_INIT_ACTION);
 			} else {
 				self::$_controller = $applicationController;
 			}
@@ -149,8 +155,8 @@ abstract class Dispatcher {
 	/**
 	 * Ejecuta accion notFound
 	 *
-	 * @access private
-	 * @param Controller $applicationController
+	 * @access 	private
+	 * @param 	Controller $applicationController
 	 * @static
 	 */
 	static private function executeNotFound($applicationController=''){
@@ -245,10 +251,10 @@ abstract class Dispatcher {
 	/**
 	 * Incluye los componentes para ejecutar la petición
 	 *
+	 * @access public
 	 * @static
 	 */
 	static public function initComponents(){
-
 		if(self::$_initializedComponents==false){
 			self::$_initializedComponents = true;
 		} else {
@@ -257,15 +263,26 @@ abstract class Dispatcher {
 	}
 
 	/**
+	 * Agrega una clase que no debe ser serializada
+	 *
+	 * @access 	public
+	 * @param 	string $className
+	 * @static
+	 */
+	static public function addNotSerializableClass($className){
+		self::$_notSerializableClasses[] = $className;
+	}
+
+	/**
 	 * Realiza el dispatch de una ruta
 	 *
-	 * @access public
-	 * @param string $module
-	 * @param string $controller
-	 * @param string $action
-	 * @param array $parameters
-	 * @param array $allParameters
-	 * @return boolean
+	 * @access 	public
+	 * @param	string $module
+	 * @param 	string $controller
+	 * @param 	string $action
+	 * @param 	array $parameters
+	 * @param 	array $allParameters
+	 * @return 	boolean
 	 * @static
 	 */
 	static public function executeRoute($module, $controller, $action, $parameters, $allParameters){
@@ -273,20 +290,22 @@ abstract class Dispatcher {
 		// Aplicacion activa
 		$activeApp = Router::getApplication();
 
-		if($module){
+		if($module!=''){
 			$controllersDir = self::$_controllersDir.'/'.$module;
 		} else {
 			$controllersDir = self::$_controllersDir;
 		}
 		$notFoundExecuted = false;
 		$appController = $controller.'Controller';
-		if(!class_exists($appController)){
+		if(class_exists($appController)==false){
 			if(Core::fileExists($controllersDir.'/'.$controller.'_controller.php')){
 				require $controllersDir.'/'.$controller.'_controller.php';
 			} else {
 				$applicationController = new ApplicationController();
 				if(self::executeNotFound($applicationController)==false){
-					self::throwException('No se encontró el Controlador "'.$controller.'". Hubo un problema al cargar el controlador, probablemente el archivo no exista en el directorio de módulos ó exista algun error de sintaxis.', self::NOT_FOUND_FILE_CONTROLLER);
+					//No se encontro el controlador
+					$message = CoreLocale::getErrorMessage(-102, $action);
+					self::throwException($message, self::NOT_FOUND_FILE_CONTROLLER);
 				} else {
 					self::$_controller = $applicationController;
 					$notFoundExecuted = true;
@@ -308,7 +327,7 @@ abstract class Dispatcher {
 			// Dispatcher mantiene referencias los controladores instanciados
 			$instanceName = Core::getInstanceName();
 			if(!isset(self::$_controllerReferences[$appController])){
-				if(!isset($_SESSION['KCON'][$instanceName][$activeApp][$module][$appController])||eval("return $appController::\$force;")){
+				if(!isset($_SESSION['KCON'][$instanceName][$activeApp][$module][$appController])){
 					self::$_controller = new $appController();
 				} else {
 					// Obtiene el objeto persistente
@@ -350,41 +369,39 @@ abstract class Dispatcher {
 					return self::$_controller;
 				}
 
-				/**
-			 	 * Se ejecuta el metodo con el nombre de la accion
-			 	 * en la clase
-			 	 */
+			    //Se ejecuta el metodo con el nombre de la accion en la clase mas el sufijo Action
 				$actionMethod = $action.'Action';
 				self::$_requestStatus = self::STATUS_DISPATCHING;
-				if(!method_exists(self::$_controller, $actionMethod)){
+				if(method_exists(self::$_controller, $actionMethod)==false){
 					if(method_exists(self::$_controller, 'notFoundAction')){
-						Router::routeTo('action: notFound', "id: $action");
+						Router::routeTo(array('action' => 'notFound', 'id' => $action));
 						return self::$_controller;
 					} else {
-						self::throwException("No se encontró la Acción \"{$action}\". Es necesario definir un método en la clase
-						 controladora '{$controller}' llamado '{$action}Action' para que
-						 esto funcione correctamente.", Dispatcher::NOT_FOUND_ACTION);
+						//Nos se encontro la acción
+						$message = CoreLocale::getErrorMessage(-101, $action, $controller, $action);
+						self::throwException($message, Dispatcher::NOT_FOUND_ACTION);
 					}
 				}
 
 				self::$_requestStatus = self::STATUS_RUNNING_CONTROLLER_ACTION;
 				$method = new ReflectionMethod($appController, $actionMethod);
 				if($method->isPublic()==false){
-					self::throwException("El método de la acción '{$action}Action' debe ser declarado con visibilidad pública.", self::INVALID_METHOD_CALLBACK);
+					$message = CoreLocale::getErrorMessage(-104, $action);
+					self::throwException($message, self::INVALID_METHOD_CALLBACK);
 				}
 				$methodParameters = $method->getParameters();
 				$paramNumber = 0;
 				foreach($methodParameters as $methodParameter){
 					if($methodParameter->isOptional()==false&&!isset($parameters[$paramNumber])){
-						self::throwException("No se ha definido un valor para el par&aacute;metro '".$methodParameter->getName()."' de la acción '$action'", self::INVALID_ARGUMENT_NUMBER);
+						//Numero inválido de argumentos
+						$message = CoreLocale::getErrorMessage(-105, $methodParameter->getName(), $action);
+						self::throwException($message, self::INVALID_ARGUMENT_NUMBER);
 					}
 					$paramNumber++;
 				}
 				self::$_valueReturned = call_user_func_array(array(self::$_controller, $actionMethod), $parameters);
 
-				/**
-			 	 * Corre los filtros after
-			 	 */
+			 	//Corre los filtros after
 				self::_runAfterFilters($appController, $controller, $action, $parameters);
 				self::$_requestStatus = self::STATUS_RENDER_PRESENTATION;
 
@@ -393,9 +410,7 @@ abstract class Dispatcher {
 
 				$cancelThrowException = false;
 
-				/**
-				 * Notifica la excepcion a los Plugins
-				 */
+				// Notifica la excepcion a los Plugins
 				PluginManager::notifyFromApplication('onControllerException', $e);
 
 				if(method_exists(self::$_controller, 'onException')){
@@ -407,10 +422,8 @@ abstract class Dispatcher {
 				}
 			}
 
-			/**
-			 * Se clona el controlador y se serializan las propiedades que no
-			 * sean instancias de modelos
-			 */
+			// Se clona el controlador y se serializan las propiedades que no
+			// sean instancias de modelos
 			if(self::$_controller->getPersistance()==true){
 				$controller = clone self::$_controller;
 				try {
@@ -420,8 +433,10 @@ abstract class Dispatcher {
 					}
 					foreach($controller as $property => $value){
 						if(is_object($value)){
-							if(is_subclass_of($value, 'ActiveRecordBase')||is_subclass_of($value, "ActiveRecordResultset")){
-								unset($controller->{$property});
+							foreach(self::$_notSerializableClasses as $className){
+								if(is_subclass_of($value, $className)){
+									unset($controller->{$property});
+								}
 							}
 						}
 					}
@@ -441,8 +456,9 @@ abstract class Dispatcher {
 			return self::$_controller;
 		} else {
 			if($notFoundExecuted==false){
-				self::throwException("No se encontró el Clase Controladora \"{$controller}Controller\".
-					Debe definir esta clase para poder trabajar este controlador", self::NOT_FOUND_CONTROLLER);
+				//No se encontró el controlador
+				$message = CoreLocale::getErrorMessage(-101, $appController);
+				self::throwException($message, self::NOT_FOUND_CONTROLLER);
 			} else {
 				return $applicationController;
 			}
@@ -463,8 +479,8 @@ abstract class Dispatcher {
 	/**
 	 * Devuelve el valor devuelto por el metodo ejecutado en la ultima accion
 	 *
-	 * @access public
-	 * @return mixed
+	 * @access 	public
+	 * @return	mixed
 	 * @static
 	 */
 	public static function getValueReturned(){
@@ -504,25 +520,11 @@ abstract class Dispatcher {
 	}
 
 	/**
-	 * Resetea la persistencia
-	 *
-	 * @access public
-	 * @param string $appController
-	 * @param string $module
-	 * @static
-	 */
-	public static function resetPersistance($appController, $module=""){
-		$instanceName = Core::getInstanceName();
-		$activeApp = Router::getApplication();
-		$appController.='Controller';
-		if(isset($_SESSION['KCON'][$instanceName][$activeApp][$module][$appController])){
-			unset($_SESSION['KCON'][$instanceName][$activeApp][$module][$appController]);
-		}
-	}
-
-	/**
 	 * Lanza una excepción de tipo DispatcherException
 	 *
+	 * @access public
+	 * @throws DispatcherException
+	 * @static
 	 */
 	public static function throwException($message, $code){
 		throw new DispatcherException($message, $code);
