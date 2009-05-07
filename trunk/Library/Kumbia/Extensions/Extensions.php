@@ -44,6 +44,20 @@ abstract class Extensions {
 	static private $_extensions = array();
 
 	/**
+	 * Directorio donde se encuentran las extensiones de usuario
+	 *
+	 * @var string
+	 */
+	static private $_userDirectory = '';
+
+	/**
+	 * Directorio donde se encuentran las extensiones Zend
+	 *
+	 * @var string
+	 */
+	static private $_zendDirectory = '';
+
+	/**
 	 * Carga los modulos que esten en el archivo boot.ini de cada
 	 * aplicacion
 	 *
@@ -81,7 +95,7 @@ abstract class Extensions {
 		}
 		if(!isset($_SESSION['KMOD'][$instanceName][$activeApp])){
 			$_SESSION['KMOD'][$instanceName][$activeApp] = array();
-			if($kumbiaConfig = CoreConfig::readFromActiveApplication('boot.ini')){
+			if($kumbiaConfig = CoreConfig::readFromActiveApplication('boot')){
 				if(isset($kumbiaConfig->modules->extensions)){
 					$kumbiaConfig->modules->extensions = str_replace(" ", "", $kumbiaConfig->modules->extensions);
 					$extensions = explode(",", $kumbiaConfig->modules->extensions);
@@ -135,6 +149,24 @@ abstract class Extensions {
 	}
 
 	/**
+	 * Establece el directorio de extensiones dinámicamente
+	 *
+	 * @param string $directory
+	 */
+	static public function setUserDirectory($directory){
+		self::$_userDirectory = $directory;
+	}
+
+	/**
+	 * Establece el directorio de extensiones Zend
+	 *
+	 * @param string $directory
+	 */
+	static public function setZendDirectory($directory){
+		self::$_zendDirectory = $directory;
+	}
+
+	/**
 	 * Obtiene el path a una extension
 	 *
 	 * @access private
@@ -149,16 +181,25 @@ abstract class Extensions {
 		} else {
 			if($ex[0]=='User'){
 				$activeApp = Router::getApplication();
-				$config = CoreConfig::readFromActiveApplication('config.ini');
-				if(isset($config->application->libraryDir)){
-					$libraryDir = 'apps/'.$config->application->libraryDir;
+				if(self::$_userDirectory==''){
+					$config = CoreConfig::readFromActiveApplication('config');
+					if(isset($config->application->libraryDir)){
+						$libraryDir = 'apps/'.$config->application->libraryDir;
+					} else {
+						$libraryDir = 'apps/'.$activeApp.'/library';
+					}
 				} else {
-					$libraryDir = 'apps/'.$activeApp.'/library';
+					$libraryDir = self::$_userDirectory;
 				}
 				$extensionPath = $libraryDir.'/'.$ex[1].'/'.$ex[0].'.php';
 			} else {
 				if($ex[0]=='Zend'){
-					$extensionPath = 'Library/Zend/'.$ex[1].'/.php';
+					if(self::$_zendDirectory!=''){
+						$zendDir = self::$_zendDirectory;
+					} else {
+						$zendDir = 'Library/Zend';
+					}
+					require $zendDir.'/'.$ex[0].'/'.$ex[0].'.php';
 				} else {
 					$extensionPath = 'Library/'.$ex[0].'/'.$ex[0].'.php';
 				}
@@ -197,4 +238,5 @@ abstract class Extensions {
 		self::$_extensions[] = $extension;
 		return $extensionPath;
 	}
+
 }

@@ -48,6 +48,13 @@ class Config extends Object {
 	static private $_instance = array();
 
 	/**
+	 * Instancias de adaptadores de Config
+	 *
+	 * @var array
+	 */
+	static private $_adapterInstances = array();
+
+	/**
 	 * El constructor privado impide q la clase sea
 	 * instanciada y obliga a usar el metodo read
 	 * para obtener la instancia del objeto
@@ -59,34 +66,64 @@ class Config extends Object {
 	}
 
 	/**
-	 * Constructor de la Clase Config
+	 * Lee un archivo de configuración
 	 *
-	 * @access public
-	 * @param string $file
-	 * @return Config
+	 * @access 	public
+	 * @param 	string $file
+	 * @param 	string $adapter
+	 * @return 	Config
 	 * @static
 	 */
-	static public function read($file='environment.ini'){
+	static public function read($file, $adapter){
 		if(isset(self::$_instance[$file])){
 			return self::$_instance[$file];
 		}
 		$config = new Config();
 		if(Core::fileExists($file)==false){
-			throw new ConfigException("No existe el archivo de configuración $file");
+			throw new ConfigException("No existe el archivo de configuración '$file'");
 		}
-		$iniSettings = @parse_ini_file(Core::getFilePath($file), true);
-		if($iniSettings==false){
-			throw new ConfigException("El archivo de configuración '$file' tiene errores '$php_errormsg'");
-		} else {
-			foreach($iniSettings as $conf => $value){
-				$config->$conf = new stdClass();
-				foreach($value as $cf => $val){
-					$config->$conf->$cf = $val;
+		$adapterInstance = self::factory($adapter);
+		$config = $adapterInstance->read($config, $file);
+		self::$_instance[$file] = $config;
+		return $config;
+	}
+
+	/**
+	 * Devuelve una instancia de un adaptador de lectura de configuración
+	 *
+	 * @access 	public
+	 * @param 	string $adapter
+	 * @static
+	 */
+	public static function factory($adapter){
+		if(!isset(self::$_adapterInstances[$adapter])){
+			$className = $adapter.'Config';
+			if(class_exists($className)==false){
+				$path = 'Library/Kumbia/Config/Adapters/'.$adapter.'.php';
+				if(Core::fileExists($path)){
+					require $path;
+				} else {
+					throw new ConfigException("No existe el adaptador de configuración '$adapter'");
 				}
 			}
-			self::$_instance[$file] = $config;
+			self::$_adapterInstances[$adapter] = new $className();
 		}
-		return $config;
+		return self::$_adapterInstances[$adapter];
+	}
+
+	/**
+	 * Método mágico para obtener los valores usando getters
+	 *
+	 * @param string $method
+	 * @param array $arguments
+	 */
+	public function __call($method, $arguments){
+		$property = Utils::uncamelize(substr($method, 3));
+		if(isset($this->{$property})){
+			return $property;
+		} else {
+			throw new CoreException("No existe la propiedad $method en el objeto Config");
+		}
 	}
 
 }

@@ -41,14 +41,14 @@ function __autoload($className){
 		 */
 		$activeApp = Router::getApplication();
 		if($activeApp){
-			$config = CoreConfig::readFromActiveApplication('config.ini');
+			$config = CoreConfig::readFromActiveApplication('config');
 			if(isset($config->application->libraryDir)){
 				$libraryDir = 'apps/'.$config->application->libraryDir;
 			} else {
 				$libraryDir = 'apps/'.$activeApp.'/library';
 			}
-			if(Core::fileExists("$libraryDir/$className/$className.php")){
-				require "$libraryDir/$className/$className.php";
+			if(Core::fileExists($libraryDir.'/'.$className.'/'.$className.'.php')){
+				require $libraryDir.'/'.$className.'/'.$className.'.php';
 			} else {
 				$componentName = preg_replace('/Exception$/', '', $className);
 				if(Core::fileExists("$libraryDir/$componentName/$className.php")){

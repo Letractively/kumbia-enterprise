@@ -105,7 +105,7 @@ abstract class PluginManager {
 	static public function loadApplicationPlugins(){
 
 		//Leer configuracion
-		$config = CoreConfig::readFromActiveApplication('config.ini');
+		$config = CoreConfig::readFromActiveApplication('config');
 
 		//Esta variable permite que no se inicialicen los plug-ins
 		if(!isset($config->plugins->autoInitialize)||$config->plugins->autoInitialize==true){

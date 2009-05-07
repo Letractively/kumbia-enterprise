@@ -62,7 +62,7 @@ abstract class Security extends Object {
 	 * @static
 	 */
 	static public function initAccessManager(){
-		$config = CoreConfig::readFromActiveApplication("config.ini");
+		$config = CoreConfig::readFromActiveApplication("config");
 		if(isset($config->application->securityAccessList)){
 			$instanceName = Core::getInstanceName();
 			self::$_securityAccessList = Acl::getAclFromDescriptor($config->application->securityAccessList);

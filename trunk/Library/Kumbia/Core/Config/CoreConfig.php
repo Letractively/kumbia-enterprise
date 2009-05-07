@@ -39,6 +39,13 @@
 abstract class CoreConfig {
 
 	/**
+	 * Adaptador de configuración por defecto
+	 *
+	 * @var string
+	 */
+	static private $_configAdapter = 'ini';
+
+	/**
 	 * Lee un archivo de configuracion
 	 *
 	 * @param string $file
@@ -58,12 +65,15 @@ abstract class CoreConfig {
 	 */
 	static public function readEnviroment(){
 		$application = Router::getApplication();
-		$config = self::getConfigurationFrom($application, 'environment.ini');
-		$core = self::getConfigurationFrom($application, 'config.ini');
+
+		//Configuración entorno
+		$config = self::getConfigurationFrom($application, 'environment');
+
+		//Configuración general
+		$core = self::getConfigurationFrom($application, 'config');
+
 		if(!isset($core->application->mode)){
-			/**
-			 * No se ha definido el entorno por defecto
-			 */
+			//No se ha definido el entorno por defecto
 			$message = CoreLocale::getErrorMessage(-12);
 			throw new CoreConfigException($message, -12);
 		}
@@ -81,9 +91,7 @@ abstract class CoreConfig {
 				}
 			}
 		} else {
-			/**
-			 * No existe el entorno en environment.ini
-			 */
+			//No existe el entorno en environment.ini
 			$message = CoreLocale::getErrorMessage(-13, $mode);
 			throw new CoreConfigException($message, -13);
 		}
@@ -105,19 +113,42 @@ abstract class CoreConfig {
 	}
 
 	/**
-	 * Devuelve la configuracion de la aplicacion indicada
+	 * Establece el adaptador a utilizar para definir los archivos de configuración
 	 *
-	 * @access public
-	 * @param string $application
-	 * @param string $file
-	 * @return Config
+	 * @access 	public
+	 * @param 	string $adapter
 	 * @static
 	 */
-	public static function getConfigurationFrom($application, $file){
+	public static function setAdapter($adapter){
+		self::$_configAdapter = $adapter;
+	}
+
+	/**
+	 * Devuelve el adaptador para leer los archivos por defecto
+	 *
+	 * @return string
+	 */
+	public static function getAdapter(){
+		return self::$_configAdapter;
+	}
+
+	/**
+	 * Devuelve la configuracion de la aplicacion indicada
+	 *
+	 * @access 	public
+	 * @param 	string $application
+	 * @param 	string $file
+	 * @return 	Config
+	 * @static
+	 */
+	public static function getConfigurationFrom($application, $file, $adapter=''){
 		if($application==''){
 			throw new CoreConfigException("Debe indicar el nombre de la aplicación donde está el archivo '$file'");
 		}
-		return Config::read('apps/'.$application.'/config/'.$file);
+		if($adapter==''){
+			$adapter = self::$_configAdapter;
+		}
+		return Config::read('apps/'.$application.'/config/'.$file.'.'.self::$_configAdapter, $adapter);
 	}
 
 	/**
@@ -141,7 +172,7 @@ abstract class CoreConfig {
 	 * @static
 	 */
 	public static function getInstanceConfig(){
-		return Config::read('config/config.ini');
+		return Config::read('config/config.ini', 'ini');
 	}
 
 }

@@ -58,7 +58,7 @@ class MemcacheSessionAdapter implements SessionInterface {
 	 * @access public
 	 */
 	public function initialize(){
-		$config = CoreConfig::readFromActiveApplication("config.ini");
+		$config = CoreConfig::readFromActiveApplication('config');
 		if(isset($config->application->sessionSavePath)){
 			session_save_path($config->application->sessionSavePath);
 		} else {
