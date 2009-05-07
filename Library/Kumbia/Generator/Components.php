@@ -77,7 +77,7 @@ abstract class Component {
  	 * @param array $form
  	 */
 	static public function buildTextComponent($com, $name, $form){
-		$config = CoreConfig::readFromActiveApplication('config.ini');
+		$config = CoreConfig::readFromActiveApplication('config');
 		$dbdate = $config->application->dbdate;
 		if(isset($com['not_label'])){
 			if(!$com['not_label']){

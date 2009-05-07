@@ -390,7 +390,7 @@ abstract class Core {
 		self::_initializeCommonComponents();
 
 		//Leer configuracion de la aplicación
-		$config = CoreConfig::readFromActiveApplication('config.ini');
+		$config = CoreConfig::readFromActiveApplication('config');
 
 		//Inicializa las rutas MVC
 		self::_initializeMVCRoutes($config);
@@ -835,7 +835,7 @@ abstract class Core {
 	 */
 	public static function reloadMVCLocations(){
 		//Aplicacion Activa
-		$config = CoreConfig::readFromActiveApplication('config.ini');
+		$config = CoreConfig::readFromActiveApplication('config');
 		self::_initializeMVCRoutes($config);
 	}
 

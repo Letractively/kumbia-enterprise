@@ -31,6 +31,7 @@
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @abstract
+ * @deprecated
  */
 abstract class Browse {
 
@@ -42,8 +43,8 @@ abstract class Browse {
 	 * @static
 	 */
 	static function writeLocation(){
-		$controller = Router::get_controller();
-		$app = Router::get_active_app();
+		$controller = Router::getController();
+		$app = Router::getActiveApplication();
 		if($app){
 			$ret = Core::getInstancePath().$app."/".$controller."/";
 		} else {
@@ -132,7 +133,7 @@ abstract class Browse {
 	 */
 	static function formsBrowse($form){
 
-		$config = CoreConfig::readFromActiveApplication("environment.ini");
+		$config = CoreConfig::readFromActiveApplication('environment');
 
 		Generator::formsPrint("&nbsp;</center><br><table cellspacing='0' align='center' cellpadding=5>
 		<tr bgcolor='#D0D0D0' style='border-top:1px solid #FFFFFF'>");

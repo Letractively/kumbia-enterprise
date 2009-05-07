@@ -129,9 +129,9 @@ abstract class Session {
 	 * Crear o especificar el valor para un indice de la sesion
 	 * actual
 	 *
-	 * @access public
-	 * @param string $index
-	 * @param mixed $value
+	 * @access 	public
+	 * @param 	string $index
+	 * @param 	mixed $value
 	 * @static
 	 */
 	static public function set($index, $value){
@@ -162,6 +162,7 @@ abstract class Session {
 	/**
 	 * Unset una variable de indice
 	 *
+	 * @static
 	 */
 	static public function unsetData(){
 		Session::initSessionData();
@@ -179,8 +180,9 @@ abstract class Session {
 	 * Evalua si esta definido un valor dentro de
 	 * los valores de sesion
 	 *
-	 * @param string $index
-	 * @return mixed
+	 * @param 	string $index
+	 * @return 	mixed
+	 * @static
 	 */
 	static public function issetData($index){
 		Session::initSessionData();
@@ -190,6 +192,7 @@ abstract class Session {
 	/**
 	 * Indica si la sesi&oacute;n esta desbloqueada
 	 *
+	 * @static
 	 */
 	static public function isLocked(){
 		return self::$_locked;
@@ -207,12 +210,14 @@ abstract class Session {
 	/**
 	 * Init Session Management
 	 *
+	 * @access public
+	 * @static
 	 */
 	static public function startSession(){
 		if(self::$_sessionStarted==true){
 			return false;
 		}
-		$config = CoreConfig::readFromActiveApplication('config.ini');
+		$config = CoreConfig::readFromActiveApplication('config');
 		if(isset($config->application->sessionAdapter)){
 			$sessionAdapter = ucfirst($config->application->sessionAdapter);
 			$className = $sessionAdapter.'SessionAdapter';

@@ -127,7 +127,7 @@ class DatabaseSessionAdapter implements SessionInterface {
 	 * @access public
 	 */
 	public function initialize(){
-		$config = CoreConfig::readFromActiveApplication("config.ini");
+		$config = CoreConfig::readFromActiveApplication('config');
 		if(isset($config->application->sessionSavePath)){
 			self::$_connection = DbLoader::factoryFromDescriptor($config->application->sessionSavePath);
 			session_set_save_handler(

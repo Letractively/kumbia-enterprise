@@ -175,7 +175,7 @@ abstract class Router {
 		 */
 		if($urlItems[0]!=""&&Core::applicationExists($urlItems[0])==true){
 
-			$config = CoreConfig::getConfigurationFrom($urlItems[0], 'config.ini');
+			$config = CoreConfig::getConfigurationFrom($urlItems[0], 'config');
 			if(isset($config->application)){
 
 				/**
@@ -353,7 +353,7 @@ abstract class Router {
 	public static function ifRouted(){
 		if(self::$_staticRoutes==true){
 			if(!isset($_SESSION['KSR'])){
-				$routes = CoreConfig::readFromActiveApplication('routes.ini');
+				$routes = CoreConfig::readFromActiveApplication('routes');
 				if(isset($routes->routes)){
 					foreach($routes->routes as $source => $destination){
 						if(count(explode('/', $source))!=3||count(explode('/', $destination))!=3){

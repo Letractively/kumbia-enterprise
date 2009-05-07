@@ -603,7 +603,7 @@ class Locale extends Object {
 		if(self::$_application!=''){
 			return self::$_application;
 		}
-		$config = CoreConfig::readFromActiveApplication('config.ini');
+		$config = CoreConfig::readFromActiveApplication('config');
 		if(isset($config->application->locale)){
 			$locale = $config->application->locale;
 		} else {

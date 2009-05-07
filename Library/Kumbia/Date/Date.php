@@ -567,7 +567,7 @@ class Date extends Object {
 	 * @return string
 	 */
 	public function getUsingFormatDefault(){
-		$config = CoreConfig::readFromActiveApplication('config.ini');
+		$config = CoreConfig::readFromActiveApplication('config');
 		$format = strtolower($config->application->dbdate);
 		$dateFormat = new DateFormat($format, $this);
 		return $dateFormat->getDate();
