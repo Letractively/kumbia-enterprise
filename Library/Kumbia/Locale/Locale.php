@@ -627,6 +627,15 @@ class Locale extends Object {
 		self::$_application = $locale;
 	}
 
+	/**
+	 * Obtiene el string de la localización
+	 *
+	 * @return string
+	 */
+	public function getLocaleString(){
+		return $this->_localeString;
+	}
+
 	public static function round($x){
 		return $x;
 	}
