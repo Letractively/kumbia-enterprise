@@ -175,4 +175,13 @@ class ControllerResponse extends Object {
 		return $this->_responseAdapter;
 	}
 
+	/**
+	 * Establece el tipo de salida generado por el controlador
+	 *
+	 * @param string $contentType
+	 */
+	public function setContentType($contentType){
+		$this->setHeader('Content-Type', $contentType);
+	}
+
 }
