@@ -57,9 +57,9 @@ abstract class Object {
 		foreach($this as $key => $value){
 			if(is_object($value)){
 				if(method_exists($value, '__toString')){
-					$inspect[] = "$key= $value";
+					$inspect[] = $key.'= '.$value;
 				} else {
-					$inspect[] = "$key= ".get_class($value);
+					$inspect[] = $key.'= '.get_class($value);
 				}
 			} else {
 				$inspect[] = $key.'= '.$value;
