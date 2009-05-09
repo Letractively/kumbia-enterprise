@@ -127,13 +127,6 @@ class Locale extends Object {
     private $_locale;
 
     /**
-     * Identificador de Localización
-     *
-     * @var string
-     */
-    private $_localeString = '';
-
-    /**
      * Objeto de datos de localización
      *
      * @var LocaleData
@@ -182,7 +175,6 @@ class Locale extends Object {
 	 */
 	public function __construct($locale=''){
 		if(is_string($locale)){
-			$this->_localeString = $locale;
 			$this->_locale = self::getLocale($locale);
 		} else {
 			$this->_locale = $locale;
@@ -197,6 +189,36 @@ class Locale extends Object {
 	 */
 	public static function initLocale(){
 		Locale::getApplication();
+	}
+
+	/**
+	 * Indica si la localización cargó un territorio
+	 *
+	 * @return boolean
+	 */
+	public function hasCountry(){
+		if(isset($this->_locale['country'])){
+			if($this->_locale['country']==''){
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Establece el territorio de la localización
+	 *
+	 * @param string $country
+	 */
+	public function setCountry($country){
+		if(is_array($this->_locale)){
+			$this->_locale = Locale::getLocale($this->_locale['language'].'_'.strtoupper($country));
+		} else {
+			throw new LocaleException("El objeto no tiene una localización válida");
+		}
 	}
 
 	/**
@@ -633,7 +655,7 @@ class Locale extends Object {
 	 * @return string
 	 */
 	public function getLocaleString(){
-		return $this->_localeString;
+		return $this->_locale['locale'];
 	}
 
 	public static function round($x){
@@ -653,7 +675,7 @@ class Locale extends Object {
 	}
 
 	public function __toString(){
-		return $this->_localeString;
+		return $this->_locale['locale'];
 	}
 
 }
