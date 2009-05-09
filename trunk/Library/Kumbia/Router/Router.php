@@ -218,7 +218,7 @@ abstract class Router {
 			if(!isset($appServerConfig->core->defaultApp)){
 				throw new RouterException("No se ha indicado la aplicación por defecto en config/config.ini (defaultApp)");
 			}
-			$config = CoreConfig::getConfigurationFrom($activeApp, 'config.ini');
+			$config = CoreConfig::getConfigurationFrom($activeApp, 'config');
 			if(!isset($config->application)){
 				throw new RouterException("No existe la sección [application] en el config.ini de la aplicación");
 			}
