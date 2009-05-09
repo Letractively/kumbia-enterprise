@@ -16,7 +16,6 @@
  * @package		Helpers
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright	Copyright (C) 2007-2007 Roger Jose Padilla Camacho(rogerjose81 at gmail.com)
  * @copyright	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
  * @license  	New BSD License
@@ -32,7 +31,6 @@
  * @package 	Helpers
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright 	Copyright (c) 2007-2007 Roger Jose Padilla Camacho(rogerjose81 at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
  * @license  	New BSD License
@@ -91,23 +89,6 @@ abstract class Helpers {
 			}
 		}
 		return "";
-	}
-
-	/**
-	 * Recibe una cadena como: item1,item2,item3 y retorna una como: "item1","item2","item3".
-	 *
-	 * @param string $lista
-	 * @return string $listaEncomillada
-	 */
-	static public function encomillarLista($lista){
-		$arrItems = split(",", $lista);
-		$n = count($arrItems);
-		$listaEncomillada = "";
-		for ($i=0; $i<$n-1; $i++) {
-			$listaEncomillada.= "\"".$arrItems[$i]."\",";
-		}
-		$listaEncomillada.= "\"".$arrItems[$n-1]."\"";
-		return $listaEncomillada;
 	}
 
 	/**

@@ -16,7 +16,6 @@
  * @package 	Tag
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright 	Copyright (C) 2007-2007 Roger Jose Padilla Camacho (rogerjose81 at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
  * @license 	New BSD License
@@ -34,7 +33,6 @@
  * @category 	Kumbia
  * @package		Tag
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright 	Copyright (C) 2007-2007 Roger Jose Padilla Camacho (rogerjose81 at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
  * @license 	New BSD License

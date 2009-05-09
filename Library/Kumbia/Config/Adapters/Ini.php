@@ -41,7 +41,7 @@ class IniConfig {
 	 * @return 	Config
 	 * @static
 	 */
-	public function read($config, $file){
+	public function read(Config $config, $file){
 		$iniSettings = @parse_ini_file(Core::getFilePath($file), true);
 		if($iniSettings==false){
 			throw new ConfigException("El archivo de configuración '$file' tiene errores '$php_errormsg'");
