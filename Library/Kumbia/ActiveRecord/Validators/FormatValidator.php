@@ -39,19 +39,19 @@ class FormatValidator extends ActiveRecordValidator implements ActiveRecordValid
 	 * Chequea que las opciones del validador sean correctas
 	 *
 	 * @access public
+	 * @throws ActiveRecordValidatorException
 	 */
 	public function checkOptions(){
 		if($this->isSetOption('format')==false){
-			throw new ActiveRecordValidatorException("El Validador Format requiere que indique la expresión regular (Perl-Compatible)");
+			throw new ActiveRecordValidatorException('El Validador Format requiere que indique la expresión regular (Perl-Compatible)');
 		}
 	}
 
 	/**
 	 * Ejecuta el validador
 	 *
-	 * @access public
-	 * @param ActiveRecord $record
-	 * @return boolean
+	 * @access 	public
+	 * @return 	boolean
 	 */
 	public function validate(){
 		$validateFails = false;

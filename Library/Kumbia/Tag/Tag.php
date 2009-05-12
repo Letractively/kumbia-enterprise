@@ -2016,7 +2016,7 @@ abstract class Tag {
 			}
 		}
 		$page->first = 1;
-		$page->next = ($start + $show)<$n ? ($pageNumber+1) : ((int)($n/$show) + 1);
+		$page->next = ($start + $show)<$n ? ($pageNumber+1) : (($start + $show)==$n ? $n : ((int)($n/$show) + 1));
 		$page->before = ($pageNumber>1) ? ($pageNumber-1) : 1;
 		$page->current = $pageNumber;
 		$page->total_pages = ($n % $show) ? ((int)($n/$show) + 1) : ($n/$show);

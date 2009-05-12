@@ -36,8 +36,10 @@
 class ExclusionInValidator extends ActiveRecordValidator implements ActiveRecordValidatorInterface {
 
 	/**
-	 * Valida que las opciones sean validas
+	 * Comprueba que las opciones sean validas
 	 *
+	 * @access public
+	 * @throws ActiveRecordValidatorException
 	 */
 	public function checkOptions(){
 		if(!$this->isSetOption('domain')){
@@ -51,11 +53,10 @@ class ExclusionInValidator extends ActiveRecordValidator implements ActiveRecord
 	/**
 	 * Ejecuta el validador
 	 *
-	 * @param ActiveRecord $record
 	 * @return boolean
 	 */
 	public function validate(){
-		if($this->isRequired()){
+		if($this->isRequired()==true){
 			$validateFails = false;
 			if($this->isSetOption('domain')){
 				if(in_array($this->getValue(), $this->getOption('domain'))){

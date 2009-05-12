@@ -155,7 +155,7 @@ class ControllerBase {
 	 * @param string $name
 	 */
 	private static function createModelBase($name){
-		$str = "<?php\n\n/**\n * ActiveRecord\n *\n * Esta clase es la clase padre de todos los modelos\n * de la aplicacion\n *\n * @category Kumbia\n * @package Db\n * @subpackage ActiveRecord\n */\nabstract class ActiveRecord extends ActiveRecordBase {\n\n}\n\n";
+		$str = "<?php\n\n/**\n * ActiveRecord\n *\n * Esta clase es la clase padre de todos los modelos\n * de la aplicacion\n *\n * @category Kumbia\n * @package ActiveRecord\n */\nabstract class ActiveRecord extends ActiveRecordBase {\n\n}\n\n";
 		file_put_contents("apps/$name/models/base/modelBase.php", $str);
 	}
 

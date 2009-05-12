@@ -38,7 +38,6 @@ class DateInValidator extends ActiveRecordValidator implements ActiveRecordValid
 	/**
 	 * Ejecuta el validador
 	 *
-	 * @param ActiveRecord $record
 	 * @return boolean
 	 */
 	public function validate(){
