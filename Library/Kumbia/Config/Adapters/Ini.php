@@ -14,6 +14,7 @@
  *
  * @category	Kumbia
  * @package		Config
+ * @subpackage 	Adapters
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license		New BSD License
  * @version 	$Id: Config.php 34 2009-05-05 01:54:23Z gutierrezandresfelipe $
@@ -26,6 +27,7 @@
  *
  * @category	Kumbia
  * @package		Config
+ * @subpackage 	Adapters
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license		New BSD License
  * @access		public
@@ -33,7 +35,11 @@
 class IniConfig {
 
 	/**
-	 * Constructor de la Clase Config
+	 * Config soporta archivos INI estos son ampliamente usados por todo
+	 * tipo de software que además son el formato predeterminado del
+	 * framework. El adaptador procesa las secciones del archivo y
+	 * variables compuestas. Gracias a que se usan funciones nativas
+	 * del lenguaje su procesado es más rápido.
 	 *
 	 * @access 	public
 	 * @param 	Config $config

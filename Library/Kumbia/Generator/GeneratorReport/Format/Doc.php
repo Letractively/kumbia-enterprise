@@ -35,7 +35,7 @@
  */
 function doc(){
 
-	$config = CoreConfig::readFromActiveApplication("config");
+	$config = CoreConfig::readAppConfig();
 	$active_app = Core::getActiveApplication();
 	$file = md5(uniqid());
 

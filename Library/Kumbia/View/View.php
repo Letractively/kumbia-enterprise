@@ -177,40 +177,71 @@ abstract class View {
 	}
 
 	/**
+	 * Carga el adaptador de View
+	 *
+	 * @access	private
+	 * @static
+	 */
+	static private function _loadAdapter(){
+		$controllerResponse = ControllerResponse::getInstance();
+		$adapter = ucfirst($controllerResponse->getResponseAdapter());
+		$adapterClassName = $adapter.'ViewResponse';
+		if(!class_exists($adapterClassName)){
+			if(!interface_exists('ViewResponseInterface')){
+				require 'Library/Kumbia/View/Interface.php';
+			}
+			$path = 'Library/Kumbia/View/Adapters/'.$adapter.'.php';
+			if(Core::fileExists($path)==true){
+				require $path;
+			}
+		}
+		return new $adapterClassName();
+	}
+
+	/**
+	 * Visualiza un valor con el adaptador de presentación
+	 *
+	 * @param string $value
+	 */
+	static private function _handleResponseAdapter($value){
+		$controllerResponse = ControllerResponse::getInstance();
+		if($controllerResponse->getResponseAdapter()){
+			$responseHandler = self::_loadAdapter();
+			$responseHandler->render($controllerResponse, $value);
+		}
+	}
+
+	/**
+	 * Envia la excepcion al adaptador de presentación
+	 *
+	 * @param Exception $e
+	 */
+	static private function _handleExceptionAdapter($e){
+		$controllerResponse = ControllerResponse::getInstance();
+		if($controllerResponse->getResponseAdapter()){
+			$responseHandler = self::_loadAdapter();
+			$responseHandler->renderException($controllerResponse, $e);
+		}
+	}
+
+	/**
 	 * Toma el objeto controlador y ejecuta la presentaci&oacute;n correspondiente a este
 	 *
-	 * @access public
-	 * @param Controller $controller
+	 * @access 	public
+	 * @param 	Controller $controller
 	 * @static
 	 */
 	static public function handleViewRender($controller){
-
-		$controllerName = $controller->getControllerName();
-		$actionName = $controller->getActionName();
-		self::_startResponse($controllerName, $actionName);
-
 		$controllerResponse = ControllerResponse::getInstance();
 		$_valueReturned = Dispatcher::getValueReturned();
 		if($controllerResponse->getResponseType()!=ControllerResponse::RESPONSE_NORMAL){
-			if($controllerResponse->getResponseAdapter()){
-				$adapter = ucfirst($controllerResponse->getResponseAdapter());
-				$adapterClassName = $adapter.'ViewResponse';
-				if(!class_exists($adapterClassName)){
-					if(!interface_exists('ViewResponseInterface')){
-						require 'Library/Kumbia/View/Interface.php';
-					}
-					$path = 'Library/Kumbia/View/Adapters/'.$adapter.'.php';
-					if(Core::fileExists($path)==true){
-						require $path;
-					}
-				}
-				$responseHandler = new $adapterClassName();
-				$responseHandler->render($controllerResponse, $_valueReturned);
-			}
+			self::_handleResponseAdapter($_valueReturned);
 			call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
 			return;
 		}
-
+		$controllerName = $controller->getControllerName();
+		$actionName = $controller->getActionName();
+		self::_startResponse($controllerName, $actionName);
 		if(!empty($controllerName)){
 			foreach(EntityManager::getEntities() as $_entityName => $_entity){
 					$$_entityName = $_entity;
@@ -526,12 +557,16 @@ abstract class View {
 			} else {
 				// Si no es una Accion AJAX incluye index.phtml y muestra
 				// el contenido de las excepciones dentro de este.
-				Tag::removeStylesheets();
-				ob_clean();
-				$e->showMessage();
-				self::$_content = ob_get_contents();
-				ob_end_clean();
-				View::xhtmlTemplate('white');
+				if($controllerResponse->getResponseAdapter()!='json'){
+					Tag::removeStylesheets();
+					ob_clean();
+					$e->showMessage();
+					self::$_content = ob_get_contents();
+					ob_end_clean();
+					View::xhtmlTemplate('white');
+				} else {
+					self::_handleExceptionAdapter($e);
+				}
 			}
 		} else {
 			throw $e;

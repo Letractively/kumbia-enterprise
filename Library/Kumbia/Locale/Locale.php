@@ -262,15 +262,20 @@ class Locale extends Object {
 	/**
 	 * Obtiene la traducción de SI en la localización actual
 	 *
+	 * @param  boolean $all
 	 * @return string
 	 */
-	public function getYesString(){
+	public function getYesString($all=false){
 		$data = $this->_getLocaleData();
 		$yesstrList = $data->queryLanguage($this->getLanguage(), '/ldml/posix/messages/yesstr');
 		foreach($yesstrList as $yesstr){
 			$allYesStr = explode(':', $yesstr->nodeValue);
 			if(isset($allYesStr[0])){
-				return $allYesStr[0];
+				if($all==false){
+					return $allYesStr[0];
+				} else {
+					return $allYesStr;
+				}
 			} else {
 				return "";
 			}
@@ -281,15 +286,20 @@ class Locale extends Object {
 	/**
 	 * Obtiene la traducción de SI en la localización actual
 	 *
-	 * @return string
+	 * @param 	boolean $all
+	 * @return 	string
 	 */
-	public function getNoString(){
+	public function getNoString($all=false){
 		$data = $this->_getLocaleData();
 		$nostrList = $data->queryLanguage($this->getLanguage(), '/ldml/posix/messages/nostr');
 		foreach($nostrList as $nostr){
 			$allNoStr = explode(':', $nostr->nodeValue);
 			if(isset($allNoStr[0])){
-				return $allNoStr[0];
+				if($all==false){
+					return $allNoStr[0];
+				} else {
+					return $allNoStr;
+				}
 			} else {
 				return "";
 			}
@@ -364,8 +374,8 @@ class Locale extends Object {
 	/**
 	 * Obtiene el formato segun el tipo de la localización
 	 *
-	 * @param string $format
-	 * @return string
+	 * @param 	string $type
+	 * @return 	string
 	 */
 	public function getDateFormat($type='full'){
 		$data = $this->_getLocaleData();
@@ -381,8 +391,8 @@ class Locale extends Object {
 	/**
 	 * Obtiene la traducción para 'Idioma' de acuerdo a la localización
 	 *
-	 * @param string $format
-	 * @return string
+	 * @param 	string $format
+	 * @return 	string
 	 */
 	public function getLanguageString(){
 		$data = $this->_getLocaleData();
@@ -431,9 +441,9 @@ class Locale extends Object {
 	/**
 	 * Obtiene el nombre de la moneda utilizada
 	 *
-	 * @param string $codeISO
-	 * @param string $displayType
-	 * @return array
+	 * @param 	string $codeISO
+	 * @param 	string $displayType
+	 * @return 	array
 	 */
 	public function getCurrency($codeISO=null, $displayType=''){
 		$data = $this->_getLocaleData();
@@ -482,7 +492,8 @@ class Locale extends Object {
 	/**
 	 * Establece la localización por defecto
 	 *
-	 * @param string $locale
+	 * @param 	string $locale
+	 * @static
 	 */
 	public static function setDefault($locale){
 		self::$_default = $locale;
@@ -491,8 +502,8 @@ class Locale extends Object {
 	/**
 	 * Obtiene la localizacion acual
 	 *
-	 * @param string $localeValue
-	 * @return array
+	 * @param 	string $localeValue
+	 * @return 	array
 	 */
 	public static function getLocale($localeValue){
 		if($localeValue=='C'){
@@ -526,6 +537,7 @@ class Locale extends Object {
 	 * Obtiene todas las localizaciones disponibles en el entorno de ejecución
 	 *
 	 * @return array
+	 * @static
 	 */
 	public static function getEnvironmentAll(){
 		$language = setlocale(LC_ALL, 0);
@@ -571,7 +583,7 @@ class Locale extends Object {
 	/**
 	 * Devuelve todas las localizaciones soportadas por el explorador
 	 *
-	 * @return Locale
+	 * @return array
 	 * @static
 	 */
 	static public function getBrowserAll(){
@@ -625,7 +637,7 @@ class Locale extends Object {
 		if(self::$_application!=''){
 			return self::$_application;
 		}
-		$config = CoreConfig::readFromActiveApplication('config');
+		$config = CoreConfig::readAppConfig();
 		if(isset($config->application->locale)){
 			$locale = $config->application->locale;
 		} else {
@@ -643,7 +655,8 @@ class Locale extends Object {
 	/**
 	 * Establece la localización de la aplicación en runtime
 	 *
-	 * @param Locale $locale
+	 * @param	Locale $locale
+	 * @static
 	 */
 	public static function setApplication(Locale $locale){
 		self::$_application = $locale;
@@ -658,22 +671,11 @@ class Locale extends Object {
 		return $this->_locale['locale'];
 	}
 
-	public static function round($x){
-		return $x;
-	}
-
-	public static function money($x){
-		return $x;
-	}
-
-	public static function formatDate($x){
-		return $x;
-	}
-
-	public static function number($x){
-		return $x;
-	}
-
+	/**
+	 * Metodo magico __toString devuelve el identificador de localizacion del objeto
+	 *
+	 * @return string
+	 */
 	public function __toString(){
 		return $this->_locale['locale'];
 	}

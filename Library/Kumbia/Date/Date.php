@@ -567,7 +567,7 @@ class Date extends Object {
 	 * @return string
 	 */
 	public function getUsingFormatDefault(){
-		$config = CoreConfig::readFromActiveApplication('config');
+		$config = CoreConfig::readAppConfig();
 		$format = strtolower($config->application->dbdate);
 		$dateFormat = new DateFormat($format, $this);
 		return $dateFormat->getDate();
@@ -579,7 +579,12 @@ class Date extends Object {
 	 * @return string
 	 */
 	public function getPeriod(){
-		return date('Ym', $this->_timestamp);
+		if($this->_year>1970&&$this->_year<2038){
+			return date('Yd', $this->_timestamp);
+		} else {
+			$dateParts = self::_getDateParts($this->_timestamp, false);
+			return $dateParts['year'].$dateParts['mon'];
+		}
 	}
 
 	/**

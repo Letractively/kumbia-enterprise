@@ -17,7 +17,7 @@
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
- * @version 	$Id$
+ * @version 	$Id: SessionRecord.php 5 2009-04-24 01:48:48Z gutierrezandresfelipe $
  */
 
 /**
@@ -52,6 +52,30 @@ class SessionRecord extends ActiveRecordBase {
 	public function bindSessionId($sidField){
 		$this->_bindSessionId = $sidField;
 		parent::__construct();
+	}
+
+	/**
+	 * Find data on Relational Map table
+	 *
+	 * @access	public
+	 * @param 	string $params
+	 * @return 	ActiveRecordResulset
+	 */
+	public function find(){
+		$numberArguments = func_num_args();
+		$params = Utils::getParams(func_get_args(), $numberArguments);
+		if(isset($params[0])){
+			if(isset($params['conditions'])){
+
+			}
+		}
+		parent::find($arguments);
+	}
+
+	public function save(){
+		$numberArguments = func_num_args();
+		$params = Utils::getParams(func_get_args(), $numberArguments);
+		parent::find($arguments);
 	}
 
 }

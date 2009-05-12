@@ -263,7 +263,7 @@ class Filter extends Object {
 				} else {
 					$activeApp = Router::getApplication();
 					if($activeApp!=""){
-						$config = CoreConfig::readFromActiveApplication('config');
+						$config = CoreConfig::readAppConfig();
 						if(isset($config->application->filtersDir)){
 							$filtersDir = 'apps/'.$config->application->filtersDir;
 						} else {

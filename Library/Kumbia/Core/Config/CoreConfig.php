@@ -67,10 +67,10 @@ abstract class CoreConfig {
 		$application = Router::getApplication();
 
 		//Configuración entorno
-		$config = self::getConfigurationFrom($application, 'environment');
+		$config = self::readFromActiveApplication('environment.'.self::$_configAdapter, self::$_configAdapter);
 
 		//Configuración general
-		$core = self::getConfigurationFrom($application, 'config');
+		$core = self::readAppConfig();
 
 		if(!isset($core->application->mode)){
 			//No se ha definido el entorno por defecto
@@ -127,6 +127,7 @@ abstract class CoreConfig {
 	 * Devuelve el adaptador para leer los archivos por defecto
 	 *
 	 * @return string
+	 * @static
 	 */
 	public static function getAdapter(){
 		return self::$_configAdapter;
@@ -141,27 +142,58 @@ abstract class CoreConfig {
 	 * @return 	Config
 	 * @static
 	 */
-	public static function getConfigurationFrom($application, $file, $adapter=''){
+	public static function getConfigurationFrom($application, $file){
 		if($application==''){
 			throw new CoreConfigException("Debe indicar el nombre de la aplicación donde está el archivo '$file'");
 		}
-		if($adapter==''){
-			$adapter = self::$_configAdapter;
-		}
-		return Config::read('apps/'.$application.'/config/'.$file.'.'.self::$_configAdapter, $adapter);
+		return Config::read('apps/'.$application.'/config/'.$file, self::$_configAdapter);
 	}
 
 	/**
 	 * Devuelve la configuracion de la aplicacion actual
 	 *
-	 * @access public
-	 * @param string $file
+	 * @access 	public
+	 * @param 	string $file
+	 * @param 	string $adapter
+	 * @return 	Config
+	 * @static
+	 */
+	public static function readFromActiveApplication($file, $adapter){
+		$application = Router::getApplication();
+		return self::getConfigurationFrom($application, $file);
+	}
+
+	/**
+	 * Lee el archivo de configuración de una aplicación
+	 *
 	 * @return Config
 	 * @static
 	 */
-	public static function readFromActiveApplication($file){
-		$application = Router::getApplication();
-		return self::getConfigurationFrom($application, $file);
+	public static function readAppConfig($application=''){
+		if($application==''){
+			$application = Router::getApplication();
+		}
+		return self::getConfigurationFrom($application, 'config.'.self::$_configAdapter, self::$_configAdapter);
+	}
+
+	/**
+	 * Lee el archivo de carga de extensiones
+	 *
+	 * @return Config
+	 * @static
+	 */
+	public static function readBootConfig(){
+		return self::readFromActiveApplication('boot.'.self::$_configAdapter, self::$_configAdapter);
+	}
+
+	/**
+	 * Lee el archivo de rutas estáticas
+	 *
+	 * @return Config
+	 * @static
+	 */
+	public static function readRoutesConfig(){
+		return self::readFromActiveApplication('routes.'.self::$_configAdapter, self::$_configAdapter);
 	}
 
 	/**

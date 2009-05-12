@@ -152,7 +152,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	protected $_errorMessages = '';
 
 	/**
-	 * Indica la ultima operacion realizada en el modelo
+	 * Indica la ultima operación realizada en el modelo
 	 *
 	 * @var int
 	 */
@@ -180,19 +180,19 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	private static $_disableEvents = false;
 
 	/**
-	 * Indica que la ultima operacion fue una inserción
+	 * Indica que la ultima operación fue una inserción
 	 *
 	 */
 	const OP_CREATE = 1;
 
 	/**
-	 * Indica que la ultima operacion fue una actualización
+	 * Indica que la ultima operación fue una actualización
 	 *
 	 */
 	const OP_UPDATE = 2;
 
 	/**
-	 * Indica que la ultima operacion fue una eliminación
+	 * Indica que la ultima operación fue una eliminación
 	 *
 	 */
 	const OP_DELETE = 3;
@@ -714,9 +714,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Find data on Relational Map table
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return ActiveRecordResulset
+	 * @access	public
+	 * @param 	string $params
+	 * @return 	ActiveRecordResulset
 	 */
 	public function find($params=''){
 		$this->_connect();
@@ -1960,7 +1960,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Devuelve el codigo de la ultima operacion realizada
+	 * Devuelve el codigo de la ultima operación realizada
 	 *
 	 * @return boolean
 	 */
@@ -1969,7 +1969,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Indica si la ultima operacion realizada fue una actualizacion
+	 * Indica si la ultima operación realizada fue una actualizacion
 	 *
 	 * @return boolean
 	 */

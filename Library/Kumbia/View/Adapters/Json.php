@@ -33,22 +33,45 @@
  * @license 	New BSD License
  * @access 		public
  */
-class JsonViewResponse {
+class JsonViewResponse implements ViewResponseInterface {
 
 	/**
-	 * Genera la presentacion
+	 * Prepara la salida JSON
+	 *
+	 * @param ControllerResponse $controllerResponse
+	 */
+	private function _prepareOutput($controllerResponse){
+		$controllerResponse->setHeader('X-Content-Type: text/json', true);
+		$controllerResponse->setHeader('Content-Type: text/json', true);
+		$controllerResponse->setHeader('Pragma: no-cache', true);
+		$controllerResponse->setHeader('Expires: 0', true);
+	}
+
+	/**
+	 * Genera la presentacion en JSON
 	 *
 	 * @param ControllerResponse $controllerResponse
 	 * @param mixed $valueReturned
 	 */
 	public function render($controllerResponse, $valueReturned){
-
-		$controllerResponse->setHeader('X-Content-Type: text/json', true);
-		$controllerResponse->setHeader('Content-Type: text/json', true);
-		$controllerResponse->setHeader('Pragma: no-cache', true);
-		$controllerResponse->setHeader('Expires: 0', true);
-
+		$this->_prepareOutput($controllerResponse);
 		print json_encode($valueReturned);
+	}
+
+	/**
+	 * Administra las excepciones en JSON
+	 *
+	 * @param ControllerResponse $controllerResponse
+	 * @param Exception $e
+	 */
+	public function renderException($controllerResponse, $e){
+		$this->_prepareOutput($controllerResponse);
+		$exception = array(
+			'type' => get_class($e),
+			'code' => $e->getCode(),
+			'message' => $e->getMessage()
+		);
+		print json_encode($exception);
 	}
 
 }

@@ -122,7 +122,7 @@ abstract class Generator {
 			$form = $data;
 			return true;
 		}
-		$config = CoreConfig::readFromActiveApplication("environment");
+		$config = CoreConfig::readAppConfig();
 		$db = db::rawConnect();
 		if($form['source']==''){
 			throw new StandardFormException("No se pudo determinar la entidad para generar el formulario");

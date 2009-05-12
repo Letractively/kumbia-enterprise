@@ -121,10 +121,10 @@ class Currency {
 	/**
 	 * Obtiene una cantidad formateada de acuerdo a la localizacion interna
 	 *
-	 * @param double $quantity
-	 * @param string $format
-	 * @param string $codeISO
-	 * @return string
+	 * @param 	double $quantity
+	 * @param 	string $format
+	 * @param 	string $codeISO
+	 * @return 	string
 	 */
 	public function getMoney($quantity, $format='', $codeISO=''){
 		$formater = $this->_getFormater();
@@ -153,8 +153,8 @@ class Currency {
 	/**
 	 * Obtiene el simbolo de la moneda utilizada
 	 *
-	 * @param string $codeISO
-	 * @return string
+	 * @param 	string $codeISO
+	 * @return 	string
 	 */
 	public function getMoneySymbol($codeISO=''){
 		$currency = $this->getCurrency($codeISO);
@@ -164,8 +164,9 @@ class Currency {
 	/**
 	 * Obtiene el nombre de la moneda utilizada
 	 *
-	 * @param string $codeISO
-	 * @return string
+	 * @param 	string $codeISO
+	 * @param	string $type
+	 * @return	string
 	 */
 	public function getMoneyDisplayName($codeISO='', $type=''){
 		$currency = $this->getCurrency($codeISO, $type);

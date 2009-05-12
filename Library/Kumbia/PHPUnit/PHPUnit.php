@@ -87,6 +87,7 @@ abstract class PHPUnit {
 				$assertionFailed++;
 			}
 			print "Total Pruebas: $numberOfTest Fallaron: $assertionFailed\n";
+			print "Total Aserciones: ".$test->getNumberAssertions()." Exitosas: ".$test->getSuccessAssertions()." Fallaron: ".$test->getFailedAssertions()."\n";
 			if($assertionFailed>0){
 				print "Los test han fallado con los siguientes mensajes:\n\n";
 				foreach($assertionMessages as $test => $messsage){

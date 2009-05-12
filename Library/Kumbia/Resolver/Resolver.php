@@ -81,7 +81,8 @@ abstract class Resolver {
 		if(!isset(self::$_resolvedServices[$serviceName])){
 			$instancePath = Core::getInstancePath();
 			$activeApp = Router::getApplication();
-			$serviceURL = 'http://'.$_SERVER['HTTP_HOST'].$instancePath.$activeApp.'/'.$serviceName;
+			$servicePath = str_replace('.', '/', $serviceName);
+			$serviceURL = 'http://'.$_SERVER['HTTP_HOST'].$instancePath.$activeApp.'/'.$servicePath;
 			self::$_resolvedServices[$serviceName] = new WebServiceClient(array(
 				'location' => $serviceURL,
 				'compression' => 0

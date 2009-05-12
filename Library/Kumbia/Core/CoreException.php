@@ -117,7 +117,7 @@ class CoreException extends Exception {
 		print "\n<div style='background: #FFFFFF; padding: 5px;'>\n";
 		Flash::error(get_class($this).": $this->message ({$this->getCode()})<br>
 		<span style='font-size:12px'>En el archivo <i>{$file}</i> en la l&iacute;nea: <i>{$this->getLine()}</i>");
-		$config = CoreConfig::readFromActiveApplication("config");
+		$config = CoreConfig::readAppConfig();
 		$activeApp = Router::getApplication();
 		if($this->show_trace==true){
 			if(isset($config->application->debug)&&$config->application->debug==true){

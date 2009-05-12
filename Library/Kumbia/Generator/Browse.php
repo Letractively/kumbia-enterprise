@@ -133,7 +133,7 @@ abstract class Browse {
 	 */
 	static function formsBrowse($form){
 
-		$config = CoreConfig::readFromActiveApplication('environment');
+		$config = CoreConfig::readEnviroment();
 
 		Generator::formsPrint("&nbsp;</center><br><table cellspacing='0' align='center' cellpadding=5>
 		<tr bgcolor='#D0D0D0' style='border-top:1px solid #FFFFFF'>");

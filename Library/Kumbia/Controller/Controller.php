@@ -446,8 +446,8 @@ class Controller extends ControllerBase {
 	/**
 	 * Indica el tipo de Respuesta dada por el controlador (este metodo está obsoleto)
 	 *
-	 * @access public
-	 * @param string $type
+	 * @access 		public
+	 * @param		string $type
 	 * @deprecated
 	 */
 	public function setResponse($type){
@@ -456,6 +456,8 @@ class Controller extends ControllerBase {
 			case 'ajax':
 			case 'view':
 				View::setRenderLevel(View::LEVEL_ACTION_VIEW);
+				$response->setResponseType(ControllerResponse::RESPONSE_NORMAL);
+				$response->setResponseAdapter('');
 				break;
 			case 'xml':
 				View::setRenderLevel(View::LEVEL_NO_RENDER);
