@@ -89,6 +89,7 @@ class Validation {
 	 */
 	public static function validateRequired($fields, $base='', $getMode=''){
 		$validationFailed = false;
+		$fieldFailed = false;
 		self::cleanValidationMessages();
 		if(is_array($fields)){
 			if(!$base){
@@ -97,52 +98,56 @@ class Validation {
 			}
 			$controllerRequest = ControllerRequest::getInstance();
 			foreach($fields as $fieldName => $config){
+				$fieldFailed = false;
 				if(!is_numeric($fieldName)){
-					$validationFailed = false;
 					if(isset($config['filter'])){
 						$params = explode('|', $config['filter']);
 						array_unshift($params, $fieldName);
 						if(in_array(call_user_func_array(array($controllerRequest, $getMode), $params), array('', null), true)){
-							$validationFailed = true;
+							$fieldFailed = true;
 						}
 					} else {
 						$valueRequested = $controllerRequest->$getMode($fieldName);
 						if(!isset($config['nullValue'])){
-							if(in_array($valueRequested, array("", null), true)){
-								$validationFailed = true;
+							if(in_array($valueRequested, array('', null), true)){
+								$fieldFailed = true;
 							}
 						} else {
 							if($valueRequested==$config['nullValue']){
-								$validationFailed = true;
+								$fieldFailed = true;
 							}
 						}
 					}
-					if($validationFailed==true){
+					if($fieldFailed==true){
 						if(isset($config['message'])){
 							$message = $config['message'];
 						} else {
 							$message = 'Un valor para "'.$fieldName.'" es requerido';
 						}
 						self::addValidationMessage($message, $fieldName);
+						$validationFailed = true;
 					}
 				}
 			}
 		} else {
 			if(func_num_args()>1){
+				$validationFailed = false;
+				$fieldFailed = false;
 				foreach(func_get_args() as $field){
-					$validationFailed = false;
+					$fieldFailed = false;
 					$validation = explode(':', $field);
 					if(!isset($validation[1])){
 						if(in_array($this->getRequest($validation[0], $validation[1]), array("", null), true)){
-							$validationFailed = true;
+							$fieldFailed = true;
 						}
 					} else {
 						if(in_array($this->getRequest($validation[0]), array("", null), true)){
-							$validationFailed = true;
+							$fieldFailed = true;
 						}
 					}
-					if($validationFailed==true){
+					if($fieldFailed==true){
 						self::addValidationMessage("Un valor para '{$validation[0]}' es requerido", $validation[0]);
+						$validationFailed = true;
 					}
 				}
 			}

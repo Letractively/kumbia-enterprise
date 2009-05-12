@@ -36,7 +36,7 @@
  */
 interface ActiveRecordValidatorInterface {
 
-	public function __construct($record, $field, $value, $options = array());
+	public function __construct($record, $field, $value, $options=array());
 	public function checkOptions();
 	public function getMessages();
 	public function validate();

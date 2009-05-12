@@ -74,7 +74,6 @@ abstract class Core {
 	 */
 	private static $_activeViewsDir;
 
-
 	/**
 	 * Establece si el framework se encuentra en modo Test
 	 *
@@ -361,19 +360,26 @@ abstract class Core {
 	 * @static
 	 */
 	private static function _initializeCommonComponents(){
-		self::requireFile('CommonEvent/CommonEventManager');
-		self::requireFile('Dispatcher/Dispatcher');
-		self::requireFile('EntityManager/EntityManager');
-		self::requireFile('Transactions/TransactionManager');
-		self::requireFile('Db/Loader/DbLoader');
-		self::requireFile('Db/DbBase');
-		self::requireFile('ActiveRecord/Base/ActiveRecordBase');
-		self::requireFile('Security/Security');
-		self::requireFile('Facility/Facility');
-		self::requireFile('View/View');
-		self::requireFile('i18n/i18n');
-		self::requireFile('Controller/ControllerResponse');
-		self::requireFile('Utils/Utils');
+		$commonComponents = array(
+			'CommonEventManager' => 'CommonEvent/CommonEventManager',
+			'Dispatcher' => 'Dispatcher/Dispatcher',
+			'EntityManager' => 'EntityManager/EntityManager',
+			'TransactionManager' => 'Transactions/TransactionManager',
+			'DbLoader' => 'Db/Loader/DbLoader',
+			'DbBase' => 'Db/DbBase',
+			'ActiveRecordBase' => 'ActiveRecord/Base/ActiveRecordBase',
+			'Security' => 'Security/Security',
+			'Facility' => 'Facility/Facility',
+			'View' => 'View/View',
+			'i18n' => 'i18n/i18n',
+			'ControllerResponse' => 'Controller/ControllerResponse',
+			'Utils' => 'Utils/Utils'
+		);
+		foreach($commonComponents as $className => $filePath){
+			if(class_exists($className, false)==false){
+				self::requireFile($filePath);
+			}
+		}
 	}
 
 	/**

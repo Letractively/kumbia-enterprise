@@ -590,25 +590,28 @@ abstract class View {
 			$controllerName = $params['controller'];
 		}
 		$_viewsDir = Core::getActiveViewsDir();
-		if(Core::fileExists($_viewsDir.'/'.$controllerName.'/_'.$_partialView.'.phtml')){
-			foreach(EntityManager::getEntities() as $_entityName => $_entity){
-				$$_entityName = $_entity;
+		$partialPath = $_viewsDir.'/'.$controllerName.'/_'.$_partialView.'.phtml';
+		if(Core::fileExists($partialPath)==false){
+			$partialPath = $_viewsDir.'/partials/_'.$_partialView.'.phtml';
+			if(Core::fileExists($partialPath)==false){
+				throw new ViewException('No se puede encontrar la vista parcial: "'.$_partialView.'"', 0);
 			}
-			foreach(self::$_data as $_key => $_value){
-				$$_key = $_value;
-			}
-			$controller = Dispatcher::getController();
-			if($controller->isExportable()==true){
-				foreach($controller as $_var => $_value) {
-					$$_var = $_value;
-				}
-				$id = $controller->getId();
-			}
-			$$_partialView = $_partialValue;
-			include $_viewsDir.'/'.$controllerName.'/_'.$_partialView.'.phtml';
-		} else {
-			throw new ViewException('No se puede encontrar la vista parcial: "'.$_partialView.'"', 0);
 		}
+		foreach(EntityManager::getEntities() as $_entityName => $_entity){
+			$$_entityName = $_entity;
+		}
+		foreach(self::$_data as $_key => $_value){
+			$$_key = $_value;
+		}
+		$controller = Dispatcher::getController();
+		if($controller->isExportable()==true){
+			foreach($controller as $_var => $_value) {
+				$$_var = $_value;
+			}
+			$id = $controller->getId();
+		}
+		$$_partialView = $_partialValue;
+		include $partialPath;
 	}
 
 	/**

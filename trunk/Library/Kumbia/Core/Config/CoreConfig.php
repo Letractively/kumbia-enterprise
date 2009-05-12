@@ -139,14 +139,18 @@ abstract class CoreConfig {
 	 * @access 	public
 	 * @param 	string $application
 	 * @param 	string $file
+	 * @param 	string $adapter
 	 * @return 	Config
 	 * @static
 	 */
-	public static function getConfigurationFrom($application, $file){
+	public static function getConfigurationFrom($application, $file, $adapter){
 		if($application==''){
 			throw new CoreConfigException("Debe indicar el nombre de la aplicación donde está el archivo '$file'");
 		}
-		return Config::read('apps/'.$application.'/config/'.$file, self::$_configAdapter);
+		if($adapter==''){
+			$adapter = self::$_configAdapter;
+		}
+		return Config::read('apps/'.$application.'/config/'.$file, $adapter);
 	}
 
 	/**
@@ -158,7 +162,7 @@ abstract class CoreConfig {
 	 * @return 	Config
 	 * @static
 	 */
-	public static function readFromActiveApplication($file, $adapter){
+	public static function readFromActiveApplication($file, $adapter=''){
 		$application = Router::getApplication();
 		return self::getConfigurationFrom($application, $file);
 	}

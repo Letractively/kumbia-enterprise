@@ -1648,6 +1648,12 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		$this->_connect();
 		$exists = $this->_exists();
 
+		if($exists==false){
+			$this->_operationMade = self::OP_CREATE;
+		} else {
+			$this->_operationMade = self::OP_UPDATE;
+		}
+
 		// Run Validation Callbacks Before
 		$this->_errorMessages = array();
 		if(self::$_disableEvents==false){
@@ -1723,7 +1729,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 					$error = true;
 				}
 			}
-			if($error){
+			if($error==true){
 				$this->_callEvent('onValidationFails');
 				return false;
 			}
@@ -1731,6 +1737,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 
 		// Run Validation
 		if($this->_callEvent('validation')===false){
+			$this->_callEvent('onValidationFails');
 			return false;
 		}
 
@@ -1867,7 +1874,6 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				}
 			}
 			$success = $this->_db->update($table, $fields, $values, $this->_wherePk);
-			$this->_operationMade = self::OP_UPDATE;
 		} else {
 			$fields = array();
 			$values = array();
@@ -1929,7 +1935,6 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				}
 			}
 			$success = $this->_db->insert($table, $values, $fields);
-			$this->_operationMade = self::OP_CREATE;
 		}
 		if($this->_db->isUnderTransaction()==false){
 			if($this->_db->getHaveAutoCommit()==true){
@@ -2212,13 +2217,13 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	private function _callEvent($eventName){
 		if(self::$_disableEvents==false){
 			if(method_exists($this, $eventName)){
-				if($this->{$eventName}()===false) {
+				if($this->{$eventName}()===false){
 					return false;
 				}
 			} else {
 				if(isset($this->{$eventName})){
 					$method = $this->{$eventName};
-					if($this->$method()===false) {
+					if($this->$method()===false){
 						return false;
 					}
 				}
@@ -2234,19 +2239,44 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	 */
 
 	/**
+	 * Ejecuta un validador sobre un campo de la entidad
+	 *
+	 * @param 	string $className
+	 * @param 	string $field
+	 * @param 	array $options
+	 */
+	private function _executeValidator($className, $field, $options){
+		if(is_array($field)==false){
+			$validator = new $className($this, $field, $this->$field, $options);
+		} else {
+			$values = array();
+			foreach($field as $singleField){
+				$values[] = $this->$singleField;
+			}
+			$validator = new $className($this, $field, $values, $options);
+		}
+		$validator->checkOptions();
+		if($validator->validate()===false){
+			foreach($validator->getMessages() as $message){
+				$this->_errorMessages[] = $message;
+			}
+		}
+	}
+
+	/**
 	 * Instancia los validadores y los ejecuta
 	 *
-	 * @access public
-	 * @param string $validatorClass
-	 * @param array $options
-	 * @throws ActiveRecordException
+	 * @access	public
+	 * @param	string $validatorClass
+	 * @param	array $options
+	 * @throws	ActiveRecordException
 	 */
 	protected function validate($validatorClass, $options){
 		if(!interface_exists('ActiveRecordValidatorInterface')){
-			require 'Library/Kumbia/ActiveRecord/ActiveRecordValidator/Interface.php';
+			require 'Library/Kumbia/ActiveRecord/Validator/Interface.php';
 		}
 		if(!class_exists('ActiveRecordValidator')){
-			require 'Library/Kumbia/ActiveRecord/ActiveRecordValidator/ActiveRecordValidator.php';
+			require 'Library/Kumbia/ActiveRecord/Validator/ActiveRecordValidator.php';
 		}
 		$className = $validatorClass.'Validator';
 		if(!class_exists($className)){
@@ -2254,8 +2284,8 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				require 'Library/Kumbia/ActiveRecord/Validators/'.$className.'.php';
 			} else {
 				$application = Router::getApplication();
-				if(Core::fileExists("apps/$application/validators/$className.php")){
-					require "apps/$application/validators/$className.php";
+				if(Core::fileExists('apps/'.$application.'/validators/'.$className.'.php')){
+					require 'apps/'.$application.'/validators/'.$className.'.php';
 				}
 			}
 		}
@@ -2278,15 +2308,18 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				$field = $options;
 			}
 		}
-		if(!isset($this->$field)){
-			throw new ActiveRecordException("No se puede validar el campo '$field' por que no esta presente en la entidad");
-		}
-		$validator = new $className($this, $field, $this->$field, $options);
-		$validator->checkOptions();
-		if($validator->validate()===false){
-			foreach($validator->getMessages() as $message){
-				$this->_errorMessages[] = $message;
+		if(!is_array($field)){
+			if(!isset($this->$field)){
+				throw new ActiveRecordException("No se puede validar el campo '$field' por que no esta presente en la entidad");
 			}
+			$this->_executeValidator($className, $field, $options);
+		} else {
+			foreach($field as $singleField){
+				if(!isset($this->$singleField)){
+					throw new ActiveRecordException("No se puede validar el campo '$singleField' por que no esta presente en la entidad");
+				}
+			}
+			$this->_executeValidator($className, $field, $options);
 		}
 	}
 

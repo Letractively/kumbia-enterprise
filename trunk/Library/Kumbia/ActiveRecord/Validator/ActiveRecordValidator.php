@@ -82,7 +82,7 @@ class ActiveRecordValidator extends Object {
 	 * @param string $value
 	 * @param array $options
 	 */
-	public function __construct($record, $fieldName, $value, $options = array()){
+	public final function __construct($record, $fieldName, $value, $options = array()){
 		$this->_record = $record;
 		$this->_fieldName = $fieldName;
 		$this->_value = $value;
