@@ -66,9 +66,11 @@ abstract class Extensions {
 	 */
 	static public function loadBooteable(){
 
-		/**
-	 	 * Aplicacion Activa
-	 	 */
+
+		//Instancia Activa
+		$instanceName = Core::getInstanceName();
+
+	 	//Aplicacion Activa
 		$activeApp = Router::getApplication();
 
 		/**
@@ -89,26 +91,39 @@ abstract class Extensions {
 		if(!isset($_SESSION['KMOD'])){
 			$_SESSION['KMOD'] = array();
 		}
-		$instanceName = Core::getInstanceName();
 		if(!isset($_SESSION['KMOD'][$instanceName])){
 			$_SESSION['KMOD'][$instanceName] = array();
 		}
 		if(!isset($_SESSION['KMOD'][$instanceName][$activeApp])){
 			$_SESSION['KMOD'][$instanceName][$activeApp] = array();
-			if($kumbiaConfig = CoreConfig::readFromActiveApplication('boot')){
-				if(isset($kumbiaConfig->modules->extensions)){
-					$kumbiaConfig->modules->extensions = str_replace(" ", "", $kumbiaConfig->modules->extensions);
-					$extensions = explode(",", $kumbiaConfig->modules->extensions);
-					if($extensions[0]!=""){
-						foreach($extensions as $extension){
-							self::_addExtension($extension);
-						}
+			$bootConfig = CoreConfig::readBootConfig();
+			if(isset($bootConfig->modules->extensions)){
+				$bootConfig->modules->extensions = str_replace(' ', '', $bootConfig->modules->extensions);
+				$extensions = explode(',', $bootConfig->modules->extensions);
+				if($extensions[0]!=''){
+					foreach($extensions as $extension){
+						self::_addExtension($extension);
+					}
+				}
+			}
+			if(isset($bootConfig->classes->files)){
+				$_SESSION['KFIL'][$instanceName][$activeApp] = array();
+				$bootConfig->classes->files = str_replace(' ', '', $bootConfig->classes->files);
+				$files = explode(',', $bootConfig->classes->files);
+				if($files[0]!=''){
+					foreach($files as $file){
+						$_SESSION['KFIL'][$instanceName][$activeApp][] = $file;
 					}
 				}
 			}
 		}
-		foreach($_SESSION['KMOD'][$instanceName][$activeApp] as $kbmodule){
-			require $kbmodule;
+		foreach($_SESSION['KMOD'][$instanceName][$activeApp] as $extension){
+			require $extension;
+		}
+		if(isset($_SESSION['KFIL'][$instanceName][$activeApp])){
+			foreach($_SESSION['KFIL'][$instanceName][$activeApp] as $file){
+				require $file;
+			}
 		}
 	}
 
@@ -182,7 +197,7 @@ abstract class Extensions {
 			if($ex[0]=='User'){
 				$activeApp = Router::getApplication();
 				if(self::$_userDirectory==''){
-					$config = CoreConfig::readFromActiveApplication('config');
+					$config = CoreConfig::readAppConfig();
 					if(isset($config->application->libraryDir)){
 						$libraryDir = 'apps/'.$config->application->libraryDir;
 					} else {

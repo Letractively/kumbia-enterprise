@@ -63,8 +63,8 @@ class ApplicationController extends Controller  {
 	/**
 	 * Visualiza un texto en la vista actual
 	 *
-	 * @access protected
-	 * @param string $text
+	 * @access	protected
+	 * @param	string $text
 	 */
 	protected function renderText($text){
 		print $text;
@@ -73,9 +73,9 @@ class ApplicationController extends Controller  {
 	/**
 	 * Visualiza una vista parcial en el controlador actual
 	 *
-	 * @access protected
-	 * @param string $partial
-	 * @param string $values
+	 * @access	protected
+	 * @param	string $partial
+	 * @param	string $values
 	 */
 	protected function renderPartial($partial, $values = ''){
 		View::renderPartial($partial, $values);
@@ -84,11 +84,11 @@ class ApplicationController extends Controller  {
 	/**
 	 * Valida que los campos requeridos enten presentes
 	 *
-	 * @access protected
-	 * @param string $fields
-	 * @param string $base
-	 * @param string $callback
-	 * @return boolean
+	 * @access	protected
+	 * @param	string $fields
+	 * @param	string $base
+	 * @param	string $getMode
+	 * @return	boolean
 	 */
 	protected function validateRequired($fields, $base='', $getMode=''){
 		return Validation::validateRequired($fields, $base, $getMode);

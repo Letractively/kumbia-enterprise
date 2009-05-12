@@ -297,7 +297,7 @@ abstract class Dispatcher {
 		}
 		$notFoundExecuted = false;
 		$appController = $controller.'Controller';
-		if(class_exists($appController)==false){
+		if(class_exists($appController, false)==false){
 			if(Core::fileExists($controllersDir.'/'.$controller.'_controller.php')){
 				require $controllersDir.'/'.$controller.'_controller.php';
 			} else {
@@ -319,7 +319,7 @@ abstract class Dispatcher {
 		// Incializa el nombre de la instancia
 		Core::setInstanceName();
 
-		if(class_exists($controller.'Controller')) {
+		if(class_exists($controller.'Controller', false)){
 
 			//Inicializa los componentes del Framework
 			self::initComponents();

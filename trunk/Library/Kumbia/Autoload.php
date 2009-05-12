@@ -41,7 +41,7 @@ function __autoload($className){
 		 */
 		$activeApp = Router::getApplication();
 		if($activeApp){
-			$config = CoreConfig::readFromActiveApplication('config');
+			$config = CoreConfig::readAppConfig();
 			if(isset($config->application->libraryDir)){
 				$libraryDir = 'apps/'.$config->application->libraryDir;
 			} else {
@@ -51,12 +51,10 @@ function __autoload($className){
 				require $libraryDir.'/'.$className.'/'.$className.'.php';
 			} else {
 				$componentName = preg_replace('/Exception$/', '', $className);
-				if(Core::fileExists("$libraryDir/$componentName/$className.php")){
-					require "$libraryDir/$componentName/$className.php";
+				if(Core::fileExists($libraryDir.'/'.$componentName.'/'.$className.'.php')){
+					require $libraryDir.'/'.$componentName.'/'.$className.'.php';
 				} else {
-					/**
-					 * Si los modelos no se autoinicializan trata de buscar la entidad
-					 */
+					// Si los modelos no se autoinicializan trata de buscar la entidad
 					if(EntityManager::getAutoInitialize()==false){
 						EntityManager::isModel($className);
 					}

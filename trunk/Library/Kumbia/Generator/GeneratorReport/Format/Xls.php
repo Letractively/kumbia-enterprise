@@ -40,7 +40,7 @@ require "Library/Excel/Main.php";
 function xls($result, $sumArray, $title, $weightArray, $headerArray){
 
 	$file = md5(mt_rand(1, 10000));
-	$config = CoreConfig::readFromActiveApplication("config");
+	$config = CoreConfig::readAppConfig();
 	$active_app = Core::getActiveApplication();
 
 	$workbook = new Spreadsheet_Excel_Writer("public/temp/$file.xls");

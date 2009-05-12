@@ -49,7 +49,7 @@ class PDF extends PdfDocument {
 	 */
 	public function Footer(){
 
-		$config = CoreConfig::readFromActiveApplication("config");
+		$config = CoreConfig::readAppConfig();
 		$active_app = Core::getActiveApplication();
 
 		//Posición: a 1,5 cm del final
@@ -86,7 +86,7 @@ class PDF extends PdfDocument {
  */
 function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 
-	$config = CoreConfig::readFromActiveApplication("config");
+	$config = CoreConfig::readAppConfig();
 	$active_app = Core::getActiveApplication();
 
 	//Orientación

@@ -54,17 +54,6 @@ class Config extends Object {
 	static private $_adapterInstances = array();
 
 	/**
-	 * El constructor privado impide q la clase sea
-	 * instanciada y obliga a usar el metodo read
-	 * para obtener la instancia del objeto
-	 *
-	 * @access private
-	 */
-	private function __construct(){
-
-	}
-
-	/**
 	 * Lee un archivo de configuración
 	 *
 	 * @access 	public

@@ -36,6 +36,27 @@
 abstract class PHPUnitTestCase extends Object {
 
 	/**
+	 * Número de aserciones realizadas en el test
+	 *
+	 * @var int
+	 */
+	private $_numberAsserts = 0;
+
+	/**
+	 * Numero de aserciones exitosas
+	 *
+	 * @var int
+	 */
+	private $_numberSuccessAsserts = 0;
+
+	/**
+	 * Numero de aserciones que fallaron
+	 *
+	 * @var int
+	 */
+	private $_numberFailedAsserts = 0;
+
+	/**
 	 * Hace una assercion si el archivo existe
 	 *
 	 * @access protected
@@ -43,9 +64,12 @@ abstract class PHPUnitTestCase extends Object {
 	 * @return boolean
 	 */
 	protected function assertFileExists($path){
+		$this->_numberAsserts++;
 		if(!Core::fileExists($path)){
+			$this->_numberFailedAsserts++;
 			throw new AssertionFailed("No existe el archivo '$path'");
 		} else {
+			$this->_numberSuccessAsserts++;
 			return true;
 		}
 	}
@@ -53,11 +77,12 @@ abstract class PHPUnitTestCase extends Object {
 	/**
 	 * Hace una asercion sobre valores iguales
 	 *
-	 * @param string $value1
-	 * @param string $value2
-	 * @return boolean
+	 * @param 	string $value1
+	 * @param 	string $value2
+	 * @return 	boolean
 	 */
 	protected function assertEquals($value1, $value2){
+		$this->_numberAsserts++;
 		if($value1!==$value2){
 			if($value1===false){
 				$v1 = "false";
@@ -77,8 +102,10 @@ abstract class PHPUnitTestCase extends Object {
 					$v2 = $value2;
 				}
 			}
+			$this->_numberFailedAsserts++;
 			throw new AssertionFailed("El valor (".gettype($value1).") $v1 no es igual a (".gettype($value2).") '$value2'");
 		} else {
+			$this->_numberSuccessAsserts++;
 			return true;
 		}
 	}
@@ -86,52 +113,97 @@ abstract class PHPUnitTestCase extends Object {
 	/**
 	 * Hace una aserción sobre si un objeto pertenece a una clase
 	 *
-	 * @param object $object
-	 * @param string $className
-	 * @return boolean
+	 * @param 	object $object
+	 * @param 	string $className
+	 * @return 	boolean
 	 */
 	protected function assertInstanceOf($object, $className){
+		$this->_numberAsserts++;
 		if(!is_object($object)){
+			$this->_numberFailedAsserts++;
 			throw new AssertionFailed("El valor no es un objeto");
 		}
 		if(get_class($object)!=$className){
+			$this->_numberFailedAsserts++;
 			throw new AssertionFailed("El objeto no pertenece a la clase '$className'");
 		}
+		$this->_numberSuccessAsserts++;
 		return true;
 	}
 
 	/**
 	 * Hace una aserción sobre si una variable es un recurso
 	 *
-	 * @param resource $resource
-	 * @return boolean
+	 * @param 	resource $resource
+	 * @return 	boolean
 	 */
 	protected function assertResource($resource){
+		$this->_numberAsserts++;
 		if(!is_object($resource)){
+			$this->_numberFailedAsserts++;
 			throw new AssertionFailed("El valor no es un recurso");
 		}
+		$this->_numberSuccessAsserts++;
+		return true;
 	}
 
 	/**
 	 * Hace una aserción sobre si un valor es verdadero
 	 *
-	 * @param bool $value
+	 * @param 	bool $value
+	 * @return 	boolean
 	 */
 	protected function assertTrue($value){
+		$this->_numberAsserts++;
 		if($value!==true){
+			$this->_numberFailedAsserts++;
 			throw new AssertionFailed("El valor '$value' no es un verdadero");
 		}
+		$this->_numberSuccessAsserts++;
+		return true;
 	}
 
 	/**
 	 * Hace una aserción sobre si un valor es nulo
 	 *
-	 * @param null $value
+	 * @param 	null $value
+	 * @return 	boolean
 	 */
 	protected function assertNull($value){
+		$this->_numberAsserts++;
 		if($value!==null){
+			$this->_numberFailedAsserts++;
 			throw new AssertionFailed("El valor '$value' no es un nulo");
 		}
+		$this->_numberSuccessAsserts++;
+		return true;
+	}
+
+	/**
+	 * Devuelve el numero de aserciones ejecutadas en el test
+	 *
+	 * @return int
+	 */
+	public function getNumberAssertions(){
+		return $this->_numberAsserts;
+	}
+
+	/**
+	 * Devuelve el numero de aserciones ejecutadas en el test que fueron exitosas
+	 *
+	 * @return int
+	 */
+	public function getSuccessAssertions(){
+		return $this->_numberSuccessAsserts;
+	}
+
+	/**
+	 * Devuelve el numero de aserciones ejecutadas en el test que fallaron
+	 *
+	 * @return int
+	 */
+	public function getFailedAssertions(){
+		return $this->_numberFailedAsserts;
 	}
 
 }

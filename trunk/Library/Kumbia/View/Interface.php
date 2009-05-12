@@ -34,6 +34,7 @@
  */
 interface ViewResponseInterface {
 
-	public function render();
+	public function render($controllerResponse, $valueReturned);
+	public function renderException($controllerResponse, $e);
 
 }

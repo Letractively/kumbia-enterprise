@@ -151,7 +151,7 @@ abstract class CoreClassPath {
 		'ScriptException' => 'Script/ScriptException',
 		'SessionException' => 'Session/SessionException',
 		'SessionNamespace' => 'Session/Namespace/Namespace',
-		'SessionRecord' => 'Session/SessionRecord/SessionRecord',
+		'SessionRecord' => 'ActiveRecord/SessionRecord/SessionRecord',
 		'StandardForm' => 'Controller/StandardForm/StandardFormController',
 		'StandardFormException' => 'Controller/StandardForm/StandardFormException',
 		'Security' => 'Security/Security',

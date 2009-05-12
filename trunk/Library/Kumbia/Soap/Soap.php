@@ -227,6 +227,7 @@ abstract class Soap {
 			$bodyElement->appendChild($faultElement);
 			$faultElement->appendChild(new DOMElement('faultcode', $e->getCode()));
 			$faultElement->appendChild(new DOMElement('faultstring', $faultMessage));
+			$faultElement->appendChild(new DOMElement('detail', get_class($e)));
 			print self::$_domDocument->saveXML();
 		}
 	}

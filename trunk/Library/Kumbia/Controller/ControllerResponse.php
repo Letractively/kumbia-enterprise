@@ -80,8 +80,8 @@ class ControllerResponse extends Object {
 	/**
 	 * Devuelve la instancia del singleton de la clase
 	 *
-	 * @access public
-	 * @return ControllerResponse
+	 * @access 	public
+	 * @return 	ControllerResponse
 	 * @static
 	 */
 	public static function getInstance(){
@@ -94,9 +94,9 @@ class ControllerResponse extends Object {
 	/**
 	 * Establece el valor de un encabezado
 	 *
-	 * @access public
-	 * @param string $header
-	 * @param boolean $replace
+	 * @access 	public
+	 * @param 	string $header
+	 * @param 	boolean $replace
 	 */
 	public function setHeader($header, $replace=true){
 		header($header, $replace);
@@ -105,9 +105,9 @@ class ControllerResponse extends Object {
 	/**
 	 * Devuelve los encabezados que serán enviados en la petición
 	 *
-	 * @access public
-	 * @param boolean $process
-	 * @return array
+	 * @access 	public
+	 * @param 	boolean $process
+	 * @return 	array
 	 */
 	public function getHeaders($process=true){
 		if($process==true){
@@ -140,8 +140,8 @@ class ControllerResponse extends Object {
 	/**
 	 * Tipo de respuesta que generara la peticion
 	 *
-	 * @access public
-	 * @param integer $type
+	 * @access	public
+	 * @param	integer $type
 	 */
 	public function setResponseType($type){
 		$this->_responseType = $type;
@@ -150,8 +150,8 @@ class ControllerResponse extends Object {
 	/**
 	 * Devuelve el tipo de respuesta que generara la peticion
 	 *
-	 * @access public
-	 * @return integer
+	 * @access	public
+	 * @return	integer
 	 */
 	public function getResponseType(){
 		return $this->_responseType;
@@ -160,7 +160,7 @@ class ControllerResponse extends Object {
 	/**
 	 * Establece el tipo de adaptador
 	 *
-	 * @param string $adapter
+	 * @param	string $adapter
 	 */
 	public function setResponseAdapter($adapter){
 		$this->_responseAdapter = $adapter;
@@ -169,7 +169,7 @@ class ControllerResponse extends Object {
 	/**
 	 * Devuelve el adaptador usado para la respuesta
 	 *
-	 * @return string
+	 * @return	string
 	 */
 	public function getResponseAdapter(){
 		return $this->_responseAdapter;
@@ -178,7 +178,7 @@ class ControllerResponse extends Object {
 	/**
 	 * Establece el tipo de salida generado por el controlador
 	 *
-	 * @param string $contentType
+	 * @param	string $contentType
 	 */
 	public function setContentType($contentType){
 		$this->setHeader('Content-Type', $contentType);

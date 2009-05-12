@@ -49,12 +49,12 @@ class SoapRouter implements RouterInterface {
 	 */
 	private function _getXSIMap($actionParam){
 		$arrayMap = array();
-		foreach($actionParam->getElementsByTagName("item") as $item){
-			foreach($item->getElementsByTagName("key") as $keyIndex){
+		foreach($actionParam->getElementsByTagName('item') as $item){
+			foreach($item->getElementsByTagName('key') as $keyIndex){
 				$index = (string) $keyIndex->nodeValue;
 			}
-			foreach($item->getElementsByTagName("value") as $valueElement){
-				$paramType = $valueElement->getAttributeNS($this->_xmlSchemaNamespace, "type");
+			foreach($item->getElementsByTagName('value') as $valueElement){
+				$paramType = $valueElement->getAttributeNS($this->_xmlSchemaNamespace, 'type');
 				if($this->_isTypeLiteral($paramType)==true){
 					$value = $valueElement->nodeValue;
 				} else {
@@ -84,10 +84,12 @@ class SoapRouter implements RouterInterface {
 	public function handleRouting(){
 		$request = ControllerRequest::getInstance();
 		$soapRawRequest = $request->getRawBody();
+
+		file_put_contents('soap.'.microtime(true).'.xml', $_SERVER['HTTP_SOAPACTION'].$soapRawRequest.print_r($_SERVER, true));
+
 		$domDocument = new DOMDocument();
 		$domDocument->loadXML($soapRawRequest);
 		$soapAction = explode("#", str_replace("\"", "", $_SERVER['HTTP_SOAPACTION']));
-
 		foreach($domDocument->getElementsByTagNameNS($soapAction[0], $soapAction[1]) as $domElement){
 			$parameters = array();
 			foreach($domElement->childNodes as $actionParam){

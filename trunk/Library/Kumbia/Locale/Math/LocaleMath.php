@@ -44,9 +44,10 @@ class LocaleMath {
 	/**
 	 * Realiza una suma utilizando BCMATH si esta disponible
 	 *
-	 * @param double $value1
-	 * @param double $value2
-	 * @param int $scale
+	 * @param 	double $value1
+	 * @param 	double $value2
+	 * @param 	int $scale
+	 * @static
 	 */
 	static public function add($value1, $value2, $scale=0){
 		if(self::$_bcMathEnabled==true){
@@ -58,11 +59,13 @@ class LocaleMath {
 	}
 
 	/**
-	 * Realiza una multiplicacion utilizando BCMATH si esta disponible
+	 * Realiza una multiplicación utilizando BCMATH si esta disponible
 	 *
-	 * @param string $value1
-	 * @param string $value2
-	 * @param int $scale
+	 * @param 	string $value1
+	 * @param 	string $value2
+	 * @param 	int $scale
+	 * @return 	string
+	 * @static
 	 */
 	static public function mul($value1, $value2, $scale=0){
 		if(self::$_bcMathEnabled==true){
@@ -76,9 +79,11 @@ class LocaleMath {
 	/**
 	 * Realiza una resta utilizando BCMATH si esta disponible
 	 *
-	 * @param string $value1
-	 * @param string $value2
-	 * @param int $scale
+	 * @param 	string $value1
+	 * @param 	string $value2
+	 * @param 	int $scale
+	 * @return 	string
+	 * @static
 	 */
 	static public function sub($value1, $value2, $scale=0){
 		if(self::$_bcMathEnabled==true){
@@ -92,9 +97,11 @@ class LocaleMath {
 	/**
 	 * Realiza una division utilizando BCMATH si esta disponible
 	 *
-	 * @param string $value1
-	 * @param string $value2
-	 * @param int $scale
+	 * @param 	string $value1
+	 * @param 	string $value2
+	 * @param 	int $scale
+	 * @return 	string
+	 * @static
 	 */
 	static public function div($value1, $value2, $scale=0){
 		if(self::$_bcMathEnabled==true){
@@ -108,8 +115,10 @@ class LocaleMath {
 	/**
 	 * Realiza un modulo de division utilizando BCMATH si esta disponible
 	 *
-	 * @param string $value1
-	 * @param string $value2
+	 * @param 	string $value1
+	 * @param 	string $value2
+	 * @return 	string
+	 * @static
 	 */
 	static public function mod($value1, $value2){
 		if(self::$_bcMathEnabled==true){
@@ -126,6 +135,8 @@ class LocaleMath {
 	 * @param string $value1
 	 * @param string $value2
 	 * @param int $scale
+	 * @return int
+	 * @static
 	 */
 	static public function cmp($value1, $value2, $scale=0){
 		if(self::$_bcMathEnabled==true){
@@ -146,9 +157,10 @@ class LocaleMath {
 	/**
 	 * Redondea un numero a la escala establecida
 	 *
-	 * @param double $value
-	 * @param int $scale
-	 * @return double
+	 * @param 	double $value
+	 * @param 	int $precision
+	 * @return 	double
+	 * @static
 	 */
 	static public function round($value, $precision=0){
 		if(self::$_bcMathEnabled==true){
@@ -179,6 +191,7 @@ class LocaleMath {
 	/**
 	 * Deshabilita BCMATH
 	 *
+	 * @static
 	 */
 	public static function disableBcMath(){
 		self::$_bcMathEnabled = false;
@@ -187,10 +200,11 @@ class LocaleMath {
 	/**
 	 * Habilita BCMATH
 	 *
+	 * @static
 	 */
 	public static function enableBcMath(){
-		if(extension_loaded("bcmath")==false){
-			throw new LocaleException("Debe cargar la extension de PHP llamada php_bcmath");
+		if(extension_loaded('bcmath')==false){
+			throw new LocaleException('Debe cargar la extension de PHP llamada php_bcmath');
 			return false;
 		}
 		self::$_bcMathEnabled = true;

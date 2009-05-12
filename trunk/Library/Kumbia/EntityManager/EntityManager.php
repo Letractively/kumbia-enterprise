@@ -243,7 +243,7 @@ abstract class EntityManager {
 			throw new EntityManagerException("No se encontró la clase \"$entityName\", es necesario definir una clase en el modelo '$model' llamado '$entityName' para que esto funcione correctamente.");
 		} else {
 			self::$_entities[$entityName] = new $entityName();
-			if(!is_subclass_of(self::$_entities[$entityName], "ActiveRecordBase")){
+			if(!is_subclass_of(self::$_entities[$entityName], 'ActiveRecordBase')){
 				throw new EntityManagerException("Error inicializando modelo '$entityName', el modelo '$model' debe heredar ActiveRecord");
 			}
 			$sourceName = self::$_entities[$entityName]->getSource();
@@ -327,8 +327,8 @@ abstract class EntityManager {
 				return true;
 			} else {
 				$model = Utils::uncamelize($modelName);
-				if(Core::fileExists(self::$_modelsDir."/$model.php")){
-					require self::$_modelsDir."/$model.php";
+				if(Core::fileExists(self::$_modelsDir.'/'.$model.'.php')){
+					require self::$_modelsDir.'/'.$model.'.php';
 					self::_initializeModel($modelName, $model);
 					return true;
 				} else {

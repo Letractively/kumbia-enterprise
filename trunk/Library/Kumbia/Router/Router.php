@@ -141,6 +141,13 @@ abstract class Router {
 	static private $_staticRoutes = true;
 
 	/**
+	 * Indica si las rutas estáticas están habilitadas
+	 *
+	 * @var boolean
+	 */
+	static private $_enableStaticRoutes = false;
+
+	/**
 	 * Tipos de Enrutamiento
 	 *
 	 */
@@ -175,7 +182,7 @@ abstract class Router {
 		 */
 		if($urlItems[0]!=""&&Core::applicationExists($urlItems[0])==true){
 
-			$config = CoreConfig::getConfigurationFrom($urlItems[0], 'config');
+			$config = CoreConfig::readAppConfig($urlItems[0]);
 			if(isset($config->application)){
 
 				/**
@@ -218,7 +225,7 @@ abstract class Router {
 			if(!isset($appServerConfig->core->defaultApp)){
 				throw new RouterException("No se ha indicado la aplicación por defecto en config/config.ini (defaultApp)");
 			}
-			$config = CoreConfig::getConfigurationFrom($activeApp, 'config');
+			$config = CoreConfig::readAppConfig($activeApp);
 			if(!isset($config->application)){
 				throw new RouterException("No existe la sección [application] en el config.ini de la aplicación");
 			}
@@ -351,68 +358,70 @@ abstract class Router {
 	 * @static
      */
 	public static function ifRouted(){
-		if(self::$_staticRoutes==true){
-			if(!isset($_SESSION['KSR'])){
-				$routes = CoreConfig::readFromActiveApplication('routes');
-				if(isset($routes->routes)){
-					foreach($routes->routes as $source => $destination){
-						if(count(explode('/', $source))!=3||count(explode('/', $destination))!=3){
-							throw new RouterException("Política de enrutamiento invalida '$source' a '$destination' en config/routes.ini");
-						} else {
-							list($controller_source,
-							$action_source,
-							$id_source) = explode("/", $source);
-							list($controller_destination,
-							$action_destination,
-							$id_destination) = explode("/", $destination);
-							if(($controller_source==$controller_destination)&&
-							($action_source==$action_destination)&&
-							($id_source==$id_destination)){
-								throw new RouterException("Política de enrutamiento ciclica de '$source' a '$destination' en config/routes.ini");
+		if(self::$_enableStaticRoutes==true){
+			if(self::$_staticRoutes==true){
+				if(!isset($_SESSION['KSR'])){
+					$routes = CoreConfig::readRoutesConfig();
+					if(isset($routes->routes)){
+						foreach($routes->routes as $source => $destination){
+							if(count(explode('/', $source))!=3||count(explode('/', $destination))!=3){
+								throw new RouterException("Política de enrutamiento invalida '$source' a '$destination' en config/routes.ini");
 							} else {
-								$_SESSION['KSR'][$controller_source][$action_source][$id_source] =
-								array('controller' => $controller_destination,
-								'action' => $action_destination,
-								'id' => $id_destination);
+								list($controller_source,
+								$action_source,
+								$id_source) = explode("/", $source);
+								list($controller_destination,
+								$action_destination,
+								$id_destination) = explode("/", $destination);
+								if(($controller_source==$controller_destination)&&
+								($action_source==$action_destination)&&
+								($id_source==$id_destination)){
+									throw new RouterException("Política de enrutamiento ciclica de '$source' a '$destination' en config/routes.ini");
+								} else {
+									$_SESSION['KSR'][$controller_source][$action_source][$id_source] =
+									array('controller' => $controller_destination,
+									'action' => $action_destination,
+									'id' => $id_destination);
+								}
 							}
 						}
+					} else {
+						self::$_staticRoutes = false;
 					}
-				} else {
-					self::$_staticRoutes = false;
 				}
 			}
-		}
 
-		$controller = self::$_controller;
-		$action = self::$_action;
-		$id = self::$_id;
+			$controller = self::$_controller;
+			$action = self::$_action;
+			$id = self::$_id;
 
-		$new_route = array('controller' => '*', 'action' => '*', 'id' => '*');
-		if(isset($_SESSION['KSR']['*'][$action]['*'])){
-			$new_route = $_SESSION['KSR']['*'][$action]['*'];
+			$new_route = array('controller' => '*', 'action' => '*', 'id' => '*');
+			if(isset($_SESSION['KSR']['*'][$action]['*'])){
+				$new_route = $_SESSION['KSR']['*'][$action]['*'];
+			}
+			if(isset($_SESSION['KSR'][$controller]['*']['*'])){
+				$new_route = $_SESSION['KSR'][$controller]['*']['*'];
+			}
+			if(isset($_SESSION['KSR'][$controller]['*'][$id])){
+				$new_route = $_SESSION['KSR'][$controller]['*'][$id];
+			}
+			if(isset($_SESSION['KSR'][$controller][$action]['*'])){
+				$new_route = $_SESSION['KSR'][$controller][$action]['*'];
+			}
+			if(isset($_SESSION['KSR'][$controller][$action][$id])){
+				$new_route = $_SESSION['KSR'][$controller][$action][$id];
+			}
+			if($new_route['controller']!='*'){
+				self::$_controller = $new_route['controller'];
+			}
+			if($new_route['action']!='*'){
+				self::$_action = $new_route['action'];
+			}
+			if($new_route['id']!='*'){
+				self::$_id = $new_route['id'];
+			}
+			return;
 		}
-		if(isset($_SESSION['KSR'][$controller]['*']['*'])){
-			$new_route = $_SESSION['KSR'][$controller]['*']['*'];
-		}
-		if(isset($_SESSION['KSR'][$controller]['*'][$id])){
-			$new_route = $_SESSION['KSR'][$controller]['*'][$id];
-		}
-		if(isset($_SESSION['KSR'][$controller][$action]['*'])){
-			$new_route = $_SESSION['KSR'][$controller][$action]['*'];
-		}
-		if(isset($_SESSION['KSR'][$controller][$action][$id])){
-			$new_route = $_SESSION['KSR'][$controller][$action][$id];
-		}
-		if($new_route['controller']!='*'){
-			self::$_controller = $new_route['controller'];
-		}
-		if($new_route['action']!='*'){
-			self::$_action = $new_route['action'];
-		}
-		if($new_route['id']!='*'){
-			self::$_id = $new_route['id'];
-		}
-		return;
 	}
 
 	/**

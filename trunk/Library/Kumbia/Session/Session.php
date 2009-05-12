@@ -217,17 +217,17 @@ abstract class Session {
 		if(self::$_sessionStarted==true){
 			return false;
 		}
-		$config = CoreConfig::readFromActiveApplication('config');
+		$config = CoreConfig::readAppConfig();
 		if(isset($config->application->sessionAdapter)){
 			$sessionAdapter = ucfirst($config->application->sessionAdapter);
 			$className = $sessionAdapter.'SessionAdapter';
 			if(interface_exists('SessionInterface')==false){
 				require 'Library/Kumbia/Session/Interface.php';
 			}
-			if(class_exists($className)==false){
+			if(class_exists($className, false)==false){
 				require 'Library/Kumbia/Session/Adapters/'.$sessionAdapter.'.php';
 			}
-			if(class_exists($className)){
+			if(class_exists($className, false)){
 				$sessionObject = new $className();
 				ini_set('session.save_handler', $sessionObject->getSaveHandler());
 				$sessionObject->initialize();
