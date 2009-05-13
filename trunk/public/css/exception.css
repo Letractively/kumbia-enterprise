@@ -1,0 +1,168 @@
+.exceptionDescription {
+	font-family: sans-serif;
+	background: #B72F09;
+	padding: 10px;
+	font-size: 14px;
+	color: white;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+}
+
+.exceptionLocation {
+	font-size: 12px;
+	color: #F4FCCA;
+}
+
+.exceptionContainer {
+	background: #FFFFFF;
+	padding: 5px;
+}
+
+.exceptionBacktraceContainer {
+	font-size:12px;
+	margin: 5px;
+	background: #404040;
+	font-family: Monaco, Lucida Console;
+	margin:10px;
+	color: white;
+	padding: 2px;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-radius: 7px;
+}
+
+.exceptionBacktracePre {
+	font-family: Monaco,Lucida Console;
+	margin:5px;
+	color: white;
+	font-size: 12px;
+	text-align: left;
+}
+
+.exceptionRemoteContainer {
+	padding-left: 20px;
+	font-family: Monaco,'Consolas','Lucida Console','Courier New',monospace;
+	color: white;
+	font-size: 12px;
+	text-align:left;
+}
+
+.exceptionRemoteTitle {
+	color: white;
+	background: #3769A0;
+	padding: 5px;
+}
+
+.exceptionActor {
+	color: #eaeaea;
+}
+
+.exceptionFileViewver {
+	color: #000000;
+	margin: 10px;
+	border: 1px solid #333333;
+	background: #FFFFFF;
+	padding:0px;
+}
+
+.exceptionLineNote {
+	font-family: sans-serif;
+	font-size: 12px;
+	color: #F4FCCA;
+	font-weight: bold;
+	padding-left: 10px;
+}
+
+.exceptionLineNotActiveOdd {
+	font-family: Monaco, Lucida Console;
+	font-size: 12px;
+	background: #111111;
+	border-bottom: 1px dotted #333333;
+	padding: 2px;
+}
+
+.exceptionLineNotActiveEven {
+	font-family: Monaco, Lucida Console;
+	font-size: 12px;
+	background: #151515;
+	border-bottom: 1px dotted #333333;
+	padding: 2px;
+}
+
+.exceptionLineActive {
+	font-family: Monaco, Lucida Console;
+	font-size: 13px;
+	background: #424242;
+	border-bottom: 1px dotted #333333;
+	padding: 2px;
+}
+
+.exceptionLineTd {
+	background: #9B2700;
+	color: white;
+	padding-left: 3px;
+	border-right: 1px solid #333333;
+}
+
+.exceptionLine {
+	color: #969696;
+}
+
+.exceptionAditionalInfo {
+	font-family: verdana, sans-serif;
+	font-size:12px;
+	margin: 0px 15px 0px 15px;
+	padding: 5px;
+	border:1px solid #969696;
+	background: #232323;
+	color: #969696;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-radius: 7px;
+}
+
+.rowInfoOdd {
+	background: #111111;
+}
+
+.rowInfoOdd td, .rowInfoEven td {
+	color: white;
+}
+
+.rowInfoOdd strong, .rowInfoEven strong {
+	color: #F4FCCA;
+	font-weight: normal;
+}
+
+.rowInfoEven {
+	background: #151515;
+}
+
+.tString {
+	color: #588E13;
+}
+
+.tNumber {
+	color: #F4FCCA;
+}
+
+.tVariable {
+	color: #eaeaea;
+}
+
+.tReserved {
+	color: #969696;
+}
+
+.tComment {
+	color: #454545;
+}
+
+.tOther {
+	color: #f2f2f2;
+}
+
+.tOtherSentence {
+	color: #ffffff;
+}
