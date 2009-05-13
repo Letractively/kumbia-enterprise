@@ -12,11 +12,13 @@
  * obtain it through the world-wide-web, please send an email
  * to kumbia@kumbia.org so we can send you a copy immediately.
  *
- * @category Kumbia
- * @package Bootstrap
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
- * @license New BSD License
+ * @category 	Kumbia
+ * @package 	Bootstrap
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @copyright 	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
+ * @license 	New BSD License
+ * @version 	$Id$
  */
 
 /**
@@ -37,44 +39,31 @@ chdir('..');
 /**
  * Cargar componentes principales
  */
-/**
- * @see Object
- */
-require "Library/Kumbia/Autoload.php";
-require "Library/Kumbia/Object.php";
-require "Library/Kumbia/Core/Core.php";
-require "Library/Kumbia/Session/Session.php";
-require "Library/Kumbia/Config/Config.php";
-require "Library/Kumbia/Core/Config/CoreConfig.php";
-require "Library/Kumbia/Core/Type/CoreType.php";
-require "Library/Kumbia/Core/ClassPath/CoreClassPath.php";
-require "Library/Kumbia/Router/Router.php";
-require "Library/Kumbia/Plugin/Plugin.php";
-require "Library/Kumbia/Registry/Memory/MemoryRegistry.php";
+require 'Library/Kumbia/Autoload.php';
+require 'Library/Kumbia/Object.php';
+require 'Library/Kumbia/Core/Core.php';
+require 'Library/Kumbia/Session/Session.php';
+require 'Library/Kumbia/Config/Config.php';
+require 'Library/Kumbia/Core/Config/CoreConfig.php';
+require 'Library/Kumbia/Core/Type/CoreType.php';
+require 'Library/Kumbia/Core/ClassPath/CoreClassPath.php';
+require 'Library/Kumbia/Router/Router.php';
+require 'Library/Kumbia/Plugin/Plugin.php';
+require 'Library/Kumbia/Registry/Memory/MemoryRegistry.php';
 
 try {
 
-	/**
-	 * Inicializar el ExceptionHandler
-	 */
-	set_exception_handler(array("Core", "manageExceptions"));
-	set_error_handler(array("Core", "manageErrors"));
+	//Inicializar el ExceptionHandler
+	set_exception_handler(array('Core', 'manageExceptions'));
+	set_error_handler(array('Core', 'manageErrors'));
 
-	/**
-	 * Detecta la forma en que se debe tratar los parametros del
-	 * enrutador
-	 */
+	//Detecta la forma en que se debe tratar los parametros del
 	Router::handleRouterParameters();
 
-	/**
-     * Kumbia reinicia las variables de aplicacion cuando cambiamos
-     * entre una aplicacion y otra. Init Application define el nombre de la instancia
-     */
+	//Inicializa el entorno de ejecución de la petición
 	Core::initApplication();
 
-	/**
-	 * Atender la petici&oacute;n
-	 */
+	//Atender la petición
 	Core::main();
 
 
@@ -82,21 +71,16 @@ try {
 catch(CoreException $e){
 	try {
 		Session::startSession();
-		ob_start();
-		$e->showMessage();
-		View::setContent(ob_get_contents());
-		ob_end_clean();
-		View::xhtmlTemplate('white');
+		$exceptionHandler = Core::determineExceptionHandler();
+		call_user_func_array($exceptionHandler, array($e, null));
 	}
 	catch(Exception $e){
+		//Pueden ocurrir mas excepciones en los componentes de inicialización
 		ob_start();
-		/**
-		 * Algunas excepciones pueden ocurrir el componente View
-		 */
-		Flash::error(get_class($e).": ".$e->getMessage()." ".$e->getFile()."(".$e->getLine().")");
-		print "<b>Backtrace:</b><br/>\n";
+		Flash::error(get_class($e).': '.$e->getMessage()." ".$e->getFile()."(".$e->getLine().")");
+		print '<b>Backtrace:</b><br/>'."\n";
 		foreach($e->getTrace() as $debug){
-			print $debug['file']." (".$debug['line'].") <br/>\n";
+			print $debug['file'].' ('.$debug['line'].") <br/>\n";
 		}
 		View::setContent(ob_get_contents());
 		ob_end_clean();
@@ -104,8 +88,8 @@ catch(CoreException $e){
 	}
 }
 catch(Exception $e){
-	print "Exception: ".$e->getMessage();
+	print 'Exception: '.$e->getMessage();
 	foreach(debug_backtrace() as $debug){
-		print $debug['file']." (".$debug['line'].") <br>\n";
+		print $debug['file'].' ('.$debug['line'].") <br>\n";
 	}
 }
