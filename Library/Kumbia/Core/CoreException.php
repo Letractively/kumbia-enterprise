@@ -148,9 +148,14 @@ class CoreException extends Exception {
 		Core::setInstanceName();
 		Core::setTimeZone();
 		$instanceName = Core::getInstanceName();
+
 		//Agrega el estilo
 		Tag::stylesheetLink('exception');
-		$file = str_replace($_SERVER['DOCUMENT_ROOT'], "", $this->getSafeFile());
+
+		//Titulo de la pantalla
+		Tag::setDocumentTitle(get_class($this).' - Kumbia Enterprise Framework');
+
+		$file = $this->getSafeFile();
 		print "\n<div class='exceptionContainer'>\n";
 		$message = "<div class='exceptionDescription'>";
 		if($this->_isRemote==true){
