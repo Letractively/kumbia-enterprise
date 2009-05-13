@@ -584,7 +584,6 @@ abstract class Core {
 	 * @static
 	 */
 	private static function _handleException($e, $controller){
-
 		//Notifica la excepcion a los Plugins
 		PluginManager::notifyFromApplication('beforeUncaughtException', $e);
 
@@ -593,11 +592,22 @@ abstract class Core {
 		if($controller){
 			$exceptionHandler = $controller->getViewExceptionHandler();
 		} else {
-			$routingAdapter = Router::getRoutingAdapter();
-			$exceptionHandler = $routingAdapter->getExceptionResponseHandler();
+			$exceptionHandler = self::determineExceptionHandler();
 		}
 		call_user_func_array($exceptionHandler, array($e, $controller));
 		return;
+	}
+
+	/**
+	 * Determina el excepction handler adecuado para dar respuesta
+	 *
+	 * @access public
+	 * @return callback
+	 * @static
+	 */
+	public static function determineExceptionHandler(){
+		$routingAdapter = Router::getRoutingAdapter();
+		return $routingAdapter->getExceptionResponseHandler();
 	}
 
 	/**

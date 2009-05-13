@@ -143,7 +143,7 @@ abstract class CoreConfig {
 	 * @return 	Config
 	 * @static
 	 */
-	public static function getConfigurationFrom($application, $file, $adapter){
+	public static function getConfigurationFrom($application, $file, $adapter=''){
 		if($application==''){
 			throw new CoreConfigException("Debe indicar el nombre de la aplicación donde está el archivo '$file'");
 		}

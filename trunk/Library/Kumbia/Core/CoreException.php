@@ -60,6 +60,27 @@ class CoreException extends Exception {
 	protected $extendedBacktrace = array();
 
 	/**
+	 * Indica si la excepcion se generó remotamente
+	 *
+	 * @var boolean
+	 */
+	private $_isRemote = false;
+
+	/**
+	 * Establece el actor que generó la excepción remota
+	 *
+	 * @var string
+	 */
+	private $_remoteActor = '';
+
+	/**
+	 * Remote backtrace
+	 *
+	 * @var array
+	 */
+	private $_remoteBacktrace = array();
+
+	/**
 	 * Constructor de la clase
 	 *
 	 * @access public
@@ -98,6 +119,24 @@ class CoreException extends Exception {
 	}
 
 	/**
+	 * Establece si la excepción se generó remotamente
+	 *
+	 * @param bool $remote
+	 */
+	public function setRemote($remote){
+		$this->_isRemote = $remote;
+	}
+
+	/**
+	 * Establece el actor que genero la excepción
+	 *
+	 * @param string $actor
+	 */
+	public function setRemoteActor($actor){
+		$this->_remoteActor = $actor;
+	}
+
+	/**
 	 * Genera la salida de la excepcion
 	 *
 	 * @access public
@@ -109,14 +148,17 @@ class CoreException extends Exception {
 		Core::setInstanceName();
 		Core::setTimeZone();
 		$instanceName = Core::getInstanceName();
-		if(isset($_SERVER['DOCUMENT_ROOT'])){
-			$file = str_replace($_SERVER['DOCUMENT_ROOT'], "", $this->getFile());
-		} else {
-			$file = $this->getFile();
+		//Agrega el estilo
+		Tag::stylesheetLink('exception');
+		$file = str_replace($_SERVER['DOCUMENT_ROOT'], "", $this->getSafeFile());
+		print "\n<div class='exceptionContainer'>\n";
+		$message = "<div class='exceptionDescription'>";
+		if($this->_isRemote==true){
+			$message.= "Remote &gt; ";
 		}
-		print "\n<div style='background: #FFFFFF; padding: 5px;'>\n";
-		Flash::error(get_class($this).": $this->message ({$this->getCode()})<br>
-		<span style='font-size:12px'>En el archivo <i>{$file}</i> en la l&iacute;nea: <i>{$this->getLine()}</i>");
+		$message.= get_class($this).": $this->message ({$this->getCode()})<br>
+		<span class='exceptionLocation'>En el archivo <i>{$file}</i> en la línea: <i>{$this->getLine()}</i></div>";
+		print $message;
 		$config = CoreConfig::readAppConfig();
 		$activeApp = Router::getApplication();
 		if($this->show_trace==true){
@@ -130,8 +172,8 @@ class CoreException extends Exception {
 						<thead>
 							<th>#</th>
 							<th>Valor</th>
-							<th>M&eacute;todo/Función</th>
-							<th>L&iacute;nea</th>
+							<th>Método/Función</th>
+							<th>Línea</th>
 							<th>Archivo</th>
 							<th>Tiempo</th>
 						</thead>\n";
@@ -179,8 +221,22 @@ class CoreException extends Exception {
 					print "</div>";
 				}
 				$traceback = $this->getTrace();
-				print "<div style='font-size:12px; margin: 5px; border:1px solid #333333; background: #676767; font-family: Lucida Console; margin:10px; color: white; padding: 2px' align='left'>
-				<pre style='font-family: Lucida Console; margin:5px; color: white; font-size: 12px; text-align:left'>";
+				print "<div class='exceptionBacktraceContainer' align='left'>
+				<pre class='exceptionBacktracePre'>";
+
+				//Imprimir Backtrace Remoto
+				if($this->_isRemote==true){
+					$color = '#151515';
+					if(count($this->_remoteBacktrace)){
+						print "<pre class='exceptionRemoteContainer'>";
+						print "<div class='exceptionRemoteTitle'>Remote Backtrace <span class='exceptionActor'>(Actor: ".$this->_remoteActor.")</span></div>";
+						foreach($this->_remoteBacktrace as $remoteTrace){
+							print "<div style='background:#151515;padding:5px;border-bottom:1px solid #323232'>/kef/kumbia-ef/Library/Kumbia/Soap/Client/WebServiceClient.php</div>";
+						}
+						print "</pre>";
+					}
+				}
+
 				if(count($this->extendedBacktrace)>0){
 					$traceback = array_merge($this->extendedBacktrace, $traceback);
 				}
@@ -193,25 +249,33 @@ class CoreException extends Exception {
 				}
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){
-						if(isset($_SERVER['DOCUMENT_ROOT'])){
-							$rfile = str_replace($_SERVER['DOCUMENT_ROOT'], "", $trace['file']);
-						} else {
-							$rfile = $trace['file'];
-						}
-						print $rfile." (".$trace['line'].")\n";
+						$rfile = self::getSafeFileName($trace['file']);
+						print $rfile." <span class='exceptionLine'>(".$trace['line'].")</span>\n";
 						if(strpos($trace['file'], "apps")){
 							$file = $trace['file'];
 							$line = $trace['line'];
-							print "</pre><strong>La excepción se ha generado en el archivo '$rfile' en la l&iacute;nea '$line':</strong><br>";
-							print "<div style='color: #000000; margin: 10px; border: 1px solid #333333; background: #FFFFFF; padding:0px'><table cellspacing='0' cellpadding='0' width='100%'>";
+							print "</pre><span class='exceptionLineNote'>La excepción se ha generado en el archivo '$rfile' en la línea '$line':</span><br/>";
+							print "<div class='exceptionFileViewver'><table cellspacing='0' cellpadding='0' width='100%'>";
 							$lines = file($file);
 							$eline = $line;
+							$className = 'exceptionLineNotActiveOdd';
 							for($i =(($eline-4)<0 ? 0: $eline-4);$i<=($eline+2>count($lines)-1?count($lines)-1:$eline+2);$i++){
-								$cline = str_replace("\t", "&nbsp;", htmlentities($lines[$i], ENT_NOQUOTES));
+								$cline = str_replace("\t", " ", $lines[$i]);
 								if($i==$eline-1){
-									print "<tr><td width='30' style='background:#eaeaea; font-size:12px'><strong>".($i+1).".</strong></td><td><div style='background: #FFDDDD;font-family: Lucida Console; font-size:13px; margin:0px; padding:0px'><strong>$cline</strong></div></td></tr>\n";
+									print "<tr><td width='30' class='exceptionLineTd'>".($i+1).".</td>
+									<td><div  class='exceptionLineActive'>&nbsp;<strong>";
+									print Highlight::getString($cline);
+									print "</strong></div></td></tr>\n";
 								} else {
-									print "<tr><td style='background:#eaeaea; font-size:12px'><strong>".($i+1).".</strong></td><td style='font-family: Lucida Console; font-size:13px;'>&nbsp;$cline</td></tr>";
+									print "<tr><td class='exceptionLineTd'>".($i+1).".</td>
+									<td class='$className'>&nbsp;";
+									print Highlight::getString($cline);
+									print "</td></tr>";
+								}
+								if($className=='exceptionLineNotActiveOdd'){
+									$className = 'exceptionLineNotActiveEven';
+								} else {
+									$className = 'exceptionLineNotActiveOdd';
 								}
 							}
 							print "</table></div><pre style='font-family: Lucida Console; margin:10px; color: white;'>";
@@ -246,7 +310,7 @@ class CoreException extends Exception {
 				/**
 				 * Imprime informacion extra de la excepcion si esta disponible
 				 */
-				if(method_exists($this, "getExceptionInformation")){
+				if(method_exists($this, 'getExceptionInformation')){
 					print $this->getExceptionInformation();
 				}
 
@@ -292,33 +356,77 @@ class CoreException extends Exception {
 					print "</div>";
 				}
 
-				print "<div style='font-size:12px; margin: 0px 15px 0px 15px; padding: 5px; border:1px solid #969696; background: #f2f2f2;' align='left'>";
+				print "<div class='exceptionAditionalInfo' align='left'>";
 				print "<i><strong>Información Adicional:</strong></i><br>";
 				print "<div style='padding: 5px'>";
-				print "<strong>Versión Framework:</strong> ".Core::FRAMEWORK_VERSION."<br>";
-				print "<strong>Nombre de la Instancia:</strong> ".$instanceName."<br>";
-				print "<strong>Fecha del Sistema:</strong> ".date("r")."<br>";
-				print "<strong>Aplicación actual:</strong> ".Router::getApplication()."<br>";
-				print "<strong>Entorno actual:</strong> ".$config->application->mode."<br>";
+				print "<table cellspacing='0' width='100%' cellpadding='3'>
+				<tr class='rowInfoEven'>
+					<td align='right' width='200'><strong>Versión Framework:</strong></td>
+					<td> ".Core::FRAMEWORK_VERSION."</td>
+				</tr>
+				<tr class='rowInfoOdd'>
+					<td align='right'><strong>Nombre de la Instancia:</strong></td>
+					<td>".$instanceName."</td>
+				</tr>
+				<tr class='rowInfoEven'>
+					<td align='right'><strong>Fecha del Sistema:</strong></td
+					><td>".date("r")."</td>
+				</tr>
+				<tr class='rowInfoOdd'>
+					<td align='right'><strong>Aplicación actual:</strong></td>
+					<td>".Router::getApplication()."</td>
+				</tr>
+				<tr class='rowInfoEven'>
+					<td align='right'><strong>Entorno actual:</strong></td>
+					<td>".$config->application->mode."</td>
+				</tr>";
 				$url = Router::getApplication()."/".Router::getController()."/".Router::getAction();
-				print "<strong>Ubicación actual:</strong> ".$url."<br>";
-				print "<strong>Modelos Cargados:</strong> ".join(", ", array_keys(EntityManager::getEntities()))."<br>";
+				print "
+				<tr class='rowInfoOdd'>
+					<td align='right'><strong>Ubicación actual:</strong></td>
+					<td>".$url."</td>
+				</tr>
+				<tr class='rowInfoEven'>
+					<td align='right'><strong>Modelos Cargados:</strong></td>
+					<td>".join(", ", array_keys(EntityManager::getEntities()))."</td>
+				</tr>";
 				if(isset($_SESSION['KMOD'][$instanceName][$activeApp])){
-					print "<strong>Modulos Cargados:</strong> ".join(", ", $_SESSION['KMOD'][$instanceName][$activeApp])."<br>";
+					print "<tr class='rowInfoOdd'>
+						<td align='right'><strong>Modulos Cargados:</strong></td>
+						<td>".join(", ", $_SESSION['KMOD'][$instanceName][$activeApp])."</td>
+					</tr>";
 				}
 				if(isset($_SESSION['KPC'][$instanceName][$activeApp])){
-					print "<strong>Plugins Cargados:</strong> ".join(", ", $_SESSION['KPC'][$instanceName][$activeApp])."<br>";
+					print "<tr class='rowInfoEven'>
+						<td align='right'><strong>Plugins Cargados:</strong></td>
+						<td>".join(", ", $_SESSION['KPC'][$instanceName][$activeApp])."</td>
+					</tr>";
 				}
 				if(isset($_SESSION['session_data'])){
 					if(is_array($_SESSION['session_data'])){
-						print "<strong>Datos de Session:</strong> ".join(", ", $_SESSION['session_data'])."<br>";
+						print "<tr class='rowInfoOdd'>
+							<td align='right'><strong>Datos de Session:</strong></td
+							><td>".join(", ", $_SESSION['session_data'])."</td>
+						</tr>";
 					} else {
-						print "<strong>Datos de Session:</strong> ".print_r(unserialize($_SESSION['session_data']), 1)."<br>";
+						print "<tr class='rowInfoOdd'>
+							<td align='right'><strong>Datos de Session:</strong></td>
+							<td>".print_r(unserialize($_SESSION['session_data']), 1)."</td>
+						</tr>";
 					}
 				}
-				print "<strong>Memoria Utilizada:</strong> ".(Helpers::toHuman(memory_get_peak_usage(true)))."<br>";
-				print "<strong>Memoria Actual:</strong> ".(Helpers::toHuman(memory_get_usage()))."<br>";
-				print "<strong>Tiempo empleado para atender la petición:</strong> ".(round($requestTime-$_SERVER['REQUEST_TIME'], 3))." segs <br>";
+				print "<tr class='rowInfoEven'>
+					<td align='right'><strong>Memoria Utilizada:</strong></td>
+					<td>".(Helpers::toHuman(memory_get_peak_usage(true)))."</td>
+				</tr>
+				<tr class='rowInfoOdd'>
+					<td align='right'><strong>Memoria Actual:</strong></td>
+					<td>".(Helpers::toHuman(memory_get_usage()))."</td>
+				</tr>
+				<tr class='rowInfoEven'>
+					<td align='right'><strong>Tiempo empleado para<br/>atender la petición:</strong></td>
+					<td>".(round($requestTime-$_SERVER['REQUEST_TIME'], 3))." segs </td>
+				</tr></table>";
 				print "</div></div>";
 			} else {
 				$traceback = $this->getTrace();
@@ -454,6 +562,8 @@ class CoreException extends Exception {
 		$userInputNode = $xml->createElement('user-input');
 		$postDataNode = $xml->createElement('post-data');
 		$queryDataNode = $xml->createElement('query-data');
+
+		//Mostrar datos recibidos por POST
 		foreach($_POST as $key => $value){
 			$postNode = $xml->createElement('post-data');
 			$keyNode = $xml->createElement('key', $key);
@@ -462,6 +572,8 @@ class CoreException extends Exception {
 			$postNode->appendChild($valueNode);
 			$postDataNode->appendChild($postNode);
 		}
+
+		//Mostrar datos recibidos por GET
 		foreach($_GET as $key => $value){
 			$queryNode = $xml->createElement('query-data');
 			$keyNode = $xml->createElement('key', $key);
@@ -503,6 +615,32 @@ class CoreException extends Exception {
 		$root->appendChild($headersNode);
 		$root->appendChild($userInputNode);
 		return $xml->saveXML();
+	}
+
+	/**
+	 * Obtiene el nombre del archivo que generó la excepción eliminando
+	 * la ruta absoluta que muestre su ubicación real
+	 *
+	 * @return string
+	 */
+	public function getSafeFile(){
+		return self::getSafeFileName($this->getFile());
+	}
+
+	/**
+	 *
+	 * Obtiene el nombre del archivo que generó la excepción eliminando
+	 * la ruta absoluta que muestre su ubicación real
+	 *
+	 * @param string $filePath
+	 * @return string
+	 */
+	public static function getSafeFileName($filePath){
+		if(isset($_SERVER['DOCUMENT_ROOT'])){
+			return str_replace($_SERVER['DOCUMENT_ROOT'], '', $filePath);
+		} else {
+			return str_replace(getcwd(), '', $filePath);
+		}
 	}
 
 	/**

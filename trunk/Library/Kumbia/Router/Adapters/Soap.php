@@ -73,7 +73,31 @@ class SoapRouter implements RouterInterface {
 	 * @param string $xsdDataType
 	 */
 	private function _isTypeLiteral($xsdDataType){
-		return in_array($xsdDataType, array('xsd:string', 'xsd:boolean', 'xsd:int'));
+		return in_array($xsdDataType, array('xsd:string', 'xsd:boolean', 'xsd:int', 'xsd:float'));
+	}
+
+	/**
+	 * Convierte el valor XSD a un valor nativo PHP
+	 *
+	 * @param string $xsdDataType
+	 * @param mixed $returnValue
+	 * @return mixed
+	 */
+	private function _decodeXSDType($xsdDataType, $returnValue){
+		switch($xsdDataType){
+			case 'xsd:string':
+				return (string) $returnValue;
+				break;
+			case 'xsd:int':
+				return (int) $returnValue;
+				break;
+			case 'xsd:float':
+				return (float) $returnValue;
+				break;
+			case 'xsd:boolean':
+				return $returnValue=='true' ? true : false;
+				break;
+		}
 	}
 
 	/**
@@ -84,21 +108,23 @@ class SoapRouter implements RouterInterface {
 	public function handleRouting(){
 		$request = ControllerRequest::getInstance();
 		$soapRawRequest = $request->getRawBody();
-
-		file_put_contents('soap.'.microtime(true).'.xml', $_SERVER['HTTP_SOAPACTION'].$soapRawRequest.print_r($_SERVER, true));
-
 		$domDocument = new DOMDocument();
-		$domDocument->loadXML($soapRawRequest);
-		$soapAction = explode("#", str_replace("\"", "", $_SERVER['HTTP_SOAPACTION']));
+		$xmlValidation = @$domDocument->loadXML($soapRawRequest);
+		if($xmlValidation==false){
+			$soapException = new SoapException($php_errormsg);
+			$soapException->setFaultCode('Sender');
+			throw $soapException;
+		}
+		$soapAction = explode('#', str_replace("\"", "", $_SERVER['HTTP_SOAPACTION']));
 		foreach($domDocument->getElementsByTagNameNS($soapAction[0], $soapAction[1]) as $domElement){
 			$parameters = array();
 			foreach($domElement->childNodes as $actionParam){
 				if($actionParam->nodeType==1){
-					$paramType = $actionParam->getAttributeNS($this->_xmlSchemaNamespace, "type");
+					$paramType = $actionParam->getAttributeNS($this->_xmlSchemaNamespace, 'type');
 					if($paramType=='ns2:Map'){
 						$parameters[] = $this->_getXSIMap($actionParam);
 					} else {
-						$parameters[] = $actionParam->nodeValue;
+						$parameters[] = $this->_decodeXSDType($paramType, $actionParam->nodeValue);
 					}
 				}
 			}
