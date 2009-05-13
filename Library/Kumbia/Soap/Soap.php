@@ -40,7 +40,14 @@ abstract class Soap {
 	 * @var string
 	 * @staticvar
 	 */
-	private static $_envelopeNS = 'http://schemas.xmlsoap.org/soap/envelope/';
+	private static $_envelopeNS = 'http://www.w3.org/2003/05/soap-envelope';
+
+	/**
+	 * Namespace para información de SoapFaults
+	 *
+	 * @var string
+	 */
+	private static $_faultsNS = 'http://schemas.loudertechnology.com/general/soapFaults';
 
 	/**
 	 * Namespace del XML Schema Instance (xsi)
@@ -95,29 +102,10 @@ abstract class Soap {
 	 * @static
 	 */
 	static public function serverHandler($controller){
-
-		/*$soapOptions = array(
-			'uri' => 'http://app-services',
-			'actor' => "http://{$_SERVER['SERVER_ADDR']}/".Core::getInstancePath()."/".$controller->getControllerName(),
-			'soap_version' => SOAP_1_2,
-			'encoding' => 'UTF-8'
-		);
-		$controllerName = $controller->getControllername();
-		#$soapOptions = $controller->getSoapOptions();
-		self::$_soapServer = new SoapServer(null, $soapOptions);
-		self::$_soapServer->setClass($controllerName."Controller");
-		self::$_soapServer->setPersistence(SOAP_PERSISTENCE_SESSION);
-		$request = ControllerRequest::getInstance();
-		$soapRawRequest = $request->getRawBody();
-		if(preg_match('/ns1:([a-zA-Z0-9]+)/', $soapRawRequest, $nsAction)==true){
-			$soapRequest = str_replace("ns1:{$nsAction[1]}", "ns1:{$nsAction[1]}Action", $soapRawRequest);
-			self::$_soapServer->handle($soapRequest);
-		} else {
-			self::$_soapServer->handle();
-		}*/
-
+		$response = ControllerResponse::getInstance();
+		$response->setContentType('application/soap+xml; charset=utf-8');
 		$soapAction = explode('#', str_replace('"', '', $_SERVER['HTTP_SOAPACTION'])); ;
-		$serviceNamespace = 'http://app-services';
+		$serviceNamespace = $soapAction[0];
 		$bodyElement = self::_createSOAPEnvelope();
 		self::$_domDocument->createAttributeNS($serviceNamespace, 'ns1:dummy');
 		self::$_domDocument->createAttributeNS('http://www.w3.org/2001/XMLSchema', 'xsd:dummy');
@@ -137,8 +125,8 @@ abstract class Soap {
 	/**
 	 * Devuelve el tipo de dato XSD de acuerdo al tipo de dato Nativo en PHP
 	 *
-	 * @param string $nativeDataType
-	 * @return string
+	 * @param 	string $nativeDataType
+	 * @return 	string
 	 */
 	private static function _getDataXSD($nativeDataType){
 		if($nativeDataType=='int'){
@@ -160,21 +148,33 @@ abstract class Soap {
 			$valueReturned = Dispatcher::getValueReturned();
 		}
 		if(!is_array($valueReturned)){
+			if(is_resource($valueReturned)){
+				throw new SoapException('Los recursos no pueden ser enviados como parte de un mensaje SOAP');
+			}
 			$element = self::$_domDocument->createElement($nodeType, $valueReturned);
 			if(is_integer($valueReturned)==true){
-				$element->setAttribute('xsi:type', 'int');
-			}
-			if(is_string($valueReturned)==true){
-				$element->setAttribute('xsi:type', 'string');
-			}
-			if(is_bool($valueReturned)==true){
-				$element->setAttribute('xsi:type', 'boolean');
-				if($valueReturned===false){
-					$stringValue = 'false';
+				$element->setAttribute('xsi:type', 'xsd:int');
+				$element->nodeValue = $valueReturned;
+			} else {
+				if(is_string($valueReturned)==true){
+					$element->setAttribute('xsi:type', 'xsd:string');
+					$element->nodeValue = $valueReturned;
 				} else {
-					$stringValue = 'boolean';
+					if(is_float($valueReturned)==true){
+						$element->setAttribute('xsi:type', 'xsd:float');
+						$element->nodeValue = $valueReturned;
+					} else {
+						if(is_bool($valueReturned)==true){
+							$element->setAttribute('xsi:type', 'xsd:boolean');
+							if($valueReturned===false){
+								$stringValue = 'false';
+							} else {
+								$stringValue = 'boolean';
+							}
+							$element->nodeValue = $stringValue;
+						}
+					}
 				}
-				$element->nodeValue = $stringValue;
 			}
 			return $element;
 		} else {
@@ -217,17 +217,96 @@ abstract class Soap {
 	 * @static
 	 */
 	static public function faultSoapHandler($e, $controller){
-		$response = ControllerResponse::getInstance();
+
+		//Genera una respuesta HTTP de error
+		$controllerResponse = ControllerResponse::getInstance();
+		$controllerResponse->setHeader('X-Application-State: Exception', true);
+		$controllerResponse->setHeader('HTTP/1.1 500 Application Exception', true);
+
 		if(isset($_SERVER['HTTP_SOAPACTION'])){
 			$faultMessage = str_replace('\n', '', html_entity_decode($e->getMessage(), ENT_COMPAT, 'UTF-8'));
-			$response->setResponseType(ControllerResponse::RESPONSE_OTHER);
-			$response->setResponseAdapter('xml');
+			$controllerResponse->setResponseType(ControllerResponse::RESPONSE_OTHER);
+			$controllerResponse->setResponseAdapter('soap');
 			$bodyElement = self::_createSOAPEnvelope();
+			self::$_domDocument->createAttributeNS(self::$_faultsNS, 'fault:dummy');
 			$faultElement = new DOMElement('Fault', '', self::$_envelopeNS);
 			$bodyElement->appendChild($faultElement);
-			$faultElement->appendChild(new DOMElement('faultcode', $e->getCode()));
-			$faultElement->appendChild(new DOMElement('faultstring', $faultMessage));
-			$faultElement->appendChild(new DOMElement('detail', get_class($e)));
+
+			//SOAP 1.1
+			#$faultElement->appendChild(new DOMElement('faultcode', 'Server'));
+			#$faultElement->appendChild(new DOMElement('faultstring', $faultMessage));
+
+			//Código de la excepcion
+			$codeElement = new DOMElement('Code', '', self::$_envelopeNS);
+			$faultElement->appendChild($codeElement);
+
+			if(get_class($e)=='SoapException'){
+				$faultCode = $e->getFaultCode();
+			} else {
+				$faultCode = 'Receiver';
+			}
+			$codeValue = new DOMElement('Value', 'SOAP-ENV:'.$faultCode, self::$_envelopeNS);
+			$codeElement->appendChild($codeValue);
+
+			//Motivo de la excepcion
+			$reasonElement = new DOMElement('Reason', '', self::$_envelopeNS);
+			$faultElement->appendChild($reasonElement);
+			$reasonText = new DOMElement('Text', $e->getMessage(), self::$_envelopeNS);
+			$reasonElement->appendChild($reasonText);
+
+			//Idioma del mensaje
+			$locale = Locale::getApplication();
+			$reasonText->setAttribute('xml:lang', $locale->getRFC4646String());
+
+			//Subcodigo de la excepcion
+			$subcodeElement = new DOMElement('Subcode', '', self::$_envelopeNS);
+			$codeElement->appendChild($subcodeElement);
+			$subcodeValue = new DOMElement('Value', 'fault:'.get_class($e), self::$_envelopeNS);
+			$subcodeElement->appendChild($subcodeValue);
+
+			//Detalle de la excepcion
+			$detailElement = new DOMElement('Detail', '', self::$_envelopeNS);
+			$faultElement->appendChild($detailElement);
+			$faultType = new DOMElement('Type', get_class($e), self::$_faultsNS);
+			$faultCode = new DOMElement('Code', $e->getCode(), self::$_faultsNS);
+			$faultTime = new DOMElement('Time', @date('r'), self::$_faultsNS);
+			$faultFile = new DOMElement('File', $e->getSafeFile(), self::$_faultsNS);
+			$faultLine = new DOMElement('Line', $e->getLine(), self::$_faultsNS);
+
+			$detailElement->appendChild($faultType);
+			$detailElement->appendChild($faultCode);
+			$detailElement->appendChild($faultFile);
+			$detailElement->appendChild($faultLine);
+			$detailElement->appendChild($faultTime);
+
+			//Remote backtrace
+			$config = CoreConfig::readAppConfig();
+			if(isset($config->application->debug)&&$config->application->debug){
+				$faultBacktrace = new DOMElement('Backtrace', '', self::$_faultsNS);
+				$detailElement->appendChild($faultBacktrace);
+				foreach($e->getTrace() as $trace){
+					$faultTrace = new DOMElement('Trace', '', self::$_faultsNS);
+					$faultBacktrace->appendChild($faultTrace);
+					if(isset($trace['file'])){
+						$faultFile = new DOMElement('File', CoreException::getSafeFileName($trace['file']), self::$_faultsNS);
+						$faultTrace->appendChild($faultFile);
+					}
+					if(isset($trace['line'])){
+						$faultLine = new DOMElement('Line', $trace['line'], self::$_faultsNS);
+						$faultTrace->appendChild($faultLine);
+					}
+					if(!isset($trace['class'])){
+						$trace['class'] = "";
+						$trace['type'] = "";
+					}
+					if(!isset($trace['function'])){
+						$trace['function'] = "";
+					}
+					$functionLocation = $trace['class'].$trace['type'].$trace['function'];
+					$faultFunction = new DOMElement('Function', $functionLocation, self::$_faultsNS);
+					$faultTrace->appendChild($faultFunction);
+				}
+			}
 			print self::$_domDocument->saveXML();
 		}
 	}

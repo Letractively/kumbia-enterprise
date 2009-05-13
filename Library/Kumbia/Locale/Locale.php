@@ -672,6 +672,15 @@ class Locale extends Object {
 	}
 
 	/**
+	 * Devuelve la localización en formato RFC4646
+	 *
+	 * @return string
+	 */
+	public function getRFC4646String(){
+		return str_replace('_', '-', $this->_locale['locale']);
+	}
+
+	/**
 	 * Metodo magico __toString devuelve el identificador de localizacion del objeto
 	 *
 	 * @return string

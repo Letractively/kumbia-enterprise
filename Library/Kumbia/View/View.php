@@ -544,8 +544,7 @@ abstract class View {
 			}
 			$controllerResponse = ControllerResponse::getInstance();
 			$controllerResponse->setHeader('X-Application-State: Exception', true);
-			$controllerResponse->setHeader('HTTP/1.1 510 Application Exception', true);
-
+			$controllerResponse->setHeader('HTTP/1.1 500 Application Exception', true);
 			// Si el encabezado solicita la salida en de la excepcion en XML se realiza asi
 			if(isset($_SERVER['HTTP_X_ACCEPT_CONTENT'])&&$_SERVER['HTTP_X_ACCEPT_CONTENT']=='text/xml'){
 				//Genera una salida XML valida
