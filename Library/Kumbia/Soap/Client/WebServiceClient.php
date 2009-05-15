@@ -51,6 +51,13 @@ class WebServiceClient {
 	private static $_xmlSchemaInstanceNS = 'http://www.w3.org/2001/XMLSchema-instance';
 
 	/**
+	 * Namespace para información de SoapFaults
+	 *
+	 * @var string
+	 */
+	private static $_faultsNS = 'http://schemas.loudertechnology.com/general/soapFaults';
+
+	/**
 	 * DOMDocument Base
 	 *
 	 * @var DOMDocument
@@ -333,6 +340,7 @@ class WebServiceClient {
 	 * @param string $responseBody
 	 */
 	private function _throwSoapFault($responseBody){
+		$this->_transport->getResponseCookies();
 		$this->_domDocument = new DOMDocument();
 		$this->_domDocument->loadXML($responseBody);
 		$subcodeNode = $this->_domDocument->getElementsByTagNameNS(self::$_envelopeNS, 'Subcode');
@@ -355,10 +363,29 @@ class WebServiceClient {
 				}
 			}
 		}
+		$remoteBacktrace = array();
+		$faultDetails = $this->_domDocument->getElementsByTagNameNS(self::$_faultsNS, 'Backtrace');
+		foreach($faultDetails as $backtrace){
+			foreach($backtrace->childNodes as $trace){
+				if($trace->localName=='Trace'){
+					$remoteTrace = array();
+					foreach($trace->childNodes as $detailNode){
+						if($detailNode->localName=='File'){
+							$remoteTrace['file'] = $detailNode->nodeValue;
+						}
+						if($detailNode->localName=='Line'){
+							$remoteTrace['line'] = $detailNode->nodeValue;
+						}
+					}
+					$remoteBacktrace[] = $remoteTrace;
+ 				}
+			}
+		}
 		if(class_exists($exceptionClassName)){
 			$exception = new $exceptionClassName($exceptionMessage);
 			$exception->setRemote(true);
 			$exception->setRemoteActor($this->_options['actor']);
+			$exception->setRemoteTrace($remoteBacktrace);
 			throw $exception;
 		} else {
 			throw new SoapException($exceptionClassName);

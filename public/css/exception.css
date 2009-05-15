@@ -1,5 +1,5 @@
 .exceptionDescription {
-	font-family: sans-serif;
+	font-family: Lucida Grande, sans-serif;
 	background: #B72F09;
 	padding: 10px;
 	font-size: 14px;
@@ -40,6 +40,23 @@
 	text-align: left;
 }
 
+.exceptionBacktraceSimple {
+	font-family: Monaco,Lucida Console;
+	font-size:12px;
+	padding: 5px;
+	border:1px solid #969696;
+	background: #232323;
+	color: #969696;
+	-moz-border-radius: 7px;
+	-webkit-border-radius: 7px;
+	border-radius: 7px;
+	margin: 5px;
+}
+
+.exceptionBacktraceSimple b {
+	color: #f2f2f2;
+}
+
 .exceptionRemoteContainer {
 	padding-left: 20px;
 	font-family: Monaco,'Consolas','Lucida Console','Courier New',monospace;
@@ -67,7 +84,7 @@
 }
 
 .exceptionLineNote {
-	font-family: sans-serif;
+	font-family: Lucida Grande, sans-serif;
 	font-size: 12px;
 	color: #F4FCCA;
 	font-weight: bold;
@@ -140,7 +157,7 @@
 }
 
 .tString {
-	color: #588E13;
+	color: #85B362;
 }
 
 .tNumber {
@@ -165,4 +182,83 @@
 
 .tOtherSentence {
 	color: #ffffff;
+}
+
+.debugInformation th {
+
+}
+
+div.exceptionExtra {
+	padding: 5px;
+	padding-bottom: 0px;
+	margin: 5px;
+}
+
+div.exceptionExtra b {
+	font-size: 11px;
+}
+
+div.exceptionExtra td {
+	border: 1px solid #eaeaea;
+	font-size: 10px;
+}
+
+.exceptionCode {
+	font-family: "Lucida Console";
+	font-size: 11px;
+}
+
+.exceptionLeftColumn {
+	background: #f2f2f2;
+}
+
+div.debugInformation {
+	padding: 5px;
+	padding-bottom: 0px;
+	margin: 5px;
+}
+
+div.debugInformation strong {
+	font-size: 11px;
+}
+
+div.debugInformation pre {
+	font-size: 11px;
+	padding: 0px;
+	margin: 0px;
+}
+
+div.debugInformation td, div.debugInformation th {
+	font-size: 11px;
+	padding: 2px;
+	background: #111111;
+	color: #AAAAAA;
+}
+
+div.debugInformation td {
+	border-bottom: 1px dotted #333333;
+}
+
+div.debugInformation th.debugThEven {
+	background: #3769A0;
+	color: white;
+	font-size: 11px;
+	padding: 3px;
+}
+
+div.debugInformation th.debugThOdd {
+	background: #2B5481;
+	color: white;
+	font-size: 11px;
+	padding: 3px;
+}
+
+.exceptionRemoteTrace {
+	background:#151515;
+	padding:5px;
+	border-bottom:1px solid #323232;
+}
+
+.exceptionRemoteLine {
+	color: #969696;
 }

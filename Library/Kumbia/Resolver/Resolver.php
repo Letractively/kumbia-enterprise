@@ -84,6 +84,7 @@ abstract class Resolver {
 			$servicePath = str_replace('.', '/', $serviceName);
 			$serviceURL = 'http://'.$_SERVER['HTTP_HOST'].$instancePath.$activeApp.'/'.$servicePath;
 			self::$_resolvedServices[$serviceName] = new WebServiceClient(array(
+				'actor' => 'http://app-services/'.$serviceName,
 				'location' => $serviceURL,
 				'compression' => 0
 			));

@@ -216,11 +216,11 @@ class ControllerRequest extends Object {
 	public function getParamPost($paramName){
 		if(func_num_args()>1){
 			$args = func_get_args();
-			$args[0] = isset($_POST[$paramName]) ? $_POST[$paramName] : "";
+			$args[0] = isset($_POST[$paramName]) ? $_POST[$paramName] : '';
 			$filter = new Filter();
-			return call_user_func_array(array($filter, "applyFilter"), $args);
+			return call_user_func_array(array($filter, 'applyFilter'), $args);
 		}
-		return isset($_POST[$paramName]) ? $_POST[$paramName] : "";
+		return isset($_POST[$paramName]) ? $_POST[$paramName] : '';
 	}
 
 	/**
@@ -619,6 +619,26 @@ class ControllerRequest extends Object {
 			$i++;
 		}
 		return $selectedCharsetName;
+	}
+
+	/**
+	 * Indica si se está solicitando contenido estático
+	 *
+	 * @return boolean
+	 */
+	public function isRequestingStaticContent(){
+		$staticMime = array(
+			'text/javascript',
+			'text/css',
+			'image/gif',
+			'image/png',
+			'image/jpeg',
+			'application/x-javascript'
+		);
+		foreach($this->getAcceptableContent() as $mime){
+			return in_array($mime['accept'], $staticMime);
+		}
+		return false;
 	}
 
 }

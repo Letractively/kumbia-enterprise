@@ -31,8 +31,13 @@ class Highlight {
 		$tokens = token_get_all('<?php '.$phpCode);
 		$numberTokens = count($tokens);
 		$highString = '';
-		for($i=0;$i<$numberTokens;$i++){
+		for($i=1;$i<$numberTokens;$i++){
 			$token = $tokens[$i];
+			if(isset($token[1])){
+				$token[1] = htmlspecialchars($token[1]);
+			} else {
+				$token[0] = htmlspecialchars($token[0]);
+			}
 			if($token[0]==T_COMMENT){
 				$highString.= '<span class="tComment">'.$token[1].'</span>';
 			} else {
