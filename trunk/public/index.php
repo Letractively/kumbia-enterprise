@@ -76,18 +76,11 @@ catch(CoreException $e){
 	}
 	catch(Exception $e){
 		//Pueden ocurrir mas excepciones en los componentes de inicialización
-		ob_start();
-		Flash::error(get_class($e).': '.$e->getMessage()." ".$e->getFile()."(".$e->getLine().")");
-		print '<b>Backtrace:</b><br/>'."\n";
-		foreach($e->getTrace() as $debug){
-			print $debug['file'].' ('.$debug['line'].") <br/>\n";
-		}
-		View::setContent(ob_get_contents());
-		ob_end_clean();
-		View::xhtmlTemplate('white');
+		CoreException::showSimpleMessage($e);
 	}
 }
 catch(Exception $e){
+	//Se trata de mostrar la excepción de la forma mas segura posible
 	print 'Exception: '.$e->getMessage();
 	foreach(debug_backtrace() as $debug){
 		print $debug['file'].' ('.$debug['line'].") <br>\n";

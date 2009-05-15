@@ -137,6 +137,15 @@ class CoreException extends Exception {
 	}
 
 	/**
+	 * Establece el sistema de traza remoto
+	 *
+	 * @param array $trace
+	 */
+	public function setRemoteTrace($trace){
+		$this->_remoteBacktrace = $trace;
+	}
+
+	/**
 	 * Genera la salida de la excepcion
 	 *
 	 * @access public
@@ -175,12 +184,12 @@ class CoreException extends Exception {
 					print "<strong>Datos de Debug:</strong>";
 					print "<table cellspacing='0' width='100%' align='center'>
 						<thead>
-							<th>#</th>
-							<th>Valor</th>
-							<th>Método/Función</th>
-							<th>Línea</th>
-							<th>Archivo</th>
-							<th>Tiempo</th>
+							<th class='debugThOdd'>#</th>
+							<th class='debugThEven'>Valor</th>
+							<th class='debugThOdd'>Método/Función</th>
+							<th class='debugThEven'>Línea</th>
+							<th class='debugThOdd'>Archivo</th>
+							<th class='debugThEven'>Tiempo</th>
 						</thead>\n";
 					$i = 1;
 					foreach($debugMessages as $message){
@@ -236,7 +245,9 @@ class CoreException extends Exception {
 						print "<pre class='exceptionRemoteContainer'>";
 						print "<div class='exceptionRemoteTitle'>Remote Backtrace <span class='exceptionActor'>(Actor: ".$this->_remoteActor.")</span></div>";
 						foreach($this->_remoteBacktrace as $remoteTrace){
-							print "<div style='background:#151515;padding:5px;border-bottom:1px solid #323232'>/kef/kumbia-ef/Library/Kumbia/Soap/Client/WebServiceClient.php</div>";
+							if(isset($remoteTrace['file'])){
+								print "<div class='exceptionRemoteTrace'>{$remoteTrace['file']} <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
+							}
 						}
 						print "</pre>";
 					}
@@ -289,16 +300,15 @@ class CoreException extends Exception {
 				}
 				print "</div>";
 
-
 				$debugMemory = Debug::getMemory();
 				if(count($debugMemory)>0){
 					print "<div class='debugInformation'>\n";
 					print "<strong>Datos de la Memoria:</strong>";
 					print "<table cellspacing='0' width='100%' align='center'>
 						<thead>
-							<th>#</th>
-							<th>Variable</th>
-							<th>Valor</th>
+							<th class='debugThOdd'>#</th>
+							<th class='debugThEven'>Variable</th>
+							<th class='debugThOdd'>Valor</th>
 						</thead>\n";
 					$i = 1;
 					foreach($debugMemory as $varname => $value){
@@ -327,10 +337,10 @@ class CoreException extends Exception {
 					print "<strong>Datos de Entrada:</strong>";
 					print "<table cellspacing='0' width='100%' align='center'>
 						<thead>
-							<th>Tipo</th>
-							<th>Nombre</th>
-							<th>Valor</th>
-							<th>Tipo de Dato PHP</th>
+							<th class='debugThOdd'>Tipo</th>
+							<th class='debugThEven'>Nombre</th>
+							<th class='debugThOdd'>Valor</th>
+							<th class='debugThEven'>Tipo de Dato PHP</th>
 					</thead>\n";
 					unset($_GET['_url']);
 					foreach($_GET as $key => $value){
@@ -470,6 +480,41 @@ class CoreException extends Exception {
 			}
 		}
 		print "</div>";
+	}
+
+	/**
+	 * Genera una presentación sencilla para excepciones en la inicialización
+	 *
+	 * @param Exception $e
+	 */
+	public static function showSimpleMessage($e){
+		//Agrega el estilo
+		Tag::stylesheetLink('exception');
+
+		//Titulo de la pantalla
+		Tag::setDocumentTitle(get_class($e).' - Kumbia Enterprise Framework');
+
+		ob_start();
+		$file = CoreException::getSafeFileName($e->getFile());
+		print "\n<div class='exceptionContainer'>\n";
+		$message = "<div class='exceptionDescription'>".
+		get_class($e).": {$e->getMessage()} ({$e->getCode()})<br>
+		<span class='exceptionLocation'>En el archivo <i>{$file}</i> en la línea: <i>{$e->getLine()}</i></div>";
+		print $message;
+
+		print "<div class='exceptionBacktraceSimple'>";
+		print '<b>Backtrace:</b><br/>'."\n";
+		foreach($e->getTrace() as $debug){
+			if(isset($debug['file'])){
+				print CoreException::getSafeFileName($debug['file']).' ('.$debug['line'].") <br/>\n";
+			}
+		}
+		print "</div>";
+		print "</div>";
+		View::setContent(ob_get_contents());
+		ob_end_clean();
+		View::xhtmlTemplate('white');
+
 	}
 
 	/**

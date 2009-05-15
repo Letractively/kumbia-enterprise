@@ -75,7 +75,7 @@ class SocketsCommunicator {
 	 *
 	 * @var array
 	 */
-	private $_headers = array("Accept" => "*/*");
+	private $_headers = array('Accept' => '*/*');
 
 	/**
 	 * Response status de la respuesta
@@ -252,7 +252,6 @@ class SocketsCommunicator {
 		} else {
 			$this->_httpRequest.="\r\n";
 		}
-		#print $this->_httpRequest;
 		fwrite($this->_socketHandler, $this->_httpRequest);
 		$response = '';
 		$header = true;
@@ -311,6 +310,24 @@ class SocketsCommunicator {
 	 */
 	public function getResponseCode(){
 		return $this->_responseCode;
+	}
+
+	/**
+	 * Devuelve las COOKIES enviadas por el servidor
+	 *
+	 * @return array
+	 */
+	public function getResponseCookies(){
+		if(isset($this->_responseHeaders['Set-Cookie'])){
+			$responseCookies = array();
+			$cookies = explode(';', $this->_responseHeaders['Set-Cookie']);
+			foreach($cookies as $cookie){
+				$cook = explode('=', $cookie);
+				$responseCookies[$cook[0]] = $cook[1];
+			}
+			return $responseCookies;
+		}
+		return array();
 	}
 
 }

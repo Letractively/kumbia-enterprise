@@ -177,6 +177,7 @@ abstract class Core {
 			/**
 		 	 * Comprueba la version correcta del Framework, si es menor a 5.2 genera una excepción
 			 */
+			Facility::setFacility(Facility::FRAMEWORK_CORE);
 			if(version_compare(PHP_VERSION, '5.2.0', '<')){
 				$message = CoreLocale::getErrorMessage(-10, PHP_VERSION);
 				throw new CoreException($message, -10);
@@ -185,6 +186,7 @@ abstract class Core {
 			 * Si el archivo public/temp no se puede escribir lanza una excepcion
 			 */
 			if(!is_writable('public/temp')){
+				Facility::setFacility(Facility::FRAMEWORK_CORE);
 				$message = CoreLocale::getErrorMessage(-11);
 				throw new CoreException($message, -11);
 			}
