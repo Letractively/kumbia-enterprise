@@ -1902,7 +1902,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 							}
 						} else {
 							if($dataType[$field]=='date'){
-								$values[] = $this->_db->getDateUsingFormat(addslashes($this->$field));
+								if(is_null($this->$field)||$this->$field===''){
+									$values[] = 'NULL';
+								} else {
+									$values[] = $this->_db->getDateUsingFormat(addslashes($this->$field));
+								}
 							} else {
 								if(is_null($this->$field)){
 									$values[] = 'NULL';
