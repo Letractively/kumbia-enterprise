@@ -72,6 +72,11 @@ class CurrencyFormat {
 		}
 	}
 
+	/**
+	 * Establece el patron
+	 *
+	 * @param double $currency
+	 */
 	public function setPattern($currency){
 		if(preg_match('/0'.$currency['decimal'].'([0]+)/', $currency['pattern'], $matches)){
 			$decimalPlaces = strlen($matches[1]);
@@ -83,11 +88,31 @@ class CurrencyFormat {
 		$this->_decimalPlaces = $decimalPlaces;
 	}
 
+	/**
+	 * Obtiene la cantidad formateada monetariamente
+	 *
+	 * @param double $quantity
+	 */
 	public function toCurrency($quantity){
 		$quantity = LocaleMath::round($quantity, $this->_decimalPlaces);
 		$this->_quantity = number_format($quantity, $this->_decimalPlaces, $this->_decimalSeparator, $this->_thousandsSeparator);
 	}
 
+	/**
+	 * Obtiene la cantidad formateada numericamente
+	 *
+	 * @param double $quantity
+	 */
+	public function toNumeric($quantity){
+		$quantity = LocaleMath::round($quantity, $this->_decimalPlaces);
+		$this->_quantity = number_format($quantity, $this->_decimalPlaces, $this->_decimalSeparator, $this->_thousandsSeparator);
+	}
+
+	/**
+	 * Obtiene la cantidad formateada
+	 *
+	 * @return string
+	 */
 	public function getQuantity(){
 		return $this->_quantity;
 	}

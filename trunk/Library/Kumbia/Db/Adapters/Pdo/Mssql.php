@@ -277,4 +277,13 @@ class DbPdoMsSQL extends DbPDO {
 		return false;
 	}
 
+	/**
+	 * Indica las extensiones PHP requeridas para utilizar el adaptador
+	 *
+	 * @return string
+	 */
+	public static function getPHPExtensionRequired(){
+		return 'pdo_odbc';
+	}
+
 }

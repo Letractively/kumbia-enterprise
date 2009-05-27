@@ -275,6 +275,13 @@ class DbPdoOracle extends DbPDO {
 		return $final_describe;
 	}
 
-}
+	/**
+	 * Indica las extensiones PHP requeridas para utilizar el adaptador
+	 *
+	 * @return string
+	 */
+	public static function getPHPExtensionRequired(){
+		return 'pdo_oracle';
+	}
 
-?>
+}

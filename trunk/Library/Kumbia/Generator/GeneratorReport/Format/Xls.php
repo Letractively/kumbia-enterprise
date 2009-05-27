@@ -41,7 +41,7 @@ function xls($result, $sumArray, $title, $weightArray, $headerArray){
 
 	$file = md5(mt_rand(1, 10000));
 	$config = CoreConfig::readAppConfig();
-	$active_app = Core::getActiveApplication();
+	$active_app = Router::getApplication();
 
 	$workbook = new Spreadsheet_Excel_Writer("public/temp/$file.xls");
 	$worksheet = $workbook->addWorksheet();

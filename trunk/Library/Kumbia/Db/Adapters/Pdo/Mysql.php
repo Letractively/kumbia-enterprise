@@ -335,4 +335,13 @@ class DbPdoMySQL extends DbPDO {
 		return true;
 	}
 
+	/**
+	 * Indica las extensiones PHP requeridas para utilizar el adaptador
+	 *
+	 * @return string
+	 */
+	public static function getPHPExtensionRequired(){
+		return 'pdo_mysql';
+	}
+
 }

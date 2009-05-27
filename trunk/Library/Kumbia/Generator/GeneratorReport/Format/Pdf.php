@@ -50,7 +50,7 @@ class PDF extends PdfDocument {
 	public function Footer(){
 
 		$config = CoreConfig::readAppConfig();
-		$active_app = Core::getActiveApplication();
+		$active_app = Router::getApplication();
 
 		//Posición: a 1,5 cm del final
 		$this->setY(-21);

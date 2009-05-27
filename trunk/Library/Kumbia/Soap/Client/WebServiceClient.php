@@ -297,16 +297,20 @@ class WebServiceClient {
 	 * @param string $method
 	 */
 	private function _bindResponseData($method, $responseBody){
-		$this->_domDocument = new DOMDocument();
-		$this->_domDocument->loadXML($responseBody);
-		$localName = $method.'Response';
-		$responseNodes = $this->_domDocument->getElementsByTagNameNS($this->_options['uri'], $localName);
-		foreach($responseNodes as $element){
-			foreach($element->getElementsByTagName('return') as $returnElement){
-				$xsdDataType = $returnElement->getAttributeNS(self::$_xmlSchemaInstanceNS, 'type');
-				return $this->_decodeXSDType($xsdDataType, $returnElement->nodeValue);
+		if($responseBody!=''){
+			$this->_domDocument = new DOMDocument();
+			$this->_domDocument->loadXML($responseBody);
+			$localName = $method.'Response';
+			$responseNodes = $this->_domDocument->getElementsByTagNameNS($this->_options['uri'], $localName);
+			foreach($responseNodes as $element){
+				foreach($element->getElementsByTagName('return') as $returnElement){
+					$xsdDataType = $returnElement->getAttributeNS(self::$_xmlSchemaInstanceNS, 'type');
+					return $this->_decodeXSDType($xsdDataType, $returnElement->nodeValue);
 
+				}
 			}
+		} else {
+			throw new SoapException('El mensaje SOAP fue vacio');
 		}
 	}
 

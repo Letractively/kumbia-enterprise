@@ -407,7 +407,7 @@ class Locale extends Object {
 	}
 
 	/**
-	 * Devuelve el formato de moneda
+	 * Devuelve el formato monetario
 	 *
 	 * @return string
 	 */
@@ -434,7 +434,39 @@ class Locale extends Object {
 			}
 			return $currency;
 		} else {
-			throw new LocaleException('El formato de fecha "'.$type."' no existe");
+			throw new LocaleException('El formato monetario "'.$type."' no existe");
+		}
+	}
+
+	/**
+	 * Devuelve el formato numerico
+	 *
+	 * @return string
+	 */
+	public function getNumericFormat(){
+		$data = $this->_getLocaleData();
+		$path = '/ldml/numbers/currencyFormats/currencyFormatLength/currencyFormat/pattern';
+		$currencyPattern = $data->queryLanguage($this->getLanguage(), $path);
+		$currency = array();
+		if($currencyPattern->length>0){
+			$currency['pattern'] = $currencyPattern->item(0)->nodeValue;
+			$path = '/ldml/numbers/symbols/decimal';
+			$decimalSymbol = $data->queryLanguage($this->getLanguage(), $path);
+			if($decimalSymbol->length>0){
+				$currency['decimal'] = $decimalSymbol->item(0)->nodeValue;
+			} else {
+				$currency['decimal'] = ',';
+			}
+			$path = '/ldml/numbers/symbols/group';
+			$groupSymbol = $data->queryLanguage($this->getLanguage(), $path);
+			if($groupSymbol->length>0){
+				$currency['group'] = $groupSymbol->item(0)->nodeValue;
+			} else {
+				$currency['group'] = '.';
+			}
+			return $currency;
+		} else {
+			throw new LocaleException('El formato numerico "'.$type."' no existe");
 		}
 	}
 
@@ -688,5 +720,22 @@ class Locale extends Object {
 	public function __toString(){
 		return $this->_locale['locale'];
 	}
+
+	public static function round($x){
+		return LocaleMath::round($x, 0);
+	}
+
+	public static function money($x){
+		return $x;
+	}
+
+	public static function formatDate($x){
+		return $x;
+	}
+
+	public static function number($x){
+		return $x;
+	}
+
 
 }

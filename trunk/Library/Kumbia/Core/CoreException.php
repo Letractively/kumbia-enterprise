@@ -256,7 +256,7 @@ class CoreException extends Exception {
 				if(count($this->extendedBacktrace)>0){
 					$traceback = array_merge($this->extendedBacktrace, $traceback);
 				}
-				if(strpos($this->getFile(), "apps")){
+				if(strpos($this->getFile(), 'apps')){
 					$firstLine = array(array(
 						'file' => $this->getFile(),
 						'line' => $this->getLine()
@@ -276,16 +276,16 @@ class CoreException extends Exception {
 							$eline = $line;
 							$className = 'exceptionLineNotActiveOdd';
 							for($i =(($eline-4)<0 ? 0: $eline-4);$i<=($eline+2>count($lines)-1?count($lines)-1:$eline+2);$i++){
-								$cline = str_replace("\t", " ", $lines[$i]);
+								$cline = str_replace("\t", "&nbsp;", htmlentities($lines[$i]));
 								if($i==$eline-1){
 									print "<tr><td width='30' class='exceptionLineTd'>".($i+1).".</td>
 									<td><div  class='exceptionLineActive'>&nbsp;<strong>";
-									print Highlight::getString($cline);
+									print $cline;
 									print "</strong></div></td></tr>\n";
 								} else {
 									print "<tr><td class='exceptionLineTd'>".($i+1).".</td>
 									<td class='$className'>&nbsp;";
-									print Highlight::getString($cline);
+									print $cline;
 									print "</td></tr>";
 								}
 								if($className=='exceptionLineNotActiveOdd'){

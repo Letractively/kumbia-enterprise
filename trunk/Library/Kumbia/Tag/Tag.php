@@ -968,16 +968,26 @@ abstract class Tag {
 	 * @static
 	 */
 	public static function javascriptBase(){
+		$path = Core::getInstancePath();
+		$code = "<script type='text/javascript' src='".$path."javascript/core/base.js'></script>\r\n";
+		$code.= "<script type='text/javascript' src='".$path."javascript/core/validations.js'></script>\r\n";
+		$code.= Tag::javascriptLocation();
+		return $code;
+	}
+
+	/**
+	 * Imprime la ubicación javascript
+	 *
+	 * @return string
+	 */
+	public static function javascriptLocation(){
 		$application = Router::getActiveApplication();
 		$controllerName = Router::getController();
 		$actionName = Router::getAction();
 		$module = Router::getModule();
 		$id = Router::getId();
 		$path = Core::getInstancePath();
-		$code = "<script type='text/javascript' src='".$path."javascript/core/base.js'></script>\r\n";
-		$code.= "<script type='text/javascript' src='".$path."javascript/core/validations.js'></script>\r\n";
-		$code.= "<script type='text/javascript' src='".$path."javascript/core/main.php?app=$application&module=$module&path=".urlencode($path)."&controller=$controllerName&action=$actionName&id=$id'></script>\r\n";
-		return $code;
+		return "<script type='text/javascript' src='".$path."javascript/core/main.php?app=$application&module=$module&path=".urlencode($path)."&controller=$controllerName&action=$actionName&id=$id'></script>\r\n";
 	}
 
 	/**
@@ -1104,9 +1114,9 @@ abstract class Tag {
 		$code = "";
 		if(!isset($params['src'])||!$params['src']){
 			$instancePath = Core::getInstancePath();
-			$code.="<img src='{$instancePath}img/{$params[0]}' ";
+			$code.="<img src=\"{$instancePath}img/{$params[0]}\" ";
 		} else {
-			$code.="<img src='{$params['src']}' ";
+			$code.="<img src=\"{$params['src']}\" ";
 			unset($params['src']);
 		}
 		if(!isset($params['alt'])||!$params['alt']) {
@@ -1122,7 +1132,7 @@ abstract class Tag {
 				}
 			}
 		}
-		$code.= "/>\r\n";
+		$code.= "/>";
 		return $code;
 	}
 
@@ -1887,7 +1897,10 @@ abstract class Tag {
 	 * @static
 	 */
 	static public function buttonToAction($caption, $action, $classCSS=''){
-		return "<input type='button' class='$classCSS' onclick='window.location=\"".Utils::getKumbiaUrl($action)."\"' value='$caption' />";
+		if($classCSS!=''){
+			$classCSS = "class='$classCSS'";
+		}
+		return "<input type='button' $classCSS onclick='window.location=\"".Utils::getKumbiaUrl($action)."\"' value='$caption' />";
 	}
 
 	/**
