@@ -66,7 +66,7 @@ abstract class Resolver {
 		} else {
 			$contextId = $_SESSION['KRS'][$instanceName][$activeApp][$serviceName];
 		}
-		self::$_resolvedServices[$serviceName]->__setCookie('PHPSESSID', $contextId);
+		#self::$_resolvedServices[$serviceName]->__setCookie('PHPSESSID', $contextId);
 	}
 
 	/**

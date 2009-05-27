@@ -797,6 +797,19 @@ class Controller extends ControllerBase {
 	}
 
 	/**
+	 * Carga los modelos como propiedades
+	 *
+	 */
+	public function loadModel(){
+		foreach(func_get_args() as $model){
+			$entity = EntityManager::getEntityInstance($model);
+			$this->_settingLock = true;
+			$this->$model = $entity;
+			$this->_settingLock = false;
+		}
+	}
+
+	/**
 	 * Obtiene una instancia de un servicio web del contenedor ó mediante Naming Directory
 	 *
 	 * @param 	string $serviceName

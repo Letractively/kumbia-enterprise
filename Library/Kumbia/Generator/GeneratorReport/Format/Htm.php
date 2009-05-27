@@ -33,7 +33,7 @@
 function htm($result, $sumArray, $title, $weightArray, $headerArray){
 
 	$config = CoreConfig::readAppConfig();
-	$active_app = Core::getActiveApplication();
+	$active_app = Router::getApplication();
 	$file = md5(uniqid());
 
 	$content = "

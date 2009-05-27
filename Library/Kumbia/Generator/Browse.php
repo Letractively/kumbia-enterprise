@@ -189,8 +189,11 @@ abstract class Browse {
 						$alias = "";
 					}
 					if(strpos($component['detailField'], "(")){
-						$browseSelect.=$component['detailField']." as $name, $source.$name as pk_$name";
-						$browseLike.=" or {$component['detailField']} like '%{$_GET['q']}%'";
+						$browseSelect.=$component['detailField']." AS $name, $source.$name as pk_$name";
+						if(!isset($_GET['q'])){
+							$_GET['q'] = '';
+						}
+						$browseLike.=" OR {$component['detailField']} LIKE '%{$_GET['q']}%'";
 					} else {
 						if(!$alias){
 							$browseSelect.=$component['foreignTable'].".".$component['detailField']." as $name, $source.$name as pk_$name";
@@ -203,15 +206,15 @@ abstract class Browse {
 					}
 					if($component['column_relation']){
 						if($alias){
-							$browseWhere.=" and ".$alias.".".$component['column_relation']." = ".$form['source'].".".$name;
+							$browseWhere.=" AND ".$alias.".".$component['column_relation']." = ".$form['source'].".".$name;
 						} else {
-							$browseWhere.=" and ".$component['foreignTable'].".".$component['column_relation']." = ".$form['source'].".".$name;
+							$browseWhere.=" AND ".$component['foreignTable'].".".$component['column_relation']." = ".$form['source'].".".$name;
 						}
 					} else {
-						$browseWhere.=" and ".$component['foreignTable'].".".$name." = ".$form['source'].".".$name;
+						$browseWhere.=" AND ".$component['foreignTable'].".".$name." = ".$form['source'].".".$name;
 					}
 					if(isset($component["whereCondition"])&&$component['whereCondition']){
-						$browseWhere.=" and ".$component['whereCondition'];
+						$browseWhere.=" AND ".$component['whereCondition'];
 					}
 				}
 			} else {

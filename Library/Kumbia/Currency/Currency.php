@@ -137,6 +137,14 @@ class Currency {
 		}
 	}
 
+	/**
+	 * Aplica el formato a la salida
+	 *
+	 * @param	string $format
+	 * @param	int $quantity
+	 * @param	string $codeISO
+	 * @return	string
+	 */
 	private function _applyFormat($format, $quantity, $codeISO){
 		if(strpos($format, '%symbol%')!==false){
 			$format = str_replace('%symbol%', $this->getMoneySymbol($codeISO), $format);
@@ -176,8 +184,8 @@ class Currency {
 	/**
 	 * Obtiene el codigo ISO de la moneda utilizada
 	 *
-	 * @param string $codeISO
-	 * @return string
+	 * @param	string $codeISO
+	 * @return	string
 	 */
 	public function getMoneyISOCode($codeISO=''){
 		$currency = $this->getCurrency($codeISO);
@@ -187,9 +195,9 @@ class Currency {
 	/**
 	 * Obtiene el simbolo y nombre de la moneda especificada
 	 *
-	 * @param string $codeISO
-	 * @param string $displayType
-	 * @return string
+	 * @param	string $codeISO
+	 * @param	string $displayType
+	 * @return	string
 	 */
 	public function getCurrency($codeISO='', $displayType=''){
 		if($codeISO){
@@ -203,10 +211,10 @@ class Currency {
 	}
 
 	/**
-	 * Devuelve una cantidad
+	 * Devuelve una cantidad monetaria formateada
 	 *
-	 * @param double $quantity
-	 * @return string
+	 * @param	double $quantity
+	 * @return	string
 	 */
 	public static function money($quantity){
 		$locale = Locale::getApplication();
@@ -215,6 +223,22 @@ class Currency {
 			self::$_currencyFormater = new CurrencyFormat($pattern, $quantity);
 		} else {
 			self::$_currencyFormater->toCurrency($pattern, $quantity);
+		}
+		return self::$_currencyFormater->getQuantity();
+	}
+
+	/**
+	 * Devuelve una cantidad numerica formateada
+	 *
+	 * @param string $quantity
+	 */
+	public static function number($quantity){
+		$locale = Locale::getApplication();
+		$pattern = $locale->getNumericFormat();
+		if(self::$_currencyFormater==null){
+			self::$_currencyFormater = new CurrencyFormat($pattern, $quantity);
+		} else {
+			self::$_currencyFormater->toNumeric($pattern, $quantity);
 		}
 		return self::$_currencyFormater->getQuantity();
 	}
@@ -275,81 +299,81 @@ class Currency {
 			if($a<=99){
 				self::$_state = 'DEC';
 				if($a>=22&&$a<=29){
-					return "VENTI".self::valueNumber($a % 10);
+					return 'VENTI'.self::valueNumber($a % 10);
 				}
 				if($a==30){
-					return  "TREINTA";
+					return  'TREINTA';
 				}
 				if($a>=31&&$a<=39){
-					return "TREINTA Y ".self::valueNumber($a % 10);
+					return 'TREINTA Y '.self::valueNumber($a % 10);
 				}
 				if($a==40){
-					$b = "CUARENTA";
+					$b = 'CUARENTA';
 				}
 				if($a>=41&&$a<=49){
-					return "CUARENTA Y ".self::valueNumber($a % 10);
+					return 'CUARENTA Y '.self::valueNumber($a % 10);
 				}
 				if($a==50){
-					return "CINCUENTA";
+					return 'CINCUENTA';
 				}
 				if($a>=51&&$a<=59){
-					return "CINCUENTA Y ".self::valueNumber($a % 10);
+					return 'CINCUENTA Y '.self::valueNumber($a % 10);
 				}
 				if($a==60){
-					return "SESENTA";
+					return 'SESENTA';
 				}
 				if($a>=61&&$a<=69){
-					return "SESENTA Y ".self::valueNumber($a % 10);
+					return 'SESENTA Y '.self::valueNumber($a % 10);
 				}
 				if($a==70) {
-					return "SETENTA";
+					return 'SETENTA';
 				}
 				if($a>=71&&$a<=79){
-					return "SETENTA Y ".self::valueNumber($a % 10);
+					return 'SETENTA Y '.self::valueNumber($a % 10);
 				}
 				if($a==80){
-					return "OCHENTA";
+					return 'OCHENTA';
 				}
 				if($a>=81&&$a<=89){
-					return "OCHENTA Y ".self::valueNumber($a % 10);
+					return 'OCHENTA Y '.self::valueNumber($a % 10);
 				}
 				if($a==90){
-					return "NOVENTA";
+					return 'NOVENTA';
 				}
 				if($a>=91&&$a<=99){
-					return "NOVENTA Y ".self::valueNumber($a % 10);
+					return 'NOVENTA Y '.self::valueNumber($a % 10);
 				}
 			} else {
 				self::$_state = 'CEN';
 				if($a==100){
-					return "CIEN";
+					return 'CIEN';
 				}
 				if($a>=101&&$a<=199){
-					return "CIENTO ".self::valueNumber($a % 100);
+					return 'CIENTO '.self::valueNumber($a % 100);
 				}
 				if($a>=200&&$a<=299){
-					return "DOSCIENTOS ".self::valueNumber($a % 100);
+					return 'DOSCIENTOS '.self::valueNumber($a % 100);
 				}
 				if($a>=300&&$a<=399){
-					return "TRECIENTOS ".self::valueNumber($a % 100);
+					return 'TRECIENTOS '.self::valueNumber($a % 100);
 				}
 				if($a>=400&&$a<=499){
-					return "CUATROCIENTOS ".self::valueNumber($a % 100);
+					return 'CUATROCIENTOS '.self::valueNumber($a % 100);
 				}
 				if($a>=500&&$a<=599){
-					return "QUINIENTOS ".self::valueNumber($a % 100);
+					return 'QUINIENTOS '.self::valueNumber($a % 100);
 				}
 				if($a>=600&&$a<=699){
-					return "SEICIENTOS ".self::valueNumber($a % 100);
+					return 'SEICIENTOS '.self::valueNumber($a % 100);
 				}
 				if($a>=700&&$a<=799){
-					return "SETECIENTOS ".self::valueNumber($a % 100);
+					return 'SETECIENTOS '.self::valueNumber($a % 100);
 				}
 				if($a>=800&&$a<=899){
-					return "OCHOCIENTOS ".self::valueNumber($a % 100);
+					return 'OCHOCIENTOS '.self::valueNumber($a % 100);
 				}
 				if($a>=901&&$a<=999){
-					return "NOVECIENTOS ".self::valueNumber($a % 100);
+					return 'NOVECIENTOS '.self::valueNumber($a % 100);
 				}
 			}
 		}
@@ -364,19 +388,19 @@ class Currency {
 	 */
 	private static function millons($number){
 		self::$_state = 'MILL';
-		$number = LocaleMath::div($number, "1000000");
+		$number = LocaleMath::div($number, '1000000');
 		if($number==1){
-			return "UN MILLON ";
+			return 'UN MILLON ';
 		} else {
-			if(LocaleMath::cmp($number, "1000")>=0){
-				$mod = LocaleMath::mod($number, "1000");
+			if(LocaleMath::cmp($number, '1000')>=0){
+				$mod = LocaleMath::mod($number, '1000');
 				$value = self::miles(LocaleMath::sub($number, $mod));
 				if($mod>0){
 					$value.= self::valueNumber($mod);
 				}
-				$value.=" MILLONES ";
+				$value.=' MILLONES ';
 			} else {
-				$value = self::valueNumber($number)." MILLONES ";
+				$value = self::valueNumber($number).' MILLONES ';
 			}
 			self::$_state = 'MILL';
 			return $value;
@@ -392,11 +416,11 @@ class Currency {
 	 */
 	private static function miles($number){
 		self::$_state = 'MIL';
-		$number = LocaleMath::div($number, "1000");
+		$number = LocaleMath::div($number, '1000');
 		if($number==1){
-			return "MIL";
+			return 'MIL';
 		} else {
-			return self::valueNumber($number)."MIL ";
+			return self::valueNumber($number).'MIL ';
 		}
 	}
 
@@ -414,33 +438,33 @@ class Currency {
 		$a = $valor;
 		$p = $moneda;
 		$c = $centavos;
-		$val = "";
+		$val = '';
 		$v = $a;
 		$a = LocaleMath::round($a, 0);
 		$d = (float) LocaleMath::round($v-$a, 2);
-		if(LocaleMath::cmp($a, "1000000")>=0){
-			$mod = LocaleMath::mod($a, "1000000");
+		if(LocaleMath::cmp($a, '1000000')>=0){
+			$mod = LocaleMath::mod($a, '1000000');
 			$val.= self::millons(LocaleMath::sub($a, $mod));
 			$a = $mod;
 		}
-		if(LocaleMath::cmp($a, "1000")>=0){
-			$mod = LocaleMath::mod($a, "1000");
+		if(LocaleMath::cmp($a, '1000')>=0){
+			$mod = LocaleMath::mod($a, '1000');
 			$val.= self::miles(LocaleMath::sub($a, $mod));
 			$a = $mod;
 		}
 		$rval = self::valueNumber($a);
-		if($rval==""){
+		if($rval==''){
 			if(in_array(self::$_state, array('MILL', 'MMILL'))){
-				$val.= "DE ".strtoupper($p)." ";
+				$val.= 'DE '.strtoupper($p).' ';
 			} else {
-				$val.= strtoupper($p)." ";
+				$val.= strtoupper($p).' ';
 			}
 		} else {
-			$val.= $rval." ".strtoupper($p)." ";
+			$val.= $rval.' '.strtoupper($p).' ';
 		}
 		if($d>0){
 			$d*=100;
-			$val.= " CON ".self::valueNumber($d)." $c ";
+			$val.= ' CON '.self::valueNumber($d).' $c ';
 		}
 		return trim($val);
 	}

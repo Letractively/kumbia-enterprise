@@ -36,7 +36,7 @@
 function doc(){
 
 	$config = CoreConfig::readAppConfig();
-	$active_app = Core::getActiveApplication();
+	$active_app = Router::getApplication();
 	$file = md5(uniqid());
 
 	$content = "

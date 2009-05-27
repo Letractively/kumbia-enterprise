@@ -93,7 +93,7 @@ abstract class StandardForm extends Controller {
 	public $scaffold = false;
 
 	/**
-	 * Indica el tipo de respuesta que ser� generado
+	 * Indica el tipo de respuesta que será generado
 	 *
 	 * @var string
 	 */

@@ -119,6 +119,9 @@ abstract class Soap {
 			$responseElement->appendChild($dataEncoded);
 		}
 		$bodyElement->appendChild($responseElement);
+
+		file_put_contents('fx.txt', self::$_domDocument->saveXML());
+
 		print self::$_domDocument->saveXML();
 	}
 
