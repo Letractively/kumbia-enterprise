@@ -95,6 +95,8 @@ abstract class DbLoader {
 				break;
 			case 'none':
 				break;
+			default:
+				throw new DbLoaderException('No se pudo determinar el tipo de capa de acceso a gestores relacionales', 0);
 		}
 		if(!class_exists($className)){
 			throw new DbLoaderException('No existe la clase '.$className.', necesaria para iniciar el adaptador', 0);
