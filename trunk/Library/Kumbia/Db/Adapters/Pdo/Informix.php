@@ -447,7 +447,7 @@ class DbPdoInformix extends DbPDO  {
 	 *
 	 * @return string
 	 */
-	public static function _getPHPExtensionRequired(){
+	public static function getPHPExtensionRequired(){
 		return 'pdo_informix';
 	}
 
