@@ -442,4 +442,13 @@ class DbPdoInformix extends DbPDO  {
 		}
 	}
 
+	/**
+	 * Obtiene la extension PHP requerida para usar el adaptador
+	 *
+	 * @return string
+	 */
+	public static function _getPHPExtensionRequired(){
+		return 'pdo_informix';
+	}
+
 }
