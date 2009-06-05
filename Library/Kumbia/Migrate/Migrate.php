@@ -26,7 +26,11 @@ class Migrate {
 		'route_to' => 'routeTo',
 		'request' => 'getRequestParam',
 		'post' => 'getPostParam',
+		'getPost' => 'getPostParam',
+		'getPOST' => 'getPostParam',
 		'get' => 'getQueryParam',
+		'getGet' => 'getQueryParam',
+		'getGET' => 'getQueryParam',
 		'render_text' => 'renderText',
 		'render_partial' => 'renderPartial'
 	);
@@ -332,7 +336,6 @@ class Migrate {
 		}
 	}
 
-
 	/**
 	 * Migra un modelo a KEF
 	 *
@@ -394,6 +397,10 @@ class Migrate {
 						} else {
 							if($this->_isCommonMethod(&$tokens, $i)==true){
 								$token = $tokens[$i];
+							} else {
+								if($this->_isKumbiaPath(&$tokens, $i)==true){
+									$token = $tokens[$i];
+								}
 							}
 						}
 					}

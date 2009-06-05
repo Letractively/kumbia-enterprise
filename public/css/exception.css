@@ -97,6 +97,7 @@
 	background: #111111;
 	border-bottom: 1px dotted #333333;
 	padding: 2px;
+	color: #eaeaea;
 }
 
 .exceptionLineNotActiveEven {
@@ -105,6 +106,7 @@
 	background: #151515;
 	border-bottom: 1px dotted #333333;
 	padding: 2px;
+	color: #eaeaea;
 }
 
 .exceptionLineActive {
@@ -113,6 +115,7 @@
 	background: #424242;
 	border-bottom: 1px dotted #333333;
 	padding: 2px;
+	color: #eaeaea;
 }
 
 .exceptionLineTd {
