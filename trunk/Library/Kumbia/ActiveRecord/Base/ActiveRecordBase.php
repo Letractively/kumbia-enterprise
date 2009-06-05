@@ -646,13 +646,19 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(isset($params['conditions'])&&$params['conditions']){
 			$select.= ' WHERE '.$params['conditions'].' ';
 		} else {
-			if(!isset($primaryKeys[0])&&$this->isView==true){
-				$primaryKeys[0] = 'id';
+			if(!isset($primaryKeys[0])){
+				if($this->isView==true){
+					$primaryKeys[0] = 'id';
+				}
 			}
 			if(isset($params[0])){
 				if(is_numeric($params[0])){
-					$params['conditions'] = $primaryKeys[0].' = '.$this->_db->addQuotes($params[0]);
-					$return = '1';
+					if(isset($primaryKeys[0])){
+						$params['conditions'] = $primaryKeys[0].' = '.$this->_db->addQuotes($params[0]);
+						$return = '1';
+					} else {
+						throw new ActiveRecordException('No se ha definido una llave primaria para este objeto');
+					}
 				} else {
 					if($params[0]==''){
 						$params['conditions'] = $primaryKeys[0]." = ''";

@@ -62,19 +62,19 @@ class MailLogger extends LoggerAdapter implements LoggerInterface {
 	 * @param string $name
 	 */
 	public function __construct($email, $options=array()){
-		if(class_exists("Swift_Connection_SMTP")==false){
-			Core::importFromLibrary("Swift", "Swift/Connection/SMTP.php");
+		if(class_exists('Swift_Connection_SMTP')==false){
+			Core::importFromLibrary('Swift', 'Swift/Connection/SMTP.php');
 		}
 		$this->_email = $email;
 		$this->_options = $options;
 		if(PHP_VERSION<5.1){
-			$this->_dateFormat = "r";
+			$this->_dateFormat = 'r';
 		}
 		if(isset($options['server'])==false){
-			throw new LoggerException("Debe indicar el nombre del servidor SMTP a utilizar por MailLogger");
+			throw new LoggerException('Debe indicar el nombre del servidor SMTP a utilizar por MailLogger');
 		}
 		if(isset($options['username'])==false){
-			throw new LoggerException("Debe indicar el nombre del usuario en el servidor SMTP a utilizar por MailLogger");
+			throw new LoggerException('Debe indicar el nombre del usuario en el servidor SMTP a utilizar por MailLogger');
 		}
 		if(!isset($options['secureConnection'])){
 			$options['secureConnection'] = false;
@@ -89,6 +89,25 @@ class MailLogger extends LoggerAdapter implements LoggerInterface {
 		$this->_smtp = new Swift_Connection_SMTP($options['server'], $port, $encryption);
 		$this->_smtp->setUsername($options['username']);
 		$this->_smtp->setPassword($options['password']);
+		$this->_transaction = true;
+	}
+
+	/**
+	 * Realiza el proceso del log
+	 *
+	 * @access public
+	 * @param string $msg
+	 * @param int $type
+	 */
+	public function log($msg, $type){
+		if(is_array($msg)||is_object($msg)){
+			$msg = print_r($msg, true);
+		}
+		if($this->_transaction==true){
+			$this->_quenue[] = new LoggerItem($msg, $type, time());
+		} else {
+			throw new LoggerException("Solo se pueden agregar items al log cuando esta en una transacci&oacute;n");
+		}
 	}
 
 	/**
@@ -106,9 +125,9 @@ class MailLogger extends LoggerAdapter implements LoggerInterface {
 			$message.=$this->_applyFormat($msg->getMessage(), $msg->getType(), $msg->getTime()).PHP_EOL;
 		}
 		if(!isset($this->_options['subject'])){
-			$this->_options['subject'] = "MailLog: ".Router::getApplication()." - ".date("r");
+			$this->_options['subject'] = 'MailLog: '.Router::getApplication().' - '.date('r');
 		}
-		$swiftMessage = new Swift_Message($this->_options['subject'], $message, "text/plain");
+		$swiftMessage = new Swift_Message($this->_options['subject'], $message, 'text/plain');
 		$swift = new Swift($this->_smtp);
 		if(!isset($this->_options['fromName'])){
 			$this->_options['fromName'] = substr($this->_options['username'], 0, strpos($this->_options['username'], '@'));
@@ -145,6 +164,10 @@ class MailLogger extends LoggerAdapter implements LoggerInterface {
 		}
 	}
 
+	/**
+	 * Destructor del Logger
+	 *
+	 */
 	public function __destruct(){
 		$this->close();
 	}
