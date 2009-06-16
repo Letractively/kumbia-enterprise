@@ -966,7 +966,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			}
 		} else {
 			$num = $this->_db->fetchOne($selectStatement);
-			return (double) $num[$alias];
+			return $num[$alias];
 		}
 	}
 
@@ -1022,7 +1022,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(isset($params['limit'])&&$params['limit']) {
 			$select = $this->_limit($select, $params['limit']);
 		}
-		return $this->_getGroupResult($params, $select, 'rowcount');
+		return (double) $this->_getGroupResult($params, $select, 'rowcount');
 	}
 
 	/**
@@ -1914,7 +1914,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 									$values[] = $this->_db->getDateUsingFormat(addslashes($this->$field));
 								}
 							} else {
-								if(is_null($this->$field)){
+								if(is_null($this->$field)||$this->$field===''){
 									$values[] = 'NULL';
 								} else {
 									if(get_magic_quotes_runtime()==true){
