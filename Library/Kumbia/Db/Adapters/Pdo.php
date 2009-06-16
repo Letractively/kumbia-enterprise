@@ -325,9 +325,16 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 * @return integer
 	 */
 	public function numRows($pdoStatement=''){
+		if($pdoStatement==''){
+			$pdoStatement = $this->_pdoStatement;
+			if(!$pdoStatement){
+				return false;
+			}
+		}
 		if($pdoStatement){
 			$pdo = clone $pdoStatement;
-			return count($pdo->fetchAll(PDO::FETCH_NUM));
+			return count($this->_pdo->query($pdoStatement->queryString)->fetchAll());
+			//return count($pdo->fetchAll(PDO::FETCH_NUM));
 		} else {
 			return 0;
 		}

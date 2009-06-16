@@ -65,7 +65,7 @@ abstract class TransactionManager implements TransactionManagerInterface {
 	public static function getUserTransaction($definition=''){
 		if($definition!==''){
 			if($definition instanceof TransactionDefinition){
-				$transaction = new ActiveRecordTransaction(true, $definition);
+				$transaction = new ActiveRecordTransaction(false, $definition);
 				$transaction->setTransactionManager('TransactionManager');
 				return $transaction;
 			} else {
@@ -73,7 +73,7 @@ abstract class TransactionManager implements TransactionManagerInterface {
 			}
 		}
 		if(count(self::$_transactions)==0){
-			$transaction = new ActiveRecordTransaction(true);
+			$transaction = new ActiveRecordTransaction(false);
 			$transaction->setTransactionManager('TransactionManager');
 			$transaction->setDependencyPointer(self::$_dependencyPointer);
 			self::$_dependencyPointer+=2048;

@@ -60,7 +60,7 @@ class DateFormat {
 			'D', 'L', 'z', 'r', 'c', 't', 'o', 'W',
 		);
 		$posibleTokens = array(
-			'MMMM', 'MM', 'm', 'M', 'EEEE', 'EEE',
+			'MMMM', 'MM', 'm','mm', 'M', 'EEEE', 'EEE',
 			'DD', 'dd', 'z', 'd', 'EE', 'E',
 			't', 'e', 'L', 'r', 'o', 'W', 'N',
 			'yyy', 'yyyy', 'y'
@@ -116,6 +116,7 @@ class DateFormat {
 					break;
 				case 'MM':
 				case 'm':
+				case 'mm':
 					$this->_formatedDate.=sprintf('%02s', $date->getMonth());
 					break;
 				case 'M':
