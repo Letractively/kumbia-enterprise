@@ -1022,7 +1022,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(isset($params['limit'])&&$params['limit']) {
 			$select = $this->_limit($select, $params['limit']);
 		}
-		return (double) $this->_getGroupResult($params, $select, 'rowcount');
+		return $this->_getGroupResult($params, $select, 'rowcount');
 	}
 
 	/**
@@ -1809,7 +1809,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 								}
 							}
 						} else {
-							if(is_null($this->$np)){
+							if(is_null($this->$np)||$this->$np===''){
 								$values[] = 'NULL';
 							} else {
 								$values[] = '\''.addslashes($this->$np).'\'';
@@ -1865,7 +1865,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 							}
 						} else {
 							if(is_null($this->$np)){
-								if(!is_null($record->$np)){
+								if(!is_null($record->$np)||$record->$np===''){
 									$fields[] = $np;
 									$values[] = 'NULL';
 								}
