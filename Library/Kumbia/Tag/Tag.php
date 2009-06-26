@@ -764,16 +764,30 @@ abstract class Tag {
 				}
 			}
 			$code.=">\r\n";
+
+			if(!isset($params['dummyValue'])){
+				$dummyValue = '@';
+			} else {
+				$dummyValue = $params['dummyValue'];
+				unset($params['dummyValue']);
+			}
+			if(!isset($params['dummyText'])){
+				$dummyText = 'Seleccione...';
+			} else {
+				$dummyText = $params['dummyText'];
+				unset($params['dummyText']);
+			}
+
 			if(isset($params['use_dummy'])&&$params['use_dummy']==true){
-				$code.="\t<option value='@'>Seleccione...</option>\r\n";
+				$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
 			} else {
 				if(isset($params['useDummy'])&&$params['useDummy']==true){
-					$code.="\t<option value='@'>Seleccione...</option>\r\n";
+					$code.="\t<option value='$dummyValue'>$dummyText...</option>\r\n";
 				}
 			}
 			if(is_object($params[1])){
 				if(!isset($params['using'])){
-					throw new TagException("Debe indicar el par&aacute;metro 'using' para el helper Tag::select()");
+					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
 				$using = explode(",", $params['using']);
 				foreach($params[1] as $o){
@@ -798,7 +812,7 @@ abstract class Tag {
 			}
 			$code.= "</select>\r\n";
 		} else {
-			$code.="<select id='$params' name='$params'></select>";
+			$code = "<select id='$params' name='$params'></select>";
 		}
 		return $code;
 	}
@@ -850,7 +864,7 @@ abstract class Tag {
 			}
 			if(is_object($params[1])){
 				if(!isset($params['using'])){
-					throw new TagException("Debe indicar el par&aacute;metro 'using' para el helper Tag::select()");
+					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
 				$using = explode(",", $params['using']);
 				foreach($params[1] as $o){
@@ -934,7 +948,7 @@ abstract class Tag {
 			}
 			if(is_object($params[1])){
 				if(!isset($params['using'])){
-					throw new TagException("Debe indicar el par&aacute;metro 'using' para el helper Tag::select()");
+					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
 				$using = explode(",", $params['using']);
 				foreach($params[1] as $o){
@@ -2005,7 +2019,7 @@ abstract class Tag {
 			if(is_object($items)){
 				if($items instanceof ActiveRecordResultset){
 					if($start<0){
-						throw new CoreException("El n&uacute;mero de la p&aacute;gina es negativo &oacute; cero ($start)");
+						throw new CoreException("El n&uacute;mero de la página es negativo &oacute; cero ($start)");
 					}
 					$page->items = array();
 					$total = count($items);

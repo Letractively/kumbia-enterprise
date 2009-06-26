@@ -1028,11 +1028,75 @@ class Date extends Object {
 	 * @param integer $month
 	 * @param integer $year
 	 */
-	static public function getFirstDayOfMonth($month, $year=''){
+	static public function getFirstDayOfMonth($month='', $year=''){
+		if(!$month){
+			$month = date('m');
+		}
 		if(!$year){
 			$year = date('Y');
 		}
 		return "$year-".sprintf("%02s", $month)."-01";
+	}
+
+	/**
+	 * Devuelve el primer dia de la semana
+	 *
+	 * @param integer $day
+	 * @param integer $month
+	 * @param integer $year
+	 */
+	static public function getFirstDayOfWeek($month='', $day='', $year=''){
+		if(!$month){
+			$month = date('m');
+		}
+		if(!$day){
+			$day = date('d');
+		}
+		if(!$year){
+			$year = date('Y');
+		}
+		$timestamp = self::mktime($month, $day, $year);
+		$array = self::_getDateParts($timestamp, false);
+		if($array['wday']==1){
+			return $array['year'].'-'.sprintf('%02s', $array['mon']).'-'.sprintf('%02s', $array['mday']);
+		} else {
+			if($array['wday']>0){
+				$timestamp-=(86400*($array['wday']-1));
+			} else {
+				$timestamp-=(86400*6);
+			}
+			$array = self::_getDateParts($timestamp, false);
+			return $array['year'].'-'.sprintf('%02s', $array['mon']).'-'.sprintf('%02s', $array['mday']);
+		}
+	}
+
+
+	/**
+	 * Devuelve el ultimo dia de la semana
+	 *
+	 * @param integer $day
+	 * @param integer $month
+	 * @param integer $year
+	 */
+	static public function getLastDayOfWeek($month='', $day='', $year=''){
+		if(!$month){
+			$month = date('m');
+		}
+		if(!$day){
+			$day = date('d');
+		}
+		if(!$year){
+			$year = date('Y');
+		}
+		$timestamp = self::mktime($month, $day, $year);
+		$array = self::_getDateParts($timestamp, false);
+		if($array['wday']==0){
+			return $array['year'].'-'.sprintf('%02s', $array['mon']).'-'.sprintf('%02s', $array['mday']);
+		} else {
+			$timestamp+=(86400*(7-$array['wday']));
+			$array = self::_getDateParts($timestamp, false);
+			return $array['year'].'-'.sprintf('%02s', $array['mon']).'-'.sprintf('%02s', $array['mday']);
+		}
 	}
 
 	/**
@@ -1041,7 +1105,10 @@ class Date extends Object {
 	 * @param integer $month
 	 * @param integer $year
 	 */
-	static public function getLastDayOfMonth($month, $year=''){
+	static public function getLastDayOfMonth($month='', $year=''){
+		if(!$month){
+			$month = date('m');
+		}
 		if(!$year){
 			$year = date('Y');
 		}
@@ -1305,7 +1372,6 @@ class Date extends Object {
             return @getdate($timestamp);
         }
 
-		//From Zend Framework DateObject
 		$numday = 0;
         $month = 0;
         // gregorian correction

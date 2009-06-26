@@ -111,7 +111,6 @@ class ControllerRequest extends Object {
 		$_COOKIE[(string) $index] = $value;
 	}
 
-
 	/**
 	 * Valida que exista un valor en $_REQUEST
 	 *
