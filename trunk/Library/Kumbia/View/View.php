@@ -546,10 +546,11 @@ abstract class View {
 			$controllerRequest = ControllerRequest::getInstance();
 			//Se está solicitando contenido estático
 			if($controllerRequest->isRequestingStaticContent()==true){
-				print_r($_SERVER);
 				$controllerResponse->setHeader('X-Application-State: Exception', true);
-				$controllerResponse->setHeader('HTTP/1.1 404 Not Found', true);
-				return;
+				$controllerResponse->setHeader('HTTP/1.1 500 Application Exception', true);
+				if(get_class($e)=='DisptacherException'){
+					return;
+				}
 			}
 			//Se genera un encabezado HTTP de problema
 			$controllerResponse->setHeader('X-Application-State: Exception', true);

@@ -83,7 +83,7 @@ abstract class Debug {
 			self::$_messages[] = array(
 				'backtrace' => $backtrace,
 				'completeBacktrace' => $completeBackTrace,
-				'class' => $backtrace[1]['class'],
+				'class' => isset($backtrace[1]['class']) ? $backtrace[1]['class'] : '',
 				'function' => $backtrace[1]['function'],
 				'line' => $backtrace[0]['line'],
 				'file' => $backtrace[0]['file'],

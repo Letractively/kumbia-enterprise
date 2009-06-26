@@ -260,6 +260,15 @@ class ReportAdapter extends Object {
 	}
 
 	/**
+	 * Agrega un encabezado
+	 *
+	 * @param string $columnHeader
+	 */
+	public function addColumnHeader($columnHeader){
+		$this->_columnHeaders[] = $columnHeader;
+	}
+
+	/**
 	 * Devuelve los encabezados del reporte
 	 *
 	 * @return array

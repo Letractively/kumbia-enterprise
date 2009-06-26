@@ -1941,6 +1941,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 							$fields[] = 'id';
 							$values[] = $identityValue;
 						}
+					} else {
+						if(isset($this->id)){
+							$fields[] = 'id';
+							$values[] = $this->id;
+						}
 					}
 				}
 			}

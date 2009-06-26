@@ -147,16 +147,18 @@ abstract class Session {
 	 */
 	static public function get($index){
 		Session::initSessionData();
-	  	if(isset($_SESSION['session_data'][(string) $index])){
-	  		if(func_num_args()>1){
-				$args[0] = $_SESSION['session_data'][(string) $index];
-				$filter = new Filter();
-				return call_user_func_array(array($filter, 'applyFilter'), $args);
-			}
-	  		return $_SESSION['session_data'][(string) $index];
+		if(isset($_SESSION['session_data'][(string) $index])){
+			$value = $_SESSION['session_data'][(string) $index];
 		} else {
-			return null;
+			$value = null;
 		}
+		if(func_num_args()>1){
+			$args = func_get_args();
+			$args[0] = $value;
+			$filter = new Filter();
+			return call_user_func_array(array($filter, 'applyFilter'), $args);
+		}
+		return $value;
 	}
 
 	/**
