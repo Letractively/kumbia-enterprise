@@ -294,7 +294,7 @@ class CoreException extends Exception {
 									$className = 'exceptionLineNotActiveOdd';
 								}
 							}
-							print "</table></div><pre style='font-family: Lucida Console; margin:10px; color: white;'>";
+							print "</table></div><pre class='exceptionPre'>";
 						}
 					}
 				}
@@ -448,7 +448,7 @@ class CoreException extends Exception {
 				if(count($this->extendedBacktrace)>0){
 					$traceback = array_merge($this->extendedBacktrace, $traceback);
 				}
-				print "<pre style='font-family: Lucida Console; margin: 10px; border:1px solid #969696; background: #fafafa; font-size:12px'><span style='font-family: Lucida Console;font-size:11px'><b>Backtrace:</b></span>\n";
+				print "<pre class='exceptionPreDesc'><span style='font-family: Lucida Console;font-size:11px'><b>Backtrace:</b></span>\n";
 				$i = 0;
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){

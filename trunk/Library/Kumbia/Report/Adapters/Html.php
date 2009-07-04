@@ -110,6 +110,20 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	private $_totalPages = 0;
 
 	/**
+	 * Totales de columnas
+	 *
+	 * @var array
+	 */
+	private $_totalizeValues = array();
+
+	/**
+	 * Número de columnas del reporte
+	 *
+	 * @var int
+	 */
+	private $_numberColumns = 0;
+
+	/**
 	 * Genera la salida del reporte
 	 *
 	 * @return string
@@ -163,8 +177,10 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 		} else {
 			$this->_renderPages();
 		}
+
 		$this->_output.= "\t</body>\n";
 		$this->_output.= "</html>\n";
+
 		return $this->_output;
 	}
 
@@ -320,6 +336,12 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 		$this->_output.="\t\t\t</thead>\n";
 	}
 
+	/**
+	 * Crea un thumbnail
+	 *
+	 * @param int $pageNumber
+	 * @return string
+	 */
 	private function _getPageThumbnail($pageNumber){
 		$numColumns = count($this->getColumnHeaders());
 		if($numColumns==0||$numColumns>6){
@@ -350,8 +372,15 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 */
 	private function _renderRows($rows){
 		foreach($rows as $row){
+			$this->_numberColumns = count($row);
 			$this->_output.="\t\t\t<tr>\n";
 			foreach($row as $numberColumn => $value){
+				if(in_array($numberColumn, $this->_totalizeColumns)){
+					if(!isset($this->_totalizeValues[$numberColumn])){
+						$this->_totalizeValues[$numberColumn] = 0;
+					}
+					$this->_totalizeValues[$numberColumn]+=$value;
+				}
 				$this->_output.="\t\t\t\t<td class='c$numberColumn'>$value</td>\n";
 			}
 			$this->_output.="\t\t\t</tr>\n";
@@ -386,6 +415,8 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 					$this->_output.= "\t<p><table cellspacing='0'>\n";
 					$this->_renderColumnHeaders();
 					$this->_renderRows(array_slice($data, $renderRows, $rowsToRender));
+					$this->_renderTotals();
+
 					$this->_output.= "\t</table></p>\n";
 					$this->_output.= "\t\t</div></div>\n";
 					$renderRows+=$rowsToRender;
@@ -408,7 +439,26 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			$this->_output.= "\t<p><table cellspacing='0' align='center'>\n";
 			$this->_renderColumnHeaders();
 			$this->_renderRows($data);
+			$this->_renderTotals();
 			$this->_output.= "\t</table></p>\n";
+		}
+	}
+
+	/**
+	 * Visualiza los totales del reporte
+	 *
+	 */
+	private function _renderTotals(){
+		if(count($this->_totalizeValues)>0){
+			$this->_output.='<tr>';
+			for($i=0;$i<$this->_numberColumns;$i++){
+				if(isset($this->_totalizeValues[$i])){
+					$this->_output.='<td class="c'.$i.'">'.$this->_totalizeValues[$i].'</td>';
+				} else {
+					$this->_output.='<td class="c'.$i.'"></td>';
+				}
+			}
+			$this->_output.='</tr>';
 		}
 	}
 
@@ -420,7 +470,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 */
 	private function _getOffsetRatio($fontFamily, $fontSize){
 		if(isset(self::$_offsetRatio[$fontFamily])==false){
-			throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily', debe establecer manualmente el n&uacute;mero de registros por p&aacute;gina");
+			throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily', debe establecer manualmente el número de registros por página");
 		}
 		if(isset(self::$_offsetRatio[$fontFamily][$fontSize])==false){
 			for($i=$fontSize;$i>=0;$i--){
@@ -428,7 +478,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 					if($fontSize-$i<=5){
 						return self::$_offsetRatio[$fontFamily][$i]-(0.1*($i-$fontSize));
 					} else {
-						throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily' tama&ntilde;o '$fontSize', debe establecer manualmente el n&uacute;mero de registros por p&aacute;gina");
+						throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily' tamaño '$fontSize', debe establecer manualmente el número de registros por página");
 					}
 				}
 			}
@@ -437,7 +487,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 					if($i-$fontSize<=6){
 						return self::$_offsetRatio[$fontFamily][$i]+(0.1*($i-$fontSize));
 					} else {
-						throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily' tama&ntilde;o '$fontSize', debe establecer manualmente el n&uacute;mero de registros por p&aacute;gina");
+						throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily' tamaño '$fontSize', debe establecer manualmente el número de registros por página");
 					}
 				}
 			}
