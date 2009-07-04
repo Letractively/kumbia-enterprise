@@ -98,6 +98,13 @@ class ReportAdapter extends Object {
 	private $_columnStyles = array();
 
 	/**
+	 * Columnas que deben ser totalizadas
+	 *
+	 * @var array
+	 */
+	protected $_totalizeColumns = array();
+
+	/**
 	 * Datos del Reporte
 	 *
 	 * @var array
@@ -296,6 +303,26 @@ class ReportAdapter extends Object {
 	}
 
 	/**
+	 * Agrega una columna de total
+	 *
+	 * @param int $column
+	 */
+	public function addTotalizeColumn($column){
+		if(!in_array($column, $this->_totalizeColumns)){
+			$this->_totalizeColumns[] = $column;
+		}
+	}
+
+	/**
+	 * Establece las columnas a totalizar
+	 *
+	 * @param array $columns
+	 */
+	public function setTotalizeColumns($columns){
+		$this->_totalizeColumns = $columns;
+	}
+
+	/**
 	 * Remplaza constantes en el texto
 	 *
 	 * @param string $text
@@ -385,4 +412,3 @@ class ReportAdapter extends Object {
 	}
 
 }
-

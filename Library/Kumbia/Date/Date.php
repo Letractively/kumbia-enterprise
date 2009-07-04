@@ -175,7 +175,7 @@ class Date extends Object {
 		$this->_month = (int) $dateParts[1];
 		$this->_day = (int) $dateParts[2];
 		if($this->_day>31||$this->_month>12){
-			throw new DateException("La fecha '$date' es invalida");
+			throw new DateException("La fecha '$date' es inválida");
 		}
 		$monthDays = self::$_monthTable[$this->_month-1];
 		if($this->isLeapYear()==true&&$this->_month==2){
@@ -225,11 +225,16 @@ class Date extends Object {
 	 */
 	private function _setDate(){
 		if($this->_year>=1970&&$this->_year<=2038){
-			$this->_date = date('Y-m-d', $this->_timestamp);
+			$this->_day = date('d', $this->_timestamp);
+			$this->_month = date('m', $this->_timestamp);
+			$this->_year = date('Y', $this->_timestamp);
 		} else {
 			$dateParts = self::_getDateParts($this->_timestamp, true);
-			$this->_date = $dateParts['year'].'-'.sprintf('%02s', $dateParts['mon']).'-'.sprintf('%02s', $dateParts['mday']);
+			$this->_day = sprintf('%02s', $dateParts['mday']);
+			$this->_month = sprintf('%02s', $dateParts['mon']);
+			$this->_year = $dateParts['year'];
 		}
+		$this->_date = $this->_year.'-'.$this->_month.'-'.$this->_day;
 	}
 
 	/**

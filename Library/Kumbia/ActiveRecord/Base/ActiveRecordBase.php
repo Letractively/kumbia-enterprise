@@ -1887,7 +1887,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			foreach($attributes as $field){
 				if($field!='id'){
 					if(in_array($field, $at)){
-						$this->$field = $this->_db->getCurrentDate();
+						if($this->$field==null||$this->$field===""){
+							$this->$field = $this->_db->getCurrentDate();
+						}
 					}
 					if(in_array($field, $in)){
 						$this->$field = new DbRawValue('NULL');

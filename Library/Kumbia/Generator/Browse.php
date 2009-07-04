@@ -149,7 +149,7 @@ abstract class Browse {
 		$browseSelect = "select ";
 		$browseFrom = " from ".$form['source'];
 		$browseWhere = " Where 1 = 1";
-		$broseLike = "";
+		$browseLike = "";
 		$source = $form['source'];
 		$nalias = 1;
 		$first = false;

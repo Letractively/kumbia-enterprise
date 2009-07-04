@@ -66,6 +66,7 @@ abstract class i18n {
 			return self::$_unicodeEnabled;
 		} else {
 			if(extension_loaded('mbstring')){
+				mb_internal_encoding(self::$_defaultCharset);
 				mb_regex_encoding(self::$_defaultCharset);
 				self::$_multiByteEnabled = true;
 			} else {
@@ -87,6 +88,7 @@ abstract class i18n {
 		if(self::$_multiByteEnabled==false){
 			return strtolower($str);
 		} else {
+
 			return mb_strtolower($str, self::$_defaultCharset);
 		}
 	}
