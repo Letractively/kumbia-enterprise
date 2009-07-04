@@ -1641,7 +1641,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	 */
 	public function exists($wherePk=''){
 		$this->_connect();
-		$this->_exists($wherePk);
+		return $this->_exists($wherePk);
 	}
 
 	/**
@@ -1964,7 +1964,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 					if(count($primaryKeys)==1){
 						$lastId = $this->_db->lastInsertId($table, $primaryKeys[0], $sequenceName);
 						$this->{$primaryKeys[0]} = $lastId;
-						$this->findFirst($lastId);
+						if($dataType[$primaryKeys[0]]!='date'){
+							$this->findFirst($lastId);
+						}
 					}
 				} else {
 					//Actualiza el consecutivo para algunos generadores
