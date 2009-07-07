@@ -391,15 +391,18 @@ abstract class Generator {
 		<form method='post' name='fl' action='' onsubmit='return false'>");
 		if(!isset($form["notShowTitle"])){
 			if(isset($form['titleImage'])){
-				if($form['titleHelp']){
-					self::formsPrint("<table><td><img src='".Core::getInstancePath()."img/{$form['titleImage']}' border=0></td>
+				if(isset($form['titleHelp'])){
+					self::formsPrint("<table class='titleHeader'><tr><td><img src='".Core::getInstancePath()."img/{$form['titleImage']}' border=0></td>
 				<td><h1 class='".$form['titleStyle']."' title='{$form['titleHelp']}'
 				style='cursor:help'>&nbsp;<u>".$form["caption"]."</u></h1>
-				</td></table>\r\n");
+				</td></tr></table>\r\n");
 				} else {
-					self::formsPrint("<table><td><img src='".Core::getInstancePath()."img/{$form['titleImage']}' border=0></td>
-				<td><h1 class='".$form['titleStyle']."'>&nbsp;".$form["caption"]."</h1>
-				</td></table>\r\n");
+					if(!isset($form['titleStyle'])){
+						$form['titleStyle'] = "";
+					}
+					self::formsPrint("<table class='titleHeader'><tr><td><img src='".Core::getInstancePath()."img/{$form['titleImage']}' border=0></td>
+					<td><h1 class='".$form['titleStyle']."'>&nbsp;".$form["caption"]."</h1>
+					</td></tr></table>\r\n");
 				}
 			} else {
 				if(!isset($form['titleStyle'])) {

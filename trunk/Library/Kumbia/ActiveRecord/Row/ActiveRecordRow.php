@@ -44,6 +44,13 @@ class ActiveRecordRow extends Object implements ActiveRecordResultInterface {
 	private $_db;
 
 	/**
+	 * Columnas del resultset
+	 *
+	 * @var array
+	 */
+	private $_columns = array();
+
+	/**
 	 * Constructor de la clase
 	 * @access public
 	 */
@@ -79,8 +86,19 @@ class ActiveRecordRow extends Object implements ActiveRecordResultInterface {
 	 */
 	public function dumpResult(array $result){
 		$objectRow = clone $this;
-		foreach($result as $field => $value){
-			$objectRow->$field = $value;
+		if(count($this->_columns)==0){
+			$columns = array();
+			foreach($result as $field => $value){
+				$columns[$field] = true;
+				$objectRow->$field = $value;
+			}
+			$objectRow->_columns = $columns;
+			$this->_columns = $columns;
+		} else {
+			foreach($result as $field => $value){
+				$objectRow->$field = $value;
+			}
+			$objectRow->_columns = $this->_columns;
 		}
 		return $objectRow;
 	}
@@ -125,7 +143,7 @@ class ActiveRecordRow extends Object implements ActiveRecordResultInterface {
 	public function __call($method, $arguments){
 		if(substr($method, 0, 3)=="get"){
 			$property = Utils::uncamelize(substr($method, 3));
-			if(isset($this->$property)){
+			if(isset($this->_columns[$property])){
 				return $this->$property;
 			}
 		}

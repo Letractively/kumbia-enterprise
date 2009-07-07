@@ -143,9 +143,11 @@ class GarbageCollector {
 					} else {
 						if($metaData['time']<$compressTime){
 							if($metaData['status']=='N'){
-								$data = gzcompress($_SESSION['KCON'][$instanceName][$activeApp][$formName]['data']);
-								$_SESSION['KSF'][$instanceName][$activeApp][$formName]['data'] = $data;
-								$_SESSION['KSF'][$instanceName][$activeApp][$formName]['status'] = 'C';
+								if(isset($_SESSION['KCON'][$instanceName][$activeApp][$formName]['data'])){
+									$data = gzcompress($_SESSION['KCON'][$instanceName][$activeApp][$formName]['data']);
+									$_SESSION['KSF'][$instanceName][$activeApp][$formName]['data'] = $data;
+									$_SESSION['KSF'][$instanceName][$activeApp][$formName]['status'] = 'C';
+								}
 							}
 						}
 					}
