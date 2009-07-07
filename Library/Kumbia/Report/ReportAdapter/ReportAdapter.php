@@ -77,6 +77,13 @@ class ReportAdapter extends Object {
 	private $_headerItems = array();
 
 	/**
+	 * Items del footer del documento
+	 *
+	 * @var array
+	 */
+	private $_footerItems = array();
+
+	/**
 	 * Encabezados de las columnas del reporte
 	 *
 	 * @var array
@@ -152,7 +159,7 @@ class ReportAdapter extends Object {
 	}
 
 	/**
-	 * Devuelve la codificaci&oacute;n del documento
+	 * Devuelve la codificación del documento
 	 *
 	 * @return string
 	 */
@@ -206,6 +213,24 @@ class ReportAdapter extends Object {
 	}
 
 	/**
+	 * Establece el footer
+	 *
+	 * @param array $items
+	 */
+	public function setFooter($items){
+		$this->_footerItems = $items;
+	}
+
+	/**
+	 * Devuelve el footer
+	 *
+	 * @return array
+	 */
+	public function getFooter(){
+		return $this->_footerItems;
+	}
+
+	/**
 	 * Renderiza el encabezado del documento
 	 *
 	 */
@@ -213,6 +238,21 @@ class ReportAdapter extends Object {
 		$header = $this->getHeader();
 		if(is_array($header)){
 			foreach($header as $item){
+				$this->_renderItem($item);
+			}
+		} else {
+			$this->_renderItem($header);
+		}
+	}
+
+	/**
+	 * Renderiza el footer del documento
+	 *
+	 */
+	protected function _renderFooter(){
+		$footer = $this->getFooter();
+		if(is_array($footer)){
+			foreach($footer as $item){
 				$this->_renderItem($item);
 			}
 		} else {

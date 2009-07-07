@@ -276,7 +276,9 @@ abstract class StandardForm extends Controller {
 		}
 
 		foreach($this->{$modelName}->getAttributesNames() as $field_name){
-			$this->{$modelName}->$field_name = $_REQUEST["fl_$field_name"];
+			if(isset($_REQUEST["fl_$field_name"])){
+				$this->{$modelName}->$field_name = $_REQUEST["fl_$field_name"];
+			}
 		}
 
 		/**
@@ -284,9 +286,9 @@ abstract class StandardForm extends Controller {
 		 * validation, si este método devuelve false termina la ejecución
 		 * de la acción
 		 */
-		if(method_exists($this, "validation")){
+		if(method_exists($this, 'validation')){
 			if($this->validation()===false){
-				$this->keep_action = "insert";
+				$this->keep_action = 'insert';
 				if(!Router::getRouted()){
 					return $this->routeTo(array('action' => 'index'));
 				}
@@ -297,7 +299,7 @@ abstract class StandardForm extends Controller {
 		} else {
 			if(isset($this->validation)){
 				if($this->{$this->validation}()===false){
-					$this->keep_action = "insert";
+					$this->keep_action = 'insert';
 					if(!Router::getRouted()){
 						return $this->routeTo(array('action' => 'index'));
 					}
@@ -313,9 +315,9 @@ abstract class StandardForm extends Controller {
 		 * beforeInsert, si este método devuelve false termina la ejecucin
 		 * de la acción
 		 */
-		if(method_exists($this, "beforeInsert")){
+		if(method_exists($this, 'beforeInsert')){
 			if($this->beforeInsert()===false){
-				$this->keep_action = "insert";
+				$this->keep_action = 'insert';
 				if(!Router::getRouted()){
 					return $this->routeTo(array('action' => 'index'));
 				}
@@ -326,7 +328,7 @@ abstract class StandardForm extends Controller {
 		} else {
 			if(isset($this->beforeInsert)){
 				if($this->{$this->beforeInsert}()===false){
-					$this->keep_action = "insert";
+					$this->keep_action = 'insert';
 					if(!Router::getRouted()){
 						return $this->routeTo(array('action' => 'index'));
 					}
@@ -343,9 +345,9 @@ abstract class StandardForm extends Controller {
 		 */
 		foreach($this->form['components'] as $fkey => $rrow){
 			if($this->form['components'][$fkey]['type']=='image'){
-				if(isset($_FILES["fl_".$fkey])){
-					move_uploaded_file($_FILES["fl_".$fkey]['tmp_name'], htmlspecialchars("public/img/upload/{$_FILES["fl_".$fkey]['name']}"));
-					$this->{$modelName}->$fkey = urlencode(htmlspecialchars("upload/".$_FILES["fl_".$fkey]['name']));
+				if(isset($_FILES['fl_'.$fkey])){
+					move_uploaded_file($_FILES['fl_'.$fkey]['tmp_name'], htmlspecialchars('public/img/upload/'.$_FILES['fl_'.$fkey]['name']));
+					$this->{$modelName}->$fkey = urlencode(htmlspecialchars('upload/'.$_FILES['fl_'.$fkey]['name']));
 				}
 			}
 		}
@@ -355,7 +357,7 @@ abstract class StandardForm extends Controller {
 		 * por lo tanto los
 		 */
 		$this->{$modelName}->id = null;
-		if($this->{$modelName}->create()){
+		if($this->{$modelName}->create()==true){
 			if($this->successInsertMessage){
 				Flash::success($this->successInsertMessage);
 			} else {
@@ -369,15 +371,17 @@ abstract class StandardForm extends Controller {
 			}
 		}
 
-		foreach($this->{$modelName}->getAttributesNames() as $field_name){
-			$_REQUEST["fl_$field_name"] = $this->{$modelName}->$field_name;
+		foreach($this->{$modelName}->getAttributesNames() as $fieldName){
+			if(isset($_REQUEST['fl_'.$fieldName])){
+				$_REQUEST['fl_'.$fieldName] = $this->{$modelName}->readAttribute($fieldName);
+			}
 		}
 
 		/**
 		 * Busca si existe un método o un llamado variable al método
 		 * after_insert
 		 */
-		if(method_exists($this, "afterInsert")){
+		if(method_exists($this, 'afterInsert')){
 			$this->afterInsert();
 			if(Router::getRouted()){
 				return;
@@ -423,9 +427,9 @@ abstract class StandardForm extends Controller {
 		 */
 		foreach($this->form['components'] as $fkey => $rrow){
 			if($this->form['components'][$fkey]['type']=='image'){
-				if(isset($_FILES["fl_".$fkey])){
-					move_uploaded_file($_FILES["fl_".$fkey]['tmp_name'], htmlspecialchars("public/img/upload/{$_FILES["fl_".$fkey]['name']}"));
-					$this->{$modelName}->$fkey = urlencode(htmlspecialchars("upload/".$_FILES["fl_".$fkey]['name']));
+				if(isset($_FILES['fl_'.$fkey])){
+					move_uploaded_file($_FILES['fl_'.$fkey]['tmp_name'], htmlspecialchars('public/img/upload/'.$_FILES['fl_'.$fkey]['name']));
+					$this->{$modelName}->$fkey = urlencode(htmlspecialchars('upload/'.$_FILES['fl_'.$fkey]['name']));
 				}
 			}
 		}
@@ -438,7 +442,7 @@ abstract class StandardForm extends Controller {
 		}
 
 		if(count($primaryKey)){
-			$this->{$modelName}->findFirst(join(" AND ", $primaryKey));
+			$this->{$modelName}->findFirst(join(' AND ', $primaryKey));
 		}
 
 		foreach($this->{$modelName}->getAttributes() as $field_name){
@@ -452,9 +456,9 @@ abstract class StandardForm extends Controller {
 		 * validation, si este método devuelve false termina la ejecución
 		 * de la acción
 		 */
-		if(method_exists($this, "validation")){
+		if(method_exists($this, 'validation')){
 			if($this->validation()===false){
-				$this->keep_action = "update";
+				$this->keep_action = 'update';
 				if(!Router::getRouted()){
 					return $this->routeTo(array('action' => 'index'));
 				}
@@ -465,7 +469,7 @@ abstract class StandardForm extends Controller {
 		} else {
 			if(isset($this->validation)){
 				if($this->{$this->validation}()===false){
-					$this->keep_action = "update";
+					$this->keep_action = 'update';
 					if(!Router::getRouted()){
 						return $this->routeTo(array('action' => 'index'));
 					}
@@ -481,9 +485,9 @@ abstract class StandardForm extends Controller {
 		 * before_update, si este metodo devuelve false termina la ejecucion
 		 * de la accion
 		 */
-		if(method_exists($this, "beforeUdate")){
+		if(method_exists($this, 'beforeUdate')){
 			if($this->beforeUpdate()===false){
-				$this->keep_action = "update";
+				$this->keep_action = 'update';
 				if(!Router::getRouted()){
 					return $this->routeTo(array('action' => 'index'));
 				}
@@ -494,7 +498,7 @@ abstract class StandardForm extends Controller {
 		} else {
 			if(isset($this->beforeUpdate)){
 				if($this->{$this->beforeUpdate}()===false){
-					$this->keep_action = "update";
+					$this->keep_action = 'update';
 					if(!Router::getRouted()){
 						return $this->routeTo(array('action' => 'index'));
 					}
@@ -512,7 +516,7 @@ abstract class StandardForm extends Controller {
 			if($this->successUpdateMessage){
 				Flash::success($this->successUpdateMessage);
 			} else {
-				Flash::success("Se actualizó correctamente el registro");
+				Flash::success('Se actualizó correctamente el registro');
 			}
 		} else {
 			foreach($this->{$modelName}->getMessages() as $message){
@@ -521,19 +525,19 @@ abstract class StandardForm extends Controller {
 			if($this->failureUpdateMessage){
 				Flash::error($this->failureUpdateMessage);
 			} else {
-				Flash::error("Hubo un error al actualizar el registro");
+				Flash::error('Hubo un error al actualizar el registro');
 			}
 		}
 
-		foreach($this->{$modelName}->getAttributes() as $field_name){
-			$_REQUEST["fl_$field_name"] = $this->{$modelName}->$field_name;
+		foreach($this->{$modelName}->getAttributes() as $fieldName){
+			$_REQUEST['fl_'.$fieldName] = $this->{$modelName}->readAttribute($fieldName);
 		}
 
 		/**
 		 * Busca si existe un método o un llamado variable al método
 		 * after_update
 		 */
-		if(method_exists($this, "afterUpdate")){
+		if(method_exists($this, 'afterUpdate')){
 			$this->afterUpdate();
 			if(Router::getRouted()){
 				return;
@@ -1486,11 +1490,11 @@ abstract class StandardForm extends Controller {
 	 * @param Exception $e
 	 */
 	public function onException($e){
-		if(get_class($e)=="DbException"){
+		if(is_subclass_of($e, 'DbException')){
 			if($e instanceof DbConstraintViolationException){
-				Flash::error("No se puede efectuar la operación ya que el registro se esta usando en  otras partes del sistema");
+				Flash::error('No se puede efectuar la operación ya que el registro se esta usando en otras partes del sistema');
 				$action = Router::getAction();
-				$this->RouteTo("action: index");
+				$this->RouteTo('action: index');
 			} else {
 				throw $e;
 			}

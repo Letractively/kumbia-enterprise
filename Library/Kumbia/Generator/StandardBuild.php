@@ -149,7 +149,7 @@ abstract class StandardGenerator {
 						} else {
 							$caption = "Borrar";
 						}
-						Generator::formsPrint("<input type='button' class='controlButton' id='borra' value='$caption' lang='Borrar' $ds onclick=\"enable_delete()\">\r\n&nbsp;");
+						Generator::formsPrint("<input type='button' class='controlButton controlButtonCancel' id='borra' value='$caption' lang='Borrar' $ds onclick=\"enable_delete()\">\r\n&nbsp;");
 					}
 				}
 
@@ -225,7 +225,9 @@ abstract class StandardGenerator {
 							}
 						}
 						Generator::formsPrint(">\r\n</td><td>".$com['caption']."</td></tr>");
-						if($com["last"]) Generator::formsPrint("</table>");
+						if($com["last"]){
+							Generator::formsPrint("</table>");
+						}
 						break;
 
 						//Textarea

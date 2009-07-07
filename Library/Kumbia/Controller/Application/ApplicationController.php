@@ -82,49 +82,6 @@ class ApplicationController extends Controller  {
 	}
 
 	/**
-	 * Valida que los campos requeridos enten presentes
-	 *
-	 * @access	protected
-	 * @param	string $fields
-	 * @param	string $base
-	 * @param	string $getMode
-	 * @return	boolean
-	 */
-	protected function validateRequired($fields, $base='', $getMode=''){
-		return Validation::validateRequired($fields, $base, $getMode);
-	}
-
-	/**
-	 * Limpia la lista de Mensajes
-	 *
-	 * @access protected
-	 */
-	protected function cleanValidationMessages(){
-		Validation::cleanValidationMessages();
-	}
-
-	/**
-	 * Agrega un mensaje a la lista de mensajes
-	 *
-	 * @access 	protected
-	 * @param 	string $fieldName
-	 * @param 	string $message
-	 */
-	protected function addValidationMessage($message, $fieldName=''){
-		Validation::addValidationMessage($message, $fieldName);
-	}
-
-	/**
-	 * Devuelve los mensajes de validación generados
-	 *
-	 * @access 	protected
-	 * @return 	array
-	 */
-	public function getValidationMessages(){
-		return Validation::getMessages();
-	}
-
-	/**
 	 * La definición de este método indica si se debe exportar
 	 * las variables públicas
 	 *

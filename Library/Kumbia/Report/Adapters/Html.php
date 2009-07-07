@@ -134,6 +134,8 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 		$this->_output.= "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
 		$this->_output.= "\t<head>\n";
 		$this->_output.= "\t\t<meta http-equiv='Content-type' content='text/html; charset=".$this->getEncoding()."' />\n";
+		$this->_output.= "\t\t<meta http-equiv='Pragma' CONTENT='no-cache' />\n";
+   		$this->_output.= "\t\t<meta http-equiv='Cache-Control' CONTENT='no-cache' />\n";
 		$this->_output.= "\t\t<title>".$this->getDocumentTitle()."</title>\n";
 		$this->_output.= "\t\t<style type='text/css'>\n";
 		$this->_output.= "\t\t\tbody, div, td, th { font-family: \"".self::$_defaultFontFamily."\"; font-size: ".self::$_defaultFontSize."px; }\n";
@@ -309,7 +311,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			$this->_output.= $item;
 			return;
 		}
-		if(is_object($item)){
+		if(is_object($item)==true){
 			if(get_class($item)=="ReportText"){
 				$html = "\t\t\t<div ";
 				$itemStyle = $item->getAttributes();
@@ -465,8 +467,8 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	/**
 	 * Busca el offsetRatio de la fuente y el tamaño
 	 *
-	 * @param unknown_type $fontFamily
-	 * @param unknown_type $fontSize
+	 * @param string $fontFamily
+	 * @param int $fontSize
 	 */
 	private function _getOffsetRatio($fontFamily, $fontSize){
 		if(isset(self::$_offsetRatio[$fontFamily])==false){
@@ -502,7 +504,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 * @return string
 	 */
 	protected function getFileExtension(){
-		return "html";
+		return 'html';
 	}
 
 }
