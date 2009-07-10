@@ -214,7 +214,10 @@ abstract class Extensions {
 					} else {
 						$zendDir = 'Library/Zend';
 					}
-					require $zendDir.'/'.$ex[0].'/'.$ex[0].'.php';
+					$pwd = getcwd();
+					chdir($zendDir);
+					require $ex[1].'.php';
+					chdir($pwd);
 				} else {
 					$extensionPath = 'Library/'.$ex[0].'/'.$ex[0].'.php';
 				}
