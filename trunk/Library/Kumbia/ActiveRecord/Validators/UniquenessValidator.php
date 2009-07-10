@@ -43,8 +43,24 @@ class UniquenessValidator extends ActiveRecordValidator implements ActiveRecordV
 	 */
 	public function validate(){
 		if($this->isRequired()==true){
-			$this->appendMessage("El valor del campo '{$this->getFieldName()}' debe ser num&eacute;rico");
-			return false;
+			$record = clone $this->getRecord();
+			$field = $this->getFieldName();
+			$value = addslashes($this->getValue());
+			$primaryFields = $record->getPrimaryKeyAttributes();
+			$condition = array();
+			foreach($primaryFields as $field){
+				$condition[] = "$field<>'".addslashes($record->readAttribute($field))."'";
+			}
+			$conditions = join(' AND ', $condition);
+			if($record->count("$field='$value' AND (".$conditions.')')>0){
+				$options = $this->getOptions();
+				if(isset($options['message'])){
+					$this->appendMessage("Este valor ya se encuentra en el atributo '$field'");
+	 			} else {
+					$this->appendMessage($options['message']);
+	 			}
+				return false;
+			}
 		}
 		return true;
 	}

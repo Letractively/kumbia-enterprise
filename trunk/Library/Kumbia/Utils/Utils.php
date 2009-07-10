@@ -114,11 +114,11 @@ abstract class Utils {
 	public static function scandirRecursive($package_dir, $files=array()){
 		foreach(scandir($package_dir) as $file){
 			if($file!='.'&&$file!='..'){
-				if(is_dir($package_dir."/".$file)){
-					$files = self::scandirRecursive($package_dir."/".$file, $files);
+				if(is_dir($package_dir.'/'.$file)){
+					$files = self::scandirRecursive($package_dir.'/'.$file, $files);
 				} else {
-					if(ereg("(.)+\.php$", $file)){
-						$files[] = $package_dir."/".$file;
+					if(ereg('(.)+\.php$', $file)){
+						$files[] = $package_dir.'/'.$file;
 					}
 				}
 			}
@@ -141,7 +141,7 @@ abstract class Utils {
 			$data = array();
 			$i = 0;
 			foreach($params as $p){
-				if(is_string($p)&&preg_match('/([a-zA-Z_0-9]+): (.+)/', $p, $regs)){
+				if(is_string($p)&&preg_match('/([a-zA-Z_0-9]+): (.*)/', $p, $regs)){
 					$data[$regs[1]] = $regs[2];
 				} else {
 					$data[$i] = $p;
@@ -254,10 +254,10 @@ abstract class Utils {
 			}
 		}
 		if($application){
-			$returnURL.=$application."/";
+			$returnURL.=$application.'/';
 		}
 		if($module){
-			$returnURL.=$module."/";
+			$returnURL.=$module.'/';
 		}
 		$returnURL.=$action;
 		return $returnURL;

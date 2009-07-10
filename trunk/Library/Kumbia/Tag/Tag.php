@@ -1031,16 +1031,19 @@ abstract class Tag {
 	 * @param string $src
 	 */
 	public static function javascriptMinifiedInclude($src){
-		if(class_exists('Jsmin')==false){
-			require 'Library/Kumbia/Tag/Jsmin/Jsmin.php';
-		}
 		$jsSource = 'public/javascript/'.$src.'.js';
 		$jsMinSource = 'public/javascript/'.$src.'.min.js';
 		if(file_exists($jsMinSource)==false){
+			if(class_exists('Jsmin')==false){
+				require 'Library/Kumbia/Tag/Jsmin/Jsmin.php';
+			}
 			$minified = Jsmin::minify(file_get_contents($jsSource));
 			file_put_contents($jsMinSource, $minified);
 		} else {
 			if(filemtime($jsSource)>filemtime($jsMinSource)){
+				if(class_exists('Jsmin')==false){
+					require 'Library/Kumbia/Tag/Jsmin/Jsmin.php';
+				}
 				$minified = Jsmin::minify(file_get_contents($jsSource));
 				file_put_contents($jsMinSource, $minified);
 			}

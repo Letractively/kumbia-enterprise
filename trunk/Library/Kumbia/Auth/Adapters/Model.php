@@ -44,7 +44,7 @@ class ModelAuth implements AuthInterface {
 	private $filename;
 
 	/**
-	 * Servidor de autenticaci�n (si es utilizado)
+	 * Servidor de autenticación (si es utilizado)
 	 *
 	 * @var string
 	 */
@@ -67,7 +67,7 @@ class ModelAuth implements AuthInterface {
 	/**
 	 * Atributos del modelo a comparar para autenticacion valida
 	 */
-	private $compareAttributes = array();
+	private $_compareAttributes = array();
 
 	/**
 	 * Identidad encontrara
@@ -93,7 +93,7 @@ class ModelAuth implements AuthInterface {
 		}
 		unset($extraArgs[0]);
 		unset($extraArgs['class']);
-		$this->compareAttributes = $extraArgs;
+		$this->_compareAttributes = $extraArgs;
 	}
 
 	/**
@@ -112,7 +112,7 @@ class ModelAuth implements AuthInterface {
 	 */
 	public function authenticate(){
 		$whereCondition = array();
-		foreach($this->compareAttributes as $field => $value){
+		foreach($this->_compareAttributes as $field => $value){
 			$value = addslashes($value);
 			$whereCondition[] = "$field = '$value'";
 		}
@@ -128,7 +128,7 @@ class ModelAuth implements AuthInterface {
 				/**
 				 * Trata de no incluir en la identidad el password del usuario
 				 */
-				if(!in_array($field, array("password", "clave", "contrasena", "passwd", "pass"))){
+				if(!in_array($field, array('password', 'clave', 'contrasena', 'passwd', 'pass'))){
 					$identity[$field] = $model->readAttribute($field);
 				}
 			}

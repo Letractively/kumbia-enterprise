@@ -89,6 +89,13 @@ abstract class Core {
 	private static $_isWebSphere = false;
 
 	/**
+	 * Framework Path Inicial
+	 *
+	 * @var string
+	 */
+	private static $_frameworkPath = "";
+
+	/**
 	 * Inicializa el entorno de aplicacion
 	 *
 	 * @access public
@@ -116,6 +123,26 @@ abstract class Core {
 		 */
 		self::setTimeZone();
 
+	}
+
+	/**
+	 * Establece el PATH inicial de la aplicación
+	 *
+	 * @param string $path
+	 * @static
+	 */
+	static public function setInitialPath($path){
+		self::$_frameworkPath = $path;
+	}
+
+	/**
+	 * Reestablece el PATH original de la aplicación
+	 *
+	 */
+	static public function restoreInitialPath(){
+		if(self::$_frameworkPath!=getcwd()){
+			chdir(self::$_frameworkPath);
+		}
 	}
 
 	/**
@@ -393,6 +420,9 @@ abstract class Core {
 	 * @static
 	 */
 	public static function main(){
+
+		//Establece el Path Inicial
+		self::setInitialPath(getcwd());
 
 		//Inicializa componentes comunes
 		self::_initializeCommonComponents();
@@ -766,6 +796,7 @@ abstract class Core {
                 E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
 		);
 		$errorReporting = ini_get('error_reporting');
+		self::restoreInitialPath();
 		if(isset($errortype[$number])&&$errorReporting>0){
 			if(!class_exists('Debug')){
 				self::requireFile('Debug/Debug');
