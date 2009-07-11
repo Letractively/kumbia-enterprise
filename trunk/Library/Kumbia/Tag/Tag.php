@@ -119,6 +119,9 @@ abstract class Tag {
 		}
 		if(is_array($action)){
 			if(isset($action['confirm'])&&$action['confirm']){
+				if(!isset($action['onclick'])){
+					$action['onclick'] = "";
+				}
 				$action['onclick'] = "if(!confirm(\"{$action['confirm']}\")) { return false; }; ".$action['onclick'];
 				unset($action['confirm']);
 			}
