@@ -183,15 +183,15 @@ abstract class Tag {
 	}
 
 	/**
-	 * Permite ejecutar una acci&oacute;n en la vista actual dentro de un contenedor
+	 * Permite ejecutar una acción en la vista actual dentro de un contenedor
 	 * HTML usando AJAX
 	 *
-	 * confirm: Texto de Confirmaci&oacute;n
-	 * success: Codigo JavaScript a ejecutar cuando termine la petici&oacute;n AJAX
-	 * before: Codigo JavaScript a ejecutar antes de la petici&oacute;n AJAX
-	 * oncomplete: Codigo JavaScript que se ejecuta al terminar la petici&oacute;n AJAX
-	 * update: Que contenedor HTML ser&oacute; actualizado
-	 * action: Accion que ejecutar&oacute; la petici&oacute;n AJAX
+	 * confirm: Texto de Confirmación
+	 * success: Codigo JavaScript a ejecutar cuando termine la petición AJAX
+	 * before: Codigo JavaScript a ejecutar antes de la petición AJAX
+	 * oncomplete: Codigo JavaScript que se ejecuta al terminar la petición AJAX
+	 * update: Que contenedor HTML seró actualizado
+	 * action: Accion que ejecutaró la petición AJAX
 	 * text: Texto del Enlace
 	 *
 	 * @access public
@@ -397,7 +397,7 @@ abstract class Tag {
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
 		$value = self::getValueFromAction($params);
-		if(!$params[0]) {
+		if(!isset($params[0])||!$params[0]) {
 			$params[0] = $params['id'];
 		}
 		if(!isset($params['name'])||!$params['name']){
@@ -810,7 +810,7 @@ abstract class Tag {
 						$code.="\t<option value='{$d[0]}'>{$d[1]}</option>\r\n";
 					}
 				} else {
-					throw new TagException("La collecci&oacute;n de opciones no es valida");
+					throw new TagException("La collección de opciones no es valida");
 				}
 			}
 			$code.= "</select>\r\n";
@@ -2025,7 +2025,7 @@ abstract class Tag {
 			if(is_object($items)){
 				if($items instanceof ActiveRecordResultset){
 					if($start<0){
-						throw new CoreException("El n&uacute;mero de la página es negativo &oacute; cero ($start)");
+						throw new CoreException("El n&uacute;mero de la página es negativo ó cero ($start)");
 					}
 					$page->items = array();
 					$total = count($items);
