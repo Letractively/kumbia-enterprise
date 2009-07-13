@@ -281,4 +281,18 @@ class Filter extends Object {
 		}
 	}
 
+	/**
+	 * Valida que un determinado valor se encuentre en un rango
+	 *
+	 * @param string $value
+	 * @param array $range
+	 */
+	public static function inRange($value, $range){
+		if(in_array($value, $range)){
+			return $value;
+		} else {
+			return null;
+		}
+	}
+
 }

@@ -69,7 +69,7 @@ class PDF extends PdfDocument {
 		//Arial italic 8
 		$this->setFont('Arial', '', 8);
 		//Número de página
-		$this->writeCell(0,10,'-- '.$this->PageNo().' --', 0, 0, 'C');
+		$this->writeCell(0,10,'-- '.$this->getPageNumber().' --', 0, 0, 'C');
 
 	}
 
@@ -87,7 +87,7 @@ class PDF extends PdfDocument {
 function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 
 	$config = CoreConfig::readAppConfig();
-	$active_app = Core::getActiveApplication();
+	$active_app = Router::getApplication();
 
 	//Orientación
 	if($sumArray>200) {
@@ -137,10 +137,10 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 	if($config->application->name){
 		$pdf->writeMultiCell(0, 6, strtoupper($config->application->name), 0, "C", 0);
 	}
-	$pdf->writeMultiCell(0, 6, "REPORTE DE ".strtoupper($title), 0, "C", 0);
+	$pdf->writeMultiCell(0, 6, 'REPORTE DE '.strtoupper($title), 0, 'C', 0);
 	$pdf->setFont('Verdana','', 12);
 	if(isset($_SESSION['fecsis'])){
-		$pdf->writeMultiCell(0, 6, "FECHA ".date("Y-m-d"), 0, "C", 0);
+		$pdf->writeMultiCell(0, 6, 'FECHA '.Date::getCurrentDate(), 0, 'C', 0);
 	}
 	$pdf->lineFeed();
 
@@ -187,7 +187,7 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 			for($i=0;$i<count($headerArray);$i++){
 				$pdf->writeCell($weightArray[$i], 7, $headerArray[$i], 1, 0, 'C', 1);
 			}
-			$pdf->Ln();
+			$pdf->LineFeed();
 			$pdf->SetFillColor(224, 235, 255);
 			$pdf->SetTextColor(0);
 			$pdf->SetFont('Arial', 'B', 7);
