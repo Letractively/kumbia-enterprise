@@ -432,19 +432,23 @@ class AclMemory implements AclAdapter {
 		foreach($accessList as $access){
 			foreach($this->_access[$role] as $resourceName => $resourceAccess){
 				if($resourceName==$resource||$resourceName=='*'){
-					if($resourceAccess[$access]=='A'){
-						$isAllowed = true;
-					} else {
-						if($resourceAccess[$access]=='D'){
-							$isAllowed = false;
+					if(isset($resourceAccess[$access])){
+						if($resourceAccess[$access]=='A'){
+							$isAllowed = true;
 						} else {
-							if($resourceAccess['*']=='A'){
-								$isAllowed = true;
-							}
-							if($resourceAccess['*']=='D'){
+							if($resourceAccess[$access]=='D'){
 								$isAllowed = false;
+							} else {
+								if($resourceAccess['*']=='A'){
+									$isAllowed = true;
+								}
+								if($resourceAccess['*']=='D'){
+									$isAllowed = false;
+								}
 							}
 						}
+					} else {
+						$isAllowed = true;
 					}
 				}
 			}
