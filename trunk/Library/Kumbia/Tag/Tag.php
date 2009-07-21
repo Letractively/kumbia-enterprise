@@ -984,10 +984,12 @@ abstract class Tag {
 	 * @return string
 	 * @static
 	 */
-	public static function javascriptBase(){
+	public static function javascriptBase($validations=true){
 		$path = Core::getInstancePath();
 		$code = "<script type='text/javascript' src='".$path."javascript/core/base.js'></script>\r\n";
-		$code.= "<script type='text/javascript' src='".$path."javascript/core/validations.js'></script>\r\n";
+		if($validations==true){
+			$code.= "<script type='text/javascript' src='".$path."javascript/core/validations.js'></script>\r\n";
+		}
 		$code.= Tag::javascriptLocation();
 		return $code;
 	}
@@ -1015,14 +1017,21 @@ abstract class Tag {
 	 * @param string $cache
 	 * @return string
 	 */
-	public static function javascriptInclude($src='', $cache=true){
+	public static function javascriptInclude($src='', $noCache=true, $parameters=""){
 		if($src==""){
 			$src = Router::getController();
 		}
 		$src.='.js';
-		if(!$cache){
+		if(!$noCache){
 			$cache = mt_rand(0, 999999);
 			$src.="?nocache=".$cache;
+			if($parameters){
+				$src.="&".$parameters;
+			}
+		} else {
+			if($parameters){
+				$src.="?".$parameters;
+			}
 		}
 		$instancePath = Core::getInstancePath();
 		return "<script type='text/javascript' src='{$instancePath}javascript/$src'></script>\r\n";
@@ -1315,7 +1324,7 @@ abstract class Tag {
 	 * @param boolean $useVariables
 	 * @static
 	 */
-	public static function stylesheetLink($src='', $useVariables=false){
+	public static function stylesheetLink($src='', $useVariables=false, $parameters=""){
 		if(!$src) {
 			$src = Router::getController();
 		}
@@ -1326,9 +1335,9 @@ abstract class Tag {
 			} else {
 				$kb = '/';
 			}
-			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css.php?c=$src&p=$kb' />\r\n";
+			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css.php?c=$src&p=$kb&$parameters' />\r\n";
 		} else {
-			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css/$src.css' />\r\n";
+			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css/$src.css?$parameters' />\r\n";
 		}
 		MemoryRegistry::prepend('CORE_CSS_IMPORTS', $code);
 		return $code;
