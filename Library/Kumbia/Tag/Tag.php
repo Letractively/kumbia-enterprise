@@ -388,6 +388,76 @@ abstract class Tag {
 	}
 
 	/**
+	 * Crea una caja de texto que solo acepta numeros y los formatea como moneda
+	 *
+	 * @param 	mixed $params
+	 * @return 	string
+	 * @static
+	 */
+	public static function moneyField($params){
+		$numberArguments = func_num_args();
+		$params = Utils::getParams(func_get_args(), $numberArguments);
+		if(!isset($params[0])){
+			$params[0] = $params['id'];
+		}
+		if(!isset($params['name'])||!$params['name']){
+			$params['name'] = $params[0];
+		}
+		if(isset($params['value'])){
+			$value = $params['value'];
+			unset($params['value']);
+		} else {
+			$value = self::getValueFromAction($params[0]);
+		}
+		if(!isset($params['onkeydown'])) {
+			$params['onkeydown'] = "valNumeric(event)";
+		} else {
+			$params['onkeydown'].=";valNumeric(event)";
+		}
+        if(!isset($params['formatOptions'])){
+            $params['formatOptions'] = '';
+        }
+        if(isset($params['objectFormat'])){
+		    if(!isset($params['onblur'])) {
+			    $params['onblur'] = "this.value={$params['objectFormat']}.money(this.value);";
+		    } else {
+			    $params['onblur'].= ";this.value={$params['objectFormat']}.money(this.value);";
+		    }
+		    if(!isset($params['onfocus'])) {
+			    $params['onfocus'] = "this.value={$params['objectFormat']}.deFormat(this.value,\"money\");this.activate();";
+		    } else {
+			    $params['onfocus'].= ";this.value={$params['objectFormat']}.deFormat(this.value,\"money\");this.activate();";
+		    }
+            $codeAlt = "<script type='text/javascript'>\n\t$('{$params[0]}').value={$params['objectFormat']}.money($('{$params[0]}').value);\n</script>\r\n";
+            unset($params['objectFormat']);
+        }else{
+		    if(!isset($params['onblur'])) {
+			    $params['onblur'] = "defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.money(this.value);";
+		    } else {
+			    $params['onblur'].=";defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.money(this.value);";
+		    }
+		    if(!isset($params['onfocus'])) {
+			    $params['onfocus'] = "defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.deFormat(this.value,\"money\");this.activate();";
+		    } else {
+			    $params['onfocus'].= ";defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.deFormat(this.value,\"money\");this.activate();";
+		    }
+            $codeAlt = "<script type='text/javascript'>\n\tdefaultFormater=new Format({$params['formatOptions']});\n\t$('{$params[0]}').value=defaultFormater.money($('{$params[0]}').value);\n</script>\r\n";
+        }
+        unset($params['formatOptions']);
+		$code = "<input type='text' id='{$params[0]}' value='$value' ";
+		foreach($params as $key => $val){
+			if(!is_integer($key)){
+				$code.="$key='$val' ";
+			}
+		}
+		$code.=" />\r\n";
+        if(isset($codeAlt) && !empty($value)){
+            $code.= $codeAlt;
+        }
+		return $code;
+	}
+
+	/**
 	 * Crea una caja de password que solo acepta numeros
 	 *
 	 * @param 	mixed $params
