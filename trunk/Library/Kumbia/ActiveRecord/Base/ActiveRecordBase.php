@@ -1964,9 +1964,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			} else {
 				if(is_null($generator)){
 					if(count($primaryKeys)==1){
-						$lastId = $this->_db->lastInsertId($table, $primaryKeys[0], $sequenceName);
-						$this->{$primaryKeys[0]} = $lastId;
-						if($dataType[$primaryKeys[0]]!='date'){
+						if($this->isANumericType($primaryKeys[0])){
+						    $lastId = $this->_db->lastInsertId($table, $primaryKeys[0], $sequenceName);
+						    $this->{$primaryKeys[0]} = $lastId;
 							$this->findFirst($lastId);
 						}
 					}
