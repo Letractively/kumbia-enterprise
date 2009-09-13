@@ -866,9 +866,9 @@ abstract class Tag {
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
-							$code.="\t<option selected='selected' value='{$o->readAttribute($using[0])}'>{$o->readAttribute($using[1])}</option>\r\n";
+							$code.="\t<option selected='selected' value='".trim($o->readAttribute($using[0]))."'>".trim($o->readAttribute($using[1]))."</option>\r\n";
 						} else {
-							$code.="\t<option value='{$o->readAttribute($using[0])}'>{$o->readAttribute($using[1])}</option>\r\n";
+							$code.="\t<option value='".trim($o->readAttribute($using[0]))."'>".trim($o->readAttribute($using[1]))."</option>\r\n";
 						}
 					} else {
 						$code.=call_user_func_array($callback, array($o, $value));

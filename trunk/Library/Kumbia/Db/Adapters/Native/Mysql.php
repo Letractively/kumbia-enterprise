@@ -231,7 +231,7 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	public function close(){
 		if($this->_idConnection){
 			parent::close();
-			$success = mysql_close($this->_idConnection);
+			@$success = mysql_close($this->_idConnection);
 			$this->_idConnection = null;
 			return $success;
 		} else {

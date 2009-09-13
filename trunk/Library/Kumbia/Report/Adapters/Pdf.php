@@ -96,6 +96,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	public function setColumnHeaders($columnHeaders){
 		$i = 0;
 		foreach($columnHeaders as $columnHeader){
+			$columnHeader = html_entity_decode($columnHeader);
 			if(isset($this->_columnSizes[$i])==false){
 				$this->_columnSizes[$i] = strlen($columnHeader);
 			} else {
@@ -212,14 +213,17 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 
 	}
 
-	private function _adjustToCenter(){
+	private function _adjustToCenter($mult=1){
 		$sumArray = array_sum($this->_columnSizes);
 		if($sumArray>250){
 			$widthPage = 355;
 		} else {
 			$widthPage = 140;
+			if($mult!=1) $widthPage = 215;
 		}
+		$sumArray *= $mult;
 		$pos = floor(($widthPage/2)-($sumArray/2));
+		if($pos<0) $pos = 0;
 		$this->_pdf->SetX($pos);
 	}
 
@@ -231,11 +235,12 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 		}
 		$preparedStyle = $this->_prepareStyle($attributes);
 		$this->_applyStyle($preparedStyle);
-		$this->_adjustToCenter();
+		$this->_adjustToCenter(3);
 		$height = ceil($preparedStyle['fontSize']*6/16)+1;
 		$i = 0;
 		foreach($this->getColumnHeaders() as $header){
-			$this->_pdf->Cell($this->_columnSizes[$i]*4, $height, $header, 1, 0, 'C', 1);
+			$header = html_entity_decode($header);
+			$this->_pdf->Cell($this->_columnSizes[$i]*3, $height, $header, 1, 0, 'C', 1);
 			$i++;
 		}
 		$this->_pdf->Ln();
@@ -246,7 +251,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 		$styles = $this->getColumnStyles();
 		$height = null;
 		foreach($data as $row){
-			$this->_adjustToCenter();
+			$this->_adjustToCenter(3);
 			$i = 0;
 			foreach($row as $value){
 				if(isset($styles[$i])){
@@ -256,7 +261,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 						$height = ceil($preparedStyle['fontSize']*6/16)+1;
 					}
 				}
-				$this->_pdf->Cell($this->_columnSizes[$i]*4, $height, $value, 1, 0, 'C', 1);
+				$this->_pdf->Cell($this->_columnSizes[$i]*3, $height, $value, 1, 0, 'C', 1);
 				$i++;
 			}
 			$this->_pdf->Ln();

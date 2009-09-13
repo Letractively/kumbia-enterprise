@@ -367,7 +367,7 @@ if(!class_exists('FPDF', false)){
 			}
 			//Page footer
 			$this->InFooter = true;
-			$this->Footer();
+			//$this->Footer();
 			$this->InFooter = false;
 			//Close page
 			$this->_endpage();
@@ -395,7 +395,7 @@ if(!class_exists('FPDF', false)){
 			if($this->page>0){
 				//Page footer
 				$this->InFooter = true;
-				$this->Footer();
+				//$this->Footer();
 				$this->InFooter = false;
 				//Close page
 				$this->_endpage();
@@ -423,7 +423,7 @@ if(!class_exists('FPDF', false)){
 			$this->TextColor = $tc;
 			$this->ColorFlag = $cf;
 			//Page header
-			$this->Header();
+			//$this->Header();
 			//Restore line width
 			if($this->LineWidth!=$lw){
 				$this->LineWidth = $lw;
@@ -450,16 +450,73 @@ if(!class_exists('FPDF', false)){
 		 * To be implemented in your own inherited class
 		 *
 		 */
-		public function Header(){
+		/*public function Header(){
 
+		}*/
+		
+		function Header($fecha="",$orientation="",$format="",$contents,$image=""){
+			//To be implemented in your own inherited class
+            $withmax=0;
+            $space = 6;
+            if($orientation=='P' && $format=='A4'){
+            	$withmax=190;
+			}
+            if($orientation=='L' && $format=='A4'){
+            	$withmax=290;
+			}
+            if($orientation=='L' && $format=='legal'){
+                $withmax=500;
+		$space = 15;
+            }
+	    $this->SetY(10);
+            if($fecha!=""){
+            	$this->SetFont('Arial','B', 8);
+                $this->Cell($withmax,6,"Fecha: ".$fecha,0,1,'L',0);
+                $this->Ln();
+	    }
+            if($image!=""){
+            	$this->Image($image,25,20,25,25);
+                $this->Ln();
+			}
+			if(is_array($contents)){
+            	$this->SetFont('Arial','B', 12);
+                foreach ($contents as $content){
+                	$this->Cell($withmax,$space,$content,0,1,'C',0);
+				}
+                $this->Ln();
+                $this->Ln();
+			}
 		}
+		
 
 		/**
 		 * To be implemented in your own inherited class
 		 *
 		 */
-		public function Footer(){
+		/*public function Footer(){
 
+		}*/
+		function Footer($orientation="",$format="",$contents){
+			$withmax=0;
+            $Ymax=0;
+            if($orientation=='P' && $format=='A4'){
+            	$withmax=190;
+                $Ymax=-23;
+			}
+            if($orientation=='L' && $format=='A4'){
+            	$withmax=290;
+                $Ymax=-23;
+			}
+            if(is_array($contents)){
+            	$Y = (count($contents)*-4)+$Ymax;
+                $this->SetY(($Y));
+                $this->SetFont('Arial','B',7);
+                foreach ($contents as $content){
+                	$this->Cell($withmax,3,$content,0,1,'C');
+				}
+            	$this->Cell($withmax,3," -- Pagina No. ".$this->PageNo()." -- ",0,1,'C');
+            }
+            //To be implemented in your own inherited class
 		}
 
 		/**
