@@ -53,7 +53,7 @@ abstract class Generator {
 			if($name==$field) {
 				return $n;
 			}
-			$n++;
+			++$n;
 		}
 		return 0;
 	}
@@ -87,7 +87,7 @@ abstract class Generator {
 	 *
 	 */
 	static function buildFormOut(){
-		print self::$outForm;
+		echo self::$outForm;
 		self::$outForm = "";
 	}
 
@@ -227,7 +227,7 @@ abstract class Generator {
 			if(!isset($form['components'][$field['Field']]['type'])){
 				$form['components'][$field['Field']]['type'] = "text";
 			}
-			$n++;
+			++$n;
 		}
 
 		if(!count($cp['components'])) {

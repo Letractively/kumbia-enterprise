@@ -173,10 +173,11 @@ abstract class Security extends Object {
 				if((time()%8)==0){
 					return generateRSAKey($kumbia);
 				} else {
-					if($kumbia)
-					formsPrint("<input type='hidden' id='rsa32_key' value=\"{$_SESSION['rsa_key']}\"/> \r\n");
-					else
-					print "<input type='hidden' id='rsa32_key' value=\"{$_SESSION['rsa_key']}\"/> \r\n";
+					if($kumbia){
+						formsPrint("<input type='hidden' id='rsa32_key' value=\"{$_SESSION['rsa_key']}\"/> \r\n");
+					} else {
+						echo "<input type='hidden' id='rsa32_key' value=\"{$_SESSION['rsa_key']}\"/> \r\n";
+					}
 				}
 			} else {
 				return generateRSAKey($kumbia);

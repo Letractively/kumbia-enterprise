@@ -66,7 +66,6 @@ abstract class Extensions {
 	 */
 	static public function loadBooteable(){
 
-
 		//Instancia Activa
 		$instanceName = Core::getInstanceName();
 

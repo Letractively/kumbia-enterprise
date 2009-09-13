@@ -57,7 +57,7 @@ class ActiveRecordCriteria {
 				}
 			}
 			$criteria = str_replace(":$key", $value, $criteria);
-			$i++;
+			++$i;
 		}
 		return $criteria;
 	}

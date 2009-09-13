@@ -170,7 +170,10 @@ class Date extends Object {
 				$date = date('Y-m-d');
 			}
 		}
-		$dateParts = split('[/-]', $date);
+		$dateParts = preg_split('#[/-]#', $date);
+		if(!isset($dateParts[1])){
+			throw new DateException("La fecha '$date' es inválida");
+		}
 		$this->_year = (int) $dateParts[0];
 		$this->_month = (int) $dateParts[1];
 		$this->_day = (int) $dateParts[2];
@@ -179,7 +182,7 @@ class Date extends Object {
 		}
 		$monthDays = self::$_monthTable[$this->_month-1];
 		if($this->isLeapYear()==true&&$this->_month==2){
-			$monthDays++;
+			++$monthDays;
 		}
 		if($this->_day>$monthDays){
 			if($fixDate==false){
@@ -263,13 +266,13 @@ class Date extends Object {
 	                if($count>$year){
 	                    $date += 365;
 	                    if($leapyear===true){
-	                        $date++;
+	                        ++$date;
 	                    }
 	                } else {
 	                    for($mcount=11;$mcount>($month-1);$mcount--){
 	                        $date += self::$_monthTable[$mcount];
 	                        if(($leapyear===true)&&($mcount==1)){
-	                            $date++;
+	                            ++$date;
 	                        }
 	                    }
 	                }
@@ -284,18 +287,18 @@ class Date extends Object {
 	                $date=-12219321600;
 	            }
 			} else {
-				for($count=1970;$count<=$year;$count++){
+				for($count=1970;$count<=$year;++$count){
 					$leapyear = self::isYearLeapYear($count);
 					if($count<$year){
 						$date += 365;
 						if($leapyear===true){
-							$date++;
+							++$date;
 						}
 					} else {
-						for($mcount=0;$mcount<($month-1);$mcount++){
+						for($mcount=0;$mcount<($month-1);++$mcount){
 							$date += self::$_monthTable[$mcount];
 							if(($leapyear===true)&&($mcount==1)){
-								$date++;
+								++$date;
 							}
 						}
 					}
@@ -351,7 +354,7 @@ class Date extends Object {
 		$this->_day = (int) $day;
 		$monthDays = self::$_monthTable[$this->_month-1];
 		if($this->isLeapYear()==true&&$this->_month==2){
-			$monthDays++;
+			++$monthDays;
 		}
 		if($this->_day>$monthDays){
 			$this->_day = self::$_monthTable[$this->_month-1];
@@ -379,7 +382,7 @@ class Date extends Object {
 		}
 		$monthDays = self::$_monthTable[$this->_month-1];
 		if($this->isLeapYear()==true&&$this->_month==2){
-			$monthDays++;
+			++$monthDays;
 		}
 		if($this->_day>$monthDays){
 			$this->_day = self::$_monthTable[$this->_month-1];
@@ -397,7 +400,7 @@ class Date extends Object {
 		$this->_year = (int) $year;
 		$monthDays = self::$_monthTable[$this->_month-1];
 		if($this->isLeapYear()==true&&$this->_month==2){
-			$monthDays++;
+			++$monthDays;
 		}
 		if($this->_day>$monthDays){
 			$this->_day = self::$_monthTable[$this->_month-1];
@@ -585,7 +588,7 @@ class Date extends Object {
 	 */
 	public function getPeriod(){
 		if($this->_year>1970&&$this->_year<2038){
-			return date('Yd', $this->_timestamp);
+			return date('Ym', $this->_timestamp);
 		} else {
 			$dateParts = self::_getDateParts($this->_timestamp, false);
 			return $dateParts['year'].$dateParts['mon'];
@@ -623,15 +626,6 @@ class Date extends Object {
 		//determinar el timezone?
 		return $this->getAbrevDayOfWeek().', '.sprintf('%02s', $this->getDay()).' '.
 			$this->getAbrevMonthName().' '.$this->getYear().' 00:00:00 +0000';
-	}
-
-	/**
-	 * Devuelve la fecha en string
-	 *
-	 * @return string
-	 */
-	public function __toString(){
-		return $this->_date;
 	}
 
 	/**
@@ -727,7 +721,7 @@ class Date extends Object {
 		if(is_object($date) && $date instanceof Date){
 			$date = $date->getDate();
 		}
-		$dateParts = split('[/-]', $date);
+		$dateParts = preg_split('#[/-]#', $date);
 		if(count($dateParts)!=3){
 			throw new DateException("La fecha '$date' es invalida");
 		}
@@ -1119,7 +1113,7 @@ class Date extends Object {
 		}
 		$day = self::$_monthTable[$month-1];
 		if(self::isYearLeapYear($year)&&$month==2){
-			$day++;
+			++$day;
 		}
 		return "$year-".sprintf("%02s", $month)."-".sprintf("%02s", $day);
 	}
@@ -1156,7 +1150,7 @@ class Date extends Object {
 		}
 		$lastDay = self::$_monthTable[$month-1];
 		if($month==2&&self::isYearLeapYear($year)){
-			$lastDay++;
+			++$lastDay;
 		}
 		$timestamp = self::mktime($month, $lastDay, $year);
 		for($i=$timestamp;$i>0;$i = self::_sub($i, 86400)){
@@ -1441,7 +1435,7 @@ class Date extends Object {
         } else {
 
             // iterate through years
-            for($i = 1970;;$i++){
+            for($i = 1970;;++$i){
                 $day = $timestamp;
                 $timestamp -= 31536000;
                 $leapyear = self::isYearLeapYear($i);
@@ -1456,7 +1450,7 @@ class Date extends Object {
             $secondsPerYear = $day;
             $timestamp = $day;
             // iterate through months
-            for($i=0;$i<=11;$i++){
+            for($i=0;$i<=11;++$i){
                 $day = $timestamp;
                 $timestamp -= self::$_monthTable[$i]*86400;
                 if(($leapyear===true)&&($i==1)){
@@ -1596,7 +1590,6 @@ class Date extends Object {
 		return LocaleMath::cmp($value1, $value2);
 	}
 
-
 	/**
 	 * Redondea un valor en forma localizada con soporte a numeros grandes
 	 *
@@ -1606,6 +1599,35 @@ class Date extends Object {
 	 */
 	static private function _round($value, $scale){
 		return LocaleMath::round($value, $scale);
+	}
+
+	/**
+	 * Desctructor de Date
+	 *
+	 * @access public
+	 */
+	public function __destruct(){
+		$this->_locale = null;
+	}
+
+	/**
+	 * Método mágico Sleep de Date
+	 *
+	 * @access 	public
+	 * @return 	array
+	 */
+	public function __sleep(){
+		return array('_date', '_year', '_month', '_day', '_timestamp');
+	}
+
+	/**
+	 * Método mágico toString de Date
+	 *
+	 * @access	public
+	 * @return	string
+	 */
+	public function __toString(){
+		return (string) $this->_date;
 	}
 
 }

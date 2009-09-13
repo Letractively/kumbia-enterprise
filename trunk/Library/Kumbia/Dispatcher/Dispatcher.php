@@ -165,7 +165,7 @@ abstract class Dispatcher {
 		}
 		PluginManager::notifyFromController('beforeNotFoundAction', $applicationController);
 		if(method_exists($applicationController, 'notFoundAction')){
-			$applicationController->notFoundAction(Router::getController(), Router::getAction(), Router::getId());
+			call_user_func_array(array($applicationController, 'notFoundAction'), Router::getAllParameters());
 			return true;
 		} else {
 			return false;
@@ -374,7 +374,7 @@ abstract class Dispatcher {
 				self::$_requestStatus = self::STATUS_DISPATCHING;
 				if(method_exists(self::$_controller, $actionMethod)==false){
 					if(method_exists(self::$_controller, 'notFoundAction')){
-						Router::routeTo(array('action' => 'notFound', 'id' => $action));
+						call_user_func_array(array(self::$_controller, 'notFoundAction'), Router::getAllParameters());
 						return self::$_controller;
 					} else {
 						//No se encontró la acción
@@ -397,7 +397,7 @@ abstract class Dispatcher {
 						$message = CoreLocale::getErrorMessage(-105, $methodParameter->getName(), $action);
 						self::throwException($message, self::INVALID_ARGUMENT_NUMBER);
 					}
-					$paramNumber++;
+					++$paramNumber;
 				}
 				self::$_valueReturned = call_user_func_array(array(self::$_controller, $actionMethod), $parameters);
 

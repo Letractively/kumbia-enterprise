@@ -84,6 +84,13 @@ class ActiveRecordTransaction {
 	private $_dependencies = array();
 
 	/**
+	 * Mensajes de validación de la transacción
+	 *
+	 * @var array
+	 */
+	private $_messages = array();
+
+	/**
 	 * Constructor de la Transaccion
 	 *
 	 * @param boolean $autoBegin
@@ -238,5 +245,32 @@ class ActiveRecordTransaction {
 			}
 		}
 	}
+
+	/**
+	 * Guarda todos los objetos asociados a la transacción
+	 *
+	 * @return boolean
+	 */
+	public function save(){
+		$this->_messages = array();
+		foreach($this->_dependencies as $dependency){
+			if($dependency->save()==false){
+				$this->_messages = $dependency->getMessages();
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Devuelve mensajes de validación si save falla
+	 *
+	 * @return array
+	 */
+	public function getMessages(){
+		return $this->_messages;
+	}
+
+	//public function
 
 }

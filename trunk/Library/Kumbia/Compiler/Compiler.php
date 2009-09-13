@@ -157,7 +157,7 @@ class Compiler {
 	 * Compila la aplicacion actual
 	 *
 	 */
-	public static function compileFramework(){
+	public static function compileFramework($otherFiles=array()){
 		set_time_limit(0);
 		$exceptions = array('public/index.php');
 		self::$_requiredFiles = get_required_files();
@@ -165,25 +165,44 @@ class Compiler {
 		$currentDirectory = getcwd();
 		foreach(self::$_requiredFiles as $requiredFile){
 			self::$_requiredFiles[$i] = str_replace('/Applications/MAMP/htdocs/kef/kumbia-ef', $currentDirectory, $requiredFile);
-			$i++;
+			++$i;
 		}
+		//0142
 		self::compileFile('Library/Kumbia/Autoload.php');
+		$includeControllerBase = false;
 		foreach(self::$_requiredFiles as $requiredFile){
-			if((strpos($requiredFile, '/Library/Kumbia/')!==false&&
-				strpos($requiredFile, '/Library/Kumbia/Compiler/')===false&&
-				strpos($requiredFile, '/Library/Kumbia/Autoload.php')===false)||
-				strpos($requiredFile, '/application.php')!==false){
-				#print $requiredFile."<br>";
-				self::compileFile($requiredFile);
-				break;
+			if(
+			  strpos($requiredFile, '/Library/Kumbia/Controller/')===false&&
+			  //strpos($requiredFile, '/Library/Kumbia/Tag/')===false&&
+			  strpos($requiredFile, '/Library/Kumbia/Compiler/')===false&&
+			  strpos($requiredFile, '/Library/Kumbia/Autoload.php')===false&&
+			  strpos($requiredFile, 'public/index.php')===false&&
+			  strpos($requiredFile, '/controllers/')===false&&
+			  strpos($requiredFile, '/library/')===false&&
+			  strpos($requiredFile, '/models/')===false&&
+			  strpos($requiredFile, '/plugins/')===false){
+			  	/*if($includeControllerBase==false){
+				  	if(strpos($requiredFile, '/Library/Kumbia/Controller')){
+						self::$_compilation.='Core::includeControllerBase();';
+						$includeControllerBase = true;
+				  	}
+			  	}*/
+			  	self::compileFile($requiredFile);
 			}
 		}
+		foreach($otherFiles as $requiredFile){
+			self::compileFile($requiredFile);
+		}
+		/*foreach(self::$_requiredFiles as $requiredFile){
+			if(strpos($requiredFile, '/library')!==false){
+				self::compileFile($requiredFile);
+			}
+		}*/
 		$compilation = self::$_compilation;
 		self::$_compilation = '';
 		self::compileFile('public/index.php');
 		self::$_compilation = str_replace('chdir(\'..\');', 'chdir(\'..\');'.$compilation, self::$_compilation);
-		#self::compileFile('/Applications/MAMP/htdocs/hfos/Library/Kumbia/Core/Core.php');
-		#file_put_contents('compile.php', '<?php '.self::$_compilation);
+		file_put_contents('compile.php', '<?php '.self::$_compilation);
 		if(isset(self::$_messages[self::MESSAGE_ERROR])){
 			if(count(self::$_messages[self::MESSAGE_ERROR])>0){
 				return false;
@@ -198,7 +217,7 @@ class Compiler {
 		$tokens = token_get_all($source);
 		$numberTokens = count($tokens);
 		#print '<table>';
-		for($i=0;$i<$numberTokens;$i++){
+		for($i=0;$i<$numberTokens;++$i){
 			$jp = false;
 			$token = $tokens[$i];
 			if(is_array($token)){
@@ -211,7 +230,7 @@ class Compiler {
 					switch($token[0]){
 						case T_CONSTANT_ENCAPSED_STRING:
 							if($token[1]!='"\'"'){
-								if(preg_match('/"(.*)"/', $token[1], $matches)){
+								if(preg_match('/^"(.*)"/', $token[1], $matches)){
 									if(strpos($matches[1], "\\")===false&&strpos($matches[1], '$')===false){
 										$token[1] = "'".addslashes($matches[1])."'";
 									}
@@ -236,7 +255,7 @@ class Compiler {
 								$i+=2;
 								if(!is_array($tokens[$i])){
 									if($tokens[$i]==';'){
-										$i++;
+										++$i;
 									}
 								}
 							}
@@ -256,12 +275,12 @@ class Compiler {
 								}
 							}
 						case T_FOR:
-							$r = self::_analizeForStatement($token, $i, &$tokens);
+							/*$r = self::_analizeForStatement($token, $i, &$tokens);
 							if($r>=0){
 								$jp = true;
 								$i = $r+1;
 							}
-							break;
+							break;*/
 					}
 					if($jp==false){
 						if(in_array($token[0], self::$_beforeSpaceTokens)){
@@ -297,14 +316,18 @@ class Compiler {
 				self::$_compilation.=PHP_EOL;
 				self::$_tokenCount = 0;
 			} else {
-				self::$_tokenCount++;
+				++self::$_tokenCount;
 			}
 		}
 		#print '</table>';
 		#print '</pre>';
 		self::$_compilation.=';';
-		if(count(self::$_messages[self::MESSAGE_ERROR])>0){
-			return false;
+		if(isset(self::$_messages[self::MESSAGE_ERROR])){
+			if(count(self::$_messages[self::MESSAGE_ERROR])>0){
+				return false;
+			} else {
+				return true;
+			}
 		} else {
 			return true;
 		}
@@ -373,7 +396,8 @@ class Compiler {
 	 */
 	public static function compileFile($file){
 		#self::$_compilation.="#$file".PHP_EOL;
-		file_put_contents('file.txt', $file);
+		#file_put_contents('file.txt', $file);
+		print $file."<br>";
 		self::compileSource(file_get_contents($file));
 	}
 
@@ -407,7 +431,7 @@ class Compiler {
 					} else {
 						$forCode.=$tokens[$j];
 					}
-					$j++;
+					++$j;
 				}
 				$forCode.=';';
 				$i = $j+1;
@@ -446,13 +470,13 @@ class Compiler {
 										} else {
 											$notEvalCode.=$tokens[$j];
 										}
-										$j++;
+										++$j;
 									}
 									$notEvalCode.=';';
 									$forCode.='$_sp;';
 									$cOpen = 0;
 									$pOpen = 1;
-									$j++;
+									++$j;
 									while(true){
 										if(is_array($tokens[$j])){
 											if(!in_array($tokens[$j][0], self::$_breakTokens)){
@@ -460,7 +484,7 @@ class Compiler {
 													if(in_array($tokens[$j][1], $posibleSource)){
 														$k = $j+1;
 														while(in_array(is_array($tokens[$k]) ? $tokens[$k][0] : '', self::$_breakTokens)){
-															$k++;
+															++$k;
 														}
 														if(in_array(
 															is_array($tokens[$k]) ? $tokens[$k][0] : $tokens[$k], array(
@@ -477,7 +501,7 @@ class Compiler {
 										} else {
 											$forCode.=$tokens[$j];
 											if($tokens[$j]=='{'){
-												$cOpen++;
+												++$cOpen;
 											}
 											if($tokens[$j]=='}'){
 												$cOpen--;
@@ -486,7 +510,7 @@ class Compiler {
 												}
 											}
 										}
-										$j++;
+										++$j;
 									}
 								} else {
 									return -1;

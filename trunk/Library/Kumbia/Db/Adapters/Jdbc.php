@@ -204,15 +204,15 @@ abstract class DbJDBC extends DbBase {
 			if($this->_fetchMode==self::JDBC_FETCH_NUM){
 				$row = array();
 				$j = 0;
-				for($i=1;$i<=$numberCols;$i++){
+				for($i=1;$i<=$numberCols;++$i){
 					$row[$j] = $resultSet->getString($i);
-					$j++;
+					++$j;
 				}
 				return $row;
 			} else {
 				if($this->_fetchMode==self::JDBC_FETCH_ASSOC){
 					$row = array();
-					for($i=1;$i<=$numberCols;$i++){
+					for($i=1;$i<=$numberCols;++$i){
 						if($metaData->getColumnType($i)==self::TYPE_DATE){
 							$row[$metaData->getColumnName($i)] = $this->_formatDate($resultSet->getString($i));
 						} else {
@@ -224,10 +224,10 @@ abstract class DbJDBC extends DbBase {
 				} else {
 					$row = array();
 					$j = 0;
-					for($i=1;$i<=$numberCols;$i++){
+					for($i=1;$i<=$numberCols;++$i){
 						$row[$metaData->getColumnName($i)] = $resultSet->getString($i);
 						$row[$j] = $resultSet->getString($i);
-						$j++;
+						++$j;
 					}
 					$row = array_change_key_case($row, CASE_LOWER);
 					return $row;

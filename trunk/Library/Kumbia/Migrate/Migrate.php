@@ -346,7 +346,7 @@ class Migrate {
 		$tokens = token_get_all($source);
 		$i = 0;
 		$tl = count($tokens);
-		for($i=0;$i<$tl;$i++){
+		for($i=0;$i<$tl;++$i){
 			$token = $tokens[$i];
 			if(!isset($token[1])){
 				$migratedSource.=$token[0];
@@ -376,7 +376,7 @@ class Migrate {
 		$tokens = token_get_all($source);
 		$i = 0;
 		$tl = count($tokens);
-		for($i=0;$i<$tl;$i++){
+		for($i=0;$i<$tl;++$i){
 			$token = $tokens[$i];
 			if(!isset($token[1])){
 				$migratedSource.=$token[0];
@@ -429,7 +429,7 @@ class Migrate {
 		$migratedSource = "";
 		$tokens = token_get_all($source);
 		$tl = count($tokens);
-		for($i=0;$i<$tl;$i++){
+		for($i=0;$i<$tl;++$i){
 			$token = $tokens[$i];
 			if(!isset($token[1])){
 				$migratedSource.=$token[0];
@@ -447,7 +447,7 @@ class Migrate {
 		$migratedSource = "";
 		$tokens = token_get_all($source);
 		$tl = count($tokens);
-		for($i=0;$i<$tl;$i++){
+		for($i=0;$i<$tl;++$i){
 			$token = $tokens[$i];
 			if(!isset($token[1])){
 				$migratedSource.=$token[0];

@@ -49,7 +49,7 @@ class RemoteDebug {
 	 */
 	public static function add($value){
 		#$shm_id = shmop_open($shm_key, "c", 0644, 100);
-		print ftok(__FILE__, 't');
+		echo ftok(__FILE__, 't');
 	}
 
 }

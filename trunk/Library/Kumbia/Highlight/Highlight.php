@@ -31,7 +31,7 @@ class Highlight {
 		$tokens = token_get_all('<?php '.$phpCode);
 		$numberTokens = count($tokens);
 		$highString = '';
-		for($i=1;$i<$numberTokens;$i++){
+		for($i=1;$i<$numberTokens;++$i){
 			$token = $tokens[$i];
 			if(isset($token[1])){
 				$token[1] = htmlspecialchars($token[1]);

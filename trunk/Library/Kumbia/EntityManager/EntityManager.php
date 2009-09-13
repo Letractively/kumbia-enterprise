@@ -195,7 +195,8 @@ abstract class EntityManager {
 	 *
 	 * @param 	string $entityName
 	 * @param 	boolean $newInstance
-	 * @return 	mixed
+	 * @return 	ActiveRecordBase
+	 * @throws  EntityManagerException
 	 */
 	public static function getEntityInstance($entityName, $newInstance=true){
 		if(self::$_autoInitialize==true){
@@ -211,7 +212,8 @@ abstract class EntityManager {
 		} else {
 			if(isset(self::$_entities[$entityName])){
 				if($newInstance==true){
-					return clone self::$_entities[$entityName];
+					$instance = clone self::$_entities[$entityName];
+					return $instance;
 				} else {
 					return self::$_entities[$entityName];
 				}
@@ -267,10 +269,12 @@ abstract class EntityManager {
 		/**
 		 * Inicializa los Modelos. modelBase es el modelo base
 		 */
-		if(Core::fileExists("$modelsDir/base/modelBase.php")){
-			require "$modelsDir/base/modelBase.php";
-		} else {
-			throw new EntityManagerException("No existe el archivo de modelo Base ($modelsDir/base/modelBase.php)");
+		if(class_exists('ActiveRecord')==false){
+			if(Core::fileExists("$modelsDir/base/modelBase.php")){
+				require "$modelsDir/base/modelBase.php";
+			} else {
+				throw new EntityManagerException("No existe el archivo de modelo Base ($modelsDir/base/modelBase.php)");
+			}
 		}
 	}
 
@@ -413,21 +417,23 @@ abstract class EntityManager {
 			foreach($relation['rf'] as $referencedField){
 				$value = $record->readAttribute($relation['fi'][$i]);
 				$conditions[] = "{$relation['rf'][$i]} = '$value'";
-				$i++;
+				++$i;
 			}
 			$condition = join(" AND ", $conditions);
 		}
+		$arguments = func_get_args();
+		$arguments = array_merge(array($condition), array_slice($arguments, 3));
 		$referenceTable = ucfirst(Utils::camelize($relation['rt']));
 		if(self::$_autoInitialize==true){
 			if(isset(self::$_entities[$referenceTable])){
-				$returnedRecord = self::$_entities[$referenceTable]->findFirst($condition);
+				$returnedRecord = call_user_func_array(array(self::$_entities[$referenceTable], "findFirst"), $arguments);
 				return $returnedRecord;
 			} else {
 				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación n-1");
 			}
 		} else {
 			$entity = self::getEntityInstance($referenceTable);
-			$returnedRecord = $entity->findFirst($condition);
+			$returnedRecord = call_user_func_array(array($entity, "findFirst"), $arguments);
 			return $returnedRecord;
 		}
 	}
@@ -453,7 +459,7 @@ abstract class EntityManager {
 			foreach($relation['rf'] as $referencedField){
 				$value = $record->readAttribute($relation['fi'][$i]);
 				$conditions[] = "{$relation['rf'][$i]} = '$value'";
-				$i++;
+				++$i;
 			}
 			$condition = join(" AND ", $conditions);
 		}
@@ -493,15 +499,16 @@ abstract class EntityManager {
 			foreach($relation['fi'] as $referencedField){
 				$value = $record->readAttribute($relation['rf'][$i]);
 				$conditions[] = "{$relation['fi'][$i]} = '$value'";
-				$i++;
+				++$i;
 			}
 			$condition = join(' AND ', $conditions);
 		}
-		if(func_num_args()>3){
+		$numberArgs = func_num_args();
+		if($numberArgs>3){
 			$allParams = func_get_args();
 			$findParams = array();
 			$conditionsKey = false;
-			for($i=3;$i<func_num_args();$i++){
+			for($i=3;$i<$numberArgs;++$i){
 				$param = Utils::getParam($allParams[$i]);
 				if($param['key']=='0'||$param['key']=='conditions'){
 					$allParams[$i] = $condition.' AND '.$param['value'];
@@ -779,7 +786,7 @@ abstract class EntityManager {
 					}
 					unset(self::$_temporaryEntities[$i]);
 				}
-				$i++;
+				++$i;
 			}
 		} else {
 			throw new EntityManagerException("No existe la entidad temporal '$entityName'");

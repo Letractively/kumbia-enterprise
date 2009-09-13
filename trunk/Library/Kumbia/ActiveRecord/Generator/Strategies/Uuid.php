@@ -82,7 +82,7 @@ class UuidGenerator implements ActiveRecordGeneratorInterface {
 			} else {
 				// If /dev/urandom isn't available (eg: in non-unix systems), use mt_rand().
 				$pr_bits="";
-				for($cnt=0;$cnt<16;$cnt++){
+				for($cnt=0;$cnt<16;++$cnt){
 					$pr_bits.=chr(mt_rand(0, 255));
 				}
 			}

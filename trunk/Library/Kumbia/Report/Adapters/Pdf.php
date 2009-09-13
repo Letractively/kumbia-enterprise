@@ -85,7 +85,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	 */
 	public function outputToBrowser(){
 		$this->getOutput();
-		print $this->_pdf->Output($this->getDocumentName(), 'I');
+		echo $this->_pdf->Output($this->getDocumentName(), 'I');
 	}
 
 	/**
@@ -105,7 +105,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 					$this->_columnSizes[$i] = $length;
 				}
 			}
-			$i++;
+			++$i;
 		}
 		parent::setColumnHeaders($columnHeaders);
 	}
@@ -126,7 +126,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 					$this->_columnSizes[$i] = $length;
 				}
 			}
-			$i++;
+			++$i;
 		}
 		parent::addRow($row);
 	}
@@ -241,7 +241,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 		foreach($this->getColumnHeaders() as $header){
 			$header = html_entity_decode($header);
 			$this->_pdf->Cell($this->_columnSizes[$i]*3, $height, $header, 1, 0, 'C', 1);
-			$i++;
+			++$i;
 		}
 		$this->_pdf->Ln();
 	}
@@ -262,7 +262,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 					}
 				}
 				$this->_pdf->Cell($this->_columnSizes[$i]*3, $height, $value, 1, 0, 'C', 1);
-				$i++;
+				++$i;
 			}
 			$this->_pdf->Ln();
 		}

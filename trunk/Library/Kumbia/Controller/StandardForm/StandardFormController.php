@@ -803,11 +803,11 @@ abstract class StandardForm extends Controller {
 		} else {
 			$db->query("select ".$_REQUEST["dfield"]." from ".$_REQUEST['ftable']. " where ".$_REQUEST['name']." = '".$_REQUEST['value']."'");
 		}
-		print "<?xml version='1.0' encoding='iso8859-1'?>\r\n<response>\r\n";
+		echo "<?xml version='1.0' encoding='iso8859-1'?>\r\n<response>\r\n";
 		$row = $db->fetchArray();
-		print "\t<row num='".$db->numRows()."' detail='".htmlspecialchars($row[0])."'/>\r\n";
+		echo "\t<row num='", $db->numRows(), "' detail='", htmlspecialchars($row[0]), "'/>\r\n";
 		$db->close();
-		print "</response>";
+		echo "</response>";
 	}
 
 	/**

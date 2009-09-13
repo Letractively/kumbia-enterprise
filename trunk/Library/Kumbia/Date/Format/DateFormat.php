@@ -66,7 +66,7 @@ class DateFormat {
 			'yyy', 'yyyy', 'y'
 		);
 		$quote = false;
-		for($i=0;$i<$n;$i++){
+		for($i=0;$i<$n;++$i){
 			$ch = substr($format, $i, 1);
 			if(in_array($ch, $tokens)){
 				if($ch!='\''){

@@ -274,7 +274,7 @@ abstract class Router {
 					}
 
 					/**
-			 	 	* Hay alguna accion
+			 	 	 * Hay alguna accion
 			 		 */
 					if(isset($urlItems[2])&&$urlItems[2]){
 						self::$_action = $urlItems[2];
@@ -308,7 +308,7 @@ abstract class Router {
 					}
 
 					/**
-			 	 	* Hay alguna accion
+			 	 	 * Hay alguna accion
 			 		 */
 					if(isset($urlItems[3])&&$urlItems[3]){
 						self::$_action = $urlItems[3];
@@ -331,7 +331,6 @@ abstract class Router {
 				}
 
 			} else {
-
 				//En parameters quedan los valores de parametros por URL
 				if(self::$_application=='default'){
 					unset($urlItems[0], $urlItems[1]);
@@ -367,21 +366,22 @@ abstract class Router {
 							if(count(explode('/', $source))!=3||count(explode('/', $destination))!=3){
 								throw new RouterException("Política de enrutamiento invalida '$source' a '$destination' en config/routes.ini");
 							} else {
-								list($controller_source,
-								$action_source,
+								list($controllerSource,
+								$actionSource,
 								$id_source) = explode("/", $source);
 								list($controller_destination,
 								$action_destination,
 								$id_destination) = explode("/", $destination);
-								if(($controller_source==$controller_destination)&&
-								($action_source==$action_destination)&&
+								if(($controllerSource==$controller_destination)&&
+								($actionSource==$action_destination)&&
 								($id_source==$id_destination)){
 									throw new RouterException("Política de enrutamiento ciclica de '$source' a '$destination' en config/routes.ini");
 								} else {
-									$_SESSION['KSR'][$controller_source][$action_source][$id_source] =
-									array('controller' => $controller_destination,
-									'action' => $action_destination,
-									'id' => $id_destination);
+									$_SESSION['KSR'][$controllerSource][$actionSource][$id_source] = array(
+										'controller' => $controller_destination,
+										'action' => $action_destination,
+										'id' => $id_destination
+									);
 								}
 							}
 						}
@@ -395,30 +395,30 @@ abstract class Router {
 			$action = self::$_action;
 			$id = self::$_id;
 
-			$new_route = array('controller' => '*', 'action' => '*', 'id' => '*');
+			$newRoute = array('controller' => '*', 'action' => '*', 'id' => '*');
 			if(isset($_SESSION['KSR']['*'][$action]['*'])){
-				$new_route = $_SESSION['KSR']['*'][$action]['*'];
+				$newRoute = $_SESSION['KSR']['*'][$action]['*'];
 			}
 			if(isset($_SESSION['KSR'][$controller]['*']['*'])){
-				$new_route = $_SESSION['KSR'][$controller]['*']['*'];
+				$newRoute = $_SESSION['KSR'][$controller]['*']['*'];
 			}
 			if(isset($_SESSION['KSR'][$controller]['*'][$id])){
-				$new_route = $_SESSION['KSR'][$controller]['*'][$id];
+				$newRoute = $_SESSION['KSR'][$controller]['*'][$id];
 			}
 			if(isset($_SESSION['KSR'][$controller][$action]['*'])){
-				$new_route = $_SESSION['KSR'][$controller][$action]['*'];
+				$newRoute = $_SESSION['KSR'][$controller][$action]['*'];
 			}
 			if(isset($_SESSION['KSR'][$controller][$action][$id])){
-				$new_route = $_SESSION['KSR'][$controller][$action][$id];
+				$newRoute = $_SESSION['KSR'][$controller][$action][$id];
 			}
-			if($new_route['controller']!='*'){
-				self::$_controller = $new_route['controller'];
+			if($newRoute['controller']!='*'){
+				self::$_controller = $newRoute['controller'];
 			}
-			if($new_route['action']!='*'){
-				self::$_action = $new_route['action'];
+			if($newRoute['action']!='*'){
+				self::$_action = $newRoute['action'];
 			}
-			if($new_route['id']!='*'){
-				self::$_id = $new_route['id'];
+			if($newRoute['id']!='*'){
+				self::$_id = $newRoute['id'];
 			}
 			return;
 		}
@@ -602,7 +602,8 @@ abstract class Router {
 			self::$_routed = true;
 		}
 		if(self::$_routed==true){
-			for($i=4;$i<=count($items)-1;$i++){
+			$numberItems = count($items);
+			for($i=4;$i<$numberItems;++$i){
 				self::$_allParameters[] = $items[$i];
 				self::$_parameters[] = $items[$i];
 			}
@@ -761,16 +762,20 @@ abstract class Router {
 		}
 		Router::rewrite($_GET['_url']);
 		if(self::_detectRoutingType()==self::ROUTING_OTHER){
-			if(Core::fileExists('Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php')==false){
-				throw new RouterException("No existe el adaptador de enrutamiento ".self::$_routingAdapterType);
+			if(class_exists(self::$_routingAdapterType.'Router')==false){
+				if(Core::fileExists('Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php')==false){
+					throw new RouterException("No existe el adaptador de enrutamiento ".self::$_routingAdapterType);
+				}
 			}
 		}
 		/**
 		 * @see RouterInterface
 		 */
 		require 'Library/Kumbia/Router/Interface.php';
-		require 'Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php';
 		$className = self::$_routingAdapterType.'Router';
+		if(class_exists($className)==false){
+			require 'Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php';
+		}
 		self::$_routerAdapter = new $className();
 		self::$_routerAdapter->handleRouting();
 	}

@@ -139,7 +139,8 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 		$this->_output.= "\t\t<title>".$this->getDocumentTitle()."</title>\n";
 		$this->_output.= "\t\t<style type='text/css'>\n";
 		$this->_output.= "\t\t\tbody, div, td, th { font-family: \"".self::$_defaultFontFamily."\"; font-size: ".self::$_defaultFontSize."px; }\n";
-		$this->_output.= "\t\t\tth, td { border: 1px solid #969696;}\n";
+		$this->_output.= "\t\t\ttable { border-right: 1px solid #969696;border-top: 1px solid #969696;}\n";
+		$this->_output.= "\t\t\tth, td { border-left: 1px solid #969696;border-bottom: 1px solid #969696;}\n";
 		if($this->getDisplayMode()==Report::DISPLAY_PRINT_PREVIEW){
 			$this->_output.= "\t\t\tbody { background: #333333; margin: 0px; padding: 0px; }\n";
 			$this->_output.= "\t\t\t.page { padding: 20px; width: 550px; height: 700px; border: 1px solid #fafafa; background: #ffffff; margin: 10px;}\n";
@@ -171,7 +172,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			$this->_output.= "\t</div></td>
 			<td width='20%' id='right_pannel' valign='top' align='center'>
 			<div style='overflow-y: scroll; height: 580px; padding: 10px;'>\n";
-			for($i=1;$i<=$this->_totalPages;$i++){
+			for($i=1;$i<=$this->_totalPages;++$i){
 				$this->_output.=$this->_getPageThumbnail($i);
 			}
 			$this->_output.="</div></td>
@@ -189,6 +190,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	/**
 	 * Escribe los estilos de los encabezados del reporte
 	 *
+	 * @access public
 	 */
 	public function _prepareCellHeaderStyle(){
 		$style = $this->getCellHeaderStyle();
@@ -246,28 +248,25 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	public function _prepareStyle($attributes){
 		$style = array();
 		foreach($attributes as $attributeName => $value){
-			if($attributeName=='fontSize'){
-				$style[] = "font-size:{$value}px";
-				continue;
-			}
-			if($attributeName=='fontWeight'){
-				$style[] = "font-weight:$value";
-				continue;
-			}
-			if($attributeName=='textAlign'){
-				$style[] = "text-align:$value";
-				continue;
-			}
-			if($attributeName=='color'){
-				$style[] = "color:$value";
-				continue;
-			}
-			if($attributeName=='borderColor'){
-				$style[] = "border:1px solid $value";
-				continue;
-			}
-			if($attributeName=='backgroundColor'){
-				$style[] = "background-color:$value";
+			switch($attributeName){
+				case 'fontSize':
+					$style[] = "font-size:{$value}px";
+					break;
+				case 'fontWeight':
+					$style[] = "font-weight:$value";
+					break;
+				case 'textAlign':
+					$style[] = "text-align:$value";
+					break;
+				case 'color':
+					$style[] = "color:$value";
+					break;
+				case 'borderColor':
+					$style[] = "border:1px solid $value";
+					break;
+				case 'backgroundColor':
+					$style[] = "background-color:$value";
+					break;
 			}
 			if($attributeName=='paddingRight'){
 				$style[] = "padding-right:$value";
@@ -355,13 +354,13 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 		$code = "<div class='thumbnail' align='center'>
 		<a href='#$pageNumber'>
 		<table cellspacing='0' cellpadding='0' width='50'><tr>";
-		for($i=0;$i<$numColumns;$i++){
+		for($i=0;$i<$numColumns;++$i){
 			$code.="<th></th>";
 		}
 		$code.="</tr>";
-		for($j=0;$j<9;$j++){
+		for($j=0;$j<9;++$j){
 			$code.="<tr>";
-			for($i=0;$i<$numColumns;$i++){
+			for($i=0;$i<$numColumns;++$i){
 				$code.="<td></td>";
 			}
 			$code.="</tr>";
@@ -371,7 +370,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	}
 
 	/**
-	 * Escribe las paginas del reporte
+	 * Escribe las páginas del reporte
 	 *
 	 * @param array $rows
 	 */
@@ -393,7 +392,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	}
 
 	/**
-	 * Escribe las paginas del reporte
+	 * Escribe las páginas del reporte
 	 *
 	 */
 	private function _renderPages(){
@@ -425,7 +424,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 					$this->_output.= "\t</table></p>\n";
 					$this->_output.= "\t\t</div></div>\n";
 					$renderRows+=$rowsToRender;
-					$pageNumber++;
+					++$pageNumber;
 					$this->_setPageNumber($pageNumber);
 				}
 			} else {
@@ -435,7 +434,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 				$this->_renderColumnHeaders();
 				$this->_output.= "\t</table></p>\n";
 				$this->_output.= "\t\t</div></div>\n";
-				$pageNumber++;
+				++$pageNumber;
 				$this->_setPageNumber($pageNumber);
 			}
 			$this->_totalPages = $pageNumber;
@@ -456,7 +455,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	private function _renderTotals(){
 		if(count($this->_totalizeValues)>0){
 			$this->_output.='<tr>';
-			for($i=0;$i<$this->_numberColumns;$i++){
+			for($i=0;$i<$this->_numberColumns;++$i){
 				if(isset($this->_totalizeValues[$i])){
 					$this->_output.='<td class="c'.$i.'">'.$this->_totalizeValues[$i].'</td>';
 				} else {
@@ -478,7 +477,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily', debe establecer manualmente el número de registros por página");
 		}
 		if(isset(self::$_offsetRatio[$fontFamily][$fontSize])==false){
-			for($i=$fontSize;$i>=0;$i--){
+			for($i=$fontSize;$i>=0;--$i){
 				if(isset(self::$_offsetRatio[$fontFamily][$i])){
 					if($fontSize-$i<=5){
 						return self::$_offsetRatio[$fontFamily][$i]-(0.1*($i-$fontSize));
@@ -487,7 +486,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 					}
 				}
 			}
-			for($i=$fontSize;$i<=128;$i++){
+			for($i=$fontSize;$i<=128;++$i){
 				if(isset(self::$_offsetRatio[$fontFamily][$i])){
 					if($i-$fontSize<=6){
 						return self::$_offsetRatio[$fontFamily][$i]+(0.1*($i-$fontSize));

@@ -184,11 +184,11 @@ class DbJDBCOracle extends DbJDBC {
 		if(!is_numeric($number)||$number<0){
 			return $sql;
 		}
-		if(eregi('ORDER[\t\n\r ]+BY', $sql)){
+		if(preg_match('/ORDER[\t\n\r ]+BY/i', $sql)){
 			if(stripos($sql, 'WHERE')){
-				return eregi_replace('ORDER[\t\n\r ]+BY', "AND ROWNUM <= $number ORDER BY", $sql);
+				return preg_replace('/ORDER[\t\n\r ]+BY/i', "AND ROWNUM <= $number ORDER BY", $sql);
 			} else {
-				return eregi_replace('ORDER[\t\n\r ]+BY', "WHERE ROWNUM <= $number ORDER BY", $sql);
+				return preg_replace('/ORDER[\t\n\r ]+BY/i', "WHERE ROWNUM <= $number ORDER BY", $sql);
 			}
 		} else {
 			if(stripos($sql, 'WHERE')){

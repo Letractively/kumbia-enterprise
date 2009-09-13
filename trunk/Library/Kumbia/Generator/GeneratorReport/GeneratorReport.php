@@ -53,7 +53,6 @@ abstract class GeneratorReport {
 		$n = 0;
 
 		$db = Db::rawConnect();
-
 		if(isset($form['dataFilter'])){
 			if(strpos($form['dataFilter'], '@')){
 				ereg('[\@][A-Za-z0-9_]+', $form['dataFilter'], $regs);
@@ -182,23 +181,25 @@ abstract class GeneratorReport {
 						$letter = chr(ord($letter)+1);
 					}
 					$weightArray[$n] = strlen($headerArray[$n])+3;
-					$n++;
-					$m++;
+					++$n;
+					++$m;
 				} else {
 					if($com['type']!='hidden'){
 						if(isset($com['class'])){
 							if($com['class']=='static'){
 								$weightArray[$n] = strlen($headerArray[$n])+3;
-								for($i=0;$i<=count($com['items'])-2;$i++){
+								$numberItems = count($com['items'])-1;
+								for($i=0;$i<$numberItems;++$i){
 									$selectedFields.="if(".$form['source'].".".$name."='".$com['items'][$i][0]."', '".$com['items'][$i][1]."', ";
 									if($weightArray[$n]<strlen($com['items'][$i][1])) {
 										$weightArray[$n] = strlen($com['items'][$i][1])+1;
 									}
 								}
-								$n++;
-								$m++;
+								++$n;
+								++$m;
 								$selectedFields.="'".$com['items'][$i][1]."')";
-								for($j=0;$j<=$i-2;$j++){
+								//$selectedFields.="')";
+								for($j=0;$j<$i-1;++$j){
 									$selectedFields.=")";
 								}
 								$selectedFields.=",";
@@ -206,7 +207,7 @@ abstract class GeneratorReport {
 								if($form['components'][$name]['type']=='helpText'){
 									$selectedFields.=$form['source'].".".$name.",";
 									$weightArray[$n] = strlen($headerArray[$n])+3;
-									$n++;
+									++$n;
 									$headerArray[$n] = ucfirst($form['components'][$name]['detailField']);
 									$weightArray[$n] = strlen($headerArray[$n])+3;
 
@@ -218,13 +219,13 @@ abstract class GeneratorReport {
 										$whereCondition[] = " {$letter}.$name = {$form['source']}.$name";
 									}
 									$letter = chr(ord($letter)+1);
-									$n++;
-									$m++;
+									++$n;
+									++$m;
 								} else {
 									$selectedFields.=$form['source'].".".$name.",";
 									$weightArray[$n] = strlen($headerArray[$n])+3;
-									$n++;
-									$m++;
+									++$n;
+									++$m;
 								}
 							}
 						}
@@ -240,7 +241,10 @@ abstract class GeneratorReport {
 			$whereCondition[] = $form['dataFilter'];
 		}
 
-		print $query = "SELECT $selectedFields FROM $tables WHERE ".join(' AND ', $whereCondition);
+		$query = "SELECT $selectedFields FROM $tables ";
+		if(count($whereCondition)>0){
+			$query.=" WHERE ".join(' AND ', $whereCondition);
+		}
 		if(isset($_POST['orderBy'])){
 			if(in_array($_POST['orderBy'], $all_components)){
 				$query.=" ORDER BY ".$_POST['orderBy'];
@@ -265,7 +269,7 @@ abstract class GeneratorReport {
 
 		foreach($result as $row){
 			$numColumns = count($row);
-			for($i=0;$i<$numColumns;$i++){
+			for($i=0;$i<$numColumns;++$i){
 				if($weightArray[$i]<strlen(trim($row[$i]))){
 					$weightArray[$i] = strlen(trim($row[$i]));
 				}
@@ -273,7 +277,7 @@ abstract class GeneratorReport {
 		}
 
 		$numArray = count($weightArray);
-		for($i=0;$i<$numArray;$i++){
+		for($i=0;$i<$numArray;++$i){
 			$weightArray[$i]*= 1.8;
 		}
 

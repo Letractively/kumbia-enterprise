@@ -137,17 +137,26 @@ class ActiveRecordRow extends Object implements ActiveRecordResultInterface {
 	/**
 	 * Permite obtener los valores mediantes
 	 *
-	 * @param string $method
-	 * @param array $arguments
+	 * @param	string $method
+	 * @param	array $arguments
 	 */
 	public function __call($method, $arguments){
-		if(substr($method, 0, 3)=="get"){
+		if(substr($method, 0, 3)=='get'){
 			$property = Utils::uncamelize(substr($method, 3));
 			if(isset($this->_columns[$property])){
 				return $this->$property;
 			}
 		}
 		throw new ActiveRecordException("El método '{$method}' ó miembro '{$property}' del resultset no existe");
+	}
+
+	/**
+	 * Método mágico Sleep
+	 *
+	 * @return 	array
+	 */
+	public function sleep(){
+		return array('_columns');
 	}
 
 }

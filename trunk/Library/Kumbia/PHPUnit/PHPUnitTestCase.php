@@ -64,12 +64,12 @@ abstract class PHPUnitTestCase extends Object {
 	 * @return boolean
 	 */
 	protected function assertFileExists($path){
-		$this->_numberAsserts++;
+		++$this->_numberAsserts;
 		if(!Core::fileExists($path)){
-			$this->_numberFailedAsserts++;
+			++$this->_numberFailedAsserts;
 			throw new AssertionFailed("No existe el archivo '$path'");
 		} else {
-			$this->_numberSuccessAsserts++;
+			++$this->_numberSuccessAsserts;
 			return true;
 		}
 	}
@@ -102,10 +102,10 @@ abstract class PHPUnitTestCase extends Object {
 					$v2 = $value2;
 				}
 			}
-			$this->_numberFailedAsserts++;
+			++$this->_numberFailedAsserts;
 			throw new AssertionFailed("El valor (".gettype($value1).") $v1 no es igual a (".gettype($value2).") '$value2'");
 		} else {
-			$this->_numberSuccessAsserts++;
+			++$this->_numberSuccessAsserts;
 			return true;
 		}
 	}
@@ -118,16 +118,16 @@ abstract class PHPUnitTestCase extends Object {
 	 * @return 	boolean
 	 */
 	protected function assertInstanceOf($object, $className){
-		$this->_numberAsserts++;
+		++$this->_numberAsserts;
 		if(!is_object($object)){
-			$this->_numberFailedAsserts++;
+			++$this->_numberFailedAsserts;
 			throw new AssertionFailed("El valor no es un objeto");
 		}
 		if(get_class($object)!=$className){
-			$this->_numberFailedAsserts++;
+			++$this->_numberFailedAsserts;
 			throw new AssertionFailed("El objeto no pertenece a la clase '$className'");
 		}
-		$this->_numberSuccessAsserts++;
+		++$this->_numberSuccessAsserts;
 		return true;
 	}
 
@@ -138,12 +138,12 @@ abstract class PHPUnitTestCase extends Object {
 	 * @return 	boolean
 	 */
 	protected function assertResource($resource){
-		$this->_numberAsserts++;
+		++$this->_numberAsserts;
 		if(!is_object($resource)){
 			$this->_numberFailedAsserts++;
 			throw new AssertionFailed("El valor no es un recurso");
 		}
-		$this->_numberSuccessAsserts++;
+		++$this->_numberSuccessAsserts;
 		return true;
 	}
 
@@ -154,12 +154,12 @@ abstract class PHPUnitTestCase extends Object {
 	 * @return 	boolean
 	 */
 	protected function assertTrue($value){
-		$this->_numberAsserts++;
+		++$this->_numberAsserts;
 		if($value!==true){
-			$this->_numberFailedAsserts++;
+			++$this->_numberFailedAsserts;
 			throw new AssertionFailed("El valor '$value' no es un verdadero");
 		}
-		$this->_numberSuccessAsserts++;
+		++$this->_numberSuccessAsserts;
 		return true;
 	}
 
@@ -170,12 +170,12 @@ abstract class PHPUnitTestCase extends Object {
 	 * @return 	boolean
 	 */
 	protected function assertNull($value){
-		$this->_numberAsserts++;
+		++$this->_numberAsserts;
 		if($value!==null){
-			$this->_numberFailedAsserts++;
+			++$this->_numberFailedAsserts;
 			throw new AssertionFailed("El valor '$value' no es un nulo");
 		}
-		$this->_numberSuccessAsserts++;
+		++$this->_numberSuccessAsserts;
 		return true;
 	}
 

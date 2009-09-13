@@ -89,7 +89,7 @@ class PHPUnitControllerTest extends Object {
 			$maxLength = mt_rand(1, 128);
 		}
 		$str = "";
-		for($i=0;$i<=$maxLength-1;$i++){
+		for($i=0;$i<$maxLength;++$i){
 			$str.=chr(mt_rand(8, 255));
 		}
 		return $str;
@@ -164,8 +164,8 @@ class PHPUnitControllerTest extends Object {
 				$message = preg_replace('/[ ]+/', ' ', html_entity_decode($e->getMessage(), ENT_COMPAT));
 			}
 			$message = preg_replace('/[\n\t\r]+/', ' ', $message);
-			print get_class($e).": ".$message."\n";
-			print "URI: ".Router::getURL()."\n";
+			echo get_class($e).": ".$message."\n";
+			echo "URI: ".Router::getURL()."\n";
 		}
 	}
 

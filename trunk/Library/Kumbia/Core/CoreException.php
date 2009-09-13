@@ -165,24 +165,26 @@ class CoreException extends Exception {
 		Tag::setDocumentTitle(get_class($this).' - Kumbia Enterprise Framework');
 
 		$file = $this->getSafeFile();
-		print "\n<div class='exceptionContainer'>\n";
+		echo "\n<div class='exceptionContainer'>\n";
 		$message = "<div class='exceptionDescription'>";
 		if($this->_isRemote==true){
 			$message.= "Remote &gt; ";
 		}
 		$message.= get_class($this).": $this->message ({$this->getCode()})<br>
 		<span class='exceptionLocation'>En el archivo <i>{$file}</i> en la línea: <i>{$this->getLine()}</i></div>";
-		print $message;
+		echo $message;
 		$config = CoreConfig::readAppConfig();
 		$activeApp = Router::getApplication();
 		if($this->show_trace==true){
 			if(isset($config->application->debug)&&$config->application->debug==true){
+				$memoryPeekUsage = memory_get_peak_usage(true);
+				$memoryUsage = memory_get_usage();
 				$requestTime = microtime(true);
 				$debugMessages = Debug::getMessages();
 				if(count($debugMessages)>0){
-					print "<div class='debugInformation'>\n";
-					print "<strong>Datos de Debug:</strong>";
-					print "<table cellspacing='0' width='100%' align='center'>
+					echo "<div class='debugInformation'>\n";
+					echo "<strong>Datos de Debug:</strong>";
+					echo "<table cellspacing='0' width='100%' align='center'>
 						<thead>
 							<th class='debugThOdd'>#</th>
 							<th class='debugThEven'>Valor</th>
@@ -201,7 +203,7 @@ class CoreException extends Exception {
 						} else {
 							$bgcolor = "#ffffff";
 						}
-						print "
+						echo "
 						<tr bgcolor='$bgcolor'>
 							<td align='center'>$i</td>
 							<td><pre>".wordwrap(htmlentities(print_r($message['value'], true), 100))."</pre></td>
@@ -216,7 +218,7 @@ class CoreException extends Exception {
 								if($i>=1){
 									if(isset($back['line'])){
 										$functionCall = Debug::getFunctionCallAsString($back);
-										print "<tr bgcolor='#f2f2f2'>
+										echo "<tr bgcolor='#f2f2f2'>
 											<td></td>
 											<td></td>
 											<td>$functionCall</td>
@@ -226,16 +228,16 @@ class CoreException extends Exception {
 										</tr>";
 									}
 								}
-								$i++;
+								++$i;
 							}
 						}
-						$i++;
+						++$i;
 					}
-					print "</table>";
-					print "</div>";
+					echo "</table>";
+					echo "</div>";
 				}
 				$traceback = $this->getTrace();
-				print "<div class='exceptionBacktraceContainer' align='left'>
+				echo "<div class='exceptionBacktraceContainer' align='left'>
 				<pre class='exceptionBacktracePre'>";
 
 				//Imprimir Backtrace Remoto
@@ -246,10 +248,10 @@ class CoreException extends Exception {
 						print "<div class='exceptionRemoteTitle'>Remote Backtrace <span class='exceptionActor'>(Actor: ".$this->_remoteActor.")</span></div>";
 						foreach($this->_remoteBacktrace as $remoteTrace){
 							if(isset($remoteTrace['file'])){
-								print "<div class='exceptionRemoteTrace'>{$remoteTrace['file']} <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
+								echo "<div class='exceptionRemoteTrace'>{$remoteTrace['file']} <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
 							}
 						}
-						print "</pre>";
+						echo "</pre>";
 					}
 				}
 
@@ -266,27 +268,28 @@ class CoreException extends Exception {
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){
 						$rfile = self::getSafeFileName($trace['file']);
-						print $rfile." <span class='exceptionLine'>(".$trace['line'].")</span>\n";
+						echo $rfile." <span class='exceptionLine'>(".$trace['line'].")</span>\n";
 						if(strpos($trace['file'], "apps")){
 							$file = $trace['file'];
 							$line = $trace['line'];
-							print "</pre><span class='exceptionLineNote'>La excepción se ha generado en el archivo '$rfile' en la línea '$line':</span><br/>";
-							print "<div class='exceptionFileViewver'><table cellspacing='0' cellpadding='0' width='100%'>";
+							echo "</pre><span class='exceptionLineNote'>La excepción se ha generado en el archivo '$rfile' en la línea '$line':</span><br/>";
+							echo "<div class='exceptionFileViewver'><table cellspacing='0' cellpadding='0' width='100%'>";
 							$lines = file($file);
 							$eline = $line;
 							$className = 'exceptionLineNotActiveOdd';
-							for($i =(($eline-4)<0 ? 0: $eline-4);$i<=($eline+2>count($lines)-1?count($lines)-1:$eline+2);$i++){
+							$numberLines = count($lines);
+							for($i =(($eline-4)<0 ? 0: $eline-4);$i<=($eline+2>$numberLines-1?$numberLines-1:$eline+2);++$i){
 								$cline = str_replace("\t", "&nbsp;", htmlentities($lines[$i]));
 								if($i==$eline-1){
-									print "<tr><td width='30' class='exceptionLineTd'>".($i+1).".</td>
+									echo "<tr><td width='30' class='exceptionLineTd'>".($i+1).".</td>
 									<td><div  class='exceptionLineActive'>&nbsp;<strong>";
-									print $cline;
-									print "</strong></div></td></tr>\n";
+									echo $cline;
+									echo "</strong></div></td></tr>\n";
 								} else {
-									print "<tr><td class='exceptionLineTd'>".($i+1).".</td>
+									echo "<tr><td class='exceptionLineTd'>".($i+1).".</td>
 									<td class='$className'>&nbsp;";
-									print $cline;
-									print "</td></tr>";
+									echo $cline;
+									echo "</td></tr>";
 								}
 								if($className=='exceptionLineNotActiveOdd'){
 									$className = 'exceptionLineNotActiveEven';
@@ -294,17 +297,17 @@ class CoreException extends Exception {
 									$className = 'exceptionLineNotActiveOdd';
 								}
 							}
-							print "</table></div><pre class='exceptionPre'>";
+							echo "</table></div><pre class='exceptionPre'>";
 						}
 					}
 				}
-				print "</div>";
+				echo "</div>";
 
 				$debugMemory = Debug::getMemory();
 				if(count($debugMemory)>0){
-					print "<div class='debugInformation'>\n";
-					print "<strong>Datos de la Memoria:</strong>";
-					print "<table cellspacing='0' width='100%' align='center'>
+					echo "<div class='debugInformation'>\n";
+					echo "<strong>Datos de la Memoria:</strong>";
+					echo "<table cellspacing='0' width='100%' align='center'>
 						<thead>
 							<th class='debugThOdd'>#</th>
 							<th class='debugThEven'>Variable</th>
@@ -312,30 +315,30 @@ class CoreException extends Exception {
 						</thead>\n";
 					$i = 1;
 					foreach($debugMemory as $varname => $value){
-						print "<tr>
+						echo "<tr>
 							<td>$i</td>
 							<td>$varname</td>
 							<td>".htmlentities($value)."</td>
 						</tr>";
-						$i++;
+						++$i;
 					}
-					print "</table></div>";
+					echo "</table></div>";
 				}
 
 				/**
 				 * Imprime informacion extra de la excepcion si esta disponible
 				 */
 				if(method_exists($this, 'getExceptionInformation')){
-					print $this->getExceptionInformation();
+					echo $this->getExceptionInformation();
 				}
 
 				/**
 				 * Imprime los datos de entrada
 				 */
 				if(count($_POST+$_GET)>1){
-					print "<div class='debugInformation'>\n";
-					print "<strong>Datos de Entrada:</strong>";
-					print "<table cellspacing='0' width='100%' align='center'>
+					echo "<div class='debugInformation'>\n";
+					echo "<strong>Datos de Entrada:</strong>";
+					echo "<table cellspacing='0' width='100%' align='center'>
 						<thead>
 							<th class='debugThOdd'>Tipo</th>
 							<th class='debugThEven'>Nombre</th>
@@ -348,7 +351,7 @@ class CoreException extends Exception {
 						if(is_array($value)){
 							$value = print_r($value, true);
 						}
-						print "<tr bgcolor='#ffffff'>
+						echo "<tr bgcolor='#ffffff'>
 							<td align='center'>GET</td>
 							<td>$key</td>
 							<td>$value</td>
@@ -360,21 +363,21 @@ class CoreException extends Exception {
 						if(is_array($value)){
 							$value = print_r($value, true);
 						}
-						print "<tr bgcolor='#ffffff'>
+						echo "<tr bgcolor='#ffffff'>
 							<td align='center'>POST</td>
 							<td>$key</td>
 							<td>$value</td>
 							<td>$type</td>
 						</tr>";
 					}
-					print "</table>";
-					print "</div>";
+					echo "</table>";
+					echo "</div>";
 				}
 
-				print "<div class='exceptionAditionalInfo' align='left'>";
-				print "<i><strong>Información Adicional:</strong></i><br>";
-				print "<div style='padding: 5px'>";
-				print "<table cellspacing='0' width='100%' cellpadding='3'>
+				echo "<div class='exceptionAditionalInfo' align='left'>";
+				echo "<i><strong>Información Adicional:</strong></i><br>";
+				echo "<div style='padding: 5px'>";
+				echo "<table cellspacing='0' width='100%' cellpadding='3'>
 				<tr class='rowInfoEven'>
 					<td align='right' width='200'><strong>Versión Framework:</strong></td>
 					<td> ".Core::FRAMEWORK_VERSION."</td>
@@ -396,7 +399,7 @@ class CoreException extends Exception {
 					<td>".$config->application->mode."</td>
 				</tr>";
 				$url = Router::getApplication()."/".Router::getController()."/".Router::getAction();
-				print "
+				echo "
 				<tr class='rowInfoOdd'>
 					<td align='right'><strong>Ubicación actual:</strong></td>
 					<td>".$url."</td>
@@ -406,49 +409,49 @@ class CoreException extends Exception {
 					<td>".join(", ", array_keys(EntityManager::getEntities()))."</td>
 				</tr>";
 				if(isset($_SESSION['KMOD'][$instanceName][$activeApp])){
-					print "<tr class='rowInfoOdd'>
+					echo "<tr class='rowInfoOdd'>
 						<td align='right'><strong>Modulos Cargados:</strong></td>
 						<td>".join(", ", $_SESSION['KMOD'][$instanceName][$activeApp])."</td>
 					</tr>";
 				}
 				if(isset($_SESSION['KPC'][$instanceName][$activeApp])){
-					print "<tr class='rowInfoEven'>
+					echo "<tr class='rowInfoEven'>
 						<td align='right'><strong>Plugins Cargados:</strong></td>
 						<td>".join(", ", $_SESSION['KPC'][$instanceName][$activeApp])."</td>
 					</tr>";
 				}
 				if(isset($_SESSION['session_data'])){
 					if(is_array($_SESSION['session_data'])){
-						print "<tr class='rowInfoOdd'>
+						echo "<tr class='rowInfoOdd'>
 							<td align='right'><strong>Datos de Session:</strong></td
 							><td>".join(", ", $_SESSION['session_data'])."</td>
 						</tr>";
 					} else {
-						print "<tr class='rowInfoOdd'>
+						echo "<tr class='rowInfoOdd'>
 							<td align='right'><strong>Datos de Session:</strong></td>
 							<td>".print_r(unserialize($_SESSION['session_data']), 1)."</td>
 						</tr>";
 					}
 				}
-				print "<tr class='rowInfoEven'>
-					<td align='right'><strong>Memoria Utilizada:</strong></td>
-					<td>".(Helpers::toHuman(memory_get_peak_usage(true)))."</td>
+				echo "<tr class='rowInfoEven'>
+					<td align='right'><strong>Memoria Total Utilizada:</strong></td>
+					<td>".(Helpers::toHuman($memoryPeekUsage))."</td>
 				</tr>
 				<tr class='rowInfoOdd'>
 					<td align='right'><strong>Memoria Actual:</strong></td>
-					<td>".(Helpers::toHuman(memory_get_usage()))."</td>
+					<td>".(Helpers::toHuman($memoryUsage))."</td>
 				</tr>
 				<tr class='rowInfoEven'>
 					<td align='right'><strong>Tiempo empleado para<br/>atender la petición:</strong></td>
 					<td>".(round($requestTime-$_SERVER['REQUEST_TIME'], 3))." segs </td>
 				</tr></table>";
-				print "</div></div>";
+				echo "</div></div>";
 			} else {
 				$traceback = $this->getTrace();
 				if(count($this->extendedBacktrace)>0){
 					$traceback = array_merge($this->extendedBacktrace, $traceback);
 				}
-				print "<pre class='exceptionPreDesc'><span style='font-family: Lucida Console;font-size:11px'><b>Backtrace:</b></span>\n";
+				echo "<pre class='exceptionPreDesc'><span style='font-family: Lucida Console;font-size:11px'><b>Backtrace:</b></span>\n";
 				$i = 0;
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){
@@ -464,22 +467,22 @@ class CoreException extends Exception {
 					if(!isset($trace['function'])){
 						$trace['function'] = "";
 					}
-					print "#$i $file -&gt; {$trace['class']}{$trace['type']}{$trace['function']} ({$trace['line']})\n";
-					$i++;
+					echo "#$i $file -&gt; {$trace['class']}{$trace['type']}{$trace['function']} ({$trace['line']})\n";
+					++$i;
 				}
-				print "</pre>";
+				echo '</pre>';
 			}
 		} else {
 			if(isset($config->application->debug)&&$config->application->debug==true){
 				/**
 				 * Imprime informacion extra de la excepcion si esta disponible
 				 */
-				if(method_exists($this, "getExceptionInformation")){
-					print $this->getExceptionInformation();
+				if(method_exists($this, 'getExceptionInformation')){
+					echo $this->getExceptionInformation();
 				}
 			}
 		}
-		print "</div>";
+		echo "</div>";
 	}
 
 	/**
@@ -496,21 +499,21 @@ class CoreException extends Exception {
 
 		ob_start();
 		$file = CoreException::getSafeFileName($e->getFile());
-		print "\n<div class='exceptionContainer'>\n";
+		echo "\n<div class='exceptionContainer'>\n";
 		$message = "<div class='exceptionDescription'>".
 		get_class($e).": {$e->getMessage()} ({$e->getCode()})<br>
 		<span class='exceptionLocation'>En el archivo <i>{$file}</i> en la línea: <i>{$e->getLine()}</i></div>";
-		print $message;
+		echo $message;
 
-		print "<div class='exceptionBacktraceSimple'>";
-		print '<b>Backtrace:</b><br/>'."\n";
+		echo "<div class='exceptionBacktraceSimple'>";
+		echo '<b>Backtrace:</b><br/>'."\n";
 		foreach($e->getTrace() as $debug){
 			if(isset($debug['file'])){
-				print CoreException::getSafeFileName($debug['file']).' ('.$debug['line'].") <br/>\n";
+				echo CoreException::getSafeFileName($debug['file']).' ('.$debug['line'].") <br/>\n";
 			}
 		}
-		print "</div>";
-		print "</div>";
+		echo "</div>";
+		echo "</div>";
 		View::setContent(ob_get_contents());
 		ob_end_clean();
 		View::xhtmlTemplate('white');

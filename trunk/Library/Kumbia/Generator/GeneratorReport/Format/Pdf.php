@@ -158,8 +158,11 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 	//Parametros del Reporte
 	$pos = floor(($widthPage/2)-($sumArray/2));
 	$pdf->setX($pos);
-	$numberColumns = count($headerArray)-1;
-	for($i=0;$i<=$numberColumns;$i++){
+	$numberColumns = count($headerArray);
+	for($i=0;$i<$numberColumns;++$i){
+		if(!isset($weightArray[$i])){
+			$weightArray[$i] = 25;
+		}
 		$pdf->writeCell($weightArray[$i], 7, $headerArray[$i], 1, 0, 'C', 1);
 	}
 	$pdf->lineFeed();
@@ -184,7 +187,7 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 			$pdf->setDrawColor(0,0,0);
 			$pdf->setLineWidth(.2);
 			$pdf->setFont('Arial', 'B', 10);
-			for($i=0;$i<count($headerArray);$i++){
+			for($i=0;$i<count($headerArray);++$i){
 				$pdf->writeCell($weightArray[$i], 7, $headerArray[$i], 1, 0, 'C', 1);
 			}
 			$pdf->LineFeed();
@@ -192,7 +195,7 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 			$pdf->SetTextColor(0);
 			$pdf->SetFont('Arial', 'B', 7);
 			$n = 1;
-			$p++;
+			++$p;
 		}
 		$pdf->setX($pos);
 		$numberColumns = count($row)-1;
@@ -203,21 +206,23 @@ function pdf($result, $sumArray, $title, $weightArray, $headerArray){
 				$pdf->writeCell($weightArray[$i], 5, trim($row[$i]),'LRTB', 0, 'L');
 			}
 		}
-		$n++;
-		$t++;
+		++$n;
+		++$t;
 		$pdf->lineFeed();
 	}
 
 	$pdf->setX($pos);
 	$pdf->setFont('Arial', 'B', 7);
 	$pdf->setFillColor(0xF2,0xF2, 0xF2);
-	$pdf->writeCell($weightArray[0], 5, "TOTAL",'LRTB', 0, 'R');
-	$pdf->writeCell($weightArray[1], 5, $t,'LRTB', 0, 'L');
+	if(isset($weightArray[1])){
+		$pdf->writeCell($weightArray[0], 5, 'TOTAL','LRTB', 0, 'R');
+		$pdf->writeCell($weightArray[1], 5, $t,'LRTB', 0, 'L');
+	}
 
 	$file = md5(mt_rand(0, 10000));
-	$pdf->outputDocument("public/temp/".$file .".pdf", 'F');
+	$pdf->outputDocument('public/temp/'.$file .'.pdf', 'F');
 	if(isset($raw_output)){
-		print "<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".pdf', null); </script>";
+		echo "<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".pdf', null); </script>";
 	} else {
 		Generator::formsPrint("<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".pdf', null); </script>");
 	}

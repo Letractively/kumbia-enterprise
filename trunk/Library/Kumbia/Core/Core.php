@@ -39,7 +39,7 @@ abstract class Core {
 	 * Version del Framework
 	 *
 	 */
-	const FRAMEWORK_VERSION = '1.0.18';
+	const FRAMEWORK_VERSION = '1.7beta';
 
 	/**
 	 * PATH donde esta instalada la instancia del framework
@@ -106,7 +106,7 @@ abstract class Core {
 		/**
 		 * @see Extensions
 		 */
-		self::requireFile('Extensions/Extensions');
+		require 'Library/Kumbia/Extensions/Extensions.php';
 
 		/**
 		 * Carga las extensiones del boot.ini
@@ -132,12 +132,23 @@ abstract class Core {
 	 * @static
 	 */
 	static public function setInitialPath($path){
-		self::$_frameworkPath = $path;
+		self::$_frameworkPath = $path.'/';
+	}
+
+	/**
+	 * Devuelve el path de la aplicación
+	 *
+	 * @return string
+	 * @static
+	 */
+	static public function getInitialPath(){
+		return self::$_frameworkPath;
 	}
 
 	/**
 	 * Reestablece el PATH original de la aplicación
 	 *
+	 * @static
 	 */
 	static public function restoreInitialPath(){
 		if(self::$_frameworkPath!=getcwd()){
@@ -193,14 +204,15 @@ abstract class Core {
 		/**
 		 * Crear el _INSTANCE_NAME
 		 */
-		$deleteSessionCache = false;
+		//$deleteSessionCache = false;
 		$exceptionThrown = false;
-		$path = substr(str_replace('/public/index.php', '', $_SERVER['PHP_SELF']), 1);
-		if(isset($_SESSION['_INSTANCE_NAME'])){
-			if($path!=$_SESSION['_INSTANCE_NAME']){
-				$deleteSessionCache = true;
-			}
+		//Debug::add($_SERVER['SERVER_SOFTWARE']);
+		if($_SERVER['SERVER_SOFTWARE']=='nginx'){
+			$path = substr(str_replace('/index.php', '', $_SERVER['PHP_SELF']), 1);
 		} else {
+			$path = substr(str_replace('/public/index.php', '', $_SERVER['PHP_SELF']), 1);
+		}
+		if(!isset($_SESSION['_INSTANCE_NAME'])){
 			/**
 		 	 * Comprueba la version correcta del Framework, si es menor a 5.2 genera una excepción
 			 */
@@ -348,13 +360,21 @@ abstract class Core {
 			self::$_activeViewsDir = 'apps/'.$activeApp.'/views';
 		}
 
-		/**
-		 * @see ControllerBase
-		 */
-		if(class_exists('ControllerBase', false)==false){
-			require self::$_activeControllersDir.'/application.php';
-		}
+		//Incluir Controller Base
+		self::includeControllerBase();
 
+	}
+
+	/**
+	 * Incluir el ControllerBase de la aplicación activa
+	 *
+	 * @access public
+	 * @static
+	 */
+	public static function includeControllerBase(){
+		if(class_exists('ControllerBase', false)==false){
+			require self::$_frameworkPath.self::$_activeControllersDir.'/application.php';
+		}
 	}
 
 	/**
@@ -367,7 +387,7 @@ abstract class Core {
 	private static function _executeGarbageCollector($config){
 		if(isset($config->collector)){
 			if(class_exists('GarbageCollector')==false){
-				self::requireFile('GarbageCollector/GarbageCollector');
+				require 'Library/Kumbia/GarbageCollector/GarbageCollector.php';
 			}
 			if(isset($config->collector->probability)){
 				GarbageCollector::setProbability($config->collector->probability);
@@ -650,7 +670,7 @@ abstract class Core {
 	 * @deprecated
 	 */
 	public static function javascriptBase(){
-		print Tag::javascriptBase();
+		echo Tag::javascriptBase();
 	}
 
 	/**
@@ -725,7 +745,7 @@ abstract class Core {
 	 * @static
 	 */
 	public static function requireFile($file){
-		require 'Library/Kumbia/'.$file.'.php';
+		require self::$_frameworkPath.'Library/Kumbia/'.$file.'.php';
 	}
 
 	/**
@@ -799,10 +819,10 @@ abstract class Core {
 		self::restoreInitialPath();
 		if(isset($errortype[$number])&&$errorReporting>0){
 			if(!class_exists('Debug')){
-				self::requireFile('Debug/Debug');
+				require'Library/Kumbia/Debug/Debug.php';
 			}
 			if(!class_exists('CoreException')){
-				self::requireFile('Core/CoreException');
+				require 'Library/Kumbia/Core/CoreException.php';
 			}
 			foreach($enviroment as $var => $value){
 				Debug::addVariable($var, $value);
@@ -958,7 +978,7 @@ abstract class Core {
 		} else {
 			return file_exists($filePath);
 		}*/
-		return file_exists($filePath);
+		return file_exists(self::$_frameworkPath.$filePath);
 	}
 
 	public static function getFilePath($path){

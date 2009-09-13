@@ -52,7 +52,8 @@ function doc(){
  <table cellspacing='0' border=1 style='border:1px solid #969696'>
  ";
 	$content.= "<tr bgcolor='#F2F2F2'>\n";
-	for($i=0;$i<=count($headerArray)-1;$i++){
+	$numberHeaders = count($headerArray);
+	for($i=0;$i<$numberHeaders;++$i){
 		$content.= "<th style='font-family:Verdana;font-size:12px'>".$headerArray[$i]."</th>\n";
 	}
 	$content.= "</tr>\n";
@@ -60,7 +61,8 @@ function doc(){
 	$l = 5;
 	foreach($result as $row){
 		$content.= "<tr bgcolor='white'>\n";
-		for($i=0;$i<=count($row)-1;$i++){
+		$numberColumns = count($row);
+		for($i=0;$i<$numberColumns;++$i){
 			if(is_numeric($row[$i])){
 				$content.= "<td style='font-family:Verdana;font-size:12px' align='center'>{$row[$i]}</td>";
 			} else {
@@ -68,12 +70,12 @@ function doc(){
 			}
 		}
 		$content.= "</tr>\n";
-		$l++;
+		++$l;
 	}
 
 	file_put_contents("public/temp/$file.doc", $content);
 	if(isset($raw_output)){
-		print "<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".doc', null);  </script>";
+		echo "<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".doc', null);  </script>";
 	} else {
 		Generator::formsPrint("<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".doc', null);  </script>");
 	}

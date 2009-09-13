@@ -88,7 +88,6 @@ abstract class i18n {
 		if(self::$_multiByteEnabled==false){
 			return strtolower($str);
 		} else {
-
 			return mb_strtolower($str, self::$_defaultCharset);
 		}
 	}
@@ -120,7 +119,7 @@ abstract class i18n {
 	 */
 	static public function eregReplace($pattern, $replacement, &$regs){
 		if(self::$_multiByteEnabled==false){
-			return ereg_replace($pattern, $replacement, $regs);
+			return preg_replace('/'.$pattern.'/', $replacement, $regs);
 		} else {
 			return mb_ereg_replace($pattern, $replacement, $regs);
 		}

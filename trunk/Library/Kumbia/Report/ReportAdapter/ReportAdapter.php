@@ -23,7 +23,7 @@
 /**
  * ReportAdapter
  *
- * Adaptador que permite generar reportes en HTML
+ * Abstrae los principales métodos para adaptadores de Report
  *
  * @category 	Kumbia
  * @package 	Report
@@ -67,7 +67,7 @@ class ReportAdapter extends Object {
 	 *
 	 * @var string
 	 */
-	private $_name = "document";
+	private $_name = 'document';
 
 	/**
 	 * Items del encabezado del documento
@@ -130,7 +130,7 @@ class ReportAdapter extends Object {
 	 *
 	 * @var string
 	 */
-	private $_displayMode = "normal";
+	private $_displayMode = 'normal';
 
 	/**
 	 * Establece el titulo del Reporte
@@ -146,7 +146,7 @@ class ReportAdapter extends Object {
 	 *
 	 */
 	public function outputToBrowser(){
-		print $this->getOutput();
+		echo $this->getOutput();
 	}
 
 	/**
@@ -448,7 +448,7 @@ class ReportAdapter extends Object {
 	 * @param string $fileName
 	 */
 	public function outputToFile($fileName){
-		file_put_contents($fileName.".".$this->getFileExtension(), $this->getOutput());
+		file_put_contents($fileName.'.'.$this->getFileExtension(), $this->getOutput());
 	}
 
 }

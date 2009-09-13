@@ -128,9 +128,10 @@ abstract class StandardGenerator {
 						}
 						if(isset($form['updateCondition'])){
 							if(strpos($form['updateCondition'], '@')){
-								ereg("[\@][A-Za-z0-9_]+", $form['updateCondition'], $regs);
-								foreach($regs as $reg){
-									$form['updateCondition'] = str_replace($reg, $_REQUEST["fl_".str_replace("@", "", $reg)], $form['updateCondition']);
+								if(preg_match('/[\@][A-Za-z0-9_]+/', $form['updateCondition'], $regs)){
+									foreach($regs as $reg){
+										$form['updateCondition'] = str_replace($reg, $_REQUEST["fl_".str_replace("@", "", $reg)], $form['updateCondition']);
+									}
 								}
 							}
 							$form['updateCondition'] = " \$val = (".$form['updateCondition'].");";
@@ -290,7 +291,8 @@ abstract class StandardGenerator {
 				<b>Ordenar Por:</b>
 					<select name='reportTypeField' id='reportTypeField'>");
 						reset($form['components']);
-						for($i=0;$i<=count($form['components'])-1;$i++){
+						$numberComponents = count($form['components']);
+						for($i=0;$i<$numberComponents;$i++){
 							if(!isset($form['components'][key($form['components'])]['notReport'])){
 								$form['components'][key($form['components'])]['notReport'] = false;
 							}
@@ -322,6 +324,7 @@ abstract class StandardGenerator {
 			//Todos los Labels
 			Generator::formsPrint("<script type='text/javascript'>\nvar Labels = {");
 			$aLabels = "";
+
 			foreach($form['components'] as $key => $com){
 				if(isset($com['caption'])){
 					$aLabels.=$key.": '".$com['caption']."',";
@@ -335,7 +338,8 @@ abstract class StandardGenerator {
 			//Todos los campos
 			Generator::formsPrint("var Fields = [");
 			reset($form['components']);
-			for($i=0;$i<=count($form['components'])-1;$i++){
+			$numberComponents = count($form['components']);
+			for($i=0;$i<$numberComponents;$i++){
 				Generator::formsPrint("'".key($form['components'])."'");
 				if($i!=(count($form['components'])-1)){
 					Generator::formsPrint(",");
@@ -348,7 +352,7 @@ abstract class StandardGenerator {
 			Generator::formsPrint("var NotNullFields = [");
 			reset($form['components']);
 			$NotNullFields = "";
-			for($i=0;$i<=count($form['components'])-1;$i++){
+			for($i=0;$i<$numberComponents;$i++){
 				if(!isset($form['components'][key($form['components'])]['notNull'])){
 					$form['components'][key($form['components'])]['notNull'] = false;
 				}

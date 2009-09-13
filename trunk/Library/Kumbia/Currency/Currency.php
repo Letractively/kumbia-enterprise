@@ -95,7 +95,8 @@ class Currency {
 	/**
 	 * Establece/Cambia la localizacion
 	 *
-	 * @param Locale $locale
+	 * @access 	public
+	 * @param	Locale $locale
 	 */
 	public function setLocale(Locale $locale){
 		$this->_locale = $locale;
@@ -108,7 +109,8 @@ class Currency {
 	/**
 	 * Crea/Obtiene el formateador de monedas
 	 *
-	 * @return CurrencyFormat
+	 * @access	public
+	 * @return	CurrencyFormat
 	 */
 	private function _getFormater(){
 		if($this->_currencyFormat==null){
@@ -213,16 +215,17 @@ class Currency {
 	/**
 	 * Devuelve una cantidad monetaria formateada
 	 *
+	 * @access 	public
 	 * @param	double $quantity
 	 * @return	string
 	 */
 	public static function money($quantity){
-		$locale = Locale::getApplication();
-		$pattern = $locale->getCurrencyFormat();
 		if(self::$_currencyFormater==null){
+			$locale = Locale::getApplication();
+			$pattern = $locale->getCurrencyFormat();
 			self::$_currencyFormater = new CurrencyFormat($pattern, $quantity);
 		} else {
-			self::$_currencyFormater->toCurrency($pattern, $quantity);
+			self::$_currencyFormater->toCurrency($quantity);
 		}
 		return self::$_currencyFormater->getQuantity();
 	}
@@ -230,17 +233,29 @@ class Currency {
 	/**
 	 * Devuelve una cantidad numerica formateada
 	 *
-	 * @param string $quantity
+	 * @access 	public
+	 * @param 	string $quantity
+	 * @static
 	 */
 	public static function number($quantity){
-		$locale = Locale::getApplication();
-		$pattern = $locale->getNumericFormat();
 		if(self::$_currencyFormater==null){
+			$locale = Locale::getApplication();
+			$pattern = $locale->getNumericFormat();
 			self::$_currencyFormater = new CurrencyFormat($pattern, $quantity);
 		} else {
-			self::$_currencyFormater->toNumeric($pattern, $quantity);
+			self::$_currencyFormater->toNumeric($quantity);
 		}
 		return self::$_currencyFormater->getQuantity();
+	}
+
+	/**
+	 * Resetea el formateador interno cuando cambia la localización
+	 *
+	 * @access public
+	 * @static
+	 */
+	public static function resetFormater(){
+		self::$_currencyFormater = null;
 	}
 
 	/**
@@ -293,7 +308,12 @@ class Currency {
 				case 18: return 'DIECIOCHO';
 				case 19: return 'DIECINUEVE';
 				case 20: return 'VEINTE';
-				case 21: return 'VENTIUN';
+				case 21:
+					if(self::$_state==''){
+						return 'VENTIUNO';
+					} else {
+						return 'VENTIUN';
+					}
 			}
 		} else {
 			if($a<=99){
@@ -308,7 +328,7 @@ class Currency {
 					return 'TREINTA Y '.self::valueNumber($a % 10);
 				}
 				if($a==40){
-					$b = 'CUARENTA';
+					return 'CUARENTA';
 				}
 				if($a>=41&&$a<=49){
 					return 'CUARENTA Y '.self::valueNumber($a % 10);

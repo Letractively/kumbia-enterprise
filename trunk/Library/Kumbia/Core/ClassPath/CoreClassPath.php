@@ -38,6 +38,20 @@
 abstract class CoreClassPath {
 
 	/**
+	 * Directorio absoluto al Framework
+	 *
+	 * @var string
+	 */
+	static private $_dirName = '';
+
+	/**
+	 * Indica si se ha inicializado el directorio absoluto
+	 *
+	 * @var boolean
+	 */
+	static private $_iniDirName = false;
+
+	/**
 	 * Directorio de Recursos
 	 *
 	 * @var array
@@ -207,7 +221,11 @@ abstract class CoreClassPath {
 	 * @param string $className
 	 */
 	static public function getClassPath($className){
-		return "Library/Kumbia/".self::$_classPath[$className].".php";
+		if(self::$_iniDirName==false){
+			self::$_dirName = getcwd().'/';
+			self::$_iniDirName = true;
+		}
+		return self::$_dirName.'Library/Kumbia/'.self::$_classPath[$className].'.php';
 	}
 
 	/**
