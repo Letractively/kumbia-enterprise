@@ -55,7 +55,7 @@ abstract class TransactionManager implements TransactionManagerInterface {
 	static private $_dependencyPointer = 0x00;
 
 	/**
-	 * Devuelve la ultima creada o crea una transaccion
+	 * Devuelve la última creada ó crea una transacción
 	 *
 	 * @access	public
 	 * @param  	TransactionDefinition $definition
@@ -73,7 +73,7 @@ abstract class TransactionManager implements TransactionManagerInterface {
 			}
 		}
 		if(count(self::$_transactions)==0){
-			$transaction = new ActiveRecordTransaction();
+			$transaction = new ActiveRecordTransaction(true);
 			$transaction->setTransactionManager('TransactionManager');
 			$transaction->setDependencyPointer(self::$_dependencyPointer);
 			self::$_dependencyPointer+=2048;
