@@ -112,10 +112,10 @@ class ActiveRecordJoin extends Object {
 							} else {
 								$replacedField = str_replace($regs[0], $entitiesSources[$regs[1]], $replacedField);
 								if(is_numeric($alias)){
-									if(strpos($replacedField, ".")==false){
+									if(strpos($replacedField, '.')==false){
 										$alias = $replacedField;
 									} else {
-										$alias = substr($replacedField, strpos($replacedField, ".")+1);
+										$alias = substr($replacedField, strpos($replacedField, '.')+1);
 									}
 								}
 							}
@@ -145,7 +145,7 @@ class ActiveRecordJoin extends Object {
 	 							$requestedFields[] = str_replace($regs[0], $entitiesSources[$regs[1]], $field);
 	 						} else {
 	 							$alias = (string) $alias;
-	 							$requestedFields[] = str_replace($regs[0], $entitiesSources[$regs[1]], $field)." AS $alias";
+	 							$requestedFields[] = str_replace($regs[0], $entitiesSources[$regs[1]], $field).' AS '.$alias;
 	 						}
 	 					}
 					} else {
@@ -153,7 +153,7 @@ class ActiveRecordJoin extends Object {
 							$requestedFields[] = $field;
 						} else {
 							$alias = (string) $alias;
-							$requestedFields[] = $field." AS ".$alias;
+							$requestedFields[] = $field.' AS '.$alias;
 						}
 					}
 				}
@@ -176,7 +176,7 @@ class ActiveRecordJoin extends Object {
 										$i = 0;
 										foreach($belongsTo['rf'] as $rf){
 											$join[] = "{$belongsTo['rt']}.{$rf} = $source.{$belongsTo['fi'][$i]}";
-											$i++;
+											++$i;
 										}
 									}
 								}
@@ -195,7 +195,7 @@ class ActiveRecordJoin extends Object {
 										$i = 0;
 										foreach($hasMany['rf'] as $rf){
 											$join[] = "$source.{$rf} = {$hasMany['rt']}.{$hasMany['fi'][$i]}";
-											$i++;
+											++$i;
 										}
 									}
 								}
@@ -215,24 +215,28 @@ class ActiveRecordJoin extends Object {
 			} else {
 				$join = array_unique($join);
 				if(isset($params['conditions'])){
-					foreach($params['entities'] as $entityName){
-						$params['conditions'] = str_replace("{#$entityName}", $entitiesSources[$entityName], $params['conditions']);
+					if($params['conditions']!=""){
+						foreach($params['entities'] as $entityName){
+							$params['conditions'] = str_replace('{#'.$entityName.'}', $entitiesSources[$entityName], $params['conditions']);
+						}
+						$join[] = $params['conditions'];
 					}
-					$join[] = $params['conditions'];
 				}
 			}
 		} else {
 			if(isset($params['conditions'])){
-				foreach($params['entities'] as $entityName){
-					$params['conditions'] = str_replace("{#$entityName}", $entitiesSources[$entityName], $params['conditions']);
+				if($params['conditions']!=''){
+					foreach($params['entities'] as $entityName){
+						$params['conditions'] = str_replace('{#'.$entityName.'}', $entitiesSources[$entityName], $params['conditions']);
+					}
+					$join[] = $params['conditions'];
 				}
-				$join[] = $params['conditions'];
 			}
 		}
 		if(isset($params['order'])){
 			if(!is_array($params['order'])){
 				foreach($params['entities'] as $entityName){
-					$params['order'] = str_replace("{#$entityName}", $entitiesSources[$entityName], $params['order']);
+					$params['order'] = str_replace('{#'.$entityName.'}', $entitiesSources[$entityName], $params['order']);
 				}
 				$order = $params['order'];
 			} else {
@@ -245,15 +249,20 @@ class ActiveRecordJoin extends Object {
 						}
 					}
 				}
-				$order = join(",", $params['order']);
+				$order = join(',', $params['order']);
 			}
 		} else {
-			$order = "1";
+			$order = '1';
 		}
 		$this->_db = DbBase::rawConnect();
-		$this->_sqlQuery = "SELECT ".join(", ", $requestedFields)." FROM ".join(", ", $entitiesSources)." WHERE ".join(" AND ", $join);
+		if(count($requestedFields)>0){
+			$fields = join(', ', $requestedFields);
+		} else {
+			$fields = '*';
+		}
+		$this->_sqlQuery = 'SELECT '.$fields.' FROM '.join(', ', $entitiesSources).' WHERE '.join(' AND ', $join);
 		if(count($groupFields)){
-			$this->_sqlQuery.= " GROUP BY ".join(", ", $groupFields);
+			$this->_sqlQuery.= ' GROUP BY '.join(', ', $groupFields);
 		}
 		if(isset($params['having'])){
 			$this->_sqlQuery.=' HAVING '.$params['having'];

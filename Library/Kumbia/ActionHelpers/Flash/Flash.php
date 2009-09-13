@@ -91,13 +91,13 @@ abstract class Flash  {
 			if(is_array($message)){
 				$clases = join(' ', $classes);
 				foreach($message as $msg){
-					print '<div class="'.$clases.'">'.$msg.'</div>'."\n";
+					echo '<div class="'.$clases.'">', $msg, '</div>', "\n";
 				}
 			} else {
-				print '<div class="'.join(' ', $classes).'">'.$message.'</div>'."\n";
+				echo '<div class="'.join(' ', $classes).'">', $message, '</div>', "\n";
 			}
 		} else {
-			print strip_tags($message)."\n";
+			echo strip_tags($message), "\n";
 		}
 	}
 

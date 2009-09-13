@@ -159,6 +159,13 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	protected $_operationMade;
 
 	/**
+	 * Indica si la entidad ya existe y/o obliga a comprobarlo
+	 *
+	 * @var bool
+	 */
+	protected $_forceExists = false;
+
+	/**
 	 * Indica si se debe hacer dynamic update
 	 *
 	 * @var boolean
@@ -1088,7 +1095,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				$params['column'] = $params[0];
 			}
 		} else {
-			$params['column'] = $params[0];
+			if(!isset($params[0])){
+				throw new ActiveRecordException('No ha definido la columna a sumar');
+			} else {
+				$params['column'] = $params[0];
+			}
 		}
 		if($this->_schema){
 			$table = $this->_schema.'.'.$this->_source;
@@ -1241,7 +1252,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	public function dumpResult(array $result){
 		$this->_connect();
 		$object = clone $this;
-
+		$object->_forceExists = true;
 		/**
 		 * Consulta si la clase es padre de otra y crea el tipo de dato correcto
 		 */
@@ -1598,38 +1609,59 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	 * @return	bool
 	 */
 	private function _exists($wherePk=''){
-		if($this->_schema){
-			$table = $this->_schema.'.'.$this->_source;
+		if($this->_forceExists==false){
+			if($this->_schema){
+				$table = $this->_schema.'.'.$this->_source;
+			} else {
+				$table = $this->_source;
+			}
+			if($wherePk==''){
+				$wherePk = array();
+				$primaryKeys = $this->_getPrimaryKeyAttributes();
+				if(count($primaryKeys)>0){
+					foreach($primaryKeys as $key){
+						if(!is_null($this->$key)&&$this->$key!==''){
+							$wherePk[] = ' '.$key.' = \''.$this->$key.'\'';
+						}
+					}
+					if(count($wherePk)){
+						$this->_wherePk = join(' AND ', $wherePk);
+					} else {
+						return 0;
+					}
+					$query = 'SELECT COUNT(*) AS rowcount FROM '.$table.' WHERE '.$this->_wherePk;
+				} else {
+					return 0;
+				}
+			} else {
+				if(is_numeric($wherePk)){
+					$query = 'SELECT COUNT(*) AS rowcount FROM '.$table.' WHERE id = \''.$wherePk.'\'';
+				} else {
+					$query = 'SELECT COUNT(*) AS rowcount FROM '.$table.' WHERE '.$wherePk;
+				}
+			}
+			$num = $this->_db->fetchOne($query);
+			return (bool) $num['rowcount'];
 		} else {
-			$table = $this->_source;
-		}
-		if($wherePk==''){
 			$wherePk = array();
 			$primaryKeys = $this->_getPrimaryKeyAttributes();
 			if(count($primaryKeys)>0){
 				foreach($primaryKeys as $key){
-					if($this->$key){
+					if(!is_null($this->$key)&&$this->$key!==''){
 						$wherePk[] = ' '.$key.' = \''.$this->$key.'\'';
 					}
 				}
 				if(count($wherePk)){
 					$this->_wherePk = join(' AND ', $wherePk);
+					return true;
 				} else {
 					return 0;
 				}
-				$query = 'SELECT COUNT(*) AS rowcount FROM '.$table.' WHERE '.$this->_wherePk;
 			} else {
 				return 0;
 			}
-		} else {
-			if(is_numeric($wherePk)){
-				$query = 'SELECT COUNT(*) AS rowcount FROM '.$table.' WHERE id = \''.$wherePk.'\'';
-			} else {
-				$query = 'SELECT COUNT(*) AS rowcount FROM '.$table.' WHERE '.$wherePk;
-			}
 		}
-		$num = $this->_db->fetchOne($query);
-		return (bool) $num['rowcount'];
+
 	}
 
 	/**
@@ -1717,7 +1749,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(is_array($notNull)){
 			$error = false;
 			$numFields = count($notNull);
-			for($i=0;$i<$numFields;$i++){
+			for($i=0;$i<$numFields;++$i){
 				$field = $notNull[$i];
 				if(is_null($this->$field)||$this->$field===''){
 					if(!$exists&&$field=='id'){
@@ -2447,6 +2479,15 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
+	 * Forza a que la entidad existe y evita su comprobación
+	 *
+	 * @param bool $forceExists
+	 */
+	public function setForceExists($forceExists){
+		$this->_forceExists = $forceExists;
+	}
+
+	/**
 	 * Herencia Simple
 	 */
 
@@ -2586,7 +2627,8 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			$requestedRelation = preg_replace('/^get/', '', $method);
 			$requestedRelation = ucfirst($requestedRelation);
 			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
-				return EntityManager::getBelongsToRecords($entityName, $requestedRelation, $this);
+				$arguments = array($entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($arguments, $args));
 			}
 			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
 				$arguments = array($entityName, $requestedRelation, $this);
@@ -2630,6 +2672,16 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				}
 			}
 		}*/
+	}
+
+	/**
+	 * Sleep de ActiveRecordBase
+	 *
+	 * @access public
+	 * @return array
+	 */
+	public function __sleep(){
+		return array('_schema', '_source', '_dependencyPointer', '_dumped');
 	}
 
 }

@@ -99,7 +99,7 @@ class CurrencyFormat {
 	}
 
 	/**
-	 * Obtiene la cantidad formateada numericamente
+	 * Obtiene la cantidad formateada numéricamente
 	 *
 	 * @param double $quantity
 	 */

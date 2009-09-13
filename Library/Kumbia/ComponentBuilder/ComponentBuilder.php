@@ -235,7 +235,7 @@ class ControllerBase {
 	 * @param string $name
 	 * @param string $schema
 	 */
-	public static function createModel($db, $modelsDir, $name, $schema=''){
+	public static function createModel($db, $modelsDir, $name, $schema='', $defineRelations=false){
 		$initialize = array();
 		if($schema){
 			$initialize[] = "\t\t\$this->setSchema(\"$schema\");";
@@ -247,6 +247,11 @@ class ControllerBase {
 			$setters = array();
 			$getters = array();
 			foreach($fields as $field){
+				if($defineRelations==true){
+					if(preg_match('/([a-zA-Z0-9\_]+)_id$/', $field['Field'], $matches)){
+						$initialize[] = "\t\t\$this->belongsTo('{$matches[1]}');";
+					}
+				}
 				$type = self::_getPHPType($field['Type']);
 				$attributes[] = "\t/**\n\t * @var $type\n\t */\n\tprotected \${$field['Field']};\n";
 				$setterName = Utils::camelize($field['Field']);
@@ -258,7 +263,7 @@ class ControllerBase {
 				}
 			}
 			if(count($initialize)>0){
-				$initCode = "\n\t/**\n\t * Método inicializador de la Entidad\n\t */\n\tprotected function initialize(){\t\t\n".join(";\n", $initialize)."\n\t}\n";
+				$initCode = "\n\t/**\n\t * Método inicializador de la Entidad\n\t */\n\tprotected function initialize(){\t\t\n".join("\n", $initialize)."\n\t}\n";
 			} else {
 				$initCode = "";
 			}

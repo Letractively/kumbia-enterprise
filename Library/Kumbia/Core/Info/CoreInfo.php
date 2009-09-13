@@ -52,7 +52,7 @@ abstract class CoreInfo {
 
 		Tag::stylesheetLink('info');
 
-		print "<div id='kumbia-info-content'><span id='kumbia-info-header'>Kumbia Enterprise Admin ".Core::FRAMEWORK_VERSION."</span>
+		echo "<div id='kumbia-info-content'><span id='kumbia-info-header'>Kumbia Enterprise Admin ".Core::FRAMEWORK_VERSION."</span>
 		<h2>Kumbia Enterprise Framework Instance (".Core::getInstanceName()."/".Router::getApplication().") funciona!</h2><div>Para reemplazar esta p&aacute;gina
 		edite el archivo <i>apps/default/controllers/application.php</i> en el DocumentRoot del servidor
 		web <i>(".(isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : getcwd())."/".Core::getInstanceName().")</i>.<br><br>

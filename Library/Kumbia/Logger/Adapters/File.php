@@ -78,7 +78,7 @@ class FileLogger extends LoggerAdapter implements LoggerInterface {
 			$this->_fileLogger = @fopen($this->_path, 'ab');
 		}
 		if($this->_fileLogger==false){
-			throw new LoggerException("No se pudo abrir el log en '$path'");
+			throw new LoggerException("No se pudo abrir el log en '{$this->_path}'");
 		}
 	}
 

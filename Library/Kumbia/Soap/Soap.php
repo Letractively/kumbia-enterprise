@@ -120,9 +120,9 @@ abstract class Soap {
 		}
 		$bodyElement->appendChild($responseElement);
 
-		file_put_contents('fx.txt', self::$_domDocument->saveXML());
+		#file_put_contents('fx.txt', self::$_domDocument->saveXML());
 
-		print self::$_domDocument->saveXML();
+		echo self::$_domDocument->saveXML();
 	}
 
 	/**
@@ -310,7 +310,7 @@ abstract class Soap {
 					$faultTrace->appendChild($faultFunction);
 				}
 			}
-			print self::$_domDocument->saveXML();
+			echo self::$_domDocument->saveXML();
 		}
 	}
 

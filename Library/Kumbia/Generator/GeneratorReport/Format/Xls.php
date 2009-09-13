@@ -79,27 +79,27 @@ function xls($result, $sumArray, $title, $weightArray, $headerArray){
 	$worksheet->write(1, 0, "REPORTE DE ".strtoupper($title), $titulo_verdana2);
 	$worksheet->write(2, 0, "FECHA ".date("Y-m-d"), $titulo_verdana2);
 
-	for($i=0;$i<=count($headerArray)-1;$i++){
+	for($i=0;$i<=count($headerArray)-1;++$i){
 		$worksheet->setColumn($i, $i, $weightArray[$i]);
 		$worksheet->write(4, $i, $headerArray[$i], $column_title);
 	}
 
 	$l = 5;
 	foreach($result as $row){
-		for($i=0;$i<=count($row)-1;$i++){
+		for($i=0;$i<=count($row)-1;++$i){
 			if(!is_numeric($row[$i])){
 				$worksheet->writeString($l, $i, $row[$i], $column);
 			} else {
 				$worksheet->writeString($l, $i, $row[$i], $column_centered);
 			}
 		}
-		$l++;
+		++$l;
 	}
 
 	$workbook->close();
 
 	if(isset($raw_output)){
-		print "<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".xls', null);  </script>";
+		echo "<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".xls', null);  </script>";
 	} else {
 		Generator::formsPrint("<script type='text/javascript'> window.open('".Core::getInstancePath()."temp/".$file.".xls', null);  </script>");
 	}

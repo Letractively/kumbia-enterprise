@@ -568,7 +568,7 @@ class Locale extends Object {
 	/**
 	 * Obtiene todas las localizaciones disponibles en el entorno de ejecución
 	 *
-	 * @return array
+	 * @return	array
 	 * @static
 	 */
 	public static function getEnvironmentAll(){
@@ -713,6 +713,48 @@ class Locale extends Object {
 	}
 
 	/**
+	 * Genera un numero formateado con la localización actual
+	 *
+	 * @param double $number
+	 * @return string
+	 */
+	public static function round($x){
+		return LocaleMath::round($x, 0);
+	}
+
+	/**
+	 * Genera un numero formateado con la localización actual para monedas
+	 *
+	 * @param double $number
+	 * @return string
+	 */
+	public static function money($number){
+		return Currency::money($number);
+	}
+
+	public static function formatDate($x){
+		return $x;
+	}
+
+	/**
+	 * Genera un numero formateado con la localización actual
+	 *
+	 * @param double $number
+	 * @return string
+	 */
+	public static function number($number){
+		return Currency::number($number);
+	}
+
+	/**
+	 * Resetea el LocaleData al serializar el objeto
+	 *
+	 */
+	public function __sleep(){
+		return array('_locale');
+	}
+
+	/**
 	 * Metodo magico __toString devuelve el identificador de localizacion del objeto
 	 *
 	 * @return string
@@ -720,22 +762,5 @@ class Locale extends Object {
 	public function __toString(){
 		return $this->_locale['locale'];
 	}
-
-	public static function round($x){
-		return LocaleMath::round($x, 0);
-	}
-
-	public static function money($x){
-		return $x;
-	}
-
-	public static function formatDate($x){
-		return $x;
-	}
-
-	public static function number($x){
-		return $x;
-	}
-
 
 }

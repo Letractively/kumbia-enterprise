@@ -57,8 +57,8 @@ abstract class PHPUnit {
 							$comment = $method->getDocComment();
 							$comment = trim(str_replace(array('/*', '*/', '*'), '', $comment));
 							$methodName = $method->getName();
-							print sprintf('%03s', $numberOfTest+1).'. '.$methodName.' - '.$comment.' : ';
-							$numberOfTest++;
+							echo sprintf('%03s', $numberOfTest+1).'. '.$methodName.' - '.$comment.' : ';
+							++$numberOfTest;
 							$test->$methodName();
 						} else {
 							continue;
@@ -66,16 +66,16 @@ abstract class PHPUnit {
 					}
 					catch(AssertionFailed $e){
 						$assertionMessages[$methodName] = get_class($e).' > '.$e->getMessage();
-						$assertionFailed++;
-						print 'FAIL'."\n";
+						++$assertionFailed;
+						echo 'FAIL', "\n";
 						continue;
 					}
 					catch(Exception $e){
 						print_r($e->getTrace());
 						$assertionMessages[$methodName] = get_class($e).' > '.$e->getConsoleMessage();
-						$assertionFailed++;
+						++$assertionFailed;
 					}
-					print 'OK'."\n";
+					echo 'OK', "\n";
 				}
 			}
 			catch(AssertionFailed $e){
@@ -86,19 +86,19 @@ abstract class PHPUnit {
 				$assertionMessages['_start'] = get_class($e).' > '.$e->getConsoleMessage();
 				$assertionFailed++;
 			}
-			print "Total Pruebas: $numberOfTest Fallaron: $assertionFailed\n";
-			print "Total Aserciones: ".$test->getNumberAssertions()." Exitosas: ".$test->getSuccessAssertions()." Fallaron: ".$test->getFailedAssertions()."\n";
+			echo "Total Pruebas: $numberOfTest Fallaron: $assertionFailed\n";
+			echo "Total Aserciones: ".$test->getNumberAssertions()." Exitosas: ".$test->getSuccessAssertions()." Fallaron: ".$test->getFailedAssertions()."\n";
 			if($assertionFailed>0){
 				print "Los test han fallado con los siguientes mensajes:\n\n";
 				foreach($assertionMessages as $test => $messsage){
-					print $test." : ".$messsage."\n";
+					echo $test." : ".$messsage."\n";
 				}
 
 			}
 		}
 		catch(Exception $e){
-			print "Exception ".$e->getMessage()."\n";
-			print "Archivo: ".$e->getFile()."\n";
+			echo "Exception ".$e->getMessage()."\n";
+			echo "Archivo: ".$e->getFile()."\n";
 			debug_print_backtrace();
 		}
 	}

@@ -323,7 +323,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			return false;
 		}
 		if($number){
-			for($i=0;$i<=$number-1;$i++){
+			for($i=0;$i<=$number-1;++$i){
 				if(!oci_fetch_row($resultQuery)){
 					return false;
 				}
@@ -482,11 +482,11 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 		if(!is_numeric($number)||$number<0){
 			return $sql;
 		}
-		if(eregi('ORDER[\t\n\r ]+BY', $sql)){
+		if(preg_match('/ORDER[\t\n\r ]+BY/i', $sql)){
 			if(stripos($sql, 'WHERE')){
-				return eregi_replace('ORDER[\t\n\r ]+BY', "AND ROWNUM <= $number ORDER BY", $sql);
+				return preg_replace('/ORDER[\t\n\r ]+BY/i', "AND ROWNUM <= $number ORDER BY", $sql);
 			} else {
-				return eregi_replace('ORDER[\t\n\r ]+BY', "WHERE ROWNUM <= $number ORDER BY", $sql);
+				return preg_replace('/ORDER[\t\n\r ]+BY/i', "WHERE ROWNUM <= $number ORDER BY", $sql);
 			}
 		} else {
 			if(stripos($sql, 'WHERE')){

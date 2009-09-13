@@ -123,8 +123,21 @@ abstract class DbLoader {
 		$className = self::_loadAdapterClass($layer, $type);
 		eval('class Db extends '.$className.' {}');
 		$extensionRequired = Db::getPHPExtensionRequired();
-		if(extension_loaded($extensionRequired)==false){
-			throw new DbException("Debe cargar la extension de PHP llamada php_$extensionRequired", 0);
+		if(is_array($extensionRequired)){
+			$someExtension = false;
+			foreach($extensionRequired as $extension){
+				if(extension_loaded($extension)){
+					$someExtension = true;
+					break;
+				}
+			}
+			if($someExtension==false){
+				throw new DbException("Debe cargar alguna de las siguientes extensiones de PHP: ".join(", ", $extensionRequired), 0);
+			}
+		} else {
+			if(extension_loaded($extensionRequired)==false){
+				throw new DbException("Debe cargar la extensión de PHP llamada php_$extensionRequired", 0);
+			}
 		}
 		return true;
 	}

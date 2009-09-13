@@ -383,7 +383,7 @@ class DbPdoInformix extends DbPDO  {
 				'Null' => $field['null'],
 				'Key' => $field['key']
 			);
-			$n++;
+			++$n;
 		}
 		$this->_fetchMode = $fetchMode;
 		return $finalDescribe;

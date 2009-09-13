@@ -254,7 +254,9 @@ abstract class View {
 			foreach(self::$_data as $_key => $_value){
 				$$_key = $_value;
 			}
-			$id = $controller->getId();
+			if(!isset($id)){
+				$id = $controller->getId();
+			}
 
 			/**
 			 * View busca un los templates correspondientes al nombre de la accion y el layout
@@ -299,7 +301,7 @@ abstract class View {
 				 * Insertar la vista si es necesario
 				 */
 				if(self::$_renderLevel>=self::LEVEL_ACTION_VIEW){
-					if(Core::fileExists("$_viewsDir/$controllerName/$actionName.phtml")){
+					if(Core::fileExists($_viewsDir.'/'.$controllerName.'/'.$actionName.'.phtml')){
 						ob_clean();
 						/**
 						 * Aqui verifica si existe un valor en minutos para el cache
@@ -310,8 +312,8 @@ abstract class View {
 					 		 * a partir del valor $_SESSION['SID'] para que sea único
 					 		 * para cada sesi&oacute;n
 					 		 */
-							if(Core::fileExists($viewCacheDir."/$actionName")==false){
-								include "$_viewsDir/$controllerName/$actionName.phtml";
+							if(Core::fileExists($viewCacheDir.'/'.$actionName)==false){
+								include $_viewsDir.'/'.$controllerName.'/'.$actionName.'.phtml';
 								file_put_contents($viewCacheDir."/$actionName", ob_get_contents());
 							} else {
 								$time_cache = $controller->get_view_cache();
@@ -339,7 +341,7 @@ abstract class View {
 							/**
 							 * Aqui verifica si existe un valor en minutos para el cache
 						 	 */
-							if(Core::fileExists("$_viewsDir/layouts/".$controller->getTemplateBefore().".phtml")){
+							if(Core::fileExists($_viewsDir.'/layouts/'.$controller->getTemplateBefore().'.phtml')){
 								ob_clean();
 								if($controller->getLayoutCache()){
 									/**
@@ -347,7 +349,7 @@ abstract class View {
 							 	 	 * a partir del valor session_id() para que sea único
 							 	 	 * para cada sesion
 							 	 	 */
-									if(!Core::fileExists($viewCacheDir."/layout")){
+									if(!Core::fileExists($viewCacheDir.'/layout')){
 										include "$_viewsDir/layouts/".$controller->getTemplateBefore().".phtml";
 										file_put_contents($viewCacheDir."/layout", ob_get_contents());
 									} else {
@@ -360,7 +362,7 @@ abstract class View {
 										}
 									}
 								} else {
-									include "$_viewsDir/layouts/".$controller->getTemplateBefore().".phtml";
+									include $_viewsDir.'/layouts/'.$controller->getTemplateBefore().'.phtml';
 								}
 								self::$_content = ob_get_contents();
 							} else {

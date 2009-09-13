@@ -67,7 +67,7 @@ class ApplicationController extends Controller  {
 	 * @param	string $text
 	 */
 	protected function renderText($text){
-		print $text;
+		echo $text;
 	}
 
 	/**

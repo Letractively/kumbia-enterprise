@@ -544,7 +544,7 @@ abstract class Tag {
 				$i = 1;
 				foreach($locale->getAbrevMonthList() as $month){
 					$meses[sprintf('%02s', $i)] = ucfirst($month);
-					$i++;
+					++$i;
 				}
 			}
 		}
@@ -582,7 +582,7 @@ abstract class Tag {
 			$display = '';
 		}
 		$code.="<select name='{$params[0]}_day' id='{$params[0]}_day' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value;\" $display>";
-		for($i=1;$i<=31;$i++){
+		for($i=1;$i<=31;++$i){
 			$n = $i<10 ? '0'.$i : $i;
 			if($n==$dia){
 				$code.="<option value='$n' selected='selected'>$n</option>\n";
@@ -692,7 +692,7 @@ abstract class Tag {
 		$code.="</select></td><td>";
 
 		$code.="<select name='{$params[0]}_day' id='{$params[0]}_day' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value\">";
-		for($i=1;$i<=31;$i++){
+		for($i=1;$i<=31;++$i){
 			$n = sprintf("%02s", $i);
 			if($n==$dia){
 				$code.="<option value='$n' selected='selected'>$n</option>\n";
@@ -736,61 +736,58 @@ abstract class Tag {
 	 * @return 	string
 	 */
 	public static function selectStatic($params='', $data=''){
-		if(func_num_args()>1){
-			$numberArguments = func_num_args();
-			$params = Utils::getParams(func_get_args(), $numberArguments);
-			if(is_array($params)){
-				$value = "";
-				if(!isset($params['value'])){
-					$value = self::getValueFromAction($params[0]);
-				} else {
-					$value = $params['value'];
-				}
-				$code ="<select id='{$params[0]}' name='{$params[0]}' ";
-				if(!isset($params['dummyValue'])){
-					$dummyValue = '@';
-				} else {
-					$dummyValue = $params['dummyValue'];
-					unset($params['dummyValue']);
-				}
-				if(!isset($params['dummyText'])){
-					$dummyText = 'Seleccione...';
-				} else {
-					$dummyText = $params['dummyText'];
-					unset($params['dummyText']);
-				}
-				if(is_array($params)){
-					foreach($params as $at => $val){
-						if(!is_integer($at)){
-							if(!is_array($val)){
-								$code.="$at='".$val."' ";
-							}
-						}
-					}
-				}
-				$code.=">\r\n";
-				if(isset($params['use_dummy'])&&$params['use_dummy']){
-					$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
-					unset($params['use_dummy']);
-				} else {
-					if(isset($params['useDummy'])&&$params['useDummy']){
-						$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
-						unset($params['useDummy']);
-					}
-				}
-				if(is_array($params[1])){
-					foreach($params[1] as $k => $d){
-						if($k==$value){
-							$code.="\t<option value='$k' selected='selected'>$d</option>\r\n";
-						} else {
-							$code.="\t<option value='$k'>$d</option>\r\n";
-						}
-					}
-				}
-				$code.= "</select>\r\n";
+		$numberArguments = func_num_args();
+		$arguments = func_get_args();
+		$params = Utils::getParams($arguments, $numberArguments);
+		if(is_array($params)){
+			$value = "";
+			if(!isset($params['value'])){
+				$value = self::getValueFromAction($params[0]);
+			} else {
+				$value = $params['value'];
 			}
-		} else {
-			$code = "<select id='$params' name='$params'></select>";
+			$code ="<select id='{$params[0]}' name='{$params[0]}' ";
+			if(!isset($params['dummyValue'])){
+				$dummyValue = '@';
+			} else {
+				$dummyValue = $params['dummyValue'];
+				unset($params['dummyValue']);
+			}
+			if(!isset($params['dummyText'])){
+				$dummyText = 'Seleccione...';
+			} else {
+				$dummyText = $params['dummyText'];
+				unset($params['dummyText']);
+			}
+			if(isset($params['use_dummy'])&&$params['use_dummy']){
+				$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
+				unset($params['use_dummy']);
+			} else {
+				if(isset($params['useDummy'])&&$params['useDummy']){
+					$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
+					unset($params['useDummy']);
+				}
+			}
+			if(is_array($params)){
+				foreach($params as $at => $val){
+					if(!is_integer($at)){
+						if(!is_array($val)){
+							$code.="$at='".$val."' ";
+						}
+					}
+				}
+			}
+			$code.=">\r\n";
+			if(is_array($params[1])){
+				foreach($params[1] as $k => $d){
+					if($k==$value){
+						$code.="\t<option value='$k' selected='selected'>$d</option>\r\n";
+					} else {
+						$code.="\t<option value='$k'>$d</option>\r\n";
+					}
+				}
+			}
+			$code.= "</select>\r\n";
 		}
 		return $code;
 	}
@@ -1080,6 +1077,21 @@ abstract class Tag {
 	}
 
 	/**
+	 * Devuelve la ubicación javascript
+	 *
+	 * @return string
+	 */
+	public static function getJavascriptLocation(){
+		$application = Router::getActiveApplication();
+		$controllerName = Router::getController();
+		$actionName = Router::getAction();
+		$module = Router::getModule();
+		$id = Router::getId();
+		$path = Core::getInstancePath();
+		return "<script type=\"text/javascript\">\$Kumbia={app:\"$application\",path:\"$path\",controller:\"$controllerName\",action:\"$actionName\",id:\"$id\"}</script>\n";
+	}
+
+	/**
 	 * Genera una etiqueta script que apunta a un archivo JavaScript
 	 * respetando las rutas y convenciones de Kumbia
  	 *
@@ -1336,7 +1348,7 @@ abstract class Tag {
 		$metas = MemoryRegistry::get('CORE_META_TAGS');
 		if(is_array($metas)){
 			foreach($metas as $meta){
-				print $meta;
+				echo $meta;
 			}
 		}
 	}
@@ -1407,7 +1419,10 @@ abstract class Tag {
 			}
 			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css.php?c=$src&p=$kb&$parameters' />\r\n";
 		} else {
-			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css/$src.css?$parameters' />\r\n";
+			if($parameters!=""){
+				$parameters = "?".$parameters;
+			}
+			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css/$src.css$parameters' />\r\n";
 		}
 		MemoryRegistry::prepend('CORE_CSS_IMPORTS', $code);
 		return $code;
@@ -1470,14 +1485,18 @@ abstract class Tag {
 			$params['method'] = 'post';
 		}
 		if(isset($params['confirm'])&&$params['confirm']){
-			$params['onsubmit'].=$params['onsubmit'].";if(!confirm(\"{$params['confirm']}\")) { return false; }";
+			$params['onsubmit'].= $params['onsubmit'].";if(!confirm(\"{$params['confirm']}\")) { return false; }";
 			unset($params['confirm']);
 		}
 		if(is_null($id)||$id===""){
-			$str = "<form action='".Utils::getKumbiaUrl("$action")."' ";
+			$action = Utils::getKumbiaUrl($action);
 		} else {
-			$str = "<form action='".Utils::getKumbiaUrl("$action/$id")."' ";
+			$action = Utils::getKumbiaUrl($action.'/'.$id);
 		}
+		if(isset($params['parameters'])){
+			$action.= '?'.$params['parameters'];
+		}
+		$str = "<form action='".$action."' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$str.= "$key='$value' ";
@@ -1887,10 +1906,10 @@ abstract class Tag {
 		if(!$l) {
 			$l = 1;
 		} else {
-			$l++;
+			++$l;
 		}
 		if(($l%$n)==0) {
-			print "</tr><tr>";
+			echo "</tr><tr>";
 		}
 	}
 
@@ -1910,10 +1929,10 @@ abstract class Tag {
 		if(!$l) {
 			$l = 1;
 		} else {
-			$l++;
+			++$l;
 		}
 		if(($l%$n)==0) {
-			print "<br/>\n";
+			echo "<br/>\n";
 		}
 	}
 
@@ -1937,18 +1956,18 @@ abstract class Tag {
 		if(count($colors)==$i) {
 			$i = 1;
 		} else {
-			$i++;
+			++$i;
 		}
 		if(isset($params)){
 			if(is_array($params)){
 				foreach($params as $key => $value){
 					if(!is_integer($key)){
-						print " $key = '$value'";
+						echo " $key = '$value'";
 					}
 				}
 			}
 		}
-		print ">";
+		echo ">";
 	}
 
 	/**
@@ -1970,7 +1989,7 @@ abstract class Tag {
 		if(count($classes)==$i) {
 			$i = 1;
 		} else {
-			$i++;
+			++$i;
 		}
 		if(isset($params)){
 			if(is_array($params)){
@@ -2121,7 +2140,7 @@ abstract class Tag {
 							if($i>=$show){
 								break;
 							}
-							$i++;
+							++$i;
 						}
 					}
 				}
@@ -2145,77 +2164,56 @@ abstract class Tag {
 	 * @param int $width
 	 * @static
 	 */
-	static public function tab($tabs, $color='green', $width=800){
-
-		switch($color){
-			case 'blue':
-				$col1 = '#E8E8E8'; $col2 = '#C0c0c0'; $col3 = '#000000';
-				break;
-
-			case 'pink':
-				$col1 = '#FFE6F2'; $col2 = '#FFCCE4'; $col3 = '#FE1B59';
-				break;
-
-			case 'orange':
-				$col1 = '#FCE6BC'; $col2 = '#FDF1DB'; $col3 = '#DE950C';
-				break;
-
-			case 'green':
-				$col2 = '#EAFFD7'; $col1 = '#DAFFB9'; $col3 = '#008000';
-				break;
-		}
-
-
-		print "
-			<table cellspacing='0' cellpadding='0' width=$width>
-			<tr>";
+	static public function tab($tabs, $width=800){
+		$code = "<table cellspacing='0' cellpadding='0' width='$width'><tr>";
 		$p = 1;
 		$w = $width;
 		foreach($tabs as $tab){
 			if($p==1){
-				$color = $col1;
+				$className = 'tab_active';
 			} else {
-				$color = $col2;
+				$className = 'tab_inactive';
 			}
 			$ww = (int) ($width * 0.22);
 			$www = (int) ($width * 0.21);
-			print "<td align='center'
-				  width=$ww style='padding-top:5px;padding-left:5px;padding-right:5px;padding-bottom:-5px'>
-				  <div style='width:$www"."px;border-top:1px solid $col3;border-left:1px solid $col3;border-right:1px solid $col3;background:$color;padding:2px;color:$col3;cursor:pointer' id='spanm_$p'
-				  onclick='showTab($p, this)'
-				  >".$tab['caption']."</div></td>";
-			$p++;
+			$code.="<td align='center' width='{$ww}' class='tab_td'><div style='width:{$www}px;' id='tabdiv_$p' onclick='showTab($p, this)' class='tab_div $className'>".$tab['caption']."</div></td>";
+			++$p;
 			$w-=$ww;
 		}
-		print "
+		$code.= "
 			<script type='text/javascript'>
 				function showTab(p, obj){
-				  	for(i=1;i<=$p-1;i++){
+					for(var i=1;i<$p;i++){
 					    $('tab_'+i).hide();
-					    $('spanm_'+i).style.background = '$col2';
-					}
+						$('tabdiv_'+i).removeClassName('tab_active');
+						$('tabdiv_'+i).addClassName('tab_inactive');
+					};
 					$('tab_'+p).show();
-					obj.style.background = '$col1'
+					$('tabdiv_'+p).removeClassName('tab_inactive');
+					$('tabdiv_'+p).addClassName('tab_active');
 				}
 			</script>
 			";
-		$p = $p + 1;
+		++$p;
 		//$w = $width/2;
-		print "<td width=$w></td><tr>";
-		print "<td colspan=$p style='border:1px solid $col3;background:$col1;padding:10px'>";
+		$code.="<td width='$w'></td><tr>";
+		$code.="<td colspan='$p' class='tab_con'>";
 		$p = 1;
 		foreach($tabs as $tab){
 			if($p!=1){
-				print "<div id='tab_$p' style='display:none'>";
+				$code.="<div id='tab_$p' style='display:none'>";
 			} else {
-				print "<div id='tab_$p'>";
+				$code.="<div id='tab_$p'>";
 			}
+			ob_start();
 			View::renderPartial($tab['partial']);
-			print "</div>";
-			$p++;
+			$code.=ob_get_contents();
+			ob_end_clean();
+			$code.="</div>";
+			++$p;
 		}
-		print "<br></td><td width='30'></td>";
-		print "</table>";
+		$code.="<br></td><td width='30'></td></table>";
+		return $code;
 	}
 
 	static public function updateDiv(){

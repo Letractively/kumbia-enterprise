@@ -1130,7 +1130,7 @@ class PdfDocument {
 		fseek($f, 6, SEEK_CUR);
 		//Seek OS/2 table
 		$found = false;
-		for($i=0;$i<$nb;$i++){
+		for($i=0;$i<$nb;++$i){
 			if(fread($f, 4)=='OS/2'){
 				$found = true;
 				break;
@@ -1212,7 +1212,7 @@ class PdfDocument {
 		$cw = &$this->_currentFont['cw'];
 		$w = 0;
 		$l = strlen($s);
-		for($i=0;$i<$l;$i++){
+		for($i=0;$i<$l;++$i){
 			$w+=$cw[$s{$i}];
 		}
 		return $w*$this->_fontSize/1000;
@@ -1307,7 +1307,7 @@ class PdfDocument {
 			//Search existing encodings
 			$d = 0;
 			$nb = count($this->_diffs);
-			for($i=1;$i<=$nb;$i++){
+			for($i=1;$i<=$nb;++$i){
 				if($this->_diffs[$i]==$diff){
 					$d=$i;
 					break;
@@ -1663,12 +1663,12 @@ class PdfDocument {
 					$this->_out('0 Tw');
 				}
 				$this->writeCell($w, $h, substr($s, $j, $i-$j), $b, 2, $align, $fill);
-				$i++;
+				++$i;
 				$sep =-1;
 				$j = $i;
 				$l = 0;
 				$ns = 0;
-				$nl++;
+				++$nl;
 				if($border && $nl==2){
 					$b = $b2;
 				}
@@ -1677,14 +1677,14 @@ class PdfDocument {
 			if($c==' '){
 				$sep = $i;
 				$ls = $l;
-				$ns++;
+				++$ns;
 			}
 			$l+= $cw[$c];
 			if($l>$wmax){
 				//Automatic line break
 				if($sep==-1){
 					if($i==$j){
-						$i++;
+						++$i;
 					}
 					if($this->_ws>0){
 						$this->_ws = 0;
@@ -1703,7 +1703,7 @@ class PdfDocument {
 				$j = $i;
 				$l = 0;
 				$ns = 0;
-				$nl++;
+				++$nl;
 				if($border && $nl==2){
 					$b = $b2;
 				}
@@ -1747,7 +1747,7 @@ class PdfDocument {
 			if($c=="\n"){
 				//Explicit line break
 				$this->writeCell($w, $h, substr($s, $j, $i-$j), 0, 2, '', 0, $link);
-				$i++;
+				++$i;
 				$sep=-1;
 				$j = $i;
 				$l = 0;
@@ -1756,7 +1756,7 @@ class PdfDocument {
 					$w = $this->_width-$this->_rightMargin-$this->_x;
 					$wmax = ($w-2*$this->_cellMargin)*1000/$this->_fontSize;
 				}
-				$nl++;
+				++$nl;
 				continue;
 			}
 			if($c==' '){
@@ -1772,12 +1772,12 @@ class PdfDocument {
 						$this->_y+=$h;
 						$w = $this->_width-$this->_rightMargin-$this->_x;
 						$wmax = ($w-2*$this->_cellMargin)*1000/$this->_fontSize;
-						$i++;
-						$nl++;
+						++$i;
+						++$nl;
 						continue;
 					}
 					if($i==$j){
-						$i++;
+						++$i;
 					}
 					$this->writeCell($w,$h,substr($s,$j,$i-$j),0,2,'',0,$link);
 				} else {
@@ -1792,9 +1792,9 @@ class PdfDocument {
 					$w = $this->_width-$this->_rightMargin-$this->_x;
 					$wmax = ($w-2*$this->_cellMargin)*1000/$this->_fontSize;
 				}
-				$nl++;
+				++$nl;
 			} else {
-				$i++;
+				++$i;
 			}
 		}
 		//Last chunk
@@ -2079,7 +2079,7 @@ class PdfDocument {
 		$nb = $this->_activePage;
 		if(!empty($this->_aliasNbPages)){
 			//Replace number of pages
-			for($n=1;$n<=$nb;$n++){
+			for($n=1;$n<=$nb;++$n){
 				$this->_pages[$n] = str_replace($this->_aliasNbPages, $nb, $this->_pages[$n]);
 			}
 		}
@@ -2091,7 +2091,7 @@ class PdfDocument {
 			$hPt = $this->_fWidthPoint;
 		}
 		$filter = ($this->_compress) ? '/Filter /FlateDecode ' : '';
-		for($n=1;$n<=$nb;$n++){
+		for($n=1;$n<=$nb;++$n){
 			//Page
 			$this->_newobj();
 			$this->_out('<</Type /Page');
@@ -2231,7 +2231,7 @@ class PdfDocument {
 					$this->_newobj();
 					$cw = &$font['cw'];
 					$s = '[';
-					for($i=32;$i<=255;$i++){
+					for($i=32;$i<=255;++$i){
 						$s.=$cw[chr($i)].' ';
 					}
 					$this->_out($s.']');
@@ -2287,7 +2287,7 @@ class PdfDocument {
 			}
 			if(isset($info['trns']) && is_array($info['trns'])){
 				$trns = '';
-				for($i=0;$i<count($info['trns']);$i++){
+				for($i=0;$i<count($info['trns']);++$i){
 					$trns.=$info['trns'][$i].' '.$info['trns'][$i].' ';
 				}
 				$this->_out('/Mask ['.$trns.']');
@@ -2431,7 +2431,7 @@ class PdfDocument {
 		$this->_out('xref');
 		$this->_out('0 '.($this->_n+1));
 		$this->_out('0000000000 65535 f ');
-		for($i=1;$i<=$this->_n;$i++){
+		for($i=1;$i<=$this->_n;++$i){
 			$this->_out(sprintf('%010d 00000 n ', $this->_offsets[$i]));
 		}
 		//Trailer
@@ -2451,7 +2451,7 @@ class PdfDocument {
 	 * @param string $orientation
 	 */
 	protected function _beginPage($orientation){
-		$this->_activePage++;
+		++$this->_activePage;
 		$this->_pages[$this->_activePage] = '';
 		$this->_state = 2;
 		$this->_x = $this->_leftMargin;
@@ -2491,7 +2491,7 @@ class PdfDocument {
 
 	protected function _newobj(){
 		//Begin a new object
-		$this->_n++;
+		++$this->_n;
 		$this->_offsets[$this->_n] = strlen($this->_buffer);
 		$this->_out($this->_n.' 0 obj');
 	}

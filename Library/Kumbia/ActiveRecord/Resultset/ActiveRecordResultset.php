@@ -140,7 +140,7 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	 * @access public
 	 */
 	public function next(){
-		$this->_pointer++;
+		++$this->_pointer;
 	}
 
 	/**

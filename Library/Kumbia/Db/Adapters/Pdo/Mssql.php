@@ -254,7 +254,7 @@ class DbPdoMsSQL extends DbPDO {
 		}
 		$describeKeys = $this->fetchAll("exec sp_pkeys @table_name = '$table'");
 		foreach($describeKeys as $field){
-			for($i=0;$i<=count($finalDescribe)-1;$i++){
+			for($i=0;$i<=count($finalDescribe)-1;++$i){
 				if($finalDescribe[$i]['Field']==$field['COLUMN_NAME']){
 					$finalDescribe[$i]['Key'] = 'PRI';
 				} else {

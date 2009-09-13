@@ -378,7 +378,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	public function dataSeek($number, $pdoStatement=''){
 		$pdoStatement->closeCursor();
 		$pdoStatement->execute();
-		for($i=0;$i<$number;$i++){
+		for($i=0;$i<$number;++$i){
 			$pdoStatement->fetch(PDO::FETCH_NUM);
 		}
 		return true;
@@ -592,7 +592,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 				}
 			}
 			$updateValues[] = $field.' = '.$values[$i];
-			$i++;
+			++$i;
 		}
 		$updateSql.= join(', ', $updateValues);
 		if($whereCondition!=null){

@@ -155,7 +155,7 @@ class AclXml implements AclAdapter {
 			} else {
 				$this->deny($roleName, $resourceName, $actionName);
 			}
-			$n++;
+			++$n;
 		}
 	}
 
@@ -529,7 +529,7 @@ class AclXml implements AclAdapter {
 	 */
 	private function _rebuildAccessList(){
 		$middle = ceil(count($this->_roles)*count($this->_roles)/2);
-		for($i=0;$i<=$middle;$i++){
+		for($i=0;$i<=$middle;++$i){
 			foreach($this->_rolesNames as $role){
 				if(isset($this->_roleInherits[$role])){
 					foreach($this->_roleInherits[$role] as $role_inherit){

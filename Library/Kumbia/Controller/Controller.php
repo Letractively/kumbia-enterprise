@@ -431,7 +431,7 @@ class Controller extends ControllerBase {
 		$instancePath = Core::getInstancePath();
 		if(headers_sent()==true){
 			$seconds*=1000;
-			print "<script type='text/javascript'>window.setTimeout(\"window.location='".$instancePath.$controller."'\", $seconds);</script>\n";
+			echo "<script type='text/javascript'>window.setTimeout(\"window.location='", $instancePath, $controller, "'\", $seconds);</script>\n";
 		} else {
 			$application = Router::getActiveApplication();
 			View::setRenderLevel(View::LEVEL_NO_RENDER);
@@ -533,7 +533,7 @@ class Controller extends ControllerBase {
 	 */
 	protected function outputJSONResponse($data){
 		$this->setResponse('json');
-		print json_encode($data);
+		echo json_encode($data);
 	}
 
 	/**

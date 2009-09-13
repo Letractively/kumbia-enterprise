@@ -180,15 +180,15 @@ abstract class Browse {
 						$browseSelect.=",";
 					} else $first = true;
 
-					if(strpos(" ".$browseFrom, $component['foreignTable'])){
-						$alias = "t".$nalias;
-						$nalias++;
-						$browseFrom.=",".$component['foreignTable']." ".$alias;
+					if(strpos(' '.$browseFrom, $component['foreignTable'])){
+						$alias = 't'.$nalias;
+						++$nalias;
+						$browseFrom.=','.$component['foreignTable'].' '.$alias;
 					} else {
-						$browseFrom.=",".$component['foreignTable'];
-						$alias = "";
+						$browseFrom.=','.$component['foreignTable'];
+						$alias = '';
 					}
-					if(strpos($component['detailField'], "(")){
+					if(strpos($component['detailField'], '(')){
 						$browseSelect.=$component['detailField']." AS $name, $source.$name as pk_$name";
 						if(!isset($_GET['q'])){
 							$_GET['q'] = '';
@@ -224,22 +224,23 @@ abstract class Browse {
 					} else {
 						$first = true;
 					}
+					$numberComponents = count($component['items']);
 					if($config->database->type=='postgresql'){
 						$browseSelect.="case ";
 					}
 					if($config->database->type=='mysql'){
-						for($i=0;$i<=count($component['items'])-2;$i++){
+						for($i=0;$i<=$numberComponents-2;++$i){
 							$browseSelect.="if(".$form['source'].".".$name."='".$component['items'][$i][0]."', '".$component['items'][$i][1]."', ";
 						}
 					}
 					if($config->database->type=='postgresql'){
-						for($i=0;$i<=count($component['items'])-1;$i++){
+						for($i=0;$i<$numberComponents;++$i){
 							$browseSelect.=" when ".$form['source'].".".$name."='".$component['items'][$i][0]."' THEN '".$component['items'][$i][1]."' ";
 						}
 					}
 					if($config->database->type=='mysql'){
 						$browseSelect.="'".$component['items'][$i][1]."')";
-						for($j=0;$j<=$i-2;$j++) {
+						for($j=0;$j<=$i-2;++$j) {
 							$browseSelect.=")";
 						}
 					}
@@ -339,7 +340,7 @@ abstract class Browse {
 							}
 						}
 					}
-					$nTr++;
+					++$nTr;
 					$pk=self::doPrimaryKey($form, $row);
 					if(!$form['unableUpdate']){
 						Generator::formsPrint("<td style='border-left:1px solid #D1D1D1'><img src='".Core::getInstancePath()."img/edit.gif' title='Editar este Registro' style='cursor:pointer' onclick='window.location=\"".Core::getInstancePath().$app_controller."/query/&amp;$pk\"' alt=''/></td>");

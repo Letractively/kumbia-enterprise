@@ -262,7 +262,7 @@ class WebServiceClient {
 		$messageRequest = '<ns1:'.$method.'>';
 		foreach($arguments as $argument){
 			$messageRequest.=$this->_encodeItem('param'.$n, $argument);
-			$n++;
+			++$n;
 		}
 		$messageRequest.='</ns1:'.$method.'>';
 		$this->_transport->setRawPostData($this->_createMessageEnvelope($messageRequest));

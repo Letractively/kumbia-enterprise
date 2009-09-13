@@ -298,11 +298,12 @@ abstract class Component {
 			if($com['dynamicFilter']){
 				$validation.="; getDetailValues(\"".$com['dynamicFilter']['field']."\", \"".$com['dynamicFilter']['foreignTable']."\", \"".$com['dynamicFilter']['detailField']."\", \"";
 				$com['dynamicFilter']['whereCondition'] = urlencode($com['dynamicFilter']['whereCondition']);
-				$com['dynamicFilter']['whereCondition'] = str_replace("%40", "@", $com['dynamicFilter']['whereCondition']);
+				$com['dynamicFilter']['whereCondition'] = str_replace('%40', '@', $com['dynamicFilter']['whereCondition']);
 				if(strpos($com['dynamicFilter']['whereCondition'], '@')){
-					ereg("[\@][A-Za-z0-9]+", $com['dynamicFilter']['whereCondition'], $regs);
-					foreach($regs as $reg){
-						$com['dynamicFilter']['whereCondition'] = str_replace($reg, "\"+document.getElementById(\"flid_".str_replace("@", "", $reg)."\").value+\"", $com['dynamicFilter']['whereCondition']);
+					if(preg_match('/[\@][A-Za-z0-9]+/', $com['dynamicFilter']['whereCondition'], $regs)){
+						foreach($regs as $reg){
+							$com['dynamicFilter']['whereCondition'] = str_replace($reg, "\"+document.getElementById(\"flid_".str_replace("@", "", $reg)."\").value+\"", $com['dynamicFilter']['whereCondition']);
+						}
 					}
 				}
 				$validation.=$com['dynamicFilter']['whereCondition']."\", \"".$com['dynamicFilter']['relfield']."\")";
@@ -515,12 +516,12 @@ abstract class Component {
 			$_REQUEST["fl_$name"] = $com['value'];
 		}
 		if($_REQUEST["fl_$name"]){
-			ereg("([0-2][0-9]):([0-5][0-8])", $_REQUEST["fl_$name"], $arr);
+			preg_matcg('/([0-2][0-9]):([0-5][0-8])/', $_REQUEST["fl_$name"], $arr);
 		}
 		Generator::formsPrint("<label for='flid_$name'><strong>".$com['caption']." :</strong></label></td><td>\n");
 		Generator::formsPrint("<select name='time{$name}_hour' id='time{$name}_hour'
 		onchange='document.getElementById(\"flid_$name\").value = document.getElementById(\"time{$name}_hour\").options[document.getElementById(\"time{$name}_hour\").selectedIndex].value+\":\"+document.getElementById(\"time{$name}_minutes\").options[document.getElementById(\"time{$name}_minutes\").selectedIndex].value' disabled='disabled'>\n");
-		for($i=0;$i<=23;$i++){
+		for($i=0;$i<=23;++$i){
 			if($arr[1]!=sprintf("%02s", $i)){
 				Generator::formsPrint("<option value='".sprintf("%02s", $i)."'>".sprintf("%02s", $i)."</option>\n");
 			} else {
@@ -530,7 +531,7 @@ abstract class Component {
 		Generator::formsPrint("</select>:");
 		Generator::formsPrint("<select name='time{$name}_minutes' id='time{$name}_minutes'
 		onchange='document.getElementById(\"flid_$name\").value = document.getElementById(\"time{$name}_hour\").options[document.getElementById(\"time{$name}_hour\").selectedIndex].value+\":\"+document.getElementById(\"time{$name}_minutes\").options[document.getElementById(\"time{$name}_minutes\").selectedIndex].value' disabled='disabled'>\n");
-		for($i=0;$i<=59;$i++){
+		for($i=0;$i<60;++$i){
 			if($arr[2]!=sprintf("%02s", $i)){
 				Generator::formsPrint("<option value='".sprintf("%02s", $i)."'>".sprintf("%02s", $i)."</option>\n");
 			} else {

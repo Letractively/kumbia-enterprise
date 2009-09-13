@@ -68,7 +68,7 @@ class Filter extends Object {
 			} else {
 				$data[$i] = $p;
 			}
-			$i++;
+			++$i;
 		}
 		return $data;
 	}
@@ -162,7 +162,7 @@ class Filter extends Object {
 			}
 
 			//agrego los filtros (recordar que $params[0] es el parametro a filtrar)
-			for($i=1; isset($params[$i]); $i++) {
+			for($i=1; isset($params[$i]); ++$i) {
 				if(is_object($params[$i])) {
 					foreach($attributes as $attr => $value) {
 						if(preg_match('/([a-z_0-9]+)\.([a-z_0-9]+)/', $attr, $regs)) {

@@ -278,7 +278,7 @@ class SocketsCommunicator {
 						$header = false;
 					}
 				}
-				$i++;
+				++$i;
 			} else {
 				$this->_responseBody.=$line;
 			}

@@ -167,7 +167,7 @@ class DigestAuth implements AuthInterface {
 					throw new AuthException("La linea $i del archivo digest no es valida");
 				}
 			}
-			$i++;
+			++$i;
 		}
 		return $existsUser;
 	}

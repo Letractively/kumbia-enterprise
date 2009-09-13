@@ -89,7 +89,7 @@ class MultiThreadController extends ApplicationController {
 			if($this->_isSynchronized($method->getDocComment())){
 				$registerAction = array($this, $method->getName());
 				$this->_synchronizedActions[] = $registerAction;
-				$numberMethods++;
+				++$numberMethods;
 			}
 		}
 		if($numberMethods>0){

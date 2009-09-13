@@ -112,7 +112,8 @@ abstract class Script extends Object {
 		$allParamNames = array();
 		$receivedParams = array();
 		$param = "";
-		for($i=1;$i<=count($_SERVER['argv'])-1;$i++){
+		$numberArguments = count($_SERVER['argv']);
+		for($i=1;$i<$numberArguments;$i++){
 			$argv = $_SERVER['argv'][$i];
 			if(substr($argv, 0, 2)=="--"){
 				$parameter = substr($argv, 2);
@@ -196,9 +197,9 @@ abstract class Script extends Object {
 	 * @param array $posibleParameters
 	 */
 	public function showHelp($posibleParameters){
-		print basename($_SERVER['PHP_SELF'])." - Modo de uso:\n\n";
+		echo basename($_SERVER['PHP_SELF'])." - Modo de uso:\n\n";
 		foreach($posibleParameters as $parameter => $description){
-			print html_entity_decode($description, ENT_COMPAT, $this->_encoding)."\n";
+			echo html_entity_decode($description, ENT_COMPAT, $this->_encoding)."\n";
 		}
 	}
 

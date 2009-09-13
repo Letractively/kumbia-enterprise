@@ -88,7 +88,7 @@ class DbException extends CoreException {
 							$i = 1;
 							foreach (array_reverse($this->_dbBase->getTracedSQL()) as $trace){
 								$htmlCode.= sprintf("%02s", $i).". $trace<br>";
-								$i++;
+								++$i;
 							}
 							$htmlCode.= "</td>
 						</tr>";

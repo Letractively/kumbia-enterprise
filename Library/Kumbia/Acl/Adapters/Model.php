@@ -299,7 +299,8 @@ class AclModel implements AclAdapter {
 		if(!is_array($operationsList)){
 			$operationsList = array($operationsList);
 		}
-		for($i=0;$i<=count($operationsList)-1;$i++){
+		$numberList = count($operationsList);
+		for($i=0;$i<$numberList;++$i){
 			if(is_string($operationsList[$i])==false){
 				$this->_transaction->rollback();
 				$this->_transaction = null;

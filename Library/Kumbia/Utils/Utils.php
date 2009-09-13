@@ -90,7 +90,7 @@ abstract class Utils {
 				}
 				$ret[$keys] = $val;
 			}
-			$n++;
+			++$n;
 		}
 		if(!$i){
 			if(!$key){
@@ -117,7 +117,7 @@ abstract class Utils {
 				if(is_dir($package_dir.'/'.$file)){
 					$files = self::scandirRecursive($package_dir.'/'.$file, $files);
 				} else {
-					if(ereg('(.)+\.php$', $file)){
+					if(preg_match('/(.)+\.php$/', $file)){
 						$files[] = $package_dir.'/'.$file;
 					}
 				}
@@ -146,7 +146,7 @@ abstract class Utils {
 				} else {
 					$data[$i] = $p;
 				}
-				$i++;
+				++$i;
 			}
 			return $data;
 		}

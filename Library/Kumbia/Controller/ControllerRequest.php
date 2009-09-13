@@ -615,7 +615,7 @@ class ControllerRequest extends Object {
 					$selectedCharsetName = $charset['accept'];
 				}
 			}
-			$i++;
+			++$i;
 		}
 		return $selectedCharsetName;
 	}
@@ -638,6 +638,31 @@ class ControllerRequest extends Object {
 			return in_array($mime['accept'], $staticMime);
 		}
 		return false;
+	}
+
+	/**
+	 * Devuelve el nombre de la acción que refirio la petición
+	 *
+	 * @return string
+	 */
+	public function getRefererAction(){
+		if(isset($_SERVER['HTTP_REFERER'])){
+			$instancePath = Core::getInstancePath();
+			if(($pos = strpos($_SERVER['HTTP_REFERER'], $instancePath))!==false){
+				$application = Router::getActiveApplication();
+				$uri = substr($_SERVER['HTTP_REFERER'], $pos+strlen($instancePath.$application));
+				$items = explode('/', $uri);
+				if(isset($items[2])){
+					if(($dotpos = strpos($items[2], '.'))!==false){
+						return substr($items[2], 0, $dotpos);
+					} else {
+						return $items[2].'?';
+					}
+				}
+			}
+		} else {
+			return false;
+		}
 	}
 
 }

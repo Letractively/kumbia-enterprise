@@ -173,4 +173,12 @@ class GarbageCollector {
 		}
 	}
 
+	static public function freeAllMetaData(){
+		$instanceName = Core::getInstanceName();
+		$activeApp = Router::getApplication();
+		if(isset($_SESSION['KMD'][$instanceName][$activeApp])){
+			unset($_SESSION['KMD'][$instanceName][$activeApp]);
+		}
+	}
+
 }
