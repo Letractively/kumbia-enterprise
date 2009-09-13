@@ -157,7 +157,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			$this->setPagination(true);
 		} else {
 			$this->_output.= "\t\t\tbody { margin: 0px; padding: 0px; }\n";
-			$this->_output.= "\t\t\t.page { padding: 20px; width: 550px; height: 700px; border: 1px solid #fafafa; background: #ffffff; }\n";
+			$this->_output.= "\t\t\t.page { padding: 20px; max-width: 850px; height: 700px; border: 1px solid #fafafa; background: #ffffff; }\n";
 		}
 		$this->_prepareCellHeaderStyle();
 		$this->_prepareColumnStyles();
@@ -268,6 +268,9 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			}
 			if($attributeName=='backgroundColor'){
 				$style[] = "background-color:$value";
+			}
+			if($attributeName=='paddingRight'){
+				$style[] = "padding-right:$value";
 			}
 		}
 		return $style;

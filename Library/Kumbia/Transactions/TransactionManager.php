@@ -73,7 +73,7 @@ abstract class TransactionManager implements TransactionManagerInterface {
 			}
 		}
 		if(count(self::$_transactions)==0){
-			$transaction = new ActiveRecordTransaction(true);
+			$transaction = new ActiveRecordTransaction();
 			$transaction->setTransactionManager('TransactionManager');
 			$transaction->setDependencyPointer(self::$_dependencyPointer);
 			self::$_dependencyPointer+=2048;

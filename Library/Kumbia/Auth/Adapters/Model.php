@@ -129,7 +129,7 @@ class ModelAuth implements AuthInterface {
 				 * Trata de no incluir en la identidad el password del usuario
 				 */
 				if(!in_array($field, array('password', 'clave', 'contrasena', 'passwd', 'pass'))){
-					$identity[$field] = $model->readAttribute($field);
+					$identity[$field] = trim($model->readAttribute($field));
 				}
 			}
 			$this->identity = $identity;
