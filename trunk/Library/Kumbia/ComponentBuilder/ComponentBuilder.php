@@ -116,7 +116,7 @@ database.name = test_db
 
 ";
 		file_put_contents("apps/$name/config/environment.ini", $str);
-		$str = "; Cargar los modulos de Kumbia en Library\n\n[modules]\nextensions =";
+		$str = "; Cargar los modulos de Kumbia en Library\n\n[modules]\nextensions = \"\"";
 		file_put_contents("apps/$name/config/boot.ini", $str);
 	}
 
