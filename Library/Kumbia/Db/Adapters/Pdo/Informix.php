@@ -376,6 +376,10 @@ class DbPdoInformix extends DbPDO  {
 					$field['type'] = 'date';
 					$field['null'] = 'NO';
 					break;
+				case 267:
+                    $field['type'] = 'byte';
+                    $field['null'] = 'NO';
+                    break;
 			}
 			$finalDescribe[] = array(
 				'Field' => $field['field'],
