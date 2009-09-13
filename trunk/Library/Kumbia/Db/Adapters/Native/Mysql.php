@@ -718,7 +718,7 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Devuelve la extension o extensiones de PHP requeridas para
+	 * Devuelve la extension ó extensiones de PHP requeridas para
 	 * usar el adaptador
 	 *
 	 * @return string|array
