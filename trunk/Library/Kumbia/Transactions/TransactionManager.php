@@ -69,7 +69,7 @@ abstract class TransactionManager implements TransactionManagerInterface {
 				$transaction->setTransactionManager('TransactionManager');
 				return $transaction;
 			} else {
-				throw new TransactionManagerException('El TransactionDefinition es invalido');
+				throw new TransactionManagerException('El TransactionDefinition es inválido');
 			}
 		}
 		if(count(self::$_transactions)==0){
