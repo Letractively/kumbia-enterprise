@@ -95,10 +95,20 @@ abstract class Generator {
 	 * Vuelca la información de la tabla para construir el array
 	 * interno que luego sirve para construir el formulario
 	 *
-	 * @param array $form
-	 * @return boolean
+	 * @access 	public
+	 * @param	array $form
+	 * @return	boolean
+	 * @static
 	 */
-	static function dumpFieldInformation($form){
+	static public function dumpFieldInformation($form){
+		/*$modelName = Router::getController();
+		$model = EntityManager::getEntityInstance(Utils::camelize($modelName));
+		$table = $model->getSource();
+		$schema = $this->getSchema();
+		if(ActiveRecordMetaData::existsMetaData($table, $schema)==false) {
+			$model->dump();
+		}*/
+
 		$controller_name = Router::getController();
 		$form['force'] = eval("return {$controller_name}Controller::\$force;");
 		$instanceName = Core::getInstanceName();

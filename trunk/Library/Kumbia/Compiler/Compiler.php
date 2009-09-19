@@ -312,7 +312,7 @@ class Compiler {
 				self::$_compilation.=$token;
 				self::$_oldToken = 0;
 			}
-			if(self::$_tokenCount>500){
+			if(self::$_tokenCount>512){
 				self::$_compilation.=PHP_EOL;
 				self::$_tokenCount = 0;
 			} else {

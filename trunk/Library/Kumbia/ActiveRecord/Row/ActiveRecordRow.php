@@ -145,9 +145,12 @@ class ActiveRecordRow extends Object implements ActiveRecordResultInterface {
 			$property = Utils::uncamelize(substr($method, 3));
 			if(isset($this->_columns[$property])){
 				return $this->$property;
+			} else {
+				throw new ActiveRecordException("El método '{$method}' ó miembro '{$property}' del resultset no existe");
 			}
+		} else {
+			throw new ActiveRecordException("El método ó miembro '{$method}' del resultset no existe");
 		}
-		throw new ActiveRecordException("El método '{$method}' ó miembro '{$property}' del resultset no existe");
 	}
 
 	/**

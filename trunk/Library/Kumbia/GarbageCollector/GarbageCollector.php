@@ -173,11 +173,31 @@ class GarbageCollector {
 		}
 	}
 
+	/**
+	 * Libera toda los datos de sesión de entidades ActiveRecord
+	 *
+	 * @access public
+	 * @static
+	 */
 	static public function freeAllMetaData(){
 		$instanceName = Core::getInstanceName();
 		$activeApp = Router::getApplication();
 		if(isset($_SESSION['KMD'][$instanceName][$activeApp])){
 			unset($_SESSION['KMD'][$instanceName][$activeApp]);
+		}
+	}
+
+	/**
+	 * Libera toda los datos de sesión de formularios StandardForm
+	 *
+	 * @access public
+	 * @static
+	 */
+	static public function freeAllStdForm(){
+		$instanceName = Core::getInstanceName();
+		$activeApp = Router::getApplication();
+		if(isset($_SESSION['KSF'][$instanceName][$activeApp])){
+			unset($_SESSION['KSF'][$instanceName][$activeApp]);
 		}
 	}
 

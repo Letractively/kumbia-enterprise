@@ -2340,7 +2340,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				}
 			}
 		}
-		if(!class_exists($className)){
+		if(class_exists($className)==false){
 			throw new ActiveRecordException("No se encontró el validador de entidades '$className'");
 		}
 		if(!in_array('ActiveRecordValidatorInterface', class_implements($className))){

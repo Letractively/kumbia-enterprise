@@ -147,9 +147,9 @@ class ActiveRecordValidator extends Object {
 	/**
 	 * Devuelve la opcion solicitada
 	 *
-	 * @access protected
-	 * @param string $option
-	 * @return mixed
+	 * @access	protected
+	 * @param	string $option
+	 * @return	mixed
 	 */
 	protected function getOption($option){
 		return isset($this->_options[$option]) ? $this->_options[$option] : "";
@@ -158,9 +158,9 @@ class ActiveRecordValidator extends Object {
 	/**
 	 * Indica si la opcion solicitada ha sido definida por parte del usuario
 	 *
-	 * @access protected
-	 * @param string $option
-	 * @return boolean
+	 * @access	protected
+	 * @param	string $option
+	 * @return	boolean
 	 */
 	protected function isSetOption($option){
 		return isset($this->_options[$option]) ? true : false;
@@ -169,8 +169,8 @@ class ActiveRecordValidator extends Object {
 	/**
 	 * Devuelve el valor del campo validado
 	 *
-	 * @access protected
-	 * @return mixed
+	 * @access	protected
+	 * @return	mixed
 	 */
 	protected function getValue(){
 		return $this->_value;

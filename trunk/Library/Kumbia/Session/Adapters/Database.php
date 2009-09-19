@@ -80,8 +80,8 @@ class DatabaseSessionAdapter implements SessionInterface {
 	/**
 	 * Lee los datos de sesion
 	 *
-	 * @param string $id
-	 * @return boolean
+	 * @param	string $id
+	 * @return	string
 	 */
 	public static function read($id){
 		$sql = "SELECT data FROM session_data WHERE session_id = '$id'";
@@ -93,10 +93,22 @@ class DatabaseSessionAdapter implements SessionInterface {
 		}
 	}
 
+	/**
+	 * Destruye la sesión
+	 *
+	 * @param string $id
+	 * @return boolean
+	 */
 	public static function destroy($id){
 		return true;
 	}
 
+	/**
+	 * Garbage Collector de Sesión
+	 *
+	 * @param int $maxTime
+	 * @return boolean
+	 */
 	public static function garbageCollector($maxTime){
 		return true;
 	}
