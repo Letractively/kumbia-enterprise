@@ -16,7 +16,7 @@
  * @package 	Router
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
- * @version 	$Id: Router.php 29 2009-05-01 02:19:38Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**

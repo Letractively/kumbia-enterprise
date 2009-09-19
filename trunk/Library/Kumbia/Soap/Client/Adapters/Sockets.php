@@ -18,7 +18,7 @@
  * @subpackage 	Client
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
- * @version 	$Id: WebServiceClient.php 51 2009-05-12 03:45:18Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**
