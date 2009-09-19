@@ -169,11 +169,11 @@ abstract class StandardForm extends Controller {
 
 	/**
 	 * Emula la acción Report llamando a show
+	 *
+	 * @access public
 	 */
 	public public function reportAction(){
-
 		$this->view = 'index';
-
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
 			throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operación de reporte');
@@ -182,7 +182,6 @@ abstract class StandardForm extends Controller {
 		if(!$this->{$modelName}->isDumped()){
 			$this->{$modelName}->dumpModel();
 		}
-
 		foreach($this->{$modelName}->getAttributesNames() as $field_name){
 			if(isset($_REQUEST["fl_$field_name"])){
 				$this->{$modelName}->$field_name = $_REQUEST["fl_$field_name"];
@@ -260,45 +259,38 @@ abstract class StandardForm extends Controller {
 	 */
 	public function insertAction(){
 
-		$this->view = 'index';
-		$this->keep_action = "";
 
-		Generator::scaffold(&$this->form, $this->scaffold);
+		$controllerRequest = ControllerRequest::getInstance();
+		if($controllerRequest->isPost()){
 
-		$modelName = EntityManager::getEntityName($this->getSource());
-		if(!EntityManager::isEntity($modelName)){
-			throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operación de inserción');
-			return $this->routeTo(array('action' => 'index'));
-		}
+			$this->view = 'index';
+			$this->keep_action = "";
 
-		if(!$this->{$modelName}->isDumped()){
-			$this->{$modelName}->dumpModel();
-		}
+			Generator::scaffold(&$this->form, $this->scaffold);
 
-		foreach($this->{$modelName}->getAttributesNames() as $field_name){
-			if(isset($_REQUEST["fl_$field_name"])){
-				$this->{$modelName}->$field_name = $_REQUEST["fl_$field_name"];
+			$modelName = EntityManager::getEntityName($this->getSource());
+			if(!EntityManager::isEntity($modelName)){
+				throw new StandardFormException('No hay un modelo "'.$modelName.'" para hacer la operación de inserción');
+				return $this->routeTo(array('action' => 'index'));
 			}
-		}
 
-		/**
-		 * Busca si existe un método o un llamado variable al método
-		 * validation, si este método devuelve false termina la ejecución
-		 * de la acción
-		 */
-		if(method_exists($this, 'validation')){
-			if($this->validation()===false){
-				$this->keep_action = 'insert';
-				if(!Router::getRouted()){
-					return $this->routeTo(array('action' => 'index'));
+			if(!$this->{$modelName}->isDumped()){
+				$this->{$modelName}->dumpModel();
+			}
+
+			foreach($this->{$modelName}->getAttributesNames() as $field_name){
+				if(isset($_REQUEST["fl_$field_name"])){
+					$this->{$modelName}->$field_name = $_REQUEST["fl_$field_name"];
 				}
 			}
-			if(Router::getRouted()){
-				return;
-			}
-		} else {
-			if(isset($this->validation)){
-				if($this->{$this->validation}()===false){
+
+			/**
+			 * Busca si existe un método o un llamado variable al método
+			 * validation, si este método devuelve false termina la ejecución
+			 * de la acción
+			 */
+			if(method_exists($this, 'validation')){
+				if($this->validation()===false){
 					$this->keep_action = 'insert';
 					if(!Router::getRouted()){
 						return $this->routeTo(array('action' => 'index'));
@@ -307,27 +299,27 @@ abstract class StandardForm extends Controller {
 				if(Router::getRouted()){
 					return;
 				}
-			}
-		}
-
-		/**
-		 * Busca si existe un método o un llamado variable al método
-		 * beforeInsert, si este método devuelve false termina la ejecucin
-		 * de la acción
-		 */
-		if(method_exists($this, 'beforeInsert')){
-			if($this->beforeInsert()===false){
-				$this->keep_action = 'insert';
-				if(!Router::getRouted()){
-					return $this->routeTo(array('action' => 'index'));
+			} else {
+				if(isset($this->validation)){
+					if($this->{$this->validation}()===false){
+						$this->keep_action = 'insert';
+						if(!Router::getRouted()){
+							return $this->routeTo(array('action' => 'index'));
+						}
+					}
+					if(Router::getRouted()){
+						return;
+					}
 				}
 			}
-			if(Router::getRouted()){
-				return;
-			}
-		} else {
-			if(isset($this->beforeInsert)){
-				if($this->{$this->beforeInsert}()===false){
+
+			/**
+			 * Busca si existe un método o un llamado variable al método
+			 * beforeInsert, si este método devuelve false termina la ejecucin
+			 * de la acción
+			 */
+			if(method_exists($this, 'beforeInsert')){
+				if($this->beforeInsert()===false){
 					$this->keep_action = 'insert';
 					if(!Router::getRouted()){
 						return $this->routeTo(array('action' => 'index'));
@@ -336,63 +328,82 @@ abstract class StandardForm extends Controller {
 				if(Router::getRouted()){
 					return;
 				}
+			} else {
+				if(isset($this->beforeInsert)){
+					if($this->{$this->beforeInsert}()===false){
+						$this->keep_action = 'insert';
+						if(!Router::getRouted()){
+							return $this->routeTo(array('action' => 'index'));
+						}
+					}
+					if(Router::getRouted()){
+						return;
+					}
 
-			}
-		}
-
-		/**
-		 * Subimos los archivos de Imagenes del Formulario
-		 */
-		foreach($this->form['components'] as $fkey => $rrow){
-			if($this->form['components'][$fkey]['type']=='image'){
-				if(isset($_FILES['fl_'.$fkey])){
-					move_uploaded_file($_FILES['fl_'.$fkey]['tmp_name'], htmlspecialchars('public/img/upload/'.$_FILES['fl_'.$fkey]['name']));
-					$this->{$modelName}->$fkey = urlencode(htmlspecialchars('upload/'.$_FILES['fl_'.$fkey]['name']));
 				}
 			}
-		}
 
-		/**
-		 * Utilizamos el modelo ActiveRecord para insertar el registro
-		 * por lo tanto los
-		 */
-		$this->{$modelName}->id = null;
-		if($this->{$modelName}->create()==true){
-			if($this->successInsertMessage){
-				Flash::success($this->successInsertMessage);
+			/**
+			 * Subimos los archivos de Imagenes del Formulario
+			 */
+			foreach($this->form['components'] as $fkey => $rrow){
+				if($this->form['components'][$fkey]['type']=='image'){
+					if(isset($_FILES['fl_'.$fkey])){
+						move_uploaded_file($_FILES['fl_'.$fkey]['tmp_name'], htmlspecialchars('public/img/upload/'.$_FILES['fl_'.$fkey]['name']));
+						$this->{$modelName}->$fkey = urlencode(htmlspecialchars('upload/'.$_FILES['fl_'.$fkey]['name']));
+					}
+				}
+			}
+
+			/**
+			 * Utilizamos el modelo ActiveRecord para insertar el registro
+			 * por lo tanto los
+			 */
+			$attributes = $this->$modelName->getPrimaryKeyAttributes();
+			foreach($attributes as $attribute){
+				if($attribute=='id'){
+					$this->{$modelName}->id = null;
+				}
+			}
+			if($this->{$modelName}->create()==true){
+				if($this->successInsertMessage){
+					Flash::success($this->successInsertMessage);
+				} else {
+					Flash::success("Se insertó correctamente el registro");
+				}
 			} else {
-				Flash::success("Se insertó correctamente el registro");
+				if(isset($this->failuresInsertMessage)&&$this->failuresInsertMessage!=""){
+					Flash::error($this->failureInsertMessage);
+				} else {
+					Flash::error("Hubo un error al insertar el registro");
+				}
+			}
+
+			foreach($this->{$modelName}->getAttributesNames() as $fieldName){
+				if(isset($_REQUEST['fl_'.$fieldName])){
+					$_REQUEST['fl_'.$fieldName] = $this->{$modelName}->readAttribute($fieldName);
+				}
+			}
+
+			/**
+			 * Busca si existe un método o un llamado variable al método
+			 * after_insert
+			 */
+			if(method_exists($this, 'afterInsert')){
+				$this->afterInsert();
+				if(Router::getRouted()){
+					return;
+				}
+			} else {
+				if(isset($this->afterInsert)){
+					$this->{$this->afterInsert}();
+				}
+				if(Router::getRouted()){
+					return;
+				}
 			}
 		} else {
-			if(isset($this->failuresInsertMessage)&&$this->failuresInsertMessage!=""){
-				Flash::error($this->failureInsertMessage);
-			} else {
-				Flash::error("Hubo un error al insertar el registro");
-			}
-		}
-
-		foreach($this->{$modelName}->getAttributesNames() as $fieldName){
-			if(isset($_REQUEST['fl_'.$fieldName])){
-				$_REQUEST['fl_'.$fieldName] = $this->{$modelName}->readAttribute($fieldName);
-			}
-		}
-
-		/**
-		 * Busca si existe un método o un llamado variable al método
-		 * after_insert
-		 */
-		if(method_exists($this, 'afterInsert')){
-			$this->afterInsert();
-			if(Router::getRouted()){
-				return;
-			}
-		} else {
-			if(isset($this->afterInsert)){
-				$this->{$this->afterInsert}();
-			}
-			if(Router::getRouted()){
-				return;
-			}
+			Flash::error('Debe volver a digitar los datos del formulario');
 		}
 
 		// Muestra el Formulario en la accion show
@@ -418,12 +429,12 @@ abstract class StandardForm extends Controller {
 			return $this->routeTo(array('action' => 'index'));
 		}
 
-		if(!$this->{$modelName}->isDumped()){
+		if($this->{$modelName}->isDumped()==false){
 			$this->{$modelName}->dumpModel();
 		}
 
 		/**
-		 * Subimos los archivos de Im&aacute;genes del Formulario
+		 * Subimos los archivos de Imágenes del Formulario
 		 */
 		foreach($this->form['components'] as $fkey => $rrow){
 			if($this->form['components'][$fkey]['type']=='image'){
@@ -967,9 +978,7 @@ abstract class StandardForm extends Controller {
 				}
 				Generator::buildForm($this->form);
 			} else {
-				throw new StandardFormException('
-					Debe especificar las propiedades del formulario a crear en $this->form
-					&oacute: coloque var $scaffold = true para generar din&aacute;micamente el formulario.');
+				throw new StandardFormException('Debe especificar las propiedades del formulario a crear en $this->form ó coloque public $scaffold = true para generar dinámicamente el formulario.');
 				$this->resetRorm();
 			}
 		}

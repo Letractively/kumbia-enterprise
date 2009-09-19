@@ -129,14 +129,18 @@ abstract class Browse {
 	/**
 	 * Genera el Browse de StandardForm
 	 *
-	 * @param array $form
+	 * @access 	public
+	 * @param 	array $form
+	 * @static
 	 */
-	static function formsBrowse($form){
+	static public function formsBrowse($form){
 
 		$config = CoreConfig::readEnviroment();
 
-		Generator::formsPrint("&nbsp;</center><br><table cellspacing='0' align='center' cellpadding=5>
-		<tr bgcolor='#D0D0D0' style='border-top:1px solid #FFFFFF'>");
+		Generator::formsPrint("&nbsp;</center><div id='stdBrowse' align='center'>
+		<table cellspacing='0' align='center' cellpadding='5' id='tabBrowse'>
+		<thead>
+		<tr><td>1</td></thead></table>");
 
 		$controller = Router::getController();
 		$app = Router::getActiveApplication();
@@ -146,9 +150,9 @@ abstract class Browse {
 			$app_controller = $controller;
 		}
 
-		$browseSelect = "select ";
-		$browseFrom = " from ".$form['source'];
-		$browseWhere = " Where 1 = 1";
+		$browseSelect = "SELECT ";
+		$browseFrom = " FROM ".$form['source'];
+		$browseWhere = " WHERE 1 = 1";
 		$browseLike = "";
 		$source = $form['source'];
 		$nalias = 1;
@@ -165,21 +169,22 @@ abstract class Browse {
 			}
 			if(($component['type']!='hidden')&&(!$component['notBrowse'])){
 				if($component['browseCaption']){
-					Generator::formsPrint("<td align='center' valign='bottom' class='browseHead'>
-                <table><tr><td align='center'><a href='".self::doBrowseLocation($name, $form['source'])."'>".$component['browseCaption']."</a></td>
-                <td>".self::doTypeBrowseLocation($name, $form['source'])."</td></tr></table></td>\r\n");
+					Generator::formsPrint("<th align='center' valign='bottom'>
+	                <table><tr><td align='center'><a href='".self::doBrowseLocation($name, $form['source'])."'>".$component['browseCaption']."</a></td>
+	                <td>".self::doTypeBrowseLocation($name, $form['source'])."</td></tr></table></td>\r\n");
 				} else {
-					Generator::formsPrint("<td align='center' valign='bottom'>
-                <table><tr><td align='center'><a href='".self::doBrowseLocation($name, $form['source'])."'>".$component['caption']."</a></td>
-                <td>".self::doTypeBrowseLocation($name, $form['source'])."</td></tr></table></td>\r\n");
+					Generator::formsPrint("<th align='center' valign='bottom'>
+	                <table><tr><td align='center'><a href='".self::doBrowseLocation($name, $form['source'])."'>".$component['caption']."</a></td>
+	                <td>".self::doTypeBrowseLocation($name, $form['source'])."</td></tr></table></td>\r\n");
 				}
 			}
 			if(($component['type']=='combo')&&($component['class']=='dynamic')){
 				if(!isset($component['notPrepare'])||$component['notPrepare']){
 					if($first) {
 						$browseSelect.=",";
-					} else $first = true;
-
+					} else {
+						$first = true;
+					}
 					if(strpos(' '.$browseFrom, $component['foreignTable'])){
 						$alias = 't'.$nalias;
 						++$nalias;
@@ -394,7 +399,7 @@ abstract class Browse {
 				Generator::formsPrint("</table>");
 			} else {
 				Generator::formsPrint("</table>");
-				Generator::formsPrint("<center><br><br>No Hay Registros Para Visualizar</center>");
+				Generator::formsPrint("<div align='center' id='noFound'>No Hay Registros Para Visualizar</div>");
 			}
 			Generator::formsPrint("</form>");
 			Generator::formsPrint("\r\n<br><center><input type='button' class='controlButton'

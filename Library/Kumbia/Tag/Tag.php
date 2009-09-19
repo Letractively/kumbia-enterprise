@@ -523,7 +523,6 @@ abstract class Tag {
 			$mes = 0;
 			$dia = 0;
 		}
-
 		if(isset($params['useDummy'])&&$params['useDummy']){
 			$useDummy = true;
 			unset($params['useDummy']);
@@ -555,7 +554,7 @@ abstract class Tag {
 				'05' => 'May', '06' => 'Jun',
 				'07' => 'Jul', '08' => 'Ago',
 				'09' => 'Sep', '10' => 'Oct',
-				'11' => 'Nov', '12' => 'Dic',
+				'11' => 'Nov', '12' => 'Dic'
 			);
 		}
 		if($useDummy){
@@ -563,7 +562,7 @@ abstract class Tag {
 		} else {
 			$displayJS = '';
 		}
-		$code .= "<select name='{$params[0]}_month' id='{$params[0]}_month' onchange=\"$displayJS$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value\">";
+		$code .= "<select id='{$params[0]}_month' onchange=\"$displayJS$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+\$F('{$params[0]}_month')+'-'+\$F('{$params[0]}_day')\">";
 		if($useDummy){
 			$code.="<option value='@'>Sel...</option>\n";
 		}
@@ -581,7 +580,7 @@ abstract class Tag {
 		} else {
 			$display = '';
 		}
-		$code.="<select name='{$params[0]}_day' id='{$params[0]}_day' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value;\" $display>";
+		$code.="<select id='{$params[0]}_day' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value;\" $display>";
 		for($i=1;$i<=31;++$i){
 			$n = $i<10 ? '0'.$i : $i;
 			if($n==$dia){
@@ -596,7 +595,7 @@ abstract class Tag {
 		} else {
 			$display = '';
 		}
-		$code.="<select name='{$params[0]}_year' id='{$params[0]}_year' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value\" $display>\n";
+		$code.="<select id='{$params[0]}_year' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value\" $display>\n";
 		if(isset($params['startYear'])){
 			$startYear = $params['startYear'];
 		} else {

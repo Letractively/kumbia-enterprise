@@ -44,7 +44,7 @@ abstract class Component {
   	 * @static
  	 */
 	static public function buildTextArea($com, $name){
-		Generator::formsPrint("<label for='flid_$name'><strong>".$com['caption']." :</strong></label></td><td>");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." :</label></td><td>");
 		Generator::formsPrint("<textarea name='fl_$name' id='flid_$name' disabled='disabled' ");
 		if(!isset($com['attributes']['rows'])||!$com['attributes']['rows']) {
 			$com['attributes']['rows'] = 15;
@@ -81,10 +81,10 @@ abstract class Component {
 		$dbdate = $config->application->dbdate;
 		if(isset($com['not_label'])){
 			if(!$com['not_label']){
-				Generator::formsPrint("<label for='flid_$name'><strong>".$com['caption']." :</strong></label></td><td>");
+				Generator::formsPrint("<label for='flid_$name'>".$com['caption']." :</label></td><td>");
 			}
 		} else {
-			Generator::formsPrint("<label for='flid_$name'><strong>".$com['caption']." :</strong></label></td><td>");
+			Generator::formsPrint("<label for='flid_$name'>".$com['caption']." :</label></td><td>");
 		}
 		if(!isset($com['valueType'])){
 			$com['valueType'] = "";
@@ -177,7 +177,7 @@ abstract class Component {
 				Generator::formsPrint("<input type='hidden' value='{$_REQUEST["fl_$name"]}' name='fl_$name' id='flid_$name' />");
 				Generator::formsPrint("<span><input type='text' size='15' disabled='disabled' id='$name"."_email1'
 				onblur='saveEmail(\"$name\")' onkeydown='validaEmail(event)' value='$p1'/>
-				<strong>@</strong><input type='text' size=15 disabled='disabled' id='$name"."_email2'
+				@<input type='text' size=15 disabled='disabled' id='$name"."_email2'
 				onblur='saveEmail(\"$name\")' onkeydown='validaEmail(event)' value='$p2'/></span>");
 			}
 		}
@@ -210,7 +210,7 @@ abstract class Component {
 	 * @param array $form
 	 */
 	public static function buildHelpContext($com, $name, $form){
-		Generator::formsPrint("<label for='flid_$name'><strong>".$com['caption']." : </strong></label></td><td valign='top'>");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." : </label></td><td valign='top'>");
 		Generator::formsPrint("<input type='text' name='fl_$name' id='flid_$name' disabled='disabled' ");
 		if(isset($_REQUEST['fl_'.$name])){
 			Generator::formsPrint("value = '".$_REQUEST['fl_'.$name]."'");
@@ -283,7 +283,7 @@ abstract class Component {
  	 * @param string $name
  	 */
 	static function buildStandardCombo($com, $name){
-		Generator::formsPrint("<label for='flid_$name'><strong>".$com['caption']." : </strong></label></td><td><select name='fl_$name' id='flid_$name' disabled='disabled' ");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." : </label></td><td><select name='fl_$name' id='flid_$name' disabled='disabled' ");
 		if(isset($com["attributes"])){
 			if(is_array($com["attributes"])){
 				foreach($com["attributes"] as $nitem => $item) {
@@ -414,7 +414,7 @@ abstract class Component {
  	 * @param string $name
   	 */
 	public static function buildStandardPassword($com, $name){
-		Generator::formsPrint("<strong>".$com['caption']." : </strong></td><td id='tp' valign='top'><input type='password' name='fl_$name' id='flid_$name' disabled='disabled' ");
+		Generator::formsPrint("".$com['caption']." : </td><td id='tp' valign='top'><input type='password' name='fl_$name' id='flid_$name' disabled='disabled' ");
 		if($_REQUEST['fl_'.$name]){
 			Generator::formsPrint("value = '".$_REQUEST['fl_'.$name]."'");
 		}
@@ -447,7 +447,7 @@ abstract class Component {
  	 * @param string $name
  	 */
 	static function buildStandardImage($com, $name){
-		Generator::formsPrint("<label for='flid_$name'><strong>".$com['caption']." : </strong></label></td><td valign='top'>");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." : </label></td><td valign='top'>");
 		Generator::formsPrint("<table><tr><td>");
 		if(!isset($_REQUEST['fl_'.$name])){
 			$_REQUEST['fl_'.$name] = 'spacer.gif';
@@ -518,7 +518,7 @@ abstract class Component {
 		if($_REQUEST["fl_$name"]){
 			preg_matcg('/([0-2][0-9]):([0-5][0-8])/', $_REQUEST["fl_$name"], $arr);
 		}
-		Generator::formsPrint("<label for='flid_$name'><strong>".$com['caption']." :</strong></label></td><td>\n");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." :</label></td><td>\n");
 		Generator::formsPrint("<select name='time{$name}_hour' id='time{$name}_hour'
 		onchange='document.getElementById(\"flid_$name\").value = document.getElementById(\"time{$name}_hour\").options[document.getElementById(\"time{$name}_hour\").selectedIndex].value+\":\"+document.getElementById(\"time{$name}_minutes\").options[document.getElementById(\"time{$name}_minutes\").selectedIndex].value' disabled='disabled'>\n");
 		for($i=0;$i<=23;++$i){

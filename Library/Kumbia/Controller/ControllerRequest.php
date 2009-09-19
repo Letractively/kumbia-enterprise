@@ -66,7 +66,7 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-	 * Cambia el valor de un parametro de $_REQUEST
+	 * Cambia el valor de un parámetro de $_REQUEST
 	 *
 	 * @param string $index
 	 * @param mixed $value
@@ -82,7 +82,7 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-	 * Cambia el valor de un parametro de $_POST
+	 * Cambia el valor de un parámetro de $_POST
 	 *
 	 * @param string $index
 	 * @param mixed $value
@@ -92,7 +92,7 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-	 * Cambia el valor de un parametro de $_GET
+	 * Cambia el valor de un parámetro de $_GET
 	 *
 	 * @param string $index
 	 * @param mixed $value
@@ -102,7 +102,7 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-	 * Cambia el valor de un parametro de $_COOKIE
+	 * Cambia el valor de un parámetro de $_COOKIE
 	 *
 	 * @param string $index
 	 * @param mixed $value
@@ -205,7 +205,7 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-	 * Devuelve un parametro enviado usando una superglobal $_POST
+	 * Devuelve un parámetro enviado usando una superglobal $_POST
 	 * y aplica los filtros correspondientes
 	 *
 	 * @access public
@@ -226,25 +226,25 @@ class ControllerRequest extends Object {
 	 * Devuelve un parámetro enviado usando una superglobal $_FILES
 	 * mediante un objeto ControllerUploadFile
 	 *
-	 * @access public
-	 * @param string $paramName
-	 * @return boolean
+	 * @access	public
+	 * @param	string $paramName
+	 * @return	ControllerUploadFile
 	 */
 	public function getParamFile($paramName){
-		if(isset($_FILE[$paramName])){
-			return new ControllerUploadFile($_FILE[$paramName]);
+		if(isset($_FILES[$paramName])){
+			return new ControllerUploadFile($_FILES[$paramName]);
 		} else {
 			return false;
 		}
 	}
 
 	/**
-	 * Devuelve un parametro enviado usando una superglobal $_GET
+	 * Devuelve un parámetro enviado usando una superglobal $_GET
 	 * y aplica los filtros correspondientes
 	 *
-	 * @access public
-	 * @param string $paramName
-	 * @return boolean
+	 * @access	public
+	 * @param	string $paramName
+	 * @return	boolean
 	 */
 	public function getParamQuery($paramName){
 		if(func_num_args()>1){
@@ -257,12 +257,12 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-	 * Devuelve un parametro enviado usando una superglobal $_REQUEST
+	 * Devuelve un parámetro enviado usando una superglobal $_REQUEST
 	 * y aplica los filtros correspondientes
 	 *
-	 * @access public
-	 * @param string $paramName
-	 * @return boolean
+	 * @access	public
+	 * @param	string $paramName
+	 * @return	boolean
 	 */
 	public function getParamRequest($paramName){
 		if(func_num_args()>1){
@@ -278,9 +278,9 @@ class ControllerRequest extends Object {
 	 * Devuelve un parámetro enviado usando una superglobal $_SERVER
 	 * y aplica los filtros correspondientes
 	 *
-	 * @access public
-	 * @param string $paramName
-	 * @return boolean
+	 * @access	public
+	 * @param	string $paramName
+	 * @return	boolean
 	 */
 	public function getParamServer($paramName){
 		if(func_num_args()>1){
@@ -293,12 +293,12 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-	 * Devuelve un parametro enviado usando una superglobal $_ENV
+	 * Devuelve un parámetro enviado usando una superglobal $_ENV
 	 * y aplica los filtros correspondientes
 	 *
-	 * @access public
-	 * @param string $paramName
-	 * @return boolean
+	 * @access	public
+	 * @param	string $paramName
+	 * @return	boolean
 	 */
 	public function getParamEnv(){
 		if(func_num_args()>1){
@@ -417,6 +417,7 @@ class ControllerRequest extends Object {
     /**
      * Devuelve el metodo HTTP con el que se realizo la petición
      *
+     * @return string
      */
     public function getMethod(){
     	if(isset($_SERVER['REQUEST_METHOD'])){

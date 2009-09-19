@@ -29,8 +29,6 @@
  * @category	Kumbia
  * @package		Generator
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright	Copyright (C) 2007-2007 Julian Cortes (jucorant at gmail.com)
  * @license 	New BSD License
  */
 abstract class StandardGenerator {
@@ -38,7 +36,9 @@ abstract class StandardGenerator {
 	/**
 	 * Crea el formulario Standard
 	 *
-	 * @param array $form
+	 * @access 	public
+	 * @param	array $form
+	 * @static
 	 */
 	static public function buildFormStandard($form){
 
@@ -88,11 +88,12 @@ abstract class StandardGenerator {
 
 		$controller = Dispatcher::getController();
 		$controller_name = Router::getController();
-		if(!array_key_exists('dataRequisite', $form)) {
+		if(!array_key_exists('dataRequisite', $form)){
 			$form['dataRequisite'] = 1;
 		}
+		Generator::formsPrint("<div align='center' id='stdForm'>");
 		if(!$form['dataRequisite']) {
-			Generator::formsPrint("<font style='font-size:11px'><div align='center'><i><b>No hay datos en consulta</b></i></div></font>");
+			Generator::formsPrint("<div align='center' id='notFound'><b>No hay datos en consulta</b></div>");
 		} else {
 			Generator::formsPrint("<center>");
 			if($_REQUEST['oldsubaction']=='Modificar') {
@@ -214,7 +215,7 @@ abstract class StandardGenerator {
 						//Este es el Check Chulito
 						case 'check':
 						if($com['first']){
-							Generator::formsPrint("<b>".$com['groupcaption']."</b></td><td><table cellpadding=0>");
+							Generator::formsPrint($com['groupcaption']."</td><td><table cellpadding='0'>");
 						}
 						Generator::formsPrint("<tr><td>\r\n<input type='checkbox' disabled name='fl_$name' id='flid_$name' style='border:1px solid #FFFFFF'");
 						if($_REQUEST['fl_'.$name]==$com['checkedValue']){
@@ -233,7 +234,7 @@ abstract class StandardGenerator {
 
 						//Textarea
 						case 'textarea':
-						Generator::formsPrint("<b>".$com['caption']." :</br></td><td><textarea disabled='disabled' name='fl_$name' id='flid_$name' ");
+						Generator::formsPrint("".$com['caption']." :</td><td><textarea disabled='disabled' name='fl_$name' id='flid_$name' ");
 						foreach($com['attributes'] as $natt => $vatt){
 							Generator::formsPrint("$natt='$vatt' ");
 						}
@@ -273,42 +274,41 @@ abstract class StandardGenerator {
 						}
 					}
 				}
-				Generator::formsPrint("<br /></td></tr><tr>
-				<td colspan='2' align='center'>
-				<div id='reportOptions' style='display:none' class='report_options'>
+				Generator::formsPrint("</td></tr><tr>
+				<td colspan='2' align='center' style='display:none'>
+				<div id='reportOptions' style='display:none'>
 				<table>
-				<tr>
-				<td align='right'>
-				<b>Formato Reporte:</b>
-					<select name='reportType' id='reportType'>
-						<option value='pdf'>PDF</option>
-						<option value='xls'>EXCEL</option>
-						<option value='doc'>WORD</option>
-						<option value='html'>HTML</option>
-					</select>
-				</td>
-				<td align='center'>
-				<b>Ordenar Por:</b>
-					<select name='reportTypeField' id='reportTypeField'>");
-						reset($form['components']);
-						$numberComponents = count($form['components']);
-						for($i=0;$i<$numberComponents;$i++){
-							if(!isset($form['components'][key($form['components'])]['notReport'])){
-								$form['components'][key($form['components'])]['notReport'] = false;
-							}
-							if(!$form['components'][key($form['components'])]['notReport']){
-								if(isset($form['components'][key($form['components'])]['caption'])){
-									Generator::formsPrint("<option value ='" .key($form['components']) ."'>".$form['components'][key($form['components'])]['caption']."</option>");
+					<tr>
+						<td align='right'>
+							<label for='reportType'>Formato Reporte:</label>
+							<select name='reportType' id='reportType'>
+								<option value='pdf'>PDF</option>
+								<option value='xls'>EXCEL</option>
+								<option value='doc'>WORD</option>
+								<option value='html'>HTML</option>
+							</select>
+						</td>
+						<td align='center'>
+							<label for='reportField'>Ordenar por:</label>
+							<select name='reportTypeField' id='reportTypeField'>");
+								reset($form['components']);
+								$numberComponents = count($form['components']);
+								for($i=0;$i<$numberComponents;$i++){
+									if(!isset($form['components'][key($form['components'])]['notReport'])){
+										$form['components'][key($form['components'])]['notReport'] = false;
+									}
+									if(!$form['components'][key($form['components'])]['notReport']){
+										if(isset($form['components'][key($form['components'])]['caption'])){
+											Generator::formsPrint("<option value ='" .key($form['components']) ."'>".$form['components'][key($form['components'])]['caption']."</option>");
+										}
+									}
+									next($form['components']);
 								}
-							}
-							next($form['components']);
-						}
-				Generator::formsPrint("</select>
-				</td>
-				</tr>
+						Generator::formsPrint("</select>
+						</td>
+					</tr>
 				</table>
 				</div>
-				<br />
 				</td>
 				</tr>");
 				Generator::formsPrint("</table><br />\r\n");
