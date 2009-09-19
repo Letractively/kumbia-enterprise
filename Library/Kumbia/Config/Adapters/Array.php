@@ -17,7 +17,7 @@
  * @subpackage 	Adapters
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license		New BSD License
- * @version 	$Id: Config.php 34 2009-05-05 01:54:23Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**

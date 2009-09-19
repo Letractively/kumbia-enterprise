@@ -17,7 +17,7 @@
  * @subpackage	CoreInfo
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license		New BSD License
- * @version 	$Id: CoreConfig.php 5 2009-04-24 01:48:48Z gutierrezandresfelipe $
+ * @version 	$Id$
  */
 
 /**
