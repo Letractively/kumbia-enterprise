@@ -37,7 +37,7 @@ if(isset($_GET['c'])){
 		if(file_exists('temp/'.$cachCss)==true){
 			$mtime = filemtime('css/'.$css.'.css');
 			if(filemtime('temp/'.$cachCss)>$mtime){
-				header('Last-Modified: '.date('r', $mtime));
+				header('Last-Modified: '.@date('r', $mtime));
 				readfile('temp/'.$cachCss);
 				exit;
 			}

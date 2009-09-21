@@ -74,7 +74,7 @@ function validaForm(form, requiredFields){
    var campos = new Array();
 
    // Obtiene los campos requeridos que no contienen datos (si los hay)
-   for(i = 0; i<requiredFields.length; i++){
+   for(var i=0;i<requiredFields.length;i++){
    	   if($(requiredFields[i]).value == ''){
    	   	   campos[cont++] = $(requiredFields[i]);
    	   }
@@ -82,10 +82,10 @@ function validaForm(form, requiredFields){
 
    // Si faltan datos requeridos se muestra el efecto de resaltado sobre los campos.
    if(cont >= 1){
-	   alert("\nEs necesario que ingrese los datos que se resaltarán");
-	   for(i=0; i<cont; i++){
+	   alert("Es necesario que ingrese los datos que se resaltarÃ¡n");
+	   for(var i=0; i<cont; i++){
 	   	   new Effect.Highlight(campos[i].name, {startcolor:'#FF0000', endcolor:"#ffbbbb"});
-	   }
+	   };
 	   campos[0].focus();
    }
 
@@ -219,23 +219,33 @@ function validatePassword(confirma, password){
 
 function checkUnique(name, obj){
 	var i, n;
-	if(!obj.value) return;
-	if(obj.value=="@") return;
+	if(!obj.value){
+		return;
+	}
+	if(obj.value=="@"){
+		return;
+	}
 	n = 0;
 	for(i=0;i<=Fields.length-1;i++){
-		if(Fields[i]==name) break
+		if(Fields[i]==name){
+			break;
+		}
 	}
-	for(j=0;j<=Values.length-1;j++) {
-		if(Values[j][i]==obj.value) {
+	for(j=0;j<=Values.length-1;j++){
+		if(Values[j][i]==obj.value){
 			if(n==1){
-				if(obj.tagName=='SELECT')
-				alert('Esta Opción ya fué seleccionada por favor elija otra diferente')
-				obj.className = "iError"
-				if(obj.tagName=='INPUT') obj.select()
-				obj.focus()
-				return
+				if(obj.tagName=='SELECT'){
+					alert('Esta OpciÃ³n ya fuÃ© seleccionada por favor elija otra diferente');
+				}
+				obj.className = "iError";
+				if(obj.tagName=='INPUT'){
+					obj.select();
+				}
+				obj.focus();
+				return;
+			} else {
+				n++;
 			}
-			else n++
 		}
 	}
 	obj.className = 'iNormal'
@@ -257,7 +267,6 @@ function nextField(evt, oname){
 					if( (document.getElementById("flid_"+Fields[i+1]).style.visibility!='hidden')&&
 					(document.getElementById("flid_"+Fields[i+1]).readOnly==false)&&
 					(document.getElementById("flid_"+Fields[i+1]).type!='hidden')){
-						//alert(document.getElementById("flid_"+Fields[i+1]).type)
 						document.getElementById("flid_"+Fields[i+1]).focus()
 					}
 				}
@@ -265,7 +274,4 @@ function nextField(evt, oname){
 			}
 		}
 	}
-	//window.status = kc
 }
-
-
