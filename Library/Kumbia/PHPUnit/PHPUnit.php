@@ -13,7 +13,7 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package		PHPUnit
+ * @package	PHPUnit
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe@gmail.com)
  * @license 	New BSD License
@@ -71,7 +71,7 @@ abstract class PHPUnit {
 						continue;
 					}
 					catch(Exception $e){
-						print_r($e->getTrace());
+						#print_r($e->getTrace());
 						$assertionMessages[$methodName] = get_class($e).' > '.$e->getConsoleMessage();
 						++$assertionFailed;
 					}

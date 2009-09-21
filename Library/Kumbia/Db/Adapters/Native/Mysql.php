@@ -13,11 +13,11 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package		Db
+ * @package	Db
  * @subpackage	Adapters
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license		New BSD License
+ * @license	New BSD License
  * @version 	$Id$
  */
 
@@ -29,13 +29,13 @@
  * La documentacion de MySQL puede encontrarse en http://dev.mysql.com/doc/.
  *
  * @category	Kumbia
- * @package		Db
+ * @package	Db
  * @subpackage	Adapters
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license		New BSD License
- * @link		http://www.php.net/manual/es/ref.mysql.php
- * @access		Public
+ * @license	New BSD License
+ * @link	http://www.php.net/manual/es/ref.mysql.php
+ * @access	Public
  */
 class DbMySQL extends DbBase implements DbBaseInterface  {
 
@@ -242,8 +242,8 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	/**
 	 * Devuelve fila por fila el contenido de un select
 	 *
-	 * @param resource $resultQuery
-	 * @return array
+	 * @param	resource $resultQuery
+	 * @return	array
 	 */
 	public function fetchArray($resultQuery=''){
 		if(!$this->_idConnection){
@@ -352,8 +352,8 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	/**
 	 * Devuelve el error de MySQL
 	 *
-	 * @param string $errorString
-	 * @return string
+	 * @param	string $errorString
+	 * @return	string
 	 */
 	public function error($errorString='', $resultQuery=null){
 		if(!$this->_idConnection){
@@ -406,9 +406,9 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	/**
 	 * Indica si el RBDM requiere de secuencias y devuelve el nombre por convencion
 	 *
-	 * @param string $tableName
-	 * @param array $primaryKey
-	 * @return boolean
+	 * @param	string $tableName
+	 * @param	array $primaryKey
+	 * @return	boolean
 	 */
 	public function getRequiredSequence($tableName='', $identityColumn='', $sequenceName=''){
 		return false;
@@ -417,10 +417,10 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	/**
 	 * Verifica si una tabla existe o no
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param string $schema
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	string $schema
+	 * @return	boolean
 	 */
 	public function tableExists($tableName, $schemaName=''){
 		$tableName = addslashes($tableName);
@@ -524,11 +524,11 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	 * - Soporte para campos autonumericos
 	 * - Soporte para llaves foraneas
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param array $definition
-	 * @param array $index
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	array $definition
+	 * @param	array $index
+	 * @return	boolean
 	 */
 	public function createTable($table, $definition, $index=array(), $tableOptions=array()){
 		if(isset($tableOptions['temporary'])&&$tableOptions['temporary']==true){
