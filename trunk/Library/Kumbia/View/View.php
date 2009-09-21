@@ -47,7 +47,7 @@
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
- * @access 		public
+ * @access	public
  * @abstract
  */
 abstract class View {
@@ -892,7 +892,7 @@ abstract class View {
 	 * @static
  	 */
 	public static function xhtmlTemplate($template='template'){
-		Tag::stylesheetLink("style", true);
+		Tag::stylesheetLink("style");
 		print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
