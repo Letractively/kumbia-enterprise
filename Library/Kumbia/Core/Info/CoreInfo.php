@@ -13,10 +13,10 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package		Core
+ * @package	Core
  * @subpackage	CoreInfo
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
- * @license		New BSD License
+ * @license	New BSD License
  * @version 	$Id$
  */
 
@@ -26,11 +26,11 @@
  * Consulta información del framework y genera la pantalla de bienvenida
  *
  * @category	Kumbia
- * @package		Core
+ * @package	Core
  * @subpackage	CoreInfo
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
- * @license		New BSD License
- * @access		public
+ * @license	New BSD License
+ * @access	public
  * @abstract
  */
 abstract class CoreInfo {
