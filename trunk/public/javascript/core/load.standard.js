@@ -1,20 +1,23 @@
-/** Kumbia - PHP Rapid Development Framework *****************************
-*
-* Copyright (C) 2005-2008 Andres Felipe Gutierrez (andresfelipe at vagoogle.net)
-* Copyright (C) 2007-2007 Julian Cortes (andresfelipe at gmail.com)
-*
-* Este framework es software libre; puedes redistribuirlo y/o modificarlo
-* bajo los terminos de la licencia p&uacute;blica general GNU tal y como fue publicada
-* por la Fundaci&oacute;n del Software Libre; desde la versi&oacute;n 2.1 o cualquier
-* versi&oacute;n superior.
-*
-* Este framework es distribuido con la esperanza de ser util pero SIN NINGUN
-* TIPO DE GARANTIA; sin dejar atr&aacute;s su LADO MERCANTIL o PARA FAVORECER ALGUN
-* FIN EN PARTICULAR. Lee la licencia publica general para m&aacute;s detalles.
-* Debes recibir una copia de la Licencia P&uacute;blica General GNU junto con este
-* framework, si no es asi, escribe a Fundaci&oacute;n del Software Libre Inc.,
-* 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*****************************************************************************/
+
+/**
+ * Kumbia Enterprise Framework
+ *
+ * LICENSE
+ *
+ * This source file is subject to the New BSD License that is bundled
+ * with this package in the file docs/LICENSE.txt.
+ *
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@loudertechnology.com so we can send you a copy immediately.
+ *
+ * @category	Kumbia
+ * @package		Core
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright 	Copyright (C) 2005-2008 Andres Felipe Gutierrez (andresfelipe at vagoogle.net)
+ * @copyright   Copyright (C) 2007-2007 Julian Cortes (andresfelipe at gmail.com)
+ *
+ *****************************************************************************/
 
 function save_master_data(action){
 
@@ -27,139 +30,138 @@ function save_master_data(action){
 	}
 	$('saveDataForm').appendChild(obj)
 
-	//reportField .
 	obj = document.createElement("INPUT");
 	obj.type = "hidden";
-	obj.name = "reportTypeField"
+	obj.name = "reportTypeField";
 	if(document.fl.reportTypeField) {
 		obj.value = $("reportTypeField").value;
-	}
+	};
 	$('saveDataForm').appendChild(obj)
 
-	for(i=0;i<=Fields.length-1;i++){
+	for(var i=0;i<Fields.length;i++){
 		if($C(Fields[i])){
 			obj = document.createElement("INPUT");
 			obj.type = "hidden"
-		}
+		};
 		if($C(Fields[i]+"_up")){
 			if($C(Fields[i]+"_up").value){
-				obj = $C(Fields[i]+"_up")
-				obj.style.display = "none"
+				obj = $C(Fields[i]+"_up");
+				obj.style.display = "none";
 			}
-		}
-		obj.name = "fl_"+Fields[i]
+		};
+		obj.name = "fl_"+Fields[i];
 		if($C(Fields[i]).type=='checkbox'){
-			obj.value = $C(Fields[i]).checked
+			obj.value = $C(Fields[i]).checked;
 		} else {
 			if($C(Fields[i]+"_up")){
 				if(!$V(Fields[i]+"_up")){
-					obj.value = $V(Fields[i])
+					obj.value = $V(Fields[i]);
 				}
 			} else {
-				obj.value = $C(Fields[i]).value
+				obj.value = $C(Fields[i]).value;
 			}
-		}
-		$('saveDataForm').appendChild(obj)
+		};
+		$('saveDataForm').appendChild(obj);
 	}
 
 	//Controller-Action
 	if($Kumbia.app==""){
-		$('saveDataForm').action = $Kumbia.path + document.fl.aaction.value + "/" + action
+		$('saveDataForm').action = $Kumbia.path + document.fl.aaction.value + "/" + action;
 	} else {
-		$('saveDataForm').action = $Kumbia.path + $Kumbia.app + "/" + document.fl.aaction.value + "/" + action
-	}
+		$('saveDataForm').action = $Kumbia.path + $Kumbia.app + "/" + document.fl.aaction.value + "/" + action;
+	};
 	$('saveDataForm').submit();
 
 }
 
 function enable_form(){
 
-	for(var i=0;i<=Fields.length-1;i++){
+	for(var i=0;i<Fields.length;i++){
 		if($C(Fields[i])){
-			$C(Fields[i]).enable()
+			$C(Fields[i]).enable();
 		} else {
-			alert('KumbiaError: El campo "'+Fields[i]+'" no existe')
-			return
+			alert('KumbiaError: El campo "'+Fields[i]+'" no existe');
+			return;
 		}
-	}
+	};
 
-	for(i=0;i<=DateFields.length-1;i++){
-		$("xfl_"+DateFields[i]+'_Month_ID').enable()
-		$("xfl_"+DateFields[i]+'_Day_ID').enable()
-		$("xfl_"+DateFields[i]+'_Year_ID').enable()
-	}
+	for(var i=0;i<DateFields.length;i++){
+		$("xfl_"+DateFields[i]+'_Month_ID').enable();
+		$("xfl_"+DateFields[i]+'_Day_ID').enable();
+		$("xfl_"+DateFields[i]+'_Year_ID').enable();
+	};
 
-	for(i=0;i<=timeFields.length-1;i++){
-		$("time"+timeFields[i]+"_hour").enable()
-		$("time"+timeFields[i]+"_minutes").enable()
-	}
+	for(var i=0;i<timeFields.length;i++){
+		$("time"+timeFields[i]+"_hour").enable();
+		$("time"+timeFields[i]+"_minutes").enable();
+	};
 
-	for(i=0;i<=imageFields.length-1;i++){
-		$C(imageFields[i]+"_up").enable()
-	}
+	for(var i=0;i<imageFields.length;i++){
+		$C(imageFields[i]+"_up").enable();
+	};
 
-	for(i=0;i<=emailFields.length-1;i++){
-		$(emailFields[i]+'_email1').enable()
-		$(emailFields[i]+'_email2').enable()
-	}
+	for(var i=0;i<emailFields.length;i++){
+		$(emailFields[i]+'_email1').enable();
+		$(emailFields[i]+'_email2').enable();
+	};
 
-	if($('aceptar')) {
-		$('aceptar').enable()
-	}
-	if($('cancelar')) {
-		$('cancelar').enable()
+	if($('aceptar')){
+		$('aceptar').enable();
+	};
+	if($('cancelar')){
+		$('cancelar').enable();
 	}
 }
 
 function disable_form(){
 
-	for(var i=0;i<=Fields.length-1;i++){
-		$C(Fields[i]).disable()
+	for(var i=0;i<Fields.length;i++){
+		$C(Fields[i]).disable();
 		if($("actAction").lang!='Modificar'){
 			if($C(Fields[i]).tagName=="SELECT"){
-				$C(Fields[i]).selectedIndex = 0
+				$C(Fields[i]).selectedIndex = 0;
 				if($C(Fields[i]+"_helper")){
-					cancel_helper(Fields[i])
+					cancel_helper(Fields[i]);
 				}
 			}
 		}
-	}
+	};
 
-	for(var i=0;i<=timeFields.length-1;i++){
-		$("time"+timeFields[i]+"_hour").disable()
-		$("time"+timeFields[i]+"_minutes").disable()
-	}
+	for(var i=0;i<timeFields.length;i++){
+		$("time"+timeFields[i]+"_hour").disable();
+		$("time"+timeFields[i]+"_minutes").disable();
+	};
 
-	for(var i=0;i<=imageFields.length-1;i++){
-		$C(imageFields[i]+"_up").disable()
-	}
+	for(var i=0;i<imageFields.length;i++){
+		$C(imageFields[i]+"_up").disable();
+	};
 
-	for(var i=0;i<=DateFields.length-1;i++){
-		$("xfl_"+DateFields[i]+'_Month_ID').disable()
-		$("xfl_"+DateFields[i]+'_Day_ID').disable()
-		$("xfl_"+DateFields[i]+'_Year_ID').disable()
-	}
+	for(var i=0;i<DateFields.length;i++){
+		$("xfl_"+DateFields[i]+'_Month_ID').disable();
+		$("xfl_"+DateFields[i]+'_Day_ID').disable();
+		$("xfl_"+DateFields[i]+'_Year_ID').disable();
+	};
 
-	for(var i=0;i<=emailFields.length-1;i++){
-		$(emailFields[i]+'_email1').disable()
-		$(emailFields[i]+'_email2').disable()
-	}
+	for(var i=0;i<emailFields.length;i++){
+		$(emailFields[i]+'_email1').disable();
+		$(emailFields[i]+'_email2').disable();
+	};
 
-	if($("aceptar")) $("aceptar").disable()
-	if($("cancelar")) $("cancelar").disable()
-	if($("adiciona")) $("adiciona").enable()
-	if($("consulta")) $("consulta").enable()
-	if($("modifica")) $("modifica").disable()
-	if($("visualiza")) $("visualiza").enable()
-	if($("borra")) $("borra").disable()
-	if($("reporte")) $("reporte").enable()
+	if($("aceptar")) $("aceptar").disable();
+	if($("cancelar")) $("cancelar").disable();
+	if($("adiciona")) $("adiciona").enable();
+	if($("consulta")) $("consulta").enable();
+	if($("modifica")) $("modifica").disable();
+	if($("visualiza")) $("visualiza").enable();
+	if($("borra")) $("borra").disable();
+	if($("reporte")) $("reporte").enable();
 	if($("anterior")) $("anterior").enable();
 	if($("primero")) $("primero").enable();
 	if($("siguiente")) $("siguiente").enable();
 	if($("ultimo")) $("ultimo").enable();
 	if($("actAction").lang=='Modificar'||$("actAction").lang=='Borrar') {
-		if($("modifica"))$("modifica").enable()
-		if($("borra")) $("borra").enable()
+		if($("modifica"))$("modifica").enable();
+		if($("borra")) $("borra").enable();
 	}
 }
 
@@ -180,60 +182,60 @@ function enable_insert(obj, x){
 	}
 
 	if(x!=1){
-		for(var i=0;i<=AddFields.length-1;i++){
+		for(var i=0;i<AddFields.length;i++){
 			if($C(AddFields[i]).tagName=="SELECT"){
-				$C(AddFields[i]).selectedIndex = 0
-			}
+				$C(AddFields[i]).selectedIndex = 0;
+			};
 			if($C(AddFields[i]).tagName=="TEXTAREA"){
-				$C(AddFields[i]).innerText = ""
-			}
+				$C(AddFields[i]).innerText = "";
+			};
 			if($C(AddFields[i]).tagName=="INPUT"){
 				if($C(AddFields[i]).type!="hidden"){
 					if($C(AddFields[i]).type=="checkbox"){
-						$C(AddFields[i]).checked = false
+						$C(AddFields[i]).checked = false;
 					} else {
-						$C(AddFields[i]).value = ""
+						$C(AddFields[i]).value = "";
 					}
 				}
 			}
 		}
-	}
+	};
 
-	for(i=0;i<=AutoValuesFields.length-1;i++){
+	for(var i=0;i<AutoValuesFields.length;i++){
 		$C(AutoValuesFields[i]).value = AutoValuesFFields[i];
-	}
+	};
 
-	for(i=0;i<=AutoFields.length-1;i++){
-		$C(AutoFields[i]).readOnly = true
-	}
+	for(var i=0;i<AutoFields.length;i++){
+		$C(AutoFields[i]).readOnly = true;
+	};
 
-	for(i=0;i<=queryOnlyFields.length-1;i++){
+	for(var i=0;i<queryOnlyFields.length;i++){
 		if($C(queryOnlyFields[i]).tagName!="SELECT"){
-			$C(queryOnlyFields[i]).readOnly = true
+			$C(queryOnlyFields[i]).readOnly = true;
 		} else{
-			$C(queryOnlyFields[i]).disable()
+			$C(queryOnlyFields[i]).disable();
 		}
+	};
+
+	for(var i=0;i<queryOnlyDateFields.length;i++){
+		$("xfl_"+queryOnlyDateFields[i]+'_Month_ID').disable();
+		$("xfl_"+queryOnlyDateFields[i]+'_Day_ID').disable();
+		$("xfl_"+queryOnlyDateFields[i]+'_Year_ID').readOnly = true;
 	}
 
-	for(i=0;i<=queryOnlyDateFields.length-1;i++){
-		$("xfl_"+queryOnlyDateFields[i]+'_Month_ID').disable()
-		$("xfl_"+queryOnlyDateFields[i]+'_Day_ID').disable()
-		$("xfl_"+queryOnlyDateFields[i]+'_Year_ID').readOnly = true
-	}
-
-	for(var i=0;i<=AddFields.length-1;i++){
+	for(var i=0;i<AddFields.length;i++){
 		if($C(AddFields[i]).disabled==false&&$C(AddFields[i]).readOnly==false){
-			$C(AddFields[i]).activate()
-			break
+			$C(AddFields[i]).activate();
+			break;
 		}
 	}
 
 	if($("adiciona")){
-		$("adiciona").disable()
-	}
+		$("adiciona").disable();
+	};
 	if($("consulta")){
-		$("consulta").disable()
-	}
+		$("consulta").disable();
+	};
 	if($("reporte")){
 		$("reporte").disable()
 	}
@@ -391,9 +393,9 @@ function enable_query(obj){
 		$("visualiza").disable()
 	}
 
-	if(window.after_enable_query){
+	if(typeof window.after_enable_query == "function"){
 		if(after_enable_query()==false){
-			return false
+			return false;
 		}
 	}
 
@@ -432,95 +434,94 @@ function form_validation(){
 				break;
 			}
 		}
-		duration = 0.7
+		duration = 0.7;
 		if(not_null.length>0){
 			new Effect.ScrollTo($C(not_null.first()), {
+				duration: 0.5,
 				afterFinish: function(){
 					not_null.each(function(item){
 						if(item==not_null.first()){
 							alert('El campo "'+eval("Labels."+item)+'" es Obligatorio');
-							$C(item).select()
-							$C(item).focus()
+							$C(item).select();
+							$C(item).focus();
 						}
 						new Effect.Highlight($C(item), {
 							duration: duration > 0.1 ? duration-=0.05 : 0.1,
 							startcolor: "#FF0000"
-						})
-					})
+						});
+					});
 				}
-			})
-			return false
+			});
+			return false;
 		}
 	}
 	catch(e){
-		alert(e.message)
+		alert(e.message);
 	}
 }
 
 function form_accept(){
-
 	if($("actAction").lang=='Adicionar'){
 		if(window.before_validation){
 			if(before_validation()==false){
-				return false
+				return false;
 			}
-		}
+		};
 		if(form_validation()==false){
-			return false
-		}
-		if(window.after_validation){
+			return false;
+		};
+		if(typeof window.after_validation == "function"){
 			if(after_validation()==false){
-				return false
+				return false;
 			}
-		}
-		if(window.before_insert){
+		};
+		if(typeof window.before_insert == "function"){
 			if(before_insert()==false){
-				return false
+				return false;
 			}
-		}
-		save_master_data('insert')
-
-	}
+		};
+		save_master_data('insert');
+	};
 
 	if($("actAction").lang=='Modificar'){
 		if(window.before_validation){
 			if(before_validation()==false){
-				return false
+				return false;
 			}
-		}
+		};
 		if(form_validation()==false){
-			return false
-		}
+			return false;
+		};
 		if(window.after_validation){
 			if(after_validation()==false){
-				return false
+				return false;
 			}
-		}
+		};
 		if(window.before_update){
 			if(before_update()==false){
-				return false
+				return false;
 			}
-		}
-		save_master_data('update')
-	}
+		};
+		save_master_data('update');
+	};
 
 	if($("actAction").lang=='Consultar'){
-		if(window.before_query){
+		if(typeof window.before_query == "function"){
 			if(before_query()==false){
-				return false
+				return false;
 			}
-		}
-		save_master_data('query')
-	}
+		};
+		save_master_data('query');
+	};
 
 	if($("actAction").lang=='Reporte'){
-		if(window.before_report){
+		if(typeof window.before_report == "function"){
 			if(before_report()==false){
-				return false
+				return false;
 			}
-		}
-		save_master_data('report')
-	}
+		};
+		save_master_data('report');
+	};
 
 	disable_form();
 }
@@ -529,7 +530,7 @@ function cancel_form(){
 
 	if(window.before_cancel_input){
 		if(before_cancel_input($("actAction").lang)==false){
-			return false
+			return false;
 		}
 	}
 
@@ -537,30 +538,37 @@ function cancel_form(){
 		for(var i=0;i<=Fields.length-1;i++){
 			if($C(Fields[i]).tagName=="SELECT"){
 				$C(Fields[i]).selectedIndex = 0
-			}
+			};
 			if($C(Fields[i]).tagName=="INPUT"){
 				if($C(Fields[i]).type!="hidden"){
-					$C(Fields[i]).value = $C(Fields[i]).defaultValue
+					$C(Fields[i]).value = $C(Fields[i]).defaultValue;
 				}
-			}
+			};
 			$C(Fields[i]).className = "iNormal";
-
 		}
 	}
-	for(i=0;i<=emailFields.length-1;i++){
-		$(emailFields[i]+'_email1').value = $(emailFields[i]+'_email1').defaultValue
-		$(emailFields[i]+'_email2').value = $(emailFields[i]+'_email2').defaultValue
+	for(var i=0;i<=emailFields.length-1;i++){
+		$(emailFields[i]+'_email1').value = $(emailFields[i]+'_email1').defaultValue;
+		$(emailFields[i]+'_email2').value = $(emailFields[i]+'_email2').defaultValue;
 	}
 
 	disable_form();
 
-	if(typeof Effect != undefined){
-		new Effect.Fade("reportOptions")
+	var reportOptions = $("reportOptions");
+	if(typeof Effect != "undefined"){
+		new Effect.Fade(reportOptions, {
+			afterFinish: function(){
+				reportOptions.parentNode.hide();
+			}
+		});
+	} else {
+		reportOptions.parentNode.hide();
+		reportOptions.hide();
 	}
 
 	if(window.after_cancel_input){
 		if(after_cancel_input($("actAction").lang)==false){
-			return false
+			return false;
 		}
 	}
 
@@ -569,11 +577,11 @@ function cancel_form(){
 function enable_delete(){
 	if(window.before_delete){
 		if(before_delete()==false){
-			return false
+			return false;
 		}
 	}
-	if(confirm("Esta seguro que desea borrar el registro?")) {
-		save_master_data('delete')
+	if(confirm("Esta seguro que desea borrar el registro?")){
+		save_master_data('delete');
 	}
 }
 
@@ -581,64 +589,69 @@ function enable_report(obj){
 
 	if(window.before_enable_report){
 		if(before_enable_report()==false){
-			return false
+			return false;
 		}
 	}
 
 	enable_form();
 
-	if(typeof Effect != undefined){
-		new Effect.Appear("reportOptions")
+	var reportOptions = $("reportOptions");
+	reportOptions.parentNode.show();
+	if(typeof Effect != "undefined"){
+		new Effect.Appear(reportOptions, {
+			duration: 0.5
+		});
+	} else {
+		reportOptions.show();
 	}
 
-	for(i=0;i<=AutoFields.length-1;i++){
-		$C(AutoFields[i]).readOnly = false
-	}
+	for(var i=0;i<AutoFields.length;i++){
+		$C(AutoFields[i]).readOnly = false;
+	};
 
-	for(i=0;i<=queryOnlyFields.length-1;i++){
-		$C(queryOnlyFields[i]).readOnly = false
-	}
+	for(var i=0;i<queryOnlyFields.length;i++){
+		$C(queryOnlyFields[i]).readOnly = false;
+	};
 
-	for(i=0;i<=queryOnlyDateFields.length-1;i++){
-		$("xfl_"+queryOnlyDateFields[i]+'_Month_ID').enable()
-		$("xfl_"+queryOnlyDateFields[i]+'_Day_ID').enable()
-		$("xfl_"+queryOnlyDateFields[i]+'_Year_ID').readOnly = false
-	}
+	for(var i=0;i<queryOnlyDateFields.length;i++){
+		$("xfl_"+queryOnlyDateFields[i]+'_Month_ID').enable();
+		$("xfl_"+queryOnlyDateFields[i]+'_Day_ID').enable();
+		$("xfl_"+queryOnlyDateFields[i]+'_Year_ID').readOnly = false;
+	};
 
-	$("actAction").lang = obj.lang
-	for(i=0;i<=Fields.length-1;i++){
+	$("actAction").lang = obj.lang;
+	for(var i=0;i<Fields.length;i++){
 		if($C(Fields[i]).tagName=="SELECT"){
 			$C(Fields[i]).selectedIndex = 0
 		}
 		if($C(Fields[i]).tagName=="TEXTAREA"){
-			$C(Fields[i]).innerText = ""
+			$C(Fields[i]).innerText = "";
 			if($C(Fields[i]).tagName=="INPUT"){
 				if($C(Fields[i]).type!="hidden"){
 					if($C(Fields[i]).type=="checkbox"){
-						$C(Fields[i]).checked = false
+						$C(Fields[i]).checked = false;
 					}
 				}
 			} else {
-				$C(Fields[i]).value = ""
+				$C(Fields[i]).value = "";
 			}
 		}
-	}
+	};
 	if($("adiciona")){
-		$("adiciona").disable()
-	}
+		$("adiciona").disable();
+	};
 	if($("consulta")){
-		$("consulta").disable()
-	}
+		$("consulta").disable();
+	};
 	if($("reporte")){
-		$("reporte").disable()
-	}
+		$("reporte").disable();
+	};
 	if($("visualiza")){
-		$("visualiza").disable()
-	}
-
-	if(window.after_enable_report){
+		$("visualiza").disable();
+	};
+	if(typeof window.after_enable_report == "function"){
 		if(after_enable_report()==false){
-			return false
+			return false;
 		}
 	}
 
@@ -647,15 +660,15 @@ function enable_report(obj){
 function show_upload_image(component){
 	if($('actAction').lang=='Adicionar'||$('actAction').lang=='Modificar'){
 		if($('a_'+component).innerHTML=='Subir Imagen'){
-			$C(component).hide()
-			$C(component+'_up').show()
-			$C(component+'_up').enable()
-			$('a_'+component).innerHTML = 'Cancelar'
+			$C(component).hide();
+			$C(component+'_up').show();
+			$C(component+'_up').enable();
+			$('a_'+component).innerHTML = 'Cancelar';
 		} else {
-			$C(component).show()
-			$C(component+'_up').disable()
-			$C(component+'_up').hide()
-			$('a_'+component).innerHTML = 'Subir Imagen'
+			$C(component).show();
+			$C(component+'_up').disable();
+			$C(component+'_up').hide();
+			$('a_'+component).innerHTML = 'Subir Imagen';
 		}
 	}
 }
@@ -695,39 +708,37 @@ function save_helper(helper){
 		},
 		onComplete: function() {
 			$(helper+"_spinner").hide()
-			new Ajax.Request($Kumbia.path+document.fl.aaction.value+"/_get_detail/?name="+helper+"&valor="+$(helper+"_helper").value,
-			{
+			new Ajax.Request($Kumbia.path+document.fl.aaction.value+"/_get_detail/?name="+helper+"&valor="+$(helper+"_helper").value, {
 				asynchronous: false,
 				onSuccess: function(resp){
-					xml = resp.responseXML
+					xml = resp.responseXML;
 					items = xml.getElementsByTagName("row");
 					while($C(helper).lastChild){
-						$C(helper).removeChild($C(helper).lastChild)
+						$C(helper).removeChild($C(helper).lastChild);
 					}
 					option = document.createElement("OPTION");
-					option.value = '@'
+					option.value = '@';
 					if(document.all){
-						option.innerText = 'Seleccione...'
+						option.innerText = 'Seleccione...';
 					} else {
-						option.text = 'Seleccione...'
+						option.text = 'Seleccione...';
 					}
 					$C(helper).appendChild(option)
-					for(i=0;i<=items.length-1;i++){
+					for(var i=0;i<=items.length-1;i++){
 						option = document.createElement("OPTION");
-						option.value = items[i].getAttribute('value')
+						option.value = items[i].getAttribute('value');
 						if(document.all){
-							option.innerText = items[i].getAttribute('text')
+							option.innerText = items[i].getAttribute('text');
 						} else {
-							option.text = items[i].getAttribute('text')
+							option.text = items[i].getAttribute('text');
 						}
 						$C(helper).appendChild(option)
 						if(items[i].getAttribute('selected')=="1"){
-							$C(helper).selectedIndex = i+1
+							$C(helper).selectedIndex = i+1;
 						}
 					}
 				}
-			}
-			)
+			});
 			cancel_helper(helper);
 		}
 	})
@@ -735,12 +746,12 @@ function save_helper(helper){
 
 function register_form_events(){
 	Fields.each(function(field){
-	["focus", "blur"].each(function(evt){
-		if(eval("window."+field+"_"+evt)){
-			Event.observe("flid_"+field, evt, eval("window."+field+"_"+evt))
-		}
-	})
-	})
+		["focus", "blur"].each(function(evt){
+			if(eval("window."+field+"_"+evt)){
+				Event.observe("flid_"+field, evt, eval("window."+field+"_"+evt))
+			}
+		});
+	});
 }
 
 function keep_action(action){

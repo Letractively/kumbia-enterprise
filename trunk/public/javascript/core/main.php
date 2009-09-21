@@ -1,6 +1,6 @@
 <?php
 
-header('Content-Type: text/javascript');
+header('Content-Type: application/x-javascript', true);
 
 print "\$Kumbia = new Object();
 \$Kumbia.app = \"".urldecode($_REQUEST['app']) ."\";

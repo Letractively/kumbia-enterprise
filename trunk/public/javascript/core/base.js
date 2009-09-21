@@ -1,8 +1,8 @@
 /***************************************************************************
-* GNU/GPL Kumbia - PHP Rapid Development Framework
-* Simple Object Manipulation Base Functions
+* Kumbia Enterprise Framework (New BSD License);
 ****************************************************************************
-* (c) 2008 Andres Felipe Gutierrez <gutierrezandresfelipe at gmail.com>
+* (c) 2008-2009 Andres Felipe Gutierrez <gutierrezandresfelipe at gmail.com>
+* (c) 2008-2009 Louder Technology COL.
 ****************************************************************************/
 
 var dummy = function(){}
@@ -70,13 +70,13 @@ Object.extend(Number.prototype, {
 		return this+1;
 	}
 
-})
+});
 
 //Obtiene una referencia a un ob
 function $O(obj){
 	if($("flid_"+obj)){
 		return $("flid_"+obj);
-	}
+	};
 	return $(obj);
 }
 
@@ -85,7 +85,7 @@ var Utils = {
 	getKumbiaURL: function(url){
 		if(typeof url == "undefined"){
 			url = "";
-		}
+		};
 		if($Kumbia.app!=""){
 			return $Kumbia.path+$Kumbia.app+"/"+url;
 		} else {
@@ -128,8 +128,8 @@ function $V(obj){
 //Funcion que envia un formulario via AJAX
 function ajaxRemoteForm(form, up, callback){
 	if(callback==undefined){
-		callback = {}
-	}
+		callback = {};
+	};
 	new Ajax.Updater(up, form.action, {
 		 method: "post",
 		 asynchronous: true,
@@ -147,33 +147,35 @@ function ajaxRemoteForm(form, up, callback){
 var AJAX = new Object();
 
 AJAX.xmlRequest = function(params){
-	this.options = $H()
+	this.options = $H();
 	if(!params.url && params.action){
-		this.url = Utils.getKumbiaURL() + params.action
+		this.url = Utils.getKumbiaURL() + params.action;
 	}
 	if(params.parameters){
-		this.url+= "/&"+params.parameters
+		this.url+= "/&"+params.parameters;
+	} else {
+		this.options.method = 'GET';
 	}
 	if(params.debug){
-		alert(this.url)
+		alert(this.url);
 	}
 	if(this.action) {
 		this.action = params.action;
 	}
-	if(params.asynchronous==undefined) {
-		this.options.asynchronous = true
+	if(params.asynchronous==undefined){
+		this.options.asynchronous = true;
 	} else {
-		this.options.asynchronous = params.asynchronous
+		this.options.asynchronous = params.asynchronous;
 	}
 	if(params.callbacks){
 		if(params.callbacks.oncomplete){
-			this.options.onComplete = params.callbacks.oncomplete
+			this.options.onComplete = params.callbacks.oncomplete;
 		}
 		if(params.callbacks.before){
-			this.options.onLoading = params.callbacks.before
+			this.options.onLoading = params.callbacks.before;
 		}
 		if(params.callbacks.success){
-			this.options.onSuccess = params.callbacks.success
+			this.options.onSuccess = params.callbacks.success;
 		}
 	}
 	try {
@@ -186,33 +188,35 @@ AJAX.xmlRequest = function(params){
 
 
 AJAX.viewRequest = function(params){
-	this.options = {}
+	this.options = {};
 	if(!params.action){
 		alert("KumbiaError: Ajax Action is not set!");
 		return;
-	}
+	};
 
 	this.url = Utils.getKumbiaURL() + params.action;
 	if(params.parameters){
 		this.url+="&"+params.parameters;
+	} else {
+		this.options.method = 'GET';
 	}
 	this.action = params.action;
 	if(params.debug){
 		alert(this.action)
-	}
+	};
 	if(params.asynchronous==undefined) {
 		this.asynchronous = true
 	} else {
 		this.asynchronous = params.asynchronous
-	}
+	};
 
 	if(params.callbacks){
 		if(params.callbacks.oncomplete){
 			this.options.onComplete = params.callbacks.oncomplete
-		}
+		};
 		if(params.callbacks.before){
 			this.options.onLoading = params.callbacks.before
-		}
+		};
 		if(params.callbacks.success){
 			this.options.onSuccess = params.callbacks.success
 		}
@@ -224,7 +228,7 @@ AJAX.viewRequest = function(params){
 	if(!$(container)){
 		window.alert("KumbiaError: Container Ajax Object '"+container+"' Not Found")
 		return null
-	}
+	};
 
 	try {
 		return new Ajax.Updater(container, this.url, this.options)
@@ -236,20 +240,24 @@ AJAX.viewRequest = function(params){
 }
 
 AJAX.execute = function(params){
-	this.options = {}
+	this.options = {};
 	if(!params.action){
 		alert("KumbiaError: AJAX Action is not set!");
 		return;
-	}
-	this.url = Utils.getKumbiaURL() + params.action;
+	};
+	this.url = Utils.getKumbiaURL(params.action);
 	if(params.parameters){
 		this.url+="&"+params.parameters;
+	} else {
+		this.options.method = 'GET';
 	}
 	this.action = params.action;
-	if(params.debug){
-		alert(this.url)
-	}
-	if(params.asynchronous==undefined) {
+	if(typeof params.debug != "undefined"){
+		if(params.debug==true){
+			alert(this.url)
+		}
+	};
+	if(typeof params.asynchronous == "undefined") {
 		this.asynchronous = false
 	} else {
 		this.asynchronous = params.asynchronous
@@ -257,15 +265,15 @@ AJAX.execute = function(params){
 
 	if(params.callbacks){
 		if(params.callbacks.oncomplete){
-			this.options.onComplete = params.callbacks.onend
-		}
+			this.options.onComplete = params.callbacks.onend;
+		};
 		if(params.callbacks.before){
-			this.options.onLoading = params.callbacks.before
-		}
+			this.options.onLoading = params.callbacks.before;
+		};
 		if(params.callbacks.success){
-			this.options.onSuccess = params.callbacks.success
+			this.options.onSuccess = params.callbacks.success;
 		}
-	}
+	};
 	try {
 		return new Ajax.Request(this.url, this.options)
 	}
@@ -274,59 +282,33 @@ AJAX.execute = function(params){
 	}
 }
 
-AJAX.query = function(qaction){
+AJAX.query = function(queryAction){
 	var me;
-	new Ajax.Request(Utils.getKumbiaURL()+qaction, {
-			asynchronous: false,
-			onSuccess: function(resp){
-				xml = resp.responseXML;
-				data = xml.getElementsByTagName("data");
-				if(document.all){
-					xmlValue = data[0].text;
-				} else {
-					xmlValue = data[0].textContent;
-				}
-				me = xmlValue;
+	new Ajax.Request(Utils.getKumbiaURL(queryAction), {
+		method: 'GET',
+		asynchronous: false,
+		onSuccess: function(transport){
+			var xml = transport.responseXML;
+			var data = xml.getElementsByTagName("data");
+			if(Prototype.Browser.IE){
+				xmlValue = data[0].text;
+			} else {
+				xmlValue = data[0].textContent;
 			}
+			me = xmlValue;
 		}
-	)
+	});
 	return me;
 }
 
-function enable_upload_file(file){
-	$(file+"_span").show();
-	$(file+"_span_pre").hide();
-	if(document.all){
-		$(file+"_file").click();
-	}
-	$(file+"_im").hide();
-}
-
-function upload_file(file){
-	$(file+"_file").id = file+"_tmp";
-	$(file).id = file+"_file";
-	$(file+"_file").name = file+"_file";
-	$(file+"_tmp").id = file;
-	$(file).name = file;
-}
-
-function cancel_upload_file(file){
-	$(file+"_file").id = file+"_tmp";
-	$(file).id = file+"_file";
-	$(file+"_file").name = file+"_file";
-	$(file+"_tmp").id = file;
-	$(file).name = file;
-	$(file).selectedIndex = 0;
-	$(file+"_span").hide();
-	$(file+"_span_pre").show();
-}
-
-function show_upload_image(file){
-	if(file.options[file.selectedIndex].value!='@'){
-		$(file.id+"_im").show()
-		$(file.id+"_im").src = $Kumbia.path + "/img/" + file.options[file.selectedIndex].value
+function gup(name){
+	var regexS = "[\\?&]"+name+"=([^&#]*)";
+	var regex = new RegExp(regexS);
+	var tmpURL = window.location.href;
+	var results = regex.exec(tmpURL);
+	if(results==null){
+		return "";
 	} else {
-		$(file.id+"_im").hide()
+		return results[1];
 	}
 }
-

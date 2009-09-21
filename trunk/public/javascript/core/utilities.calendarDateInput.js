@@ -1,6 +1,6 @@
 /** Kumbia - PHP Rapid Development Framework *****************************
 *
-* Copyright (C) 2005 Andrés Felipe Gutiérrez (andresfelipe at vagoogle.net)
+* Copyright (C) 2008 AndrÃ©s Felipe GutiÃ©rrez (andresfelipe at vagoogle.net)
 * Fool-Proof Date Input Script with DHTML Calendar by
 * Jason Moon - calendar at moonscript.com
 *
@@ -44,7 +44,7 @@ var MonthDays = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 var MonthNames = new Array('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
 
 // Write out the stylesheet definition for the calendar
-with (document) {
+with(document){
    writeln('<style>');
    writeln('td.calendarDateInput {letter-spacing:normal;line-height:normal;font-family:'+FontFamily+',Sans-Serif;font-size:'+FontSize+'px;}');
    writeln('select.calendarDateInput {letter-spacing:.06em;font-family:Verdana,Sans-Serif;font-size:11px;}');
@@ -604,7 +604,7 @@ function DateInput(DateName, Required, DateFormat, DefaultDate) {
             writeln('<option'+DaySelected+'>'+j+'</option>');
          }
          writeln('</select>'+String.fromCharCode(13)+'</td>'+String.fromCharCode(13)+'<td valign="middle">');
-         writeln('<input'+InitialStatus+' class="calendarDateInput" disabled type="text" id="x'+DateName+'_Year_ID" size="'+eval(DateName+'_Object.picked.yearPad.length')+'" maxlength="'+eval(DateName+'_Object.picked.yearPad.length')+'" title="Año" value="'+eval(DateName+'_Object.picked.yearPad')+'" onKeyPress="return YearDigitsOnly(window.event)" onKeyUp="'+DateName+'_Object.checkYear(this)" onBlur="'+DateName+'_Object.fixYear(this)">');
+         writeln('<input'+InitialStatus+' class="calendarDateInput" disabled type="text" id="x'+DateName+'_Year_ID" size="'+eval(DateName+'_Object.picked.yearPad.length')+'" maxlength="'+eval(DateName+'_Object.picked.yearPad.length')+'" title="Aï¿½o" value="'+eval(DateName+'_Object.picked.yearPad')+'" onKeyPress="return YearDigitsOnly(window.event)" onKeyUp="'+DateName+'_Object.checkYear(this)" onBlur="'+DateName+'_Object.fixYear(this)">');
          write('<td valign="middle">'+String.fromCharCode(13)+'<a'+InitialStatus+' id="'+DateName+'_ID_Link" '+
 		 'href="javascript:if(document.getElementById(\'x'+DateName+'_Month_ID\').disabled==false) {'+DateName+'_Object.show()}" '+
 		 'onMouseOver="return '+DateName+'_Object.iconHover(true)" '+
@@ -639,15 +639,15 @@ function disableDateInput(name){
 }
 
 function setDateValue(cname, dvalue){
-	document.getElementById("xfl_"+cname+'_Month_ID').selectedIndex = parseInt(dvalue.substr(5, 2)) - 1
-	document.getElementById("xfl_"+cname+'_Day_ID').style.visibility = 'visible'
-	document.getElementById("xfl_"+cname+'_Day_ID').selectedIndex = parseInt(dvalue.substr(8, 2)) - 1
-	document.getElementById("xfl_"+cname+'_Year_ID').value = parseInt(dvalue.substr(0, 4))
-	document.getElementById("xfl_"+cname+'_Year_ID').style.visibility = 'visible'
-	document.getElementById("fl_"+cname+'_ID_Link').style.visibility = 'visible'
+	document.getElementById("x"+cname+'_Month_ID').selectedIndex = parseInt(dvalue.substr(5, 2)) - 1
+	document.getElementById("x"+cname+'_Day_ID').style.visibility = 'visible'
+	document.getElementById("x"+cname+'_Day_ID').selectedIndex = parseInt(dvalue.substr(8, 2)) - 1
+	document.getElementById("x"+cname+'_Year_ID').value = parseInt(dvalue.substr(0, 4))
+	document.getElementById("x"+cname+'_Year_ID').style.visibility = 'visible'
+	document.getElementById(cname+'_ID_Link').style.visibility = 'visible'
 
-	eval('fl_'+cname+'_Object').picked = new storedMonthObject(eval('fl_'+cname+'_Object').format, parseInt(dvalue.substr(0, 4)),
+	eval(cname+'_Object').picked = new storedMonthObject(eval(cname+'_Object').format, parseInt(dvalue.substr(0, 4)),
 	parseInt(dvalue.substr(5, 2)) - 1 ,
 	parseInt(dvalue.substr(8, 2)) - 1);
-	eval('fl_'+cname+'_Object').setDisplayed(parseInt(dvalue.substr(0, 4)), parseInt(dvalue.substr(5, 2)) - 1);
+	eval(cname+'_Object').setDisplayed(parseInt(dvalue.substr(0, 4)), parseInt(dvalue.substr(5, 2)) - 1);
 }
