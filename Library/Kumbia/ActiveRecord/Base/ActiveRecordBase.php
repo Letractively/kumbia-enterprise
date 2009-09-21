@@ -2348,21 +2348,21 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		}
 		if(is_array($options)){
 			if(!isset($options['field'])){
-				throw new ActiveRecordException("No ha indicado el campo a validar para '$className' ");
+				throw new ActiveRecordException("No ha indicado el campo a validar para '$className'");
 			} else {
 				$field = $options['field'];
 			}
 		} else {
 			if($options==''){
-				throw new ActiveRecordException("No ha indicado el campo a validar para '$className' ");
+				throw new ActiveRecordException("No ha indicado el campo a validar para '$className'");
 			} else {
 				$field = $options;
 			}
 		}
 		if(!is_array($field)){
-			if(!isset($this->$field)){
-				throw new ActiveRecordException("No se puede validar el campo '$field' por que no esta presente en la entidad");
-			}
+			#if(!isset($this->$field)){
+			#	throw new ActiveRecordException("No se puede validar el campo '$field' por que no esta presente en la entidad");
+			#}
 			$this->_executeValidator($className, $field, $options);
 		} else {
 			foreach($field as $singleField){
