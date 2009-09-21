@@ -13,7 +13,7 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package		Db
+ * @package	Db
  * @subpackage	Adapters
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2007 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
@@ -38,99 +38,164 @@
  * La documentación de PostgreSQL puede encontrarse en http://www.postgresql.org/docs.
  *
  * @category	Kumbia
- * @package		Db
+ * @package	Db
  * @subpackage	Adapters
  * @copyright 	Copyright (c) 2005-2007 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2007-2007 Emilio Silveira (emilio.rst@gmail.com)
- * @license		New BSD License
- * @link		http://www.php.net/manual/es/ref.pgsql.php
- * @access		Public
+ * @license	New BSD License
+ * @link	http://www.php.net/manual/es/ref.pgsql.php
+ * @access	Public
  */
 class DbPostgreSQL extends DbBase implements DbBaseInterface {
 
-	public $Id_Connection;
-	public $lastResultQuery;
-	public $lastQuery;
-	public $lastError;
-	private $dbUser;
-	private $dbHost;
-	private $dbPass;
-	private $dbPort = 5432;
-	private $dbDSN;
-	private $dbName;
+	/**
+	 * ISOLATION READ UNCOMMITED
+	 *
+	 */
+	const ISOLATION_READ_UNCOMMITED = 1;
 
-	const DB_ASSOC = PGSQL_ASSOC;
-	const DB_BOTH = PGSQL_BOTH;
-	const DB_NUM = PGSQL_NUM;
+	/**
+	 * ISOLATION READ COMMITED
+	 *
+	 */
+	const ISOLATION_READ_COMMITED = 2;
+
+	/**
+	 * This is the default isolation level for InnoDB
+	 *
+	 */
+	const ISOLATION_REPEATABLE_READ = 3;
+
+	/**
+	 * ISOLATION SERIALIZABLE	 
+	 */
+	const ISOLATION_SERIALIZABLE = 4;
+
+	/**
+	 * Tipo de Dato Integer
+	 *
+	 */
+	const TYPE_INTEGER = 'INT';
+
+	/**
+	 * Tipo de Dato Date
+	 *
+	 */
+	const TYPE_DATE = 'DATE';
+
+	/**
+	 * Tipo de Dato Varchar
+	 *
+	 */
+	const TYPE_VARCHAR = 'VARCHAR';
+
+	/**
+	 * Tipo de Dato Decimal
+	 *
+	 */
+	const TYPE_DECIMAL = 'DECIMAL';
+
+	/**
+	 * Tipo de Dato Datetime
+	 *
+	 */
+	const TYPE_DATETIME = 'TIMESTAMP';
+
+	/**
+	 * Tipo de Dato Char
+	 *
+	 */
+	const TYPE_CHAR = 'CHAR';
+
+	/**
+	 * Tipo de Text
+	 *
+	 */
+	const TYPE_TEXT = 'TEXT';
+
+	/**
+	 * Constructor de la Clase
+	 *
+	 * @param stdClass $descriptor
+	 */
+	public function __construct($descriptor=''){
+		if($descriptor==''){
+			$descriptor = $this->_descriptor;
+		}
+		$this->connect($descriptor);
+	}
 
 	/**
 	 * Hace una conexión a la base de datos de PostgreSQL
 	 *
-	 * @param string $dbhost
-	 * @param string $dbuser
-	 * @param string $dbpass
-	 * @param string $dbname
-	 * @param string $dbport
-	 * @param string $dbdsn
-	 * @return resourceConnection
+	 * @param	stdClass $descriptor
+	 * @return	resource
 	 */
-	public function connect($dbhost='', $dbuser='', $dbpass='', $dbname='', $dbport='', $dbdsn=''){
-
-		if(!extension_loaded('pgsql')){
-			throw new DbException('Debe cargar la extensión de PHP llamada php_pgsql');
-			return false;
+	public function connect($descriptor=''){
+		if($descriptor==''){
+			$descriptor = $this->_descriptor;
 		}
-
-		if(!$dbhost){
-			$dbhost = $this->dbHost;
-		} else {
-			$this->dbHost = $dbhost;
+		$connectionString = "";
+		if(isset($descriptor->hostname)){
+			$connectionString.='host='.$descriptor->hostname.' ';
 		}
-		if(!$dbuser) $dbuser = $this->dbUser; else $this->dbUser = $dbuser;
-		if(!$dbpass) $dbpass = $this->dbPass; else $this->dbPass = $dbpass;
-		if(!$dbname) $dbpass = $this->dbName; else $this->dbName = $dbname;
-		if(!$dbport) $dbport = $this->dbPort; else $this->dbPort = $dbport;
-		if(!$dbdsn) $dbdsn = $this->dbDSN; else $this->dbDSN = $dbdsn;
-
-		if($this->Id_Connection = @pg_connect("host={$this->dbHost} port=5432 user={$this->dbUser} password={$this->dbPass} dbname={$this->dbName} port={$this->dbPort}")){
+		if(isset($descriptor->username)){
+			$connectionString.='user='.$descriptor->username.' ';
+		}
+		if(isset($descriptor->password)){
+			$connectionString.='password='.$descriptor->password.' ';
+		}	
+		if(isset($descriptor->port)){
+			$connectionString.='port='.$descriptor->port.' ';
+		}
+		if(isset($descriptor->name)){
+			$connectionString.='dbname='.$descriptor->name.' ';
+		}
+		if($this->_idConnection = @pg_connect($connectionString)){			
+			$this->_fetchMode = PGSQL_BOTH;
+			parent::__construct($descriptor);
 			return true;
 		} else {
-			if($this->display_errors){
-				throw new DbException("No se puede conectar a PostgreSQL, verifique q el servicio este arriba y los par&aacute;metros de conexión sean correctos", false);
-			}
-			$this->lastError = $this->error();
-			$this->log($this->lastError, Logger::ERROR);
+			throw new DbException($this->error($php_errormsg), $this->noError(), false);
 			return false;
 		}
-
 	}
 
 	/**
 	 * Efectua operaciones SQL sobre la base de datos
 	 *
-	 * @param string $sqlQuery
-	 * @return resource or false
+	 * @param	string $sqlStatement
+	 * @return	resource|false
 	 */
-	public function query($sqlQuery){
-		$this->debug($sqlQuery);
-		$this->log($sqlQuery, Logger::DEBUG);
-		if(!$this->Id_Connection){
+	public function query($sqlStatement){
+		parent::beforeQuery($sqlStatement);
+		if(!$this->_idConnection){
 			$this->connect();
-			if(!$this->Id_Connection){
+			if(!$this->_idConnection){
 				return false;
 			}
 		}
-		$this->lastQuery = $sqlQuery;
-		if($resultQuery = @pg_query($this->Id_Connection, $sqlQuery)){
-			$this->lastResultQuery = $resultQuery;
+		$this->_lastQuery = $sqlStatement;
+		if($resultQuery = pg_query($this->_idConnection, $sqlStatement)){
+			$this->_lastResultQuery = $resultQuery;
+			parent::afterQuery($sqlStatement);
 			return $resultQuery;
 		} else {
-			if($this->display_errors){
-				throw new DbException($this->error()." al ejecutar <i>'$sqlQuery'</i>");
+			$this->_lastResultQuery = false;
+			$errorMessage = $this->error(" al ejecutar <i>\"$sqlStatement\"</i> en la conexión \"".$this->getConnectionId(true)."\"");
+			/*if($this->noError()==1205||$this->noError()==1213){
+				throw new DbLockAdquisitionException($errorMessage, $this->noError(), true, $this);
 			}
-			$this->log($this->error()." al ejecutar '$sqlQuery'", Logger::ERROR);
-			$this->lastResultQuery = false;
-			$this->lastError = $this->error();
+			if($this->noError()==1064||$this->noError()==1054){
+				throw new DbSQLGrammarException($errorMessage, $this->noError(), true, $this);
+			}
+			if($this->noError()==1451){
+				throw new DbConstraintViolationException($errorMessage, $this->noError(), true, $this);
+			}
+			if($this->noError()==1292){
+				throw new DbInvalidFormatException($errorMessage, $this->noError(), true, $this);
+			}*/
+			throw new DbException($errorMessage, $this->noError(), true, $this);
 			return false;
 		}
 	}
@@ -139,37 +204,28 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	 * Cierra la Conexion al Motor de Base de datos
 	 */
 	public function close(){
-		if($this->Id_Connection) {
-			pg_close($this->Id_Connection);
+		if($this->_idConnection) {
+			pg_close($this->_idConnection);
 		}
 	}
 
 	/**
-	 * Devuelve fila por fila el contenido de un select
+	 * Devuelve fila por fila el contenido de una consulta
 	 *
-	 * @param resource $resultQuery
-	 * @param integer $opt
-	 * @return array
+	 * @param	resource $resultQuery
+	 * @return	array
 	 */
-	public function fetchArray($resultQuery='', $opt=''){
-		if($opt==='') $opt = db::DB_BOTH;
-		if(!$this->Id_Connection){
+	public function fetchArray($resultQuery=''){
+		if(!$this->_idConnection){
 			return false;
 		}
 		if(!$resultQuery){
-			$resultQuery = $this->lastResultQuery;
+			$resultQuery = $this->_lastResultQuery;
 			if(!$resultQuery){
 				return false;
 			}
 		}
-		return pg_fetch_array($resultQuery, NULL, $opt);
-	}
-
-	/**
-	 * Constructor de la Clase
-	 */
-	public function __construct($dbhost=null, $dbuser=null, $dbpass=null, $dbname='', $dbport='', $dbdns=''){
-		$this->connect($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbdsn);
+		return pg_fetch_array($resultQuery, null, $this->_fetchMode);
 	}
 
 	/**
@@ -179,7 +235,7 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	 * @return boolean|integer
 	 */
 	public function numRows($resultQuery=''){
-		if(!$this->Id_Connection){
+		if(!$this->_idConnection){
 			return false;
 		}
 		if(!$resultQuery){
@@ -206,7 +262,7 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	 * @return string
 	 */
 	public function fieldName($number, $resultQuery=''){
-		if(!$this->Id_Connection){
+		if(!$this->_idConnection){
 			return false;
 		}
 		if(!$resultQuery){
@@ -218,7 +274,7 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 		if(($fieldName = pg_field_name($resultQuery, $number))!==false){
 			return $fieldName;
 		} else {
-			$this->lastError = pg_last_error($this->Id_Connection);
+			$this->lastError = pg_last_error($this->_idConnection);
 			$this->log($this->error(), Logger::ERROR);
 			return false;
 		}
@@ -260,7 +316,7 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	 * @return integer
 	 */
 	public function affectedRows($resultQuery=''){
-		if(!$this->Id_Connection){
+		if(!$this->_idConnection){
 			return false;
 		}
 		if(!$resultQuery){
@@ -282,39 +338,53 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	/**
 	 * Devuelve el error de PostgreSQL
 	 *
-	 * @param string $err
-	 * @return string
+	 * @param	string $errorString
+	 * @return	string
 	 */
-	public function error($err=''){
-		if(!$this->Id_Connection){
-			return @pg_last_error() ? @pg_last_error() : "[Error Desconocido en PostgreSQL $err]";
+	public function error($errorString='', $resultQuery=null){
+		if(!$this->_idConnection){					
+			$this->_lastError = $errorString;
+			$this->log($this->_lastError, Logger::ERROR);
+			return $this->_lastError;
 		}
-		return pg_last_error($this->Id_Connection);
+		$errorMessage = pg_last_error($this->_idConnection);
+		if($errorMessage!=""){
+			$this->_lastError = "\"".$errorMessage."\" ".$errorString;
+		} else {
+			$this->_lastError = "[Error Desconocido en PostgreSQL: $errorString]";
+		}
+		$this->log($this->_lastError, Logger::ERROR);
+		return $this->_lastError;
 	}
 
 	/**
 	 * Devuelve el no error de PostgreSQL
 	 *
-	 * @return integer
+	 * @return	integer|boolean
 	 */
-	public function noError(){
-		if(!$this->Id_Connection){
+	public function noError($resultQuery=null){
+		if(!$this->_idConnection){
 			return false;
 		}
-		return "0"; //Codigo de Error?
+		return 0;
+		//return mysql_errno($this->_idConnection);
 	}
 
 	/**
 	 * Verifica si una tabla existe o no
 	 *
-	 * @param string $schema
-	 * @param string $table
-	 * @return boolean
+	 * @param	string $schemaName
+	 * @param	string $tableName
+	 * @return	boolean
 	 */
-	public function tableExists($table, $schema=''){
-		$table = strtolower($table);
-		$num = $this->fetch_one("select count(*) from information_schema.tables where table_schema = 'public' and table_name='$table'");
-		return $num[0];
+	public function tableExists($tableName, $schemaName=''){
+		$table = strtolower($tableName);
+		if($schemaName==''){
+			$sql = "select count(*) from information_schema.tables where table_schema = 'public' and table_name='$tableName'";
+		} else {
+			$sql = "select count(*) from information_schema.tables where table_schema = '$schemaName' and table_name='$tableName'";
+		}
+		return $this->fetchOne($sql);
 	}
 
 	/**
@@ -356,9 +426,9 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	/**
 	 * Borra una tabla de la base de datos
 	 *
-	 * @param string $table
-	 * @param boolean $ifExists
-	 * @return boolean
+	 * @param	string $table
+	 * @param	boolean $ifExists
+	 * @return	boolean
 	 */
 	public function dropTable($table, $ifExists=true){
 		if($ifExists){
@@ -373,14 +443,26 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	}
 
 	/**
-	 * Devuelve el ultimo ROW'id en la ultima insercion
+	 * Devuelve el ultimo ROW'id en la ultima inserción
 	 *
-	 * @param string $table
-	 * @param array $primaryKey
-	 * @return integer
+	 * @param	string $table
+	 * @param	array $primaryKey
+	 * @param	string $sequenceName
+	 * @return	integer
 	 */
-	public function lastInsertId($table='', $primaryKey=array()){
+	public function lastInsertId($table='', $primaryKey=array(), $sequenceName=''){
 		return pg_last_oid($this->lastResultQuery);
+	}
+
+	/**
+	 * Indica si el RBDM requiere de secuencias y devuelve el nombre por convencion
+	 *
+	 * @param string $tableName
+	 * @param array $primaryKey
+	 * @return boolean
+	 */
+	public function getRequiredSequence($tableName='', $identityColumn='', $sequenceName=''){
+		return false;
 	}
 
 	/**
@@ -391,77 +473,81 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	 * - Soporte para campos autonumericos
 	 * - Soporte para llaves foraneas
 	 *
-	 * @param string $table
-	 * @param array $definition
-	 * @param array $index
-	 * @return boolean
+	 * @param	string $table
+	 * @param	array $definition
+	 * @param	array $index
+	 * @param	array $tableOptions
+	 * @return	boolean
 	 */
-	public function createTable($table, $definition, $index=array()){
-		$create_sql = "CREATE TABLE $table (";
-		if(!is_array($definition)){
-			new DbException("Definición invalida para crear la tabla '$table'");
+	public function createTable($table, $definition, $index=array(), $tableOptions=array()){
+		if(isset($tableOptions['temporary'])&&$tableOptions['temporary']==true){
+			$createSQL = 'CREATE TEMPORARY TABLE '.$table.' (';
+		} else {
+			$createSQL = 'CREATE TABLE '.$table.' (';
+		}
+		if(is_array($definition)==false){
+			throw new DbException("Definición invalida para crear la tabla '$table'");
 			return false;
 		}
-		$create_lines = array();
+		$createLines = array();
 		$index = array();
-		$unique_index = array();
+		$uniqueIndex = array();
 		$primary = array();
-		$not_null = "";
+		$notNull = "";
 		$size = "";
-		foreach($definition as $field => $field_def){
-			if(isset($field_def['not_null'])){
-				$not_null = $field_def['not_null'] ? 'NOT NULL' : '';
+		foreach($definition as $field => $fieldDefinition){
+			if(isset($fieldDefinition['notNull'])){
+				$notNull = $fieldDefinition['notNull'] ? 'NOT NULL' : '';
 			} else {
-				$not_null = "";
+				$notNull = "";
 			}
-			if(isset($field_def['size'])){
-				$size = $field_def['size'] ? '('.$field_def['size'].')' : '';
+			if(isset($fieldDefinition['size'])){
+				$size = $fieldDefinition['size'] ? '('.$fieldDefinition['size'].')' : '';
 			} else {
 				$size = "";
 			}
-			if(isset($field_def['index'])){
-				if($field_def['index']){
+			if(isset($fieldDefinition['index'])){
+				if($fieldDefinition['index']){
 					$index[] = "INDEX($field)";
 				}
 			}
-			if(isset($field_def['unique_index'])){
-				if($field_def['unique_index']){
+			if(isset($fieldDefinition['unique_index'])){
+				if($fieldDefinition['unique_index']){
 					$index[] = "UNIQUE($field)";
 				}
 			}
-			if(isset($field_def['primary'])){
-				if($field_def['primary']){
+			if(isset($fieldDefinition['primary'])){
+				if($fieldDefinition['primary']){
 					$primary[] = "$field";
 				}
 			}
-			if(isset($field_def['auto'])){
-				if($field_def['auto']){
-					$field_def['type'] = "SERIAL";
+			if(isset($fieldDefinition['auto'])){
+				if($fieldDefinition['auto']){
+					$fieldDefinition['type'] = 'SERIAL';
 				}
 			}
-			if(isset($field_def['extra'])){
-				$extra = $field_def['extra'];
+			if(isset($fieldDefinition['extra'])){
+				$extra = $fieldDefinition['extra'];
 			} else {
 				$extra = "";
 			}
-			$create_lines[] = "$field ".$field_def['type'].$size.' '.$not_null.' '.$extra;
+			$createLines[] = "$field ".$fieldDefinition['type'].$size.' '.$notNull.' '.$extra;
 		}
-		$create_sql.= join(',', $create_lines);
-		$last_lines = array();
+		$createSQL.= join(',', $createLines);
+		$lastLines = array();
 		if(count($primary)){
-			$last_lines[] = 'PRIMARY KEY('.join(",", $primary).')';
+			$lastLines[] = 'PRIMARY KEY('.join(",", $primary).')';
 		}
 		if(count($index)){
-			$last_lines[] = join(',', $index);
+			$lastLines[] = join(',', $index);
 		}
-		if(count($unique_index)){
-			$last_lines[] = join(',', $unique_index);
+		if(count($uniqueIndex)){
+			$lastLines[] = join(',', $uniqueIndex);
 		}
-		if(count($last_lines)){
-			$create_sql.= ','.join(',', $last_lines).')';
+		if(count($lastLines)){
+			$createSQL.= ','.join(',', $lastLines).')';
 		}
-		return $this->query($create_sql);
-
+		return $this->query($createSQL);
 	}
 
 	/**
@@ -469,16 +555,16 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	 *
 	 * @return array
 	 */
-	public function listTables(){
+	public function listTables($schemaName=''){
 		return $this->fetchAll("SELECT c.relname AS table_name FROM pg_Class c, pg_user u "
-             ."WHERE c.relowner = u.usesysid AND c.relkind = 'r' "
-             ."AND NOT EXISTS (SELECT 1 FROM pg_views WHERE viewname = c.relname) "
-             ."AND c.relname !~ '^(pg_|sql_)' UNION "
-             ."SELECT c.relname AS table_name FROM pg_Class c "
-             ."WHERE c.relkind = 'r' "
-             ."AND NOT EXISTS (SELECT 1 FROM pg_views WHERE viewname = c.relname) "
-             ."AND NOT EXISTS (SELECT 1 FROM pg_user WHERE usesysid = c.relowner) "
-             ."AND c.relname !~ '^pg_'");
+		."WHERE c.relowner = u.usesysid AND c.relkind = 'r' "
+		."AND NOT EXISTS (SELECT 1 FROM pg_views WHERE viewname = c.relname) "
+		."AND c.relname !~ '^(pg_|sql_)' UNION "
+		."SELECT c.relname AS table_name FROM pg_Class c "
+		."WHERE c.relkind = 'r' "
+		."AND NOT EXISTS (SELECT 1 FROM pg_views WHERE viewname = c.relname) "
+		."AND NOT EXISTS (SELECT 1 FROM pg_user WHERE usesysid = c.relowner) "
+		."AND c.relname !~ '^pg_'");
 	}
 
 	/**
@@ -490,12 +576,17 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 	 */
 	public function describeTable($table, $schema=''){
 		$describe = $this->fetchAll("SELECT a.attname AS Field, t.typname AS Type,
-			 	CASE WHEN attnotnull=false THEN 'YES' ELSE 'NO' END AS Null,
-			 	CASE WHEN (select cc.contype FROM pg_catalog.pg_constraint cc WHERE
-			 	cc.conrelid = c.oid AND cc.conkey[1] = a.attnum)='p' THEN 'PRI' ELSE ''
-			 	END AS Key FROM pg_catalog.pg_Class c, pg_catalog.pg_attribute a,
-			 	pg_catalog.pg_type t WHERE c.relname = '$table' AND c.oid = a.attrelid
-			 	AND a.attnum > 0 AND t.oid = a.atttypid order by a.attnum");
+		CASE WHEN attnotnull=false THEN 'YES' ELSE 'NO' END AS Null,
+		CASE WHEN (select cc.contype FROM pg_catalog.pg_constraint cc WHERE
+		cc.conrelid = c.oid AND cc.conkey[1] = a.attnum)='p' THEN 'PRI' ELSE ''
+		END AS Key FROM pg_catalog.pg_Class c, pg_catalog.pg_attribute a,
+		pg_catalog.pg_type t WHERE 
+		c.relname = '$table' AND 
+		c.oid = a.attrelid AND 
+		a.attnum > 0 AND
+		c.relhaspkey = 't' AND 
+		t.oid = a.atttypid 
+		order by a.attnum");
 		$finalDescribe = array();
 		foreach($describe as $key => $value){
 			$finalDescribe[] = array(
@@ -506,24 +597,6 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 			);
 		}
 		return $finalDescribe;
-	}
-
-	/**
-	 * Devuelve el id de Conexion generado por el driver
-	 *
-	 * @return resource
-	 */
-	public function getConnectionId(){
-		return $this->_idConnection;
-	}
-
-	/**
-	 * Obtiene el nombre de la base de datos actual en el adaptador
-	 *
-	 * @return string
-	 */
-	public function getDatabaseName(){
-		return $this->_dbName;
 	}
 
 	/**
@@ -578,5 +651,34 @@ class DbPostgreSQL extends DbBase implements DbBaseInterface {
 		$this->query($isolationCommand);
 		return true;
 	}
+
+	/**
+	 * Establece el modo en se que deben devolver los registros
+	 *
+	 * @param	int $fetchMode
+	 */
+	public function setFetchMode($fetchMode){
+		if($fetchMode==self::DB_ASSOC){
+			$this->_fetchMode = PGSQL_ASSOC;
+			return;
+		}
+		if($fetchMode==self::DB_BOTH){
+			$this->_fetchMode = PGSQL_BOTH;
+			return;
+		}
+		if($fetchMode==self::DB_NUM){
+			$this->_fetchMode = PGSQL_NUM;
+			return;
+		}
+	}
+
+	/**
+	 * Destructor de DbMysql
+	 *
+	 */
+	public function __destruct(){
+		#$this->close();
+	}
+
 
 }

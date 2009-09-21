@@ -13,11 +13,11 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package		Core
+ * @package	Core
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
- * @license		New BSD License
+ * @license	New BSD License
  * @version 	$Id$
  */
 
@@ -27,10 +27,10 @@
  * Esta es la clase que integra todo el framework
  *
  * @category	Kumbia
- * @package		Core
+ * @package	Core
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license		New BSD License
+ * @license	New BSD License
  * @abstract
  */
 abstract class Core {
@@ -148,19 +148,22 @@ abstract class Core {
 	/**
 	 * Reestablece el PATH original de la aplicación
 	 *
+	 * @access	public
 	 * @static
 	 */
 	static public function restoreInitialPath(){
-		if(self::$_frameworkPath!=getcwd()){
-			chdir(self::$_frameworkPath);
+		if(self::$_frameworkPath!=""){
+			if(self::$_frameworkPath!=getcwd()){
+				chdir(self::$_frameworkPath);
+			}
 		}
 	}
 
 	/**
 	 * Establecer el timezone para las fechas y horas
 	 *
-	 * @access public
-	 * @param string $timezone
+	 * @access	public
+	 * @param	string $timezone
 	 * @static
 	 */
 	static public function setTimeZone($timezone=''){
@@ -180,8 +183,8 @@ abstract class Core {
 	/**
 	 * Obtiene el timezone actual
 	 *
-	 * @access public
-	 * @return string
+	 * @access	public
+	 * @return	string
 	 * @static
 	 */
 	static public function getTimezone(){
@@ -191,12 +194,11 @@ abstract class Core {
 	/**
 	 * Inicializar el _INSTANCE_NAME
 	 *
-	 * @access public
-	 * @return boolean
+	 * @access	public
+	 * @return	boolean
 	 * @static
 	 */
 	static public function setInstanceName(){
-
 		if(self::$_instanceName!==null){
 			return false;
 		}
