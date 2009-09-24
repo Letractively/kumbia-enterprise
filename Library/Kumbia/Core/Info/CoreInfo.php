@@ -13,10 +13,10 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package	Core
+ * @package		Core
  * @subpackage	CoreInfo
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
- * @license	New BSD License
+ * @license		New BSD License
  * @version 	$Id$
  */
 
@@ -26,11 +26,11 @@
  * Consulta información del framework y genera la pantalla de bienvenida
  *
  * @category	Kumbia
- * @package	Core
+ * @package		Core
  * @subpackage	CoreInfo
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license	New BSD License
- * @access	public
+ * @access 		public
  * @abstract
  */
 abstract class CoreInfo {
@@ -52,8 +52,11 @@ abstract class CoreInfo {
 
 		Tag::stylesheetLink('info');
 
-		echo "<div id='kumbia-info-content'><span id='kumbia-info-header'>Kumbia Enterprise Admin ".Core::FRAMEWORK_VERSION."</span>
-		<h2>Kumbia Enterprise Framework Instance (".Core::getInstanceName()."/".Router::getApplication().") funciona!</h2><div>Para reemplazar esta p&aacute;gina
+		echo '<div id="header-1"><h1>LouderTechnology&reg;</h1></div>
+		<div id="header-2"><h2>Kumbia Enterprise Framework <span id="version">'.Core::FRAMEWORK_VERSION.'</span></h2></div>
+		<div align="center">
+		<div id="kumbia-info-content">
+		<h2>Bienvenido ('.Core::getInstanceName()."/".Router::getApplication().") funciona!</h2><div>Para reemplazar esta p&aacute;gina
 		edite el archivo <i>apps/default/controllers/application.php</i> en el DocumentRoot del servidor
 		web <i>(".(isset($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : getcwd())."/".Core::getInstanceName().")</i>.<br><br>
 		Está invitado a registrarse. El registro es opcional, al hacerlo usted obtiene:
@@ -65,7 +68,9 @@ abstract class CoreInfo {
 		</ul></div>
 		<hr color='#eaeaea'><div align='center' id='kumbia-info-footer'>
 		<a href='http://www.loudertechnology.com/site/projects/license'>Licencia</a> |
-		<a href='http://www.loudertechnology.com/'>Louder Technology</a> ".date("Y")."</div>";
+		<a href='http://www.loudertechnology.com/'>Louder Technology</a> ".date("Y")."
+		</div>
+		</div>";
 		View::setContent(ob_get_contents());
 		ob_end_clean();
 		View::xhtmlTemplate();

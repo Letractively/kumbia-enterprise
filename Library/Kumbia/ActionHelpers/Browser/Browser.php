@@ -200,6 +200,17 @@ abstract class Browser {
 	}
 
 	/**
+	 * Indica si se está usando Google Chrome Framew
+	 *
+	 * @access	public
+	 * @return	boolean
+	 * @static
+	 */
+	public static function isChromeFrame(){
+		return strpos($_SERVER['HTTP_USER_AGENT'], 'chromeframe')!==false ? true : false;
+	}
+
+	/**
 	 * Devuelve el User/Agent del cliente
 	 *
 	 * @access 	public
