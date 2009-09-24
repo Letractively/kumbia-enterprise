@@ -167,7 +167,6 @@ class Compiler {
 			self::$_requiredFiles[$i] = str_replace('/Applications/MAMP/htdocs/kef/kumbia-ef', $currentDirectory, $requiredFile);
 			++$i;
 		}
-		//0142
 		self::compileFile('Library/Kumbia/Autoload.php');
 		$includeControllerBase = false;
 		foreach(self::$_requiredFiles as $requiredFile){
@@ -180,6 +179,7 @@ class Compiler {
 			  strpos($requiredFile, '/controllers/')===false&&
 			  strpos($requiredFile, '/library/')===false&&
 			  strpos($requiredFile, '/models/')===false&&
+			  strpos($requiredFile, '/views/')===false&&
 			  strpos($requiredFile, '/plugins/')===false){
 			  	/*if($includeControllerBase==false){
 				  	if(strpos($requiredFile, '/Library/Kumbia/Controller')){

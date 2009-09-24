@@ -46,7 +46,7 @@ abstract class GeneratorReport {
 
 		$weightArray = array();
 		$headerArray = array();
-		$selectedFields = "";
+		$selectedFields = array();
 		$tables = "";
 		$whereCondition = array();
 		$maxCondition = "";
@@ -69,7 +69,7 @@ abstract class GeneratorReport {
 				$tables = $form['joinTables'];
 			}
 			if(isset($form['joinConditions'])){
-				$whereCondition = " ".$form['joinConditions'];
+				$whereCondition = ' '.$form['joinConditions'];
 			}
 			foreach($form['components'] as $name => $com){
 				if(isset($com['attributes']['value'])){
@@ -141,88 +141,103 @@ abstract class GeneratorReport {
 		$all_components = array();
 		foreach($form['components'] as $name => $com){
 			$all_components[] = $name;
-			if(!isset($_REQUEST['rep_'.$name])||$_REQUEST['rep_'.$name]=='Yes'){
+			$not_alias = false;
+			if($com['type']=='combo'&&$com['class']=='dynamic'){
+				if(isset($com['extraTables'])&&$com['extraTables']){
+					$tables.=(string) $com['extraTables'].',';
+				}
+				if(isset($com['whereConditionOnQuery'])&&$com['whereConditionOnQuery']){
+					$whereCondition.=' AND '.$com['whereConditionOnQuery'];
+				}
+				if(strpos(' '.$com['detailField'], 'concat(')){
+					$not_alias = true;
+				}
+				if($not_alias){
+					$tables.=$com['foreignTable'].',';
+					$tab = $com['foreignTable'];
+				} else {
+					$tables.=$com['foreignTable']." $letter,";
+					$tab = $letter;
+				}
+				if($com['column_relation']){
+					$whereCondition[] = $tab.".".$com['column_relation']." = ".$form['source'].".".$name;
+				} else {
+					$whereCondition[] = $tab.".".$name." = ".$form['source'].".".$name;
+				}
+				if(isset($com['whereCondition'])&&$com['whereCondition']){
+					if(!$not_alias){
+						$com['whereCondition'] = str_replace($com['foreignTable'].".", "$letter.", $com['whereCondition']);
+					}
+					$whereCondition[] = $com['whereCondition'];
+				}
+				if(!$not_alias){
+					$letter = chr(ord($letter)+1);
+				}
+			} else {
+				if($com['type']!='hidden'){
+					if(isset($com['class'])){
+						if($form['components'][$name]['type']=='helpText'){
+							$tables.="{$com['foreignTable']} $letter,";
+							if($com['column_relation']){
+								$whereCondition[] = "{$letter}.{$com['column_relation']} = {$form['source']}.$name";
+							} else {
+								$whereCondition[] = " {$letter}.$name = {$form['source']}.$name";
+							}
+							$letter = chr(ord($letter)+1);
+						}
+					}
+				}
+			}
+		}
+
+		$n = 0;
+		$m = 0;
+		foreach($form['components'] as $name => $com){
+			$all_components[] = $name;
+			if(!isset($com['notReport'])||$com['notReport']){
 				$headerArray[$n] = html_entity_decode($com['caption'], ENT_NOQUOTES, 'UTF-8');
 				$headerArray[$n] = str_replace('<br>', ' ', $headerArray[$n]);
 				$headerArray[$n] = str_replace('<br/>', ' ', $headerArray[$n]);
-				$not_alias = false;
 				if($com['type']=='combo'&&$com['class']=='dynamic'){
-					if(isset($com['extraTables'])&&$com['extraTables']){
-						$tables.=(string) $com['extraTables'].',';
-					}
-					if(isset($com['whereConditionOnQuery'])&&$com['whereConditionOnQuery']){
-						$whereCondition.=' AND '.$com['whereConditionOnQuery'];
-					}
 					if(strpos(' '.$com['detailField'], 'concat(')){
-						$selectedFields.= $com['detailField'].',';
-						$not_alias = true;
+						$selectedFields[] = $com['detailField'];
 					} else {
-						$selectedFields.= $letter.'.'.$com['detailField'].',';
+						$selectedFields[] = $letter.'.'.$com['detailField'];
 					}
-					if($not_alias){
-						$tables.=$com['foreignTable'].',';
-						$tab = $com['foreignTable'];
-					} else {
-						$tables.=$com['foreignTable']." $letter,";
-						$tab = $letter;
-					}
-					if($com['column_relation']){
-						$whereCondition[] = $tab.".".$com['column_relation']." = ".$form['source'].".".$name;
-					} else {
-						$whereCondition[] = $tab.".".$name." = ".$form['source'].".".$name;
-					}
-					if(isset($com['whereCondition'])&&$com['whereCondition']){
-						if(!$not_alias){
-							$com['whereCondition'] = str_replace($com['foreignTable'].".", "$letter.", $com['whereCondition']);
-						}
-						$whereCondition[] = $com['whereCondition'];
-					}
-					if(!$not_alias){
-						$letter = chr(ord($letter)+1);
-					}
-					$weightArray[$n] = strlen($headerArray[$n])+3;
-					++$n;
-					++$m;
 				} else {
 					if($com['type']!='hidden'){
 						if(isset($com['class'])){
 							if($com['class']=='static'){
 								$weightArray[$n] = strlen($headerArray[$n])+3;
 								$numberItems = count($com['items'])-1;
+								$selectedField = "";
 								for($i=0;$i<$numberItems;++$i){
-									$selectedFields.="if(".$form['source'].".".$name."='".$com['items'][$i][0]."', '".$com['items'][$i][1]."', ";
+									$selectedField.= "if(".$form['source'].".".$name."='".$com['items'][$i][0]."', '".$com['items'][$i][1]."',";
 									if($weightArray[$n]<strlen($com['items'][$i][1])) {
 										$weightArray[$n] = strlen($com['items'][$i][1])+1;
 									}
 								}
 								++$n;
 								++$m;
-								$selectedFields.="'".$com['items'][$i][1]."')";
+								$selectedField.="'".$com['items'][$i][1]."')";
 								//$selectedFields.="')";
 								for($j=0;$j<$i-1;++$j){
-									$selectedFields.=")";
+									$selectedField.=")";
 								}
-								$selectedFields.=",";
+								$selectedFields[] = $selectedField;
 							} else {
 								if($form['components'][$name]['type']=='helpText'){
-									$selectedFields.=$form['source'].".".$name.",";
+									$selectedFields[] = $form['source'].".".$name;
 									$weightArray[$n] = strlen($headerArray[$n])+3;
 									++$n;
 									$headerArray[$n] = ucfirst($form['components'][$name]['detailField']);
 									$weightArray[$n] = strlen($headerArray[$n])+3;
-
-									$tables.="{$com['foreignTable']} $letter,";
-									$selectedFields.=$letter.".".$com['detailField']." AS {$letter}_{$com['detailField']},";
-									if($com['column_relation']){
-										$whereCondition[] = "{$letter}.{$com['column_relation']} = {$form['source']}.$name";
-									} else {
-										$whereCondition[] = " {$letter}.$name = {$form['source']}.$name";
-									}
+									$selectedFields[] = $letter.".".$com['detailField']." AS {$letter}_{$com['detailField']}";
 									$letter = chr(ord($letter)+1);
 									++$n;
 									++$m;
 								} else {
-									$selectedFields.=$form['source'].".".$name.",";
+									$selectedFields[] = $form['source'].'.'.$name;
 									$weightArray[$n] = strlen($headerArray[$n])+3;
 									++$n;
 									++$m;
@@ -235,7 +250,7 @@ abstract class GeneratorReport {
 		}
 
 		$tables.=$form['source'];
-		$selectedFields = substr($selectedFields, 0, strlen($selectedFields)-1);
+		$selectedFields = join(',', $selectedFields);
 
 		if(isset($form['dataRequisite'])){
 			$whereCondition[] = $form['dataFilter'];
@@ -282,6 +297,8 @@ abstract class GeneratorReport {
 		}
 
 		$sumArray = array_sum($weightArray);
+
+		//echo $sumArray;
 
 		if(!isset($_REQUEST['reportType'])||!$_REQUEST['reportType']){
 			$_REQUEST['reportType'] = 'pdf';

@@ -10,6 +10,24 @@
 	text-align: left;
 }
 
+.exceptionPre {
+	font-family: Lucida Console;
+	margin:10px;
+	color: white;
+	text-align: left;
+	padding: 5px;
+}
+
+.exceptionPreDesc {
+	font-family: Lucida Console;
+	margin: 10px;
+	border:1px solid #969696;
+	background: #fafafa;
+	font-size: 12px;
+	text-align: left;
+	padding: 5px;
+}
+
 .exceptionLocation {
 	font-size: 12px;
 	color: #F4FCCA;

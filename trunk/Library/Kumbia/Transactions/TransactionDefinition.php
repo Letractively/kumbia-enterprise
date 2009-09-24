@@ -165,7 +165,6 @@ class TransactionDefinition extends Object {
 	 * @return bool
 	 */
 	public function getCreateConnection(){
-		Debug::add($this->_createConnection);
 		return $this->_createConnection;
 	}
 
