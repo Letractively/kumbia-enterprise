@@ -280,8 +280,10 @@ abstract class Tag {
 	public static function textFieldWithAutocomplete($params){
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
-		$value = self::getValueFromAction($params[0]);
-		$hash = md5(mt_rand(1, 100));
+		if(!isset($params['value'])){
+			$params['value'] = self::getValueFromAction($params[0]);
+		}
+		$hash = mt_rand(1, 100);
 		if(!isset($params['name'])||!$params['name']) {
 			$params['name'] = $params[0];
 		}
@@ -320,35 +322,29 @@ abstract class Tag {
 	/**
 	 * Crea un TextArea
 	 *
-	 * @access public
-	 * @param array $configuration
-	 * @return string
+	 * @access	public
+	 * @param	array $configuration
+	 * @return	string
 	 * @static
 	 */
 	public static function textArea($configuration){
-		if(func_num_args()==1){
-			$configuration = func_get_args();
-			$value = self::getValueFromAction($configuration);
-			return "<textarea id=\"{$configuration[0]}\" name=\"{$configuration[0]}\" cols=\"40\" rows=\"25\">$value</textarea>\r\n";
-		} else {
-			$numberArguments = func_num_args();
-			$configuration = Utils::getParams(func_get_args(), $numberArguments);
-			if(!isset($configuration['name'])||$configuration['name']) {
-				$configuration['name'] = $configuration[0];
-			}
-			if(!isset($configuration['cols'])||!$configuration['cols']) {
-				$configuration['cols'] = 40;
-			}
-			if(!isset($configuration['rows'])||!$configuration['rows']) {
-				$configuration['rows'] = 25;
-			}
-			if(!isset($configuration['value'])){
-				$value = self::getValueFromAction($configuration[0]);
-			} else {
-				$value = $configuration['value'];
-			}
-			return "<textarea id=\"{$configuration['name']}\" name=\"{$configuration['name']}\" cols=\"{$configuration['cols']}\" rows=\"{$configuration['rows']}\">$value</textarea>\r\n";
+		$numberArguments = func_num_args();
+		$configuration = Utils::getParams(func_get_args(), $numberArguments);
+		if(!isset($configuration['name'])||$configuration['name']) {
+			$configuration['name'] = $configuration[0];
 		}
+		if(!isset($configuration['cols'])||!$configuration['cols']) {
+			$configuration['cols'] = 40;
+		}
+		if(!isset($configuration['rows'])||!$configuration['rows']) {
+			$configuration['rows'] = 25;
+		}
+		if(!isset($configuration['value'])){
+			$value = self::getValueFromAction($configuration[0]);
+		} else {
+			$value = $configuration['value'];
+		}
+		return "<textarea id=\"{$configuration['name']}\" name=\"{$configuration['name']}\" cols=\"{$configuration['cols']}\" rows=\"{$configuration['rows']}\">$value</textarea>\r\n";
 	}
 
 	/**
