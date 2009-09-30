@@ -755,15 +755,6 @@ abstract class Tag {
 				$dummyText = $params['dummyText'];
 				unset($params['dummyText']);
 			}
-			if(isset($params['use_dummy'])&&$params['use_dummy']){
-				$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
-				unset($params['use_dummy']);
-			} else {
-				if(isset($params['useDummy'])&&$params['useDummy']){
-					$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
-					unset($params['useDummy']);
-				}
-			}
 			if(is_array($params)){
 				foreach($params as $at => $val){
 					if(!is_integer($at)){
@@ -774,6 +765,15 @@ abstract class Tag {
 				}
 			}
 			$code.=">\r\n";
+			if(isset($params['use_dummy'])&&$params['use_dummy']){
+				$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
+				unset($params['use_dummy']);
+			} else {
+				if(isset($params['useDummy'])&&$params['useDummy']){
+					$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
+					unset($params['useDummy']);
+				}
+			}
 			if(is_array($params[1])){
 				foreach($params[1] as $k => $d){
 					if($k==$value){
