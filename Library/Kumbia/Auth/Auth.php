@@ -130,16 +130,19 @@ class Auth extends Object {
 			throw new AuthException('Adaptador de autenticación "'.$adapter.'" no soportado');
 		}
 		$this->_adapter = $adapter;
-		if(Core::fileExists('Library/Kumbia/Auth/Adapters/'.ucfirst($adapter).'.php')){
-			/**
- 			 * @see AuthInterface
- 			 */
-			require 'Library/Kumbia/Auth/Interface.php';
-			require 'Library/Kumbia/Auth/Adapters/'.ucfirst($adapter).'.php';
-		} else {
-			throw new AuthException("No existe el adaptador de autenticación: '$adapter'");
-		}
 		$adapterClass = $adapter.'Auth';
+		if(class_exists($adapterClass, false)==false){
+			$filePath = 'Library/Kumbia/Auth/Adapters/'.ucfirst($adapter).'.php';
+			if(Core::fileExists($filePath)){
+				/**
+	 			 * @see AuthInterface
+	 			 */
+				require 'Library/Kumbia/Auth/Interface.php';
+				require 'Library/Kumbia/Auth/Adapters/'.ucfirst($adapter).'.php';
+			} else {
+				throw new AuthException("No existe el adaptador de autenticación: '$adapter'");
+			}
+		}
 		$this->_extraArgs = $extraArgs;
 		$this->_adapterObject = new $adapterClass($auth, $extraArgs);
 	}

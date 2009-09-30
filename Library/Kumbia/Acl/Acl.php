@@ -75,7 +75,7 @@ class Acl extends Object {
 		 	$adapterClassName = 'Memory';
 		}
 		$adapterClass = 'Acl'.$adapterClassName;
-		if(!class_exists($adapterClass)){
+		if(class_exists($adapterClass, false)==false){
 			if(!isset($params['path'])){
 				$adapterFile = 'Library/Kumbia/Acl/Adapters/'.$adapterClassName.'.php';
 				if(Core::fileExists($adapterFile)==true){

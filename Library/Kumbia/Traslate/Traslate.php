@@ -51,7 +51,7 @@ class Traslate extends Object {
 		if(interface_exists('TraslateInterface')==false){
 			require 'Library/Kumbia/Traslate/Interface.php';
 		}
-		if(class_exists($adapterClass)==false){
+		if(class_exists($adapterClass, false)==false){
 			$file = "Library/Kumbia/Traslate/Adapters/$adapter.php";
 			if(Core::fileExists($file)==true){
 				require $file;

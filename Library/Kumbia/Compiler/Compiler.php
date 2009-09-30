@@ -136,6 +136,13 @@ class Compiler {
 	private static $_compilation = '';
 
 	/**
+	 * Indica secciones de codigo que no deben incluirse en la compilación
+	 *
+	 * @var boolean
+	 */
+	private static $_deusableCode = false;
+
+	/**
 	 * Mensaje de Error
 	 *
 	 */
@@ -227,81 +234,95 @@ class Compiler {
 				#print '<td>'.$token[1].'</td>';
 				#print '</tr>';
 				if(!in_array($token[0], self::$_breakTokens)){
-					switch($token[0]){
-						case T_CONSTANT_ENCAPSED_STRING:
-							if($token[1]!='"\'"'){
-								if(preg_match('/^"(.*)"/', $token[1], $matches)){
-									if(strpos($matches[1], "\\")===false&&strpos($matches[1], '$')===false){
-										$token[1] = "'".addslashes($matches[1])."'";
+					if(self::$_deusableCode==false){
+						switch($token[0]){
+							case T_CONSTANT_ENCAPSED_STRING:
+								if($token[1]!='"\'"'){
+									if(preg_match('/^"(.*)"/', $token[1], $matches)){
+										if(strpos($matches[1], "\\")===false&&strpos($matches[1], '$')===false){
+											$token[1] = "'".addslashes($matches[1])."'";
+										}
 									}
 								}
-							}
-							break;
-						case T_FILE:
-							self::$_compilation.="'$file'";
-							$jp = true;
-							break;
-						case T_LINE:
-							self::$_compilation=$token[2];
-							$jp = true;
-							break;
-						case T_REQUIRE:
-						case T_INCLUDE:
-						case T_REQUIRE_ONCE:
-						case T_INCLUDE_ONCE:
-							$r = self::_checkRequire($tokens[$i+2]);
-							if($r==-1){
+								break;
+							case T_FILE:
+								self::$_compilation.="'$file'";
 								$jp = true;
-								$i+=2;
-								if(!is_array($tokens[$i])){
-									if($tokens[$i]==';'){
-										++$i;
+								break;
+							case T_LINE:
+								self::$_compilation=$token[2];
+								$jp = true;
+								break;
+							case T_REQUIRE:
+							case T_INCLUDE:
+							case T_REQUIRE_ONCE:
+							case T_INCLUDE_ONCE:
+								$r = self::_checkRequire($tokens[$i+2]);
+								if($r==-1){
+									$jp = true;
+									$i+=2;
+									if(!is_array($tokens[$i])){
+										if($tokens[$i]==';'){
+											++$i;
+										}
 									}
 								}
-							}
-							break;
-						case T_STRING:
-							if(is_array($tokens[$i+1])){
-								if($tokens[$i+1][0]==T_PAAMAYIM_NEKUDOTAYIM){
-									if(is_array($tokens[$i+2])){
-										if($tokens[$i+2][0]==T_STRING){
-											if(!is_array($tokens[$i+3])&&$tokens[$i+3]=='('){
-												self::_checkStaticMethod($token[1], $tokens[$i+2][1]);
-											} else {
-												self::_checkClassConstant($token[1], $tokens[$i+2][1]);
+								break;
+							case T_STRING:
+								if(is_array($tokens[$i+1])){
+									if($tokens[$i+1][0]==T_PAAMAYIM_NEKUDOTAYIM){
+										if(is_array($tokens[$i+2])){
+											if($tokens[$i+2][0]==T_STRING){
+												if(!is_array($tokens[$i+3])&&$tokens[$i+3]=='('){
+													self::_checkStaticMethod($token[1], $tokens[$i+2][1]);
+												} else {
+													self::_checkClassConstant($token[1], $tokens[$i+2][1]);
+												}
 											}
 										}
 									}
 								}
-							}
-						case T_FOR:
-							/*$r = self::_analizeForStatement($token, $i, &$tokens);
-							if($r>=0){
-								$jp = true;
-								$i = $r+1;
-							}
-							break;*/
-					}
-					if($jp==false){
-						if(in_array($token[0], self::$_beforeSpaceTokens)){
-							if(self::$_oldToken!=T_WHITESPACE){
-								self::$_compilation.=" ";
-							}
-						} else {
-							if(isset(self::$_forcedSpace[$token[0]])){
-								if(in_array(self::$_oldToken, self::$_forcedSpace[$token[0]])){
+							case T_FOR:
+								/*$r = self::_analizeForStatement($token, $i, &$tokens);
+								if($r>=0){
+									$jp = true;
+									$i = $r+1;
+								}
+								break;*/
+						}
+						if($jp==false){
+							if(in_array($token[0], self::$_beforeSpaceTokens)){
+								if(self::$_oldToken!=T_WHITESPACE){
 									self::$_compilation.=" ";
 								}
+							} else {
+								if(isset(self::$_forcedSpace[$token[0]])){
+									if(in_array(self::$_oldToken, self::$_forcedSpace[$token[0]])){
+										self::$_compilation.=" ";
+									}
+								}
+							}
+							if(isset($token[1])){
+								self::$_compilation.=$token[1];
+							}
+							if(in_array($token[0], self::$_afterSpaceTokens)){
+								self::$_compilation.=" ";
 							}
 						}
-						if(isset($token[1])){
-							self::$_compilation.=$token[1];
-						}
-						if(in_array($token[0], self::$_afterSpaceTokens)){
-							self::$_compilation.=" ";
+						self::$_oldToken = $token[0];
+					}
+				} else {
+					if(isset($token[1])){
+						if($token[0]==T_COMMENT){
+							if(strpos($token[1], '#if[compile-time]')===0){
+								self::$_deusableCode = true;
+								self::$_compilation.=';';
+							}
+							if(strpos($token[1], '#endif')===0){
+								self::$_deusableCode = false;
+							}
 						}
 					}
-					self::$_oldToken = $token[0];
 				}
 			} else {
 				#print '<tr>';
@@ -309,14 +330,18 @@ class Compiler {
 				#print '<td>T_NPI</td>';
 				#print '<td>'.$token.'</td>';
 				#print '</tr>';
-				self::$_compilation.=$token;
-				self::$_oldToken = 0;
+				if(self::$_deusableCode==false){
+					self::$_compilation.=$token;
+					self::$_oldToken = 0;
+				}
 			}
-			if(self::$_tokenCount>512){
-				self::$_compilation.=PHP_EOL;
-				self::$_tokenCount = 0;
-			} else {
-				++self::$_tokenCount;
+			if(self::$_deusableCode==false){
+				if(self::$_tokenCount>1024){
+					self::$_compilation.=PHP_EOL;
+					self::$_tokenCount = 0;
+				} else {
+					++self::$_tokenCount;
+				}
 			}
 		}
 		#print '</table>';

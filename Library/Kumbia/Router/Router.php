@@ -762,7 +762,7 @@ abstract class Router {
 		}
 		Router::rewrite($_GET['_url']);
 		if(self::_detectRoutingType()==self::ROUTING_OTHER){
-			if(class_exists(self::$_routingAdapterType.'Router')==false){
+			if(class_exists(self::$_routingAdapterType.'Router', false)==false){
 				if(Core::fileExists('Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php')==false){
 					throw new RouterException("No existe el adaptador de enrutamiento ".self::$_routingAdapterType);
 				}
@@ -773,7 +773,7 @@ abstract class Router {
 		 */
 		require 'Library/Kumbia/Router/Interface.php';
 		$className = self::$_routingAdapterType.'Router';
-		if(class_exists($className)==false){
+		if(class_exists($className, false)==false){
 			require 'Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php';
 		}
 		self::$_routerAdapter = new $className();
