@@ -891,6 +891,49 @@ class Date extends Object {
 		return array($initialDate, $finalDate);
 	}
 
+    /**
+     *
+     *
+     */
+    static public function makeDate($date,$format = 'YYYY-MM-DD'){
+		$pattern = str_replace('/','\\/',$format);
+		$pattern = '/^'.str_replace('Y','\\d',$pattern);
+		$pattern = str_replace('M','\\d',$pattern);
+		$pattern = str_replace('D','\\d',$pattern).'$/';
+		
+		if(!preg_match($pattern,$date))
+		    return null;
+		
+		$count = substr_count($format,'Y');
+		$tmp = str_repeat('\\d',$count);
+		$pattern_year = preg_replace('/[^Y]/','.',$format);
+		$pattern_year = '/^'.preg_replace('/Y{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
+		preg_match($pattern_year,$date,$matches);
+		$year = $matches[1];
+        if(strlen($year) == 2){
+            $year = (int)$year;
+            $siglo = floor((float)date('Y') / 100);
+            if($year < 50)
+                $siglo -= 1;
+            $year += (int)$siglo * 100;
+        }
+		
+		$count = substr_count($format,'M');
+		$tmp = str_repeat('\\d',$count);
+		$pattern_year = preg_replace('/[^M]/','.',$format);
+		$pattern_year = '/^'.preg_replace('/M{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
+		preg_match($pattern_year,$date,$matches);
+		$month = $matches[1];
+		
+		$count = substr_count($format,'D');
+		$tmp = str_repeat('\\d',$count);
+		$pattern_year = preg_replace('/[^D]/','.',$format);
+		$pattern_year = '/^'.preg_replace('/D{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
+		preg_match($pattern_year,$date,$matches);
+		$day = $matches[1];
+		return new Date($year.'-'.$month.'-'.$day);
+    }
+
 	/**
 	 * Compara dos fechas, si la primera es menor a la segunda devuelve -1, si
 	 * son iguales devuelve 0 y si la primera es mayor a la segunda devuelve 1
