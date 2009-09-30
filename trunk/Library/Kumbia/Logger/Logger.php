@@ -151,10 +151,10 @@ class Logger extends Object {
  	 */
 	public function __construct($adapter='File', $name='', $options=array()){
 		$className = $adapter.'Logger';
-		if(!class_exists($className)){
+		if(!class_exists($className, false)){
 			require "Library/Kumbia/Logger/Adapters/$adapter.php";
 		}
-		if(!class_exists($className)){
+		if(!class_exists($className, false)){
 			throw new LoggerException("No se encontr&oacute; el adaptador '$className'");
 		}
 		$this->_objectLogger = new $className($name, $options);

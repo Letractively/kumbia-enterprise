@@ -186,7 +186,7 @@ abstract class View {
 		$controllerResponse = ControllerResponse::getInstance();
 		$adapter = ucfirst($controllerResponse->getResponseAdapter());
 		$adapterClassName = $adapter.'ViewResponse';
-		if(!class_exists($adapterClassName)){
+		if(!class_exists($adapterClassName, false)){
 			if(!interface_exists('ViewResponseInterface')){
 				require 'Library/Kumbia/View/Interface.php';
 			}

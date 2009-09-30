@@ -96,7 +96,7 @@ class Filter extends Object {
 				$this->_bufferFilters[] = $param;
 			} else {
 				$className = $param.'Filter';
-				if(class_exists($className)==false){
+				if(class_exists($className, false)==false){
 					self::load($className);
 				}
 				$filter = new $className();
@@ -177,10 +177,10 @@ class Filter extends Object {
 					array_push($this->_bufferFilters, $params[$i]);
 				} else {
 					$filter = ucfirst(Utils::camelize($params[$i])).'Filter';
-					if(!class_exists($filter)){
+					if(!class_exists($filter, false)){
 						self::load($params[$i]);
 					}
-					if(class_exists($filter)) {
+					if(class_exists($filter, false)) {
 						$obj = new $filter();
 						foreach($attributes as $attr => $value) {
 							if(preg_match('/([a-z_0-9]+)\.([a-z_0-9]+)/', $attr, $regs)) {
@@ -256,7 +256,7 @@ class Filter extends Object {
 			require 'Library/Kumbia/Filter/Interface.php';
 		}
 		foreach($filters as $filterName){
-			if(class_exists($filterName.'Filter')==false){
+			if(class_exists($filterName.'Filter', false)==false){
 				$fileName = ucfirst($filterName);
 				if(Core::fileExists('Library/Kumbia/Filter/BaseFilters/'.$fileName.'.php')==true){
 					require 'Library/Kumbia/Filter/BaseFilters/'.$fileName.'.php';

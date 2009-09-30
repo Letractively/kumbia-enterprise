@@ -892,18 +892,20 @@ class Date extends Object {
 	}
 
     /**
+     * Crea una fecha apartir de un determinado formato
      *
-     *
+     * @param	string $date
+     * @param	string $format
+     * @return	Date
      */
-    static public function makeDate($date,$format = 'YYYY-MM-DD'){
+    static public function fromFormat($date, $format='YYYY-MM-DD'){
 		$pattern = str_replace('/','\\/',$format);
 		$pattern = '/^'.str_replace('Y','\\d',$pattern);
 		$pattern = str_replace('M','\\d',$pattern);
 		$pattern = str_replace('D','\\d',$pattern).'$/';
-		
-		if(!preg_match($pattern,$date))
+		if(!preg_match($pattern,$date)){
 		    return null;
-		
+		}
 		$count = substr_count($format,'Y');
 		$tmp = str_repeat('\\d',$count);
 		$pattern_year = preg_replace('/[^Y]/','.',$format);
@@ -913,18 +915,19 @@ class Date extends Object {
         if(strlen($year) == 2){
             $year = (int)$year;
             $siglo = floor((float)date('Y') / 100);
-            if($year < 50)
+            if($year < 50){
                 $siglo -= 1;
+            }
             $year += (int)$siglo * 100;
         }
-		
 		$count = substr_count($format,'M');
 		$tmp = str_repeat('\\d',$count);
 		$pattern_year = preg_replace('/[^M]/','.',$format);
 		$pattern_year = '/^'.preg_replace('/M{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
 		preg_match($pattern_year,$date,$matches);
-		$month = $matches[1];
-		
+		if(isset($matches[1])){
+			$month = $matches[1];
+		}
 		$count = substr_count($format,'D');
 		$tmp = str_repeat('\\d',$count);
 		$pattern_year = preg_replace('/[^D]/','.',$format);
@@ -938,9 +941,9 @@ class Date extends Object {
 	 * Compara dos fechas, si la primera es menor a la segunda devuelve -1, si
 	 * son iguales devuelve 0 y si la primera es mayor a la segunda devuelve 1
 	 *
-	 * @param string $initialDate
-	 * @param string $finalDate
-	 * @return integer
+	 * @param	string $initialDate
+	 * @param	string $finalDate
+	 * @return	integer
 	 */
 	static public function compareDates($initialDate, $finalDate=''){
 		if($finalDate===""){
@@ -954,9 +957,9 @@ class Date extends Object {
 	/**
 	 * Indica si una fecha es menor a la otra
 	 *
-	 * @param string $initialDate
-	 * @param string $finalDate
-	 * @return boolean
+	 * @param	string $initialDate
+	 * @param	string $finalDate
+	 * @return	boolean
 	 */
 	static public function isEarlier($initialDate, $finalDate){
 		return self::compareDates($initialDate, $finalDate) == -1 ? true : false;
@@ -965,9 +968,9 @@ class Date extends Object {
 	/**
 	 * Indica si una fecha es mayor a la otra
 	 *
-	 * @param string $initialDate
-	 * @param string $finalDate
-	 * @return boolean
+	 * @param	string $initialDate
+	 * @param	string $finalDate
+	 * @return	boolean
 	 */
 	static public function isLater($initialDate, $finalDate){
 		return self::compareDates($initialDate, $finalDate) == 1 ? true : false;
@@ -976,9 +979,9 @@ class Date extends Object {
 	/**
 	 * Indica si una fecha es igual a la otra
 	 *
-	 * @param string $initialDate
-	 * @param string $finalDate
-	 * @return boolean
+	 * @param	string $initialDate
+	 * @param	string $finalDate
+	 * @return	boolean
 	 */
 	static public function isEquals($initialDate, $finalDate){
 		return self::compareDates($initialDate, $finalDate) == 0 ? true : false;
@@ -997,9 +1000,9 @@ class Date extends Object {
 	/**
 	 * Devuelve la fecha actual
 	 *
-	 * @access public
-	 * @param string $format
-	 * @return string
+	 * @access	public
+	 * @param	string $format
+	 * @return	string
 	 * @static
 	 */
 	static public function getCurrentDate($format='Y-m-d'){
@@ -1009,9 +1012,9 @@ class Date extends Object {
 	/**
 	 * Devuelve la hora actual
 	 *
-	 * @access public
-	 * @param string $format
-	 * @return string
+	 * @access	public
+	 * @param	string $format
+	 * @return	string
 	 * @static
 	 */
 	static public function getCurrentTime($format='H:i:s'){

@@ -13,11 +13,11 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package	Core
+ * @package		Core
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
- * @license	New BSD License
+ * @license		New BSD License
  * @version 	$Id$
  */
 
@@ -203,40 +203,26 @@ abstract class Core {
 			return false;
 		}
 
-		/**
-		 * Crear el _INSTANCE_NAME
-		 */
-		//$deleteSessionCache = false;
+		//Crear el _INSTANCE_NAME
 		$exceptionThrown = false;
-		//Debug::add($_SERVER['SERVER_SOFTWARE']);
-		if($_SERVER['SERVER_SOFTWARE']=='nginx'){
-			$path = substr(str_replace('/index.php', '', $_SERVER['PHP_SELF']), 1);
-		} else {
-			$path = substr(str_replace('/public/index.php', '', $_SERVER['PHP_SELF']), 1);
-		}
+		$path = substr(str_replace(array('/public/index.php', '/index.php'), '', $_SERVER['PHP_SELF']), 1);
 		if(!isset($_SESSION['_INSTANCE_NAME'])){
-			/**
-		 	 * Comprueba la version correcta del Framework, si es menor a 5.2 genera una excepción
-			 */
 			Facility::setFacility(Facility::FRAMEWORK_CORE);
+			#if[compile-time]
 			if(version_compare(PHP_VERSION, '5.2.0', '<')){
 				$message = CoreLocale::getErrorMessage(-10, PHP_VERSION);
 				throw new CoreException($message, -10);
 			}
-			/**
-			 * Si el archivo public/temp no se puede escribir lanza una excepcion
-			 */
 			if(!is_writable('public/temp')){
 				Facility::setFacility(Facility::FRAMEWORK_CORE);
 				$message = CoreLocale::getErrorMessage(-11);
 				throw new CoreException($message, -11);
 			}
+			#endif
 			$_SESSION['_INSTANCE_NAME'] = '';
 		}
 
-		/**
-		 * Ejecutar onStartApplication y onChangeInstance
-		 */
+		//Ejecutar onStartApplication y onChangeInstance
 		$e = null;
 		try {
 			if($path!=$_SESSION['_INSTANCE_NAME']){
@@ -388,7 +374,7 @@ abstract class Core {
 	 */
 	private static function _executeGarbageCollector($config){
 		if(isset($config->collector)){
-			if(class_exists('GarbageCollector')==false){
+			if(class_exists('GarbageCollector', false)==false){
 				require 'Library/Kumbia/GarbageCollector/GarbageCollector.php';
 			}
 			if(isset($config->collector->probability)){
@@ -820,10 +806,10 @@ abstract class Core {
 		$errorReporting = ini_get('error_reporting');
 		self::restoreInitialPath();
 		if(isset($errortype[$number])&&$errorReporting>0){
-			if(!class_exists('Debug')){
+			if(!class_exists('Debug', false)){
 				require'Library/Kumbia/Debug/Debug.php';
 			}
-			if(!class_exists('CoreException')){
+			if(!class_exists('CoreException', false)){
 				require 'Library/Kumbia/Core/CoreException.php';
 			}
 			foreach($enviroment as $var => $value){

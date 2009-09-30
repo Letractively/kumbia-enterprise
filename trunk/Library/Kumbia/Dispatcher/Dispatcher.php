@@ -384,6 +384,7 @@ abstract class Dispatcher {
 				}
 
 				self::$_requestStatus = self::STATUS_RUNNING_CONTROLLER_ACTION;
+				#if[compile-time]
 				$method = new ReflectionMethod($appController, $actionMethod);
 				if($method->isPublic()==false){
 					$message = CoreLocale::getErrorMessage(-104, $action);
@@ -399,6 +400,7 @@ abstract class Dispatcher {
 					}
 					++$paramNumber;
 				}
+				#endif
 				self::$_valueReturned = call_user_func_array(array(self::$_controller, $actionMethod), $parameters);
 
 			 	//Corre los filtros after

@@ -86,7 +86,7 @@ class Config extends Object {
 	public static function factory($adapter){
 		if(!isset(self::$_adapterInstances[$adapter])){
 			$className = $adapter.'Config';
-			if(class_exists($className)==false){
+			if(class_exists($className, false)==false){
 				$path = 'Library/Kumbia/Config/Adapters/'.ucfirst($adapter).'.php';
 				if(Core::fileExists($path)){
 					require $path;

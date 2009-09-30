@@ -241,7 +241,7 @@ abstract class EntityManager {
 	 * @param string $model
 	 */
 	private static function _initializeModel($entityName, $model){
-		if(class_exists($entityName)==false){
+		if(class_exists($entityName, false)==false){
 			throw new EntityManagerException("No se encontró la clase \"$entityName\", es necesario definir una clase en el modelo '$model' llamado '$entityName' para que esto funcione correctamente.");
 		} else {
 			self::$_entities[$entityName] = new $entityName();
@@ -269,7 +269,7 @@ abstract class EntityManager {
 		/**
 		 * Inicializa los Modelos. modelBase es el modelo base
 		 */
-		if(class_exists('ActiveRecord')==false){
+		if(class_exists('ActiveRecord', false)==false){
 			if(Core::fileExists("$modelsDir/base/modelBase.php")){
 				require "$modelsDir/base/modelBase.php";
 			} else {

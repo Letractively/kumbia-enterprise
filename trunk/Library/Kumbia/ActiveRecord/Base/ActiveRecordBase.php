@@ -2326,11 +2326,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(!interface_exists('ActiveRecordValidatorInterface')){
 			require 'Library/Kumbia/ActiveRecord/Validator/Interface.php';
 		}
-		if(!class_exists('ActiveRecordValidator')){
+		if(!class_exists('ActiveRecordValidator', false)){
 			require 'Library/Kumbia/ActiveRecord/Validator/ActiveRecordValidator.php';
 		}
 		$className = $validatorClass.'Validator';
-		if(!class_exists($className)){
+		if(!class_exists($className, false)){
 			if(Core::fileExists('Library/Kumbia/ActiveRecord/Validators/'.$className.'.php')){
 				require 'Library/Kumbia/ActiveRecord/Validators/'.$className.'.php';
 			} else {
