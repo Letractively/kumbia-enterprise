@@ -136,7 +136,7 @@ class Date extends Object {
     private static $_monthTable = array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
 
     /**
-     * Tabla de A&ntilde;os
+     * Tabla de Años
      *
      * @var array
      */
