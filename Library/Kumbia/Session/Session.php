@@ -254,7 +254,7 @@ abstract class Session {
 	/**
 	 * Devuelve el id de la session actual
 	 *
-	 * @access
+	 * @access public
 	 * @return string
 	 * @static
 	 */
