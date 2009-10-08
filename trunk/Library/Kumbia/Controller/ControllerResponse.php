@@ -129,8 +129,8 @@ class ControllerResponse extends Object {
 	/**
 	 * Indica si ya se ha enviado un determinado encabezado
 	 *
-	 * @param string $headerName
-	 * @return boolean
+	 * @param	string $headerName
+	 * @return	boolean
 	 */
 	public function hasHeader($headerName){
 		$headers = $this->getHeaders();
