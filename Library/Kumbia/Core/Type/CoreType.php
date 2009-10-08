@@ -42,9 +42,11 @@ abstract class CoreType {
 	 * @param int $var
 	 */
 	public static function assertNumeric($var){
+		#if[compile-time]
 		if(is_int($var)==false){
 			throw new CoreException("Se esperaba recibir un valor entero");
 		}
+		#endif
 	}
 
 	/**
@@ -55,9 +57,11 @@ abstract class CoreType {
 	 * @static
 	 */
 	public static function assertBool($var){
+		#if[compile-time]
 		if(is_bool($var)==false){
 			throw new CoreException("Se esperaba recibir un valor booleano");
 		}
+		#endif
 	}
 
 	/**
@@ -68,9 +72,11 @@ abstract class CoreType {
 	 * @static
 	 */
 	public static function assertString($str){
+		#if[compile-time]
 		if(is_string($str)==false){
 			throw new CoreException("Se esperaba recibir un valor string");
 		}
+		#endif
 	}
 
 	/**
@@ -81,9 +87,11 @@ abstract class CoreType {
 	 * @static
 	 */
 	public static function assertArray($var){
+		#if[compile-time]
 		if(is_array($var)==false){
 			throw new CoreException("Se esperaba recibir un valor array");
 		}
+		#endif
 	}
 
 	/**
@@ -94,9 +102,11 @@ abstract class CoreType {
 	 * @static
 	 */
 	public static function assertResource($var){
+		#if[compile-time]
 		if(is_resource($var)==false){
 			throw new CoreException("Se esperaba recibir un valor resource");
 		}
+		#endif
 	}
 
 	/**
@@ -107,9 +117,11 @@ abstract class CoreType {
 	 * @static
 	 */
 	public static function assertObject($var){
+		#if[compile-time]
 		if(is_object($var)==false){
 			throw new CoreException("Se esperaba recibir un objeto");
 		}
+		#endif
 	}
 
 }

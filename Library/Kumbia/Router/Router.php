@@ -219,16 +219,20 @@ abstract class Router {
 
 			self::$_application = $activeApp;
 
+			#if[compile-time]
 			if(!isset($appServerConfig->core)){
 				throw new RouterException("No existe la sección [core] en el archivo de configuración de la instancia");
 			}
 			if(!isset($appServerConfig->core->defaultApp)){
 				throw new RouterException("No se ha indicado la aplicación por defecto en config/config.ini (defaultApp)");
 			}
+			#endif
 			$config = CoreConfig::readAppConfig($activeApp);
+			#if[compile-time]
 			if(!isset($config->application)){
 				throw new RouterException("No existe la sección [application] en el config.ini de la aplicación");
 			}
+			#endif
 
 			/**
 			 * Hay alguna controlador
@@ -358,6 +362,7 @@ abstract class Router {
      */
 	public static function ifRouted(){
 		if(self::$_enableStaticRoutes==true){
+			#if[compile-time]
 			if(self::$_staticRoutes==true){
 				if(!isset($_SESSION['KSR'])){
 					$routes = CoreConfig::readRoutesConfig();
@@ -390,11 +395,13 @@ abstract class Router {
 					}
 				}
 			}
+			#endif
 
 			$controller = self::$_controller;
 			$action = self::$_action;
 			$id = self::$_id;
 
+			#if[compile-time]
 			$newRoute = array('controller' => '*', 'action' => '*', 'id' => '*');
 			if(isset($_SESSION['KSR']['*'][$action]['*'])){
 				$newRoute = $_SESSION['KSR']['*'][$action]['*'];
@@ -420,6 +427,7 @@ abstract class Router {
 			if($newRoute['id']!='*'){
 				self::$_id = $newRoute['id'];
 			}
+			#endif
 			return;
 		}
 	}

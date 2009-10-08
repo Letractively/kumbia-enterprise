@@ -122,6 +122,7 @@ abstract class DbLoader {
 		}
 		$className = self::_loadAdapterClass($layer, $type);
 		eval('class Db extends '.$className.' {}');
+		#if[compile-time]
 		$extensionRequired = Db::getPHPExtensionRequired();
 		if(is_array($extensionRequired)){
 			$someExtension = false;
@@ -139,6 +140,7 @@ abstract class DbLoader {
 				throw new DbException("Debe cargar la extensión de PHP llamada php_$extensionRequired", 0);
 			}
 		}
+		#endif
 		return true;
 	}
 
