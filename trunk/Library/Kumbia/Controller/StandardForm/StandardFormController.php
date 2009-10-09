@@ -108,6 +108,13 @@ abstract class StandardForm extends Controller {
 	public $keep_action = true;
 
 	/**
+	 * Último fetch realizado en la consulta
+	 *
+	 * @var int
+	 */
+	private $_lastFetch = 0;
+
+	/**
 	 * Mensaje de exito al insertar
 	 *
 	 * @var string
@@ -162,7 +169,7 @@ abstract class StandardForm extends Controller {
 	 */
 	public function __construct(){
 		$this->setPersistance(true);
-		if(method_exists($this, "initialize")){
+		if(method_exists($this, 'initialize')){
 			$this->initialize();
 		}
 	}
@@ -190,7 +197,7 @@ abstract class StandardForm extends Controller {
 
 		/**
 		 * Busca si existe un método o un llamado variable al método
-		 * before_report, si este método devuelve false termina la ejecución
+		 * beforeReport, si este método devuelve false termina la ejecución
 		 * de la acción
 		 */
 		if(method_exists($this, "beforeReport")){
@@ -365,6 +372,7 @@ abstract class StandardForm extends Controller {
 					$this->{$modelName}->id = null;
 				}
 			}
+
 			if($this->{$modelName}->create()==true){
 				if($this->successInsertMessage){
 					Flash::success($this->successInsertMessage);
@@ -372,10 +380,17 @@ abstract class StandardForm extends Controller {
 					Flash::success("Se insertó correctamente el registro");
 				}
 			} else {
+				foreach($this->{$modelName}->getMessages() as $message){
+					Flash::error($message->getMessage());
+				}
 				if(isset($this->failuresInsertMessage)&&$this->failuresInsertMessage!=""){
 					Flash::error($this->failureInsertMessage);
 				} else {
 					Flash::error("Hubo un error al insertar el registro");
+					$this->keep_action = 'insert';
+					if(Router::getRouted()==false){
+						return $this->routeTo(array('action' => 'index'));
+					}
 				}
 			}
 
@@ -456,9 +471,9 @@ abstract class StandardForm extends Controller {
 			$this->{$modelName}->findFirst(join(' AND ', $primaryKey));
 		}
 
-		foreach($this->{$modelName}->getAttributes() as $field_name){
-			if(isset($_REQUEST["fl_$field_name"])){
-				$this->{$modelName}->$field_name = $_REQUEST["fl_$field_name"];
+		foreach($this->{$modelName}->getAttributes() as $fieldName){
+			if(isset($_REQUEST["fl_$fieldName"])){
+				$this->{$modelName}->$fieldName = $_REQUEST["fl_$fieldName"];
 			}
 		}
 
@@ -523,13 +538,14 @@ abstract class StandardForm extends Controller {
 		/**
 		 * Utilizamos el modelo ActiveRecord para actualizar el registro
 		 */
-		if($this->{$modelName}->update()){
+		if($this->{$modelName}->update()==true){
 			if($this->successUpdateMessage){
 				Flash::success($this->successUpdateMessage);
 			} else {
 				Flash::success('Se actualizó correctamente el registro');
 			}
 		} else {
+			$this->keep_action = 'update';
 			foreach($this->{$modelName}->getMessages() as $message){
 				Flash::error($message->getMessage());
 			}
@@ -538,6 +554,9 @@ abstract class StandardForm extends Controller {
 			} else {
 				Flash::error('Hubo un error al actualizar el registro');
 			}
+			$_REQUEST['queryStatus'] = 1;
+			$_REQUEST['id'] = $this->{$modelName}->readAttribute('id');
+			return $this->routeTo(array('action' => 'index'));
 		}
 
 		foreach($this->{$modelName}->getAttributes() as $fieldName){
@@ -546,7 +565,7 @@ abstract class StandardForm extends Controller {
 
 		/**
 		 * Busca si existe un método o un llamado variable al método
-		 * after_update
+		 * afterUpdate
 		 */
 		if(method_exists($this, 'afterUpdate')){
 			$this->afterUpdate();
@@ -565,6 +584,15 @@ abstract class StandardForm extends Controller {
 		// Muestra el Formulario en la accion index
 		return $this->routeTo(array('action' => 'index'));
 
+	}
+
+	/**
+	 * Esta acción se emplea al generarse un error de validación al actualizar
+	 *
+	 * @access public
+	 */
+	public function checkAction(){
+		$_REQUEST['queryStatus'] = true;
 	}
 
 	/**
@@ -713,21 +741,21 @@ abstract class StandardForm extends Controller {
 				$tables = "";
 			}
 		}
-		if(!isset($this->form['joinConditions'])) {
-			$this->form['joinConditions'] = "";
-			$joinConditions = "";
+		if(isset($this->form['joinConditions'])){
+			$joinConditions = " AND ".$this->form['joinConditions'];
 		} else {
-			$joinConditions = "";
+			$joinConditions = '';
 		}
-		if($this->form['joinConditions']) $joinConditions = " and ".$this->form['joinConditions'];
 
 		$modelName = EntityManager::getEntityName($this->getSource());
+		$model = $this->{$modelName};
 
-		if(!$this->{$modelName}->isDumped()){
-			$this->{$modelName}->dumpModel();
+		if($model->isDumped()==false){
+			$model->dumpModel();
 		}
 
-		$query =  "select * from ".$this->form['source']."$tables where $dataFilter $joinConditions ";
+		$primaryKeys = $model->getPrimaryKeyAttributes();
+		$query =  "SELECT ".join(',', $primaryKeys)." FROM ".$this->form['source']."$tables WHERE $dataFilter $joinConditions ";
 		$source = $this->form['source'];
 
 		$form = $this->form;
@@ -786,53 +814,17 @@ abstract class StandardForm extends Controller {
 	}
 
 	/**
-	 * Metodo de ayuda para el componente helpText
+	 * Emula la acción Fetch llamando a show
 	 *
-	 */
-	public function __autocompleteAction(){
-
-	}
-
-	/**
-	 * Metodo de ayuda para el componente helpText
-	 *
-	 * @access public
-	 */
-	public function __check_value_inAction(){
-		$this->set_response('xml');
-		$db = db::rawConnect();
-		$_REQUEST['condition'] = str_replace(";", "", urldecode($_REQUEST['condition']));
-		ActiveRecord::sql_item_sanizite($_REQUEST['ftable']);
-		ActiveRecord::sql_item_sanizite($_REQUEST['dfield']);
-		ActiveRecord::sql_item_sanizite($_REQUEST['name']);
-		ActiveRecord::sql_item_sanizite($_REQUEST['crelation']);
-		$_REQUEST['ftable'] = str_replace(";", "", $_REQUEST['ftable']);
-		$_REQUEST['dfield'] = str_replace(";", "", $_REQUEST['dfield']);
-		$_REQUEST['name'] = str_replace(";", "", $_REQUEST['name']);
-		if($_REQUEST["crelation"]){
-			$db->query("select ".$_REQUEST["dfield"]." from ".$_REQUEST['ftable']. " where ".$_REQUEST['crelation']." = '".$_REQUEST['value']."'");
-		} else {
-			$db->query("select ".$_REQUEST["dfield"]." from ".$_REQUEST['ftable']. " where ".$_REQUEST['name']." = '".$_REQUEST['value']."'");
-		}
-		echo "<?xml version='1.0' encoding='iso8859-1'?>\r\n<response>\r\n";
-		$row = $db->fetchArray();
-		echo "\t<row num='", $db->numRows(), "' detail='", htmlspecialchars($row[0]), "'/>\r\n";
-		$db->close();
-		echo "</response>";
-	}
-
-	/**
-	 * Emula la accion Fetch llamando a show
-	 *
-	 * @access public
-	 * @param integer $id
+	 * @access	public
+	 * @param	integer $id
 	 */
 	public function fetchAction($id=0){
 
 		$this->view = 'index';
 		$db = db::rawConnect();
 		if(!$this->query){
-			return $this->routeTo("action: index");
+			return $this->routeTo(array('action' => 'index'));
 		}
 
 		if($id!=='last') {
@@ -842,6 +834,9 @@ abstract class StandardForm extends Controller {
 			}
 		}
 
+		$this->_lastFetch = $id;
+
+		$db->setFetchMode(DbBase::DB_ASSOC);
 		$rows = $db->fetchAll($this->query);
 		if(!isset($id)) {
 			$id = 0;
@@ -851,7 +846,7 @@ abstract class StandardForm extends Controller {
 
 		//Hubo resultados en el select?
 		if(!count($rows)){
-			Flash::notice("No se encontraron resultados en la b&uacute;squeda");
+			Flash::notice("No se encontraron resultados en la búsqueda");
 			foreach($this->form['components'] as $fkey => $rrow){
 				unset($_REQUEST["fl_".$fkey]);
 			}
@@ -872,10 +867,10 @@ abstract class StandardForm extends Controller {
 
 		/**
 		 * Busca si existe un método o un llamado variable al método
-		 * before_fetch, si este método devuelve false termina la ejecución
+		 * beforeFetch, si este método devuelve false termina la ejecución
 		 * de la acción
 		 */
-		if(method_exists($this, "beforeFetch")){
+		if(method_exists($this, 'beforeFetch')){
 			if($this->beforeFetch()===false){
 				return null;
 			}
@@ -893,27 +888,28 @@ abstract class StandardForm extends Controller {
 			}
 		}
 
-
 		Flash::notice("Visualizando ".($num+1)." de ".count($rows)." registros");
+
+		$modelName = EntityManager::getEntityName($this->getSource());
+		$model = $this->{$modelName};
 
 		//especifica el registro que quiero mostrar
 		$row = $rows[$num];
-
-		//Mete en $row la fila en la que me paro el seek
-
+		$conditions = array();
 		foreach($row as $key => $value){
-			if(!is_numeric($key)){
-				$_REQUEST['fl_'.$key] = $value;
-			}
+			$conditions[] = $key.' = "'.$value.'"';
 		}
 
-		$_REQUEST['id'] = $num;
+		$record = $model->findFirst(join(' AND ', $conditions));
+		foreach($record->getAttributes() as $attribute){
+			$_REQUEST['fl_'.$attribute] = $record->readAttribute($attribute);
+		}
 
 		/**
 		 * Busca si existe un método o un llamado variable al método
 		 * after_delete
 		 */
-		if(method_exists($this, "afterFetch")){
+		if(method_exists($this, 'afterFetch')){
 			$this->afterFetch();
 			if(Router::getRouted()){
 				return;
@@ -939,6 +935,7 @@ abstract class StandardForm extends Controller {
 	 */
 	public function backAction(){
 		$this->view = 'index';
+		$this->keep_action = "";
 		return $this->routeTo(array('action' => 'index'));
 	}
 
@@ -949,6 +946,7 @@ abstract class StandardForm extends Controller {
 	 */
 	public function browseAction(){
 		$this->view = 'browse';
+		$this->keep_action = "";
 		return $this->routeTo(array('action' => 'index'));
 	}
 
@@ -957,8 +955,6 @@ abstract class StandardForm extends Controller {
 	 * para mostrar el formulario y su accion asociada.
 	 * La propiedad $this->getSource() indica la tabla con la que se va a generar
 	 * el formulario
-	 * La función buildForm es la encargada de crear el formulario
-	 * esta se encuentra en forms.functions.php
 	 *
 	 * @access public
 	 */
@@ -1069,6 +1065,42 @@ abstract class StandardForm extends Controller {
 			}
 		}
 		$xml->out_response();
+	}
+
+	/**
+	 * Metodo de ayuda para el componente helpText
+	 *
+	 */
+	public function __autocompleteAction(){
+
+	}
+
+	/**
+	 * Metodo de ayuda para el componente helpText
+	 *
+	 * @access public
+	 */
+	public function __check_value_inAction(){
+		$this->set_response('xml');
+		$db = db::rawConnect();
+		$_REQUEST['condition'] = str_replace(";", "", urldecode($_REQUEST['condition']));
+		ActiveRecord::sql_item_sanizite($_REQUEST['ftable']);
+		ActiveRecord::sql_item_sanizite($_REQUEST['dfield']);
+		ActiveRecord::sql_item_sanizite($_REQUEST['name']);
+		ActiveRecord::sql_item_sanizite($_REQUEST['crelation']);
+		$_REQUEST['ftable'] = str_replace(";", "", $_REQUEST['ftable']);
+		$_REQUEST['dfield'] = str_replace(";", "", $_REQUEST['dfield']);
+		$_REQUEST['name'] = str_replace(";", "", $_REQUEST['name']);
+		if($_REQUEST["crelation"]){
+			$db->query("select ".$_REQUEST["dfield"]." from ".$_REQUEST['ftable']. " where ".$_REQUEST['crelation']." = '".$_REQUEST['value']."'");
+		} else {
+			$db->query("select ".$_REQUEST["dfield"]." from ".$_REQUEST['ftable']. " where ".$_REQUEST['name']." = '".$_REQUEST['value']."'");
+		}
+		echo "<?xml version='1.0' encoding='iso8859-1'?>\r\n<response>\r\n";
+		$row = $db->fetchArray();
+		echo "\t<row num='", $db->numRows(), "' detail='", htmlspecialchars($row[0]), "'/>\r\n";
+		$db->close();
+		echo "</response>";
 	}
 
 	/**
