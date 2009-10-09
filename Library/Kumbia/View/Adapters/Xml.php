@@ -49,7 +49,7 @@ class XmlViewResponse {
 		$controllerResponse->setHeader('Pragma: no-cache', true);
 		$controllerResponse->setHeader('Expires: 0', true);
 
-		if(!is_null($valueReturned)){
+		if($valueReturned!==null){
 			require 'Library/Kumbia/Xml/Xml.php';
 			$xml = new SimpleXMLResponse();
 			$xml->addData($valueReturned);

@@ -67,7 +67,7 @@ abstract class Debug {
 	 */
 	static public function add($value, $completeBackTrace=false){
 		$backtrace = debug_backtrace();
-		if(is_null($value)){
+		if($value===null){
 			$value = 'NULL';
 		}
 		if($value===true){
@@ -229,7 +229,7 @@ abstract class Debug {
 	 * @param mixed $value
 	 */
 	public static function addVariable($varname, $value){
-		if(is_null($value)){
+		if($value===null){
 			$value = 'NULL';
 		}
 		if($value===true){

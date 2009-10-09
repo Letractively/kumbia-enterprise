@@ -49,8 +49,8 @@ class RssViewResponse {
 		$controllerResponse->setHeader('Pragma: no-cache', true);
 		$controllerResponse->setHeader('Expires: 0', true);
 
-		if(!is_null($valueReturned)){
-			print $valueReturned;
+		if($valueReturned!==null){
+			echo $valueReturned;
 		}
 	}
 

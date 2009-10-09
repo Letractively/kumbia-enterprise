@@ -1484,7 +1484,7 @@ abstract class Tag {
 			$params['onsubmit'].= $params['onsubmit'].";if(!confirm(\"{$params['confirm']}\")) { return false; }";
 			unset($params['confirm']);
 		}
-		if(is_null($id)||$id===""){
+		if($id===null||$id===''){
 			$action = Utils::getKumbiaUrl($action);
 		} else {
 			$action = Utils::getKumbiaUrl($action.'/'.$id);
@@ -1624,7 +1624,7 @@ abstract class Tag {
 			$params['name'] = $params[0];
 		}
 
-		if($value!==""&&!is_null($value)){
+		if($value!==""&&$value!==null){
 			$params['checked'] = "checked";
 		}
 		$code = "<input type='checkbox' id='{$params[0]}' ";

@@ -888,7 +888,7 @@ abstract class EntityManager {
 	 */
 	public static function getEntityGenerator($entityName){
 		if(isset(self::$_generators[$entityName])){
-			if(is_null(self::$_generators[$entityName]['generator'])){
+			if(self::$_generators[$entityName]['generator']===null){
 				$generator = new ActiveRecordGenerator(
 					self::$_generators[$entityName]['adapter'],
 					self::$_generators[$entityName]['column'],

@@ -473,11 +473,12 @@ abstract class ActiveRecordMetaData {
 			if($field['Type']){
 				$_dataType[$field['Field']] = strtolower($field['Type']);
 			}
-			if(substr($field['Field'], strlen($field['Field'])-3, 3)=='_at'){
-				$_at[] = $field['Field'];
-			}
-			if(substr($field['Field'], strlen($field['Field'])-3, 3)=='_in'){
-				$_in[] = $field['Field'];
+			if(preg_match('/_at$/', $field['Field'])){
+				$_at[$field['Field']] = 1;
+			} else {
+				if(preg_match('/_in$/', $field['Field'])){
+					$_in[$field['Field']] = 1;
+				}
 			}
 		}
 		if(count($fields)==0){
