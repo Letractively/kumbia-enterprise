@@ -1756,7 +1756,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			$numFields = count($notNull);
 			for($i=0;$i<$numFields;++$i){
 				$field = $notNull[$i];
-				if($this->$field!==null||$this->$field===''){
+				if($this->$field===null||$this->$field===''){
 					if(!$exists&&$field=='id'){
 						continue;
 					}
