@@ -140,7 +140,7 @@ abstract class Browse {
 		Generator::formsPrint("&nbsp;</center><div id='stdBrowse' align='center'>
 		<table cellspacing='0' align='center' cellpadding='5' id='tabBrowse'>
 		<thead>
-		<tr><td>1</td></thead></table>");
+		");
 
 		$controller = Router::getController();
 		$app = Router::getActiveApplication();
@@ -312,6 +312,8 @@ abstract class Browse {
 
 			$color = $color1;
 			$hoverColor = $hoverColor1;
+
+			Generator::formsPrint("</thead>");
 
 			if($db->numRows($q)){
 				$nTr = 0;

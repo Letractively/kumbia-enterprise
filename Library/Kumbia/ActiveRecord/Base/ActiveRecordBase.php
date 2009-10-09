@@ -1544,10 +1544,10 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Creates a new row in map table
 	 *
-	 * @access public
-	 * @param mixed $values
-	 * @return boolean
-	 * @throws ActiveRecordException
+	 * @access	public
+	 * @param	mixed $values
+	 * @return	boolean
+	 * @throws	ActiveRecordException
 	 */
 	public function create($values=''){
 		$this->_connect();
@@ -1555,11 +1555,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(is_array($values)){
 			$fields = $this->getAttributes();
 			if(isset($values[0])&&is_array($values[0])){
-				foreach($values as $v){
-					foreach($fields as $f){
-						$this->$f = '';
+				foreach($values as $value){
+					foreach($fields as $field){
+						$this->$field = '';
 					}
-					foreach($v as $k => $r){
+					foreach($value as $k => $r){
 						if(isset($this->$k)){
 							$this->$k = $r;
 						} else {
@@ -1724,7 +1724,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			foreach($foreignKeys as $indexKey => $keyDescription){
 				$entity = EntityManager::getEntityInstance($indexKey, false);
 				$field = $keyDescription['fi'];
-				$rowcount = $entity->count($keyDescription['rf'].' = \''.$this->$field.'\'');
+				$conditions = $keyDescription['rf'].' = \''.$this->$field.'\'';
+				if(isset($keyDescription['op']['conditions'])){
+					$conditions.= ' AND '.$keyDescription['op']['conditions'];
+				}
+				$rowcount = $entity->count($conditions);
 				if($rowcount==0){
 					if(isset($keyDescription['op']['message'])){
 						$userMessage = $keyDescription['op']['message'];
@@ -1830,19 +1834,15 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 					if(is_object($this->$np)&&($this->$np instanceof DbRawValue)){
 						$values[] = $this->$np->getValue();
 					} else {
-						if($this->isANumericType($np)==false){
-							if($dataType[$np]=='date'){
-								$values[] = $this->_db->getDateUsingFormat($this->$np);
-							} else {
-								if($this->$np===''||is_null($this->$np)){
-									$values[] = 'NULL';
+						if($this->$np===''||is_null($this->$np)){
+							$values[] = 'NULL';
+						} else {
+							if($this->isANumericType($np)==false){
+								if($dataType[$np]=='date'){
+									$values[] = $this->_db->getDateUsingFormat($this->$np);
 								} else {
 									$values[] = '\''.addslashes($this->$np).'\'';
 								}
-							}
-						} else {
-							if(is_null($this->$np)||$this->$np===''){
-								$values[] = 'NULL';
 							} else {
 								$values[] = '\''.addslashes($this->$np).'\'';
 							}
@@ -2460,10 +2460,10 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Agrega una llave primaria
 	 *
-	 * @param mixed $fields
-	 * @param string $referencedTable
-	 * @param mixed $referencedFields
-	 * @param array $options
+	 * @param	mixed $fields
+	 * @param	string $referencedTable
+	 * @param	mixed $referencedFields
+	 * @param	array $options
 	 */
 	protected function addForeignKey($fields, $referencedTable='', $referencedFields='', $options=array()){
 		EntityManager::addForeignKey(get_class($this), $fields, $referencedTable, $referencedFields, $options);
@@ -2472,7 +2472,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Establece que un campo no debe ser persistido
 	 *
-	 * @param string $attribute
+	 * @param	string $attribute
 	 */
 	public function setTrasient($attribute){
 		EntityManager::addTrasientAttribute(get_class($this), $attribute);
