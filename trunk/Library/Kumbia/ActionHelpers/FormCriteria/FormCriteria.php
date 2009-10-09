@@ -85,7 +85,7 @@ class FormCriteria {
 				if(isset($descriptor['type'])){
 					switch($descriptor['type']){
 						case 'integer':
-							if(!is_null($provider[$key])&&$provider[$key]!==''){
+							if($provider[$key]!==null&&$provider[$key]!==''){
 								$filter = new Filter();
 								$value = $filter->applyFilter($provider[$key], 'int');
 							} else {
@@ -94,7 +94,7 @@ class FormCriteria {
 							break;
 						case 'double':
 						case 'float':
-							if(!is_null($provider[$key])&&$provider[$key]!==''){
+							if($provider[$key]!==null&&$provider[$key]!==''){
 								$filter = new Filter();
 								$value = $filter->applyFilter($provider[$key], 'double');
 							} else {
@@ -125,7 +125,7 @@ class FormCriteria {
 						$this->addCondition($descriptor, $fieldName, $value);
 					} else {
 						if(!isset($descriptor['nullValue'])){
-							if($provider[$key]!==''&&!is_null($provider[$key])){
+							if($provider[$key]!==''&&$provider[$key]!==null){
 								$this->addCondition($descriptor, $fieldName, $value);
 							}
 						} else {

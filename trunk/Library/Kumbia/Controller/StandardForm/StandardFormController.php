@@ -904,6 +904,7 @@ abstract class StandardForm extends Controller {
 		foreach($record->getAttributes() as $attribute){
 			$_REQUEST['fl_'.$attribute] = $record->readAttribute($attribute);
 		}
+		$_REQUEST['id'] = $num;
 
 		/**
 		 * Busca si existe un método o un llamado variable al método

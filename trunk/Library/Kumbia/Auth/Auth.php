@@ -321,7 +321,7 @@ class Auth extends Object {
 	 * @static
 	 */
 	static public function isValid(){
-		if(!is_null(self::$_isValid)){
+		if(self::$_isValid!==null){
 			return self::$_isValid;
 		} else {
 			self::$_isValid = Session::get('AUTH_VALID');

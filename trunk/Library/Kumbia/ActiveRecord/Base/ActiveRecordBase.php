@@ -1592,6 +1592,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				throw new ActiveRecordException("Parámetro incompatible en acción 'create'. No se pudo crear ningun registro");
 			} else {
 				//Detectar campo autonumerico
+				$this->_forceExists = true;
 				if($primaryKeys[0]=='id'){
 					$this->id = null;
 				}
@@ -1620,7 +1621,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				$primaryKeys = $this->_getPrimaryKeyAttributes();
 				if(count($primaryKeys)>0){
 					foreach($primaryKeys as $key){
-						if(!is_null($this->$key)&&$this->$key!==''){
+						if($this->$key!==null&&$this->$key!==''){
 							$wherePk[] = ' '.$key.' = \''.$this->$key.'\'';
 						}
 					}
@@ -1647,7 +1648,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			$primaryKeys = $this->_getPrimaryKeyAttributes();
 			if(count($primaryKeys)>0){
 				foreach($primaryKeys as $key){
-					if(!is_null($this->$key)&&$this->$key!==''){
+					if($this->$key!==null&&$this->$key!==''){
 						$wherePk[] = ' '.$key.' = \''.$this->$key.'\'';
 					}
 				}
@@ -1747,23 +1748,26 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			}
 		}
 
+		$notNull = $this->_getNotNullAttributes();
 		$at = $this->_getDatesAtAttributes();
 		$in = $this->_getDatesInAttributes();
-		$notNull = $this->_getNotNullAttributes();
 		if(is_array($notNull)){
 			$error = false;
 			$numFields = count($notNull);
 			for($i=0;$i<$numFields;++$i){
 				$field = $notNull[$i];
-				if(is_null($this->$field)||$this->$field===''){
+				if($this->$field!==null||$this->$field===''){
 					if(!$exists&&$field=='id'){
 						continue;
 					}
-					if(!$exists&&in_array($field, $at)){
-						continue;
-					}
-					if($exists&&in_array($field, $in)){
-						continue;
+					if(!$exists){
+						if(isset($at[$field])){
+							continue;
+						}
+					} else {
+						if(isset($in[$field])){
+							continue;
+						}
 					}
 					$field = str_replace('_id', '', $field);
 					$message = new ActiveRecordMessage("El campo $field no puede ser nulo ''", $field, 'PresenceOf');
@@ -1827,14 +1831,14 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				$values = array();
 				$nonPrimary = $this->_getNonPrimaryKeyAttributes();
 				foreach($nonPrimary as $np){
-					if(in_array($np, $in)){
+					if(isset($in[$field])){
 						$this->$np = Date::now();
 					}
 					$fields[] = $np;
 					if(is_object($this->$np)&&($this->$np instanceof DbRawValue)){
 						$values[] = $this->$np->getValue();
 					} else {
-						if($this->$np===''||is_null($this->$np)){
+						if($this->$np===''||$this->$np===null){
 							$values[] = 'NULL';
 						} else {
 							if($this->isANumericType($np)==false){
@@ -1861,7 +1865,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				$values = array();
 				$nonPrimary = $this->_getNonPrimaryKeyAttributes();
 				foreach($nonPrimary as $np){
-					if(in_array($np, $in)){
+					if(isset($in[$np])){
 						$this->$np = $this->_db->getCurrentDate();
 					}
 					if(is_object($this->$np)){
@@ -1875,36 +1879,24 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 							throw new ActiveRecordException('El objeto instancia de "'.get_class($this->$field).'" en el campo "'.$field.'" es muy complejo, debe realizarle un "cast" a un tipo de dato escalar antes de almacenarlo');
 						}
 					} else {
-						if($this->isANumericType($np)==false){
-							if($dataType[$np]=='date'){
-								$value = $this->_db->getDateUsingFormat($this->$np);
-								if($record->$np!=$value){
-									$fields[] = $np;
-									$values[] = $value;
-								}
-							} else {
-								if($this->$np===''||is_null($this->$np)){
-									if($record->$np!==''&&!is_null($record->$np)){
+						if($this->$np===''||$this->$np===null){
+							if($record->$np!==''&&$record->$np!==null){
+								$fields[] = $np;
+								$values[] = 'NULL';
+							}
+						} else {
+							if($this->isANumericType($np)==false){
+								if($dataType[$np]=='date'){
+									$value = $this->_db->getDateUsingFormat($this->$np);
+									if($record->$np!=$value){
 										$fields[] = $np;
-										$values[] = 'NULL';
+										$values[] = $value;
 									}
 								} else {
 									if($record->$np!=$this->$np){
 										$fields[] = $np;
 										$values[] = "'".addslashes($this->$np)."'";
 									}
-								}
-							}
-						} else {
-							if(is_null($this->$np)){
-								if(!is_null($record->$np)||$record->$np===''){
-									$fields[] = $np;
-									$values[] = 'NULL';
-								}
-							} else {
-								if($record->$np!=$this->$np){
-									$fields[] = $np;
-									$values[] = "'".addslashes($this->$np)."'";
 								}
 							}
 						}
@@ -1918,12 +1910,12 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			$attributes = $this->getAttributes();
 			foreach($attributes as $field){
 				if($field!='id'){
-					if(in_array($field, $at)){
+					if(isset($at[$field])){
 						if($this->$field==null||$this->$field===""){
 							$this->$field = $this->_db->getCurrentDate();
 						}
 					}
-					if(in_array($field, $in)){
+					if(isset($in[$field])){
 						$this->$field = new DbRawValue('NULL');
 					}
 					$fields[] = $field;
@@ -1935,20 +1927,20 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 						}
 					} else {
 						if($this->isANumericType($field)==true||$this->$field=='NULL'){
-							if($this->$field===''||is_null($this->$field)){
+							if($this->$field===''||$this->$field===null){
 								$values[] = 'NULL';
 							} else {
 								$values[] = addslashes($this->$field);
 							}
 						} else {
 							if($dataType[$field]=='date'){
-								if(is_null($this->$field)||$this->$field===''){
+								if($this->$field===null||$this->$field===''){
 									$values[] = 'NULL';
 								} else {
 									$values[] = $this->_db->getDateUsingFormat(addslashes($this->$field));
 								}
 							} else {
-								if(is_null($this->$field)||$this->$field===''){
+								if($this->$field===null||$this->$field===''){
 									$values[] = 'NULL';
 								} else {
 									if(get_magic_quotes_runtime()==true){
@@ -1963,7 +1955,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				}
 			}
 			$sequenceName = '';
-			if(is_null($generator)){
+			if($generator===null){
 				if(count($primaryKeys)==1){
 					// Hay que buscar la columna identidad aqui!
 					if(!isset($this->id)||!$this->id){
@@ -1994,7 +1986,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			if($exists==true){
 				$this->_callEvent('afterUpdate');
 			} else {
-				if(is_null($generator)){
+				if($generator===null){
 					if(count($primaryKeys)==1){
 						if($this->isANumericType($primaryKeys[0])){
 						    $lastId = $this->_db->lastInsertId($table, $primaryKeys[0], $sequenceName);
