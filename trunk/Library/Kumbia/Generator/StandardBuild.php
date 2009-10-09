@@ -520,11 +520,15 @@ abstract class StandardGenerator {
 					$value['auto_numeric'] = false;
 				}
 				if($value['auto_numeric']){
-					ActiveRecordUtils::sqlItemSanizite($key);
-					ActiveRecordUtils::sqlItemSanizite($form['source']);
-					$q = $db->query("select max($key)+1 from ".$form['source']);
+					$db->setFetchMode(DbBase::DB_NUM);
+					$q = $db->query("select max($key) from ".$form['source']);
 					$row = $db->fetchArray($q);
-					$aFields.="'".($row[0] ? $row[0] : 1 )."',";
+					if($row){
+						$row[0]++;
+						$aFields.="'".$row[0]."',";
+					} else {
+						$aFields.="'1',";
+					}
 				}
 			}
 			$aFields = substr($aFields, 0, strlen($aFields)-1);
