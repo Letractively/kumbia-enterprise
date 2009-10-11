@@ -24,22 +24,25 @@ require 'Library/Kumbia/Core/ClassPath/CoreClassPath.php';
 require 'Library/Kumbia/Autoload.php';
 
 /**
- * CreateApplication
+ * CreateWebService
  *
- * Permite crear el esqueleto de una aplicación
+ * Permite crear un controlador tipo WebServiceController por linea de comandos
  *
  * @category 	Kumbia
  * @package 	Scripts
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
+ * @version 	$Id$
  */
-class CreateApplication extends Script {
+class CreateWebService extends Script {
 
 	public function __construct(){
 
 		$posibleParameters = array(
-			'name=s' => '--name nombre \t\tNombre de la tabla source del modelo',
+			'name=s' => '--name nombre \t\tNombre del controlador',
+			'application=s' => '--application nombre \tNombre de la aplicación [opcional]',
+			'force' => '--force \t\tForza a que se reescriba el controlador [opcional]',
 			'help' => '--help \t\t\tMuestra esta ayuda'
 		);
 
@@ -50,21 +53,36 @@ class CreateApplication extends Script {
 			return;
 		}
 
-		$this->checkRequired(array('name'));
+		$this->checkRequired(array("name"));
 
 		$name = $this->getOption('name');
-		ComponentBuilder::createApplication($name);
+		$application = $this->getOption('application');
+		if($application==''){
+			$application = 'default';
+		}
+		Router::setActiveApplication($application);
+		Core::reloadMVCLocations();
+		if($name){
+			$controllersDir = Core::getActiveControllersDir();
+			$code = "<?php\n\nclass ".Utils::camelize($name)."Controller extends WebServiceController {\n\n}\n\n";
+			if(!file_exists("$controllersDir/{$name}_controller.php")||$this->isReceivedOption('force')){
+				file_put_contents("$controllersDir/{$name}_controller.php", $code);
+			} else {
+	 			throw new ScriptException("Ya existe el nombre del controlador en la aplicación '$application'");
+			}
+		} else {
+			throw new ScriptException("Debe indicar el nombre del controlador");
+		}
 	}
 
 }
 
 try {
-	$script = new CreateApplication();
+	$script = new CreateWebService();
 }
 catch(CoreException $e){
-	print get_class($e).' : '.$e->getMessage()."\n";
+	print get_class($e)." : ".$e->getConsoleMessage()."\n";
 }
 catch(Exception $e){
-	print 'Exception : '.$e->getMessage()."\n";
+	print "Exception : ".$e->getMessage()."\n";
 }
-
