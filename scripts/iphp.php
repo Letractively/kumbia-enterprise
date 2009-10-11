@@ -24,57 +24,48 @@ if(isset($_SERVER['SERVER_SOFTWARE'])){
 }
 
 $fp = fopen("php://stdin", "r");
-print "Bienvenido a Kumbia Enterprise Console\n";
-print "Escriba 'exit' para salir\n\n";
-print "iphp> ";
+echo "Bienvenido a Kumbia Enterprise Console\n";
+echo "Escriba 'exit' para salir\n\n";
+echo "iphp> ";
 while($_c = fgets($fp)){
 	if(rtrim($_c)=="quit"){
 		exit;
 	}
-	if(rtrim($_c)=='entonces que parce'){
-		print 'que mas'."\n";
-	}
-	if(rtrim($_c)=='que hay pa hacer'){
-		print 'no se pero yo me apunto!'."\n";
-	}
-	if(rtrim($_c)=='bueno nos vemos'){
-		print 'listo marik'."\n";
-	}
-	/*try {
+	try {
 		if(trim($_c)){
 			$_a = eval("return ".trim($_c).";");
 			if($_a===null){
-				print "NULL";
+				echo "NULL";
 			} else {
 				if($_a===false){
-					print "FALSE";
+					echo "FALSE";
 				} else {
 					if($_a===true){
-						print "TRUE";
+						echo "TRUE";
 					} else {
 						if(!is_object($_a)){
 							print_r($_a);
 						} else {
-							print "Object Instance Of ".get_class($_a);
+							echo "Object Instance Of ".get_class($_a);
 						}
 					}
 				}
 			}
-			print "\niphp> ";
+			echo "\niphp> ";
 		} else {
-			print "iphp> ";
+			echo "iphp> ";
 		}
 	}
 	catch(KumbiaException $e){
-		print $e->getMessage()."\n";
+		echo $e->getMessage()."\n";
 		$i = 1;
 		foreach($e->getTrace() as $trace){
 			if($trace['class']){
-				print "#$i {$trace['class']}::{$trace['function']}(".join(",",$trace['args']).") en ".basename($trace['file'])."\n";
+				echo "#$i {$trace['class']}::{$trace['function']}(".join(",",$trace['args']).") en ".basename($trace['file'])."\n";
 			}
 			$i++;
 		}
-	}*/
-	print "iphp> ";
+	}
+	echo "iphp> ";
 }
 fclose($fp);
