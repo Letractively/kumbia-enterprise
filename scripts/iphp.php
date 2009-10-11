@@ -12,10 +12,12 @@
  * obtain it through the world-wide-web, please send an email
  * to kumbia@kumbia.org so we can send you a copy immediately.
  *
- * @category Kumbia
- * @package Scripts
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @category 	Kumbia
+ * @package 	Scripts
+ * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @license 	New BSD License
+ * @version 	$Id$
  */
 
 if(isset($_SERVER['SERVER_SOFTWARE'])){
