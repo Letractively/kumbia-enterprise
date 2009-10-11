@@ -53,9 +53,10 @@ class CreateAllModels extends Script {
 	public function __construct(){
 
 		$posibleParameters = array(
-			'application=s' => '--application nombre \tNombre de la aplicaci&oacute;n [opcional]',
-			'force' => '--force \t\tForza a que se reescriba el modelo [opcional]',
-			'help' => '--help \t\t\tMuestra esta ayuda'
+			'application=s' => "--application nombre \tNombre de la aplicación [opcional]",
+			'force' => "--force \t\tForza a que se reescriba los modelos existentes [opcional]",
+			'define-relations' => "--define-relations \t\tDefine posibles relaciones existentes de acuerdo a convenciones [opcional]",
+			'help' => "--help \t\t\tVisualiza esta ayuda"
 		);
 
 		$this->parseParameters($posibleParameters);
@@ -73,23 +74,26 @@ class CreateAllModels extends Script {
 		Core::reloadMVCLocations();
 
 		$modelsDir = Core::getActiveModelsDir();
-		if(!$this->isReceivedOption('force')){
-			if(file_exists("$modelsDir/$name.php")){
-				throw new ScriptException("El archivo del modelo '$name.php' ya existe en el directorio de modelos");
-			}
-		}
 		if(!DbLoader::loadDriver()){
 			throw new DbException("No se puede conectar a la base de datos");
 		}
+		$forceProcess = $this->isReceivedOption('force');
+		$defineRelations = $this->isReceivedOption('define-relations');
 		$db = DbBase::rawConnect();
 		foreach($db->listTables() as $name){
 			if($db->tableExists($name)){
-				if(!file_exists("$modelsDir/$name.php")){
+				if(!file_exists($modelsDir.'/'.$name.'.php')||$forceProcess){
 					$fields = $db->describeTable($name);
 					$attributes = array();
 					$setters = array();
 					$getters = array();
+					$initialize = array();
 					foreach($fields as $field){
+						if($defineRelations==true){
+							if(preg_match('/([a-zA-Z0-9_]+)_id$/', $field['Field'], $matches)){
+								$initialize[] = "\t\t\$this->belongsTo('{$matches[1]}');";
+							}
+						}
 						$type = $this->getPHPType($field['Type']);
 						$attributes[] = "\t/**\n\t * @var $type\n\t */\n\tprotected \${$field['Field']};\n";
 						$setterName = Utils::camelize($field['Field']);
@@ -100,10 +104,15 @@ class CreateAllModels extends Script {
 							$getters[] = "\t/**\n\t * Devuelve el valor del campo {$field['Field']}\n\t * @return $type\n\t */\n\tpublic function get$setterName(){\n\t\treturn \$this->{$field['Field']};\n\t}\n";
 						}
 					}
-					$code = "<?php\n\nclass ".Utils::camelize($name)." extends ActiveRecord {\n\n".join("\n", $attributes)."\n\n".join("\n", $setters)."\n\n".join("\n", $getters)."}\n\n";
+					if(count($initialize)>0){
+						$initCode = "\n\t/**\n\t * Método inicializador de la Entidad\n\t */\n\tprotected function initialize(){\t\t\n".join("\n", $initialize)."\n\t}\n";
+					} else {
+						$initCode = "";
+					}
+					$code = "<?php\n\nclass ".Utils::camelize($name)." extends ActiveRecord {\n\n".join("\n", $attributes)."\n\n".join("\n", $setters)."\n\n".join("\n", $getters)."$initCode\n}\n\n";
 					file_put_contents("$modelsDir/$name.php", $code);
 				} else {
-					print "Saltando el modelo '$name' ya que el archivo de modelo ya existe\n";
+					print "INFO: Saltando el modelo \"$name\" ya que el archivo de modelo ya existe\n";
 				}
 			} else {
 				throw new ScriptException("No existe la tabla '$name'");

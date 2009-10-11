@@ -99,6 +99,7 @@ class Package extends Script {
 			"public/css.php",
 			"public/css/index.html",
 			"public/css/style.css",
+			"public/css/exception.css",
 		);
 		$includeNonRecursive = array(
 			"public/img"
@@ -119,6 +120,7 @@ class Package extends Script {
 			if(file_exists("{$outputDir}/$application.zip")){
 				unlink("{$outputDir}/$application.zip");
 			}
+			print "zip -q {$outputDir}/$application.zip ".join(" ", $files);
 			system("zip -q {$outputDir}/$application.zip ".join(" ", $files));
 		}
 	}
