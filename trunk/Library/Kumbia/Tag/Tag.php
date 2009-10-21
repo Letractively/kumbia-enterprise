@@ -441,6 +441,7 @@ abstract class Tag {
             $codeAlt = "<script type='text/javascript'>\n\tdefaultFormater=new Format({$params['formatOptions']});\n\t$('{$params[0]}').value=defaultFormater.money($('{$params[0]}').value);\n</script>\r\n";
         }
         unset($params['formatOptions']);
+        $params['format'] = 'money';
 		$code = "<input type='text' id='{$params[0]}' value='$value' ";
 		foreach($params as $key => $val){
 			if(!is_integer($key)){
@@ -448,7 +449,7 @@ abstract class Tag {
 			}
 		}
 		$code.=" />\r\n";
-        if(isset($codeAlt) && !empty($value)){
+        if(isset($codeAlt) && (!empty($value) || $value == 0)){
             $code.= $codeAlt;
         }
 		return $code;
