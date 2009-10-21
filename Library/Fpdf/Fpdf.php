@@ -464,16 +464,15 @@ if(!class_exists('FPDF', false)){
             if($orientation=='L' && $format=='A4'){
             	$withmax=290;
 			}
-            if($orientation=='L' && $format=='legal'){
-                $withmax=500;
-		$space = 15;
+            if($orientation=='L' && $format=='Legal'){
+                $withmax=350;
             }
-	    $this->SetY(10);
+	        $this->SetY(10);
             if($fecha!=""){
             	$this->SetFont('Arial','B', 8);
                 $this->Cell($withmax,6,"Fecha: ".$fecha,0,1,'L',0);
                 $this->Ln();
-	    }
+	        }
             if($image!=""){
             	$this->Image($image,25,20,25,25);
                 $this->Ln();
@@ -488,7 +487,39 @@ if(!class_exists('FPDF', false)){
 			}
 		}
 		
-
+		function Header2($fecha="",$orientation="",$format="",$contents,$image=""){
+			//To be implemented in your own inherited class
+            $withmax=0;
+            $space = 6;
+            if($orientation=='P' && $format=='A4'){
+            	$withmax=190;
+			}
+            if($orientation=='L' && $format=='A4'){
+            	$withmax=290;
+			}
+            if($orientation=='L' && $format=='legal'){
+                $withmax=10;
+		        //$space = 15;
+            }
+	        $this->SetY(150);
+            if($fecha!=""){
+            	$this->SetFont('Arial','B', 8);
+                $this->Cell($withmax,6,"Fecha: ".$fecha,0,1,'L',0);
+                $this->Ln();
+	        }
+            if($image!=""){
+            	$this->Image($image,25,162,25,25);
+                $this->Ln();
+			}
+			if(is_array($contents)){
+            	$this->SetFont('Arial','B', 12);
+                foreach ($contents as $content){
+                	$this->Cell($withmax,$space,$content,0,1,'C',0);
+				}
+                $this->Ln();
+                $this->Ln();
+			}
+		}
 		/**
 		 * To be implemented in your own inherited class
 		 *
@@ -505,6 +536,10 @@ if(!class_exists('FPDF', false)){
 			}
             if($orientation=='L' && $format=='A4'){
             	$withmax=290;
+                $Ymax=-23;
+			}
+            if($orientation=='L' && $format=='Legal'){
+            	$withmax=380;
                 $Ymax=-23;
 			}
             if(is_array($contents)){
