@@ -85,6 +85,8 @@ abstract class CoreClassPath {
 		'AuthException' => 'Auth/AuthException',
 		'AssertionFailed' => 'PHPUnit/AssertionFailed',
 		'Browser' => 'ActionHelpers/Browser/Browser',
+		'Cache' => 'Cache/Cache',
+		'CacheException' => 'Cache/CacheException',
 		'CommonEvent' => 'CommonEvent/Base/CommonEvent',
 		'Compiler' => 'Compiler/Compiler',
 		'CompilerException' => 'Compiler/CompilerException',

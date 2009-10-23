@@ -30,46 +30,27 @@
  * @license		New BSD License
  * @access		public
  */
-class Cache extends Object {
-
-	/**
-	 * Adaptador utilizado
-	 *
-	 * @var string
-	 */
-	private $_adapter;
+class Cache {
 
 	/**
 	 * Constructor de Cache
 	 *
-	 * @param string $adapter
-	 * @param array $frontendOptions
-	 * @param array $backendOptions
+	 * @param	string $adapter
+	 * @param	array $frontendOptions
+	 * @param	array $backendOptions
 	 * @static
 	 */
 	public static function factory($adapter, $frontendOptions=array(), $backendOptions=array()){
-		$path = 'Library/Kumbia/Cache/Adapters/'.$adapter.'.php';
-		if(Core::fileExists($path)){
-			require $path;
-		} else {
-			throw new CacheException('No existe el adaptador "'.$adapter."'");
-		}
 		$adapterClass = $adapter.'Cache';
-		$this->_adapter = new $adapterClass($backendOptions);
-	}
-
-	/**
-	 * Carga un resultado de cache si existe
-	 *
-	 * @param 	string $keyName
-	 * @return	mixed
-	 */
-	public function load($keyName){
-		return $this->_adapter->load($keyName);
-	}
-
-	public function save($keyName, $value){
-
+		if(class_exists($adapterClass, false)==false){
+			$path = 'Library/Kumbia/Cache/Adapters/'.$adapter.'.php';
+			if(Core::fileExists($path)){
+				require $path;
+			} else {
+				throw new CacheException('No existe el adaptador "'.$adapter."'");
+			}
+		}
+		return new $adapterClass($frontendOptions, $backendOptions);
 	}
 
 }

@@ -67,9 +67,11 @@ class Config extends Object {
 			return self::$_instance[$file];
 		}
 		$config = new Config();
+		#if[compile-time]
 		if(Core::fileExists($file)==false){
 			throw new ConfigException("No existe el archivo de configuración '$file'");
 		}
+		#endif
 		$adapterInstance = self::factory($adapter);
 		$config = $adapterInstance->read($config, $file);
 		self::$_instance[$file] = $config;

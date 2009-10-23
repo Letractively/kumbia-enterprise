@@ -45,14 +45,23 @@ class UniquenessValidator extends ActiveRecordValidator implements ActiveRecordV
 		if($this->isRequired()==true){
 			$record = clone $this->getRecord();
 			$field = $this->getFieldName();
-			$value = addslashes($this->getValue());
-			$primaryFields = $record->getPrimaryKeyAttributes();
-			$condition = array();
-			foreach($primaryFields as $primaryField){
-				$condition[] = "$primaryField<>'".addslashes($record->readAttribute($primaryField))."'";
+			$conditions = array();
+			if(is_array($field)){
+				foreach($field as $composeField){
+					$value = addslashes($record->readAttribute($composeField));
+					$conditions[] = "$composeField='$value'";
+				}
+			} else {
+				$value = addslashes($this->getValue());
+				$conditions[] = "$field='$value'";
 			}
-			$conditions = join(' AND ', $condition);
-			if($record->count("$field='$value' AND (".$conditions.')')>0){
+			$primaryFields = $record->getPrimaryKeyAttributes();
+			foreach($primaryFields as $primaryField){
+				$conditions[] = "$primaryField<>'".addslashes($record->readAttribute($primaryField))."'";
+			}
+			$conditions = join(' AND ', $conditions);
+			//$record->setDebug(true);
+			if($record->count($conditions)>0){
 				$options = $this->getOptions();
 				if(isset($options['message'])){
 					$this->appendMessage($options['message']);
