@@ -268,8 +268,8 @@ class CoreException extends Exception {
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){
 						$rfile = self::getSafeFileName($trace['file']);
-						echo $rfile." <span class='exceptionLine'>(".$trace['line'].")</span>\n";
 						if(strpos($trace['file'], "apps")){
+							echo $rfile." <span class='exceptionLine'>(".$trace['line'].")</span>\n";
 							$file = $trace['file'];
 							$line = $trace['line'];
 							echo "</pre><span class='exceptionLineNote'>La excepción se ha generado en el archivo '$rfile' en la línea '$line':</span><br/>";
@@ -298,6 +298,9 @@ class CoreException extends Exception {
 								}
 							}
 							echo "</table></div><pre class='exceptionPre'>";
+						} else {
+							$rfile = preg_replace('/\.php$/', '', $rfile);
+							echo $rfile." <span class='exceptionLine'>(".$trace['line'].")</span>\n";
 						}
 					}
 				}
@@ -451,11 +454,12 @@ class CoreException extends Exception {
 				if(count($this->extendedBacktrace)>0){
 					$traceback = array_merge($this->extendedBacktrace, $traceback);
 				}
-				echo "<pre class='exceptionPreDesc'><span style='font-family: Lucida Console;font-size:11px'><b>Backtrace:</b></span>\n";
+				echo "<pre class='exceptionPreDesc'><span id='backtrace-title'><b>Backtrace:</b></span>\n";
 				$i = 0;
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){
 						$file = str_replace($_SERVER['DOCUMENT_ROOT'], "", $trace['file']);
+						$trace['file'] = preg_replace('/\.php$/', '', $trace['file']);
 					} else {
 						$file = "internal-function ";
 						$trace['line'] = 0;

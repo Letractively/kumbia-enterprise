@@ -33,23 +33,92 @@
 class FileCache {
 
 	/**
-	 * Opciones del adaptador
+	 * Opciones front-end del adaptador
 	 *
 	 * @var array
 	 */
-	private $_options = array();
+	private $_frontendOptions = array();
 
 	/**
-	 * Constructor del adaptador
+	 * Opciones back-end del adaptador
 	 *
-	 * @param array $options
+	 * @var array
 	 */
-	public function __construct($options){
-		$this->_options = $options;
+	private $_backendOptions = array();
+
+	/**
+	 * Ultima llave que se le hizo una consulta
+	 *
+	 * @var string
+	 */
+	private $_lastKey = "";
+
+	/**
+	 * Contructor de FileCache
+	 *
+	 * @param	array $frontendOptions
+	 * @param	array $backendOptions
+	 */
+	public function __construct($frontendOptions, $backendOptions){
+		$this->_frontendOptions = $frontendOptions;
+		$this->_backendOptions = $backendOptions;
+		#if[compile-time]
+		if(isset($backendOptions['cacheDir'])){
+			if(!is_writable($backendOptions['cacheDir'])){
+				throw new CacheException('El directorio para caches no existe ó no tiene permisos de escritura');
+			}
+		} else {
+			throw new CacheException('Debe indicar el directorio para caches con la opción cachesDir');
+		}
+		#endif
 	}
 
-	public function load(){
+	/**
+	 * Carga un valor cacheado mediante una llave
+	 *
+	 * @param 	string $keyName
+	 * @return  mixed
+	 */
+	public function start($keyName){
+		$backend = $this->_backendOptions;
+		$cacheDir = $backend['cacheDir'];
+		$cacheFile = $cacheDir.'/'.$keyName;
+		if(file_exists($cacheFile)){
+			$frontend = $this->_frontendOptions;
+			$time = $_SERVER['REQUEST_TIME'];
+			$lifetime = $frontend['lifetime'];
+			if(($time-$lifetime)<filemtime($cacheFile)){
+				return file_get_contents($cacheFile);
+			} else {
+				$this->_lastKey = $keyName;
+				ob_start();
+				return null;
+			}
+		} else {
+			$this->_lastKey = $keyName;
+			ob_start();
+			return null;
+		}
+	}
 
+	/**
+	 * Almacena un resultado con load ó el valor en buffer por start
+	 *
+	 * @param mixed $value
+	 * @param string $keyName
+	 */
+	public function save($value=null, $keyName=''){
+		if($keyName==''){
+			$keyName = $this->_lastKey;
+			$this->_lastKey = '';
+		}
+		$backend = $this->_backendOptions;
+		$cacheDir = $backend['cacheDir'];
+		$cacheFile = $cacheDir.'/'.$keyName;
+		$cachedContent = ob_get_contents();
+		file_put_contents($cacheFile, $cachedContent);
+		ob_end_clean();
+		echo $cachedContent;
 	}
 
 }

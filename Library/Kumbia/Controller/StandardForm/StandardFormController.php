@@ -628,11 +628,11 @@ abstract class StandardForm extends Controller {
 			$this->{$modelName}->dumpModel();
 		}
 
-		foreach($this->{$modelName}->getAttributesNames() as $field_name){
-			if(isset($_REQUEST["fl_$field_name"])){
-				$this->{$modelName}->$field_name = $_REQUEST["fl_$field_name"];
+		foreach($this->{$modelName}->getAttributesNames() as $fieldName){
+			if(isset($_REQUEST["fl_$fieldName"])){
+				$this->{$modelName}->$fieldName = $_REQUEST["fl_$fieldName"];
 			} else {
-				$this->{$modelName}->$field_name = "";
+				$this->{$modelName}->$fieldName = "";
 			}
 		}
 
@@ -680,8 +680,8 @@ abstract class StandardForm extends Controller {
 				Flash::error("Hubo un error al eliminar el registro");
 			}
 		}
-		foreach($this->{$modelName}->getAttributesNames() as $field_name){
-			$_REQUEST["fl_$field_name"] = $this->{$modelName}->$field_name;
+		foreach($this->{$modelName}->getAttributesNames() as $fieldName){
+			$_REQUEST["fl_$fieldName"] = $this->{$modelName}->readAttribute($fieldName);
 		}
 
 		/**
@@ -864,6 +864,8 @@ abstract class StandardForm extends Controller {
 		if($id==='last'){
 			$num = count($rows)-1;
 		}
+
+		$_REQUEST['id'] = $num;
 
 		/**
 		 * Busca si existe un método o un llamado variable al método
