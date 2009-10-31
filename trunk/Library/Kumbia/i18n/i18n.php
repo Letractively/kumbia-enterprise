@@ -109,6 +109,25 @@ abstract class i18n {
 	}
 
 	/**
+	 * Obtiene una parte de un String
+	 *
+	 * @param string $str
+	 * @param int $start
+	 * @param int $length
+	 * @return string
+	 */
+	static public function substr($str, $start, $length=null){
+		if(self::$_multiByteEnabled==false){
+			return substr($str, $start, $length);
+		} else {
+			if($length===null){
+				$length = mb_strlen($str);
+			}
+			return mb_substr($str, $start, $length, self::$_defaultCharset);
+		}
+	}
+
+	/**
 	 * Reemplaza en una cadena de caracteres mediante una expresion regular
 	 *
 	 * @access 	public
