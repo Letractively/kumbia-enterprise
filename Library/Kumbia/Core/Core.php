@@ -966,6 +966,8 @@ abstract class Core {
 		} else {
 			return file_exists($filePath);
 		}*/
+		//Debug::add(self::$_frameworkPath.$filePath);
+		#file_put_contents('/Users/andresgutierrez/xs.txt', self::$_frameworkPath.$filePath);
 		return file_exists(self::$_frameworkPath.$filePath);
 	}
 
