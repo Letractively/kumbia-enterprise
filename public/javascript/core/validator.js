@@ -15,6 +15,7 @@ var Validator = Class.create({
 		doDeFormat: true, //Realiza un deformateo de los campos tipo format automaticamente
 		doTrim: true, //Realiza una funcion que quita espacios al principio y al final de la cadena de texto
 		doToUpperCase: true, //Convierte a mayusculas el valor del campo
+		doToLowerCase: false, //Convierte a mayusculas el valor del campo
 		removeTags: true, //Remueve los tags de un campo tipo texto
 		removeScripts: true, //Remueve los scripts de un campo tipo texto
 		blankStrings: ['@'], //Matriz con todos los strings que serÃ¡n considerados como nulos
@@ -54,6 +55,10 @@ var Validator = Class.create({
 		if($$(selector).length > 1) throw "Validator.addField\n * El selector " + selector + " debe apuntar a un campo unico.";
 		var validate = {};
 		Object.extend(validate,this._validate);
+        if(type == 'email'){
+            validate.doToUpperCase = false;
+            validate.doToLowerCase = true;
+        }
 		if(!Object.isUndefined(this._preDefinedOptions[type]))
 			Object.extend(validate,this._preDefinedOptions[type]);
 		if(!Object.isUndefined(arguments[3]) && !Object.isUndefined(this._preDefinedOptions[arguments[3].group]))
@@ -84,6 +89,15 @@ var Validator = Class.create({
 		}
 		return false;
 	},
+
+    getField: function(name){
+		for(var i=0;i<this._fields.length;i++){
+			if(this._fields[i].name == name) {
+				return this._fields[i];
+			}
+		}
+		return false;
+    },
 	
 	//Modifica las opciones por defecto para un tipo de campo o grupo de campos. Ademas tambien modifica las opciones para un campo especifico.
 	//Returna true si la modificacion se pudo efectuar, false en caso contrario.
@@ -121,6 +135,7 @@ var Validator = Class.create({
 				this._createError(this._fields[i],-1,this._fields[i].selector,this._fields[i].options['msg_error']);
 			if(this._fields[i].type != "select" && this._fields[i].type != "number" && this._fields[i].type != "decimal"){
 				if(this._fields[i].options.doTrim) campo.value = campo.value.strip();
+				if(this._fields[i].options.doToLowerCase) campo.value = campo.value.toLowerCase();
 				if(this._fields[i].options.doToUpperCase) campo.value = campo.value.toUpperCase();
 				if(this._fields[i].options.removeTags) campo.value = campo.value.stripTags();
 				if(this._fields[i].options.removeScripts) campo.value = campo.value.stripScripts();
@@ -151,7 +166,7 @@ var Validator = Class.create({
 					this._createError(this._fields[i],2,this._fields[i].selector);
 			}
 			//Valida si es un email correcto.
-			if(this._fields[i].type.match(/^email$/) && !campo.value.match(/(^[a-z]([\w_\.]*)@([a-z_\.]*)([.][a-z]{3})([.][a-z]{2})?$)/i))
+			if(this._fields[i].type.match(/^email$/) && !campo.value.match(/(^[a-z]([\w_\.]*)@([a-z_\.]*)([.][a-z]{3})([.][a-z]{2})?$)/i) && !campo.value.blank())
 				this._createError(this._fields[i],4,this._fields[i].selector);
 			//Realiza los deFormateos automaticos
 			if(this._fields[i].type.match(/^format_[a-z]*$/) && Object.isFunction(this._fields[i].options.format.deFormat) && this._fields[i].options.doDeFormat) 
@@ -166,9 +181,10 @@ var Validator = Class.create({
 			if(!Object.isUndefined(this._fields[i].options['include'])){
 				var functions = this._fields[i].options['include'].split(",");
 				for(var j=0;j<functions.length;j++){
-					var funct = eval("this._"+functions[j]);
-					if(!Object.isFunction(funct)) throw "Validator.Valide\n * No existe una validacion estandar con ese nombre: " + functions[j] + ".";
-					var ret = funct(campo.value,this._fields[i].name,this._fields[i].type,this._fields[i].options['value']);
+					/*var funct = eval("this._"+functions[j]);
+					f(!Object.isFunction(funct)) throw "Validator.Valide\n * No existe una validacion estandar con ese nombre: " + functions[j] + ".";
+					var ret = funct(campo.value,this._fields[i].name,this._fields[i].type,this._fields[i].options['value']);*/
+                    var ret = this.execute(campo.value,this._fields[i].name,this._fields[i].type,this._fields[i].options['value']);
 					if(ret !== true){
 						if(ret !== false){
 							this._createError(this._fields[i],-1,this._fields[i].selector,ret);
@@ -241,9 +257,13 @@ var Validator = Class.create({
 	//Valida que un dato esta en pasado.
     _InPast: function(value,name,type){
         var d = new Date();
-		if(!Object.isUndefined(this._fields[i].options['dateFormat'])){
+        alert(this);
+        var field = this.getField(name);
+        if(field == false)
+            return "El campo " + name + " no existe.";
+		if(!Object.isUndefined(field.options['dateFormat'])){
             var str=value; 
-            var format=this._fields[i].options['dateFormat'];
+            var format=field.options['dateFormat'];
             var fecha = new Object();
             //Años
             var patt1=/[Y]/gi;
@@ -277,6 +297,19 @@ var Validator = Class.create({
             }
             return true;
         }
+        return "No hay como comparar el campo.";
+    },
+
+	execute: function(function_name){
+		var result = '';
+        switch(function_name){
+            case "InPast": result = this._InPast(arguments[1],arguments[2],arguments[3]);break;
+            case "Equals": result = this._Equals(arguments[1],arguments[2],arguments[3],arguments[4]);break;
+            case "Negative": result = this._Negative(arguments[1],arguments[2],arguments[3]);break;
+            case "Positive": result = this._Positive(arguments[1],arguments[2],arguments[3]);break;
+            default: throw "Validator.Execute\n * No existe una validacion estandar con ese nombre: " + function_name + ".";break;
+        }
+		return result;
     }
 
 });
@@ -676,11 +709,11 @@ var Tabs = {
 		campos.each(function(element){
 			element.enable();
 		});
-		campos[0].activate();
-		campos = $$(".error_message");
-		campos.each(function(element){
-			element.hide();
-		});
+		//campos[0].activate();
+		//campos = $$(".error_message");
+		//campos.each(function(element){
+			//element.hide();
+		//});
 	}
 };
 
@@ -765,7 +798,7 @@ var Format = Class.create({
 	},
 	
 	numeric: function(number){//format.numeric(numero); Retorna una cadena de caracteres formateada con las propiedades que han sido definidas para los numeros.
-		if(number == '') {
+		if(number === '') {
 			if(this._numeric.blankToZero) number = 0;
 			else return '';
 		}
@@ -775,7 +808,7 @@ var Format = Class.create({
 	},
 	
 	money: function(number){//format.money(numero); Retorna una cadena de caracteres formateada con las propiedades que han sido definidas para las monedas.
-		if(number == '') {
+		if(number === '') {
 			if(this._money.blankToZero) number = 0;
 			else return '';
 		}
@@ -785,7 +818,7 @@ var Format = Class.create({
 	},
 	
 	percent: function(number){//format.percent(numero); Retorna una cadena de caracteres formateada con las propiedades que han sido definidas para los porcentajes.
-		if(number == '') {
+		if(number === '') {
 			if(this._percent.blankToZero) number = 0;
 			else return '';
 		}
