@@ -597,7 +597,9 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 		}
 		if(count($lastLines)){
 			$createSQL.= ','.join(',', $lastLines).')';
-		}
+		}else{
+            $createSQL.= ')';
+        }
 		return $this->query($createSQL);
 	}
 

@@ -279,6 +279,7 @@ class Date extends Object {
 	                }
 	            }
 	            $date += (self::$_monthTable[$month-1]-$day);
+                $date = self::isYearLeapYear($year) && $month == 2 ? $date + 1 : $date;
 	            $date = -(($date*86400)+(86400-(($hour*3600)+($minute*60)+$second)));
 
 	            // gregorian correction for 5.Oct.1582
@@ -1414,7 +1415,7 @@ class Date extends Object {
 	protected static function _getDateParts($timestamp, $fast = null){
 
 		// 32bit timestamp
-        if(abs($timestamp)<=0x7FFFFFFF){
+        if($timestamp >= 0 && abs($timestamp)<=0x7FFFFFFF){
             return @getdate($timestamp);
         }
 

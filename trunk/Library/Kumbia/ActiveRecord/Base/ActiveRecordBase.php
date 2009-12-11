@@ -508,9 +508,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if($transaction->getConnection()->isUnderTransaction()==false){
 			throw new ActiveRecordException('La transacción no se ha iniciado');
 		}
-		if($transaction->isManaged()==true){
+		/*if($transaction->isManaged()==true){
 			$this->_dependencyPointer = $transaction->attachDependency($this->_dependencyPointer, $this);
-		}
+		}*/
 		$this->_db = $transaction->getConnection();
 	}
 
@@ -678,6 +678,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			if(isset($params['conditions'])){
 				$select.= ' WHERE '.$params['conditions'];
 			}
+		}
+		if(isset($params['group'])&&$params['group']) {
+			$select.= ' GROUP BY '.$params['group'];
 		}
 		if(isset($params['order'])&&$params['order']) {
 			$select.= ' ORDER BY '.$params['order'];
