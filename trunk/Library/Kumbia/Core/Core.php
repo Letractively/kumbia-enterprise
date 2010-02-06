@@ -13,11 +13,11 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package	Core
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @package		Core
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
- * @license	New BSD License
+ * @license		New BSD License
  * @version 	$Id$
  */
 
@@ -27,10 +27,10 @@
  * Esta es la clase que integra todo el framework
  *
  * @category	Kumbia
- * @package	Core
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @package		Core
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license	New BSD License
+ * @license		New BSD License
  * @abstract
  */
 abstract class Core {
@@ -39,7 +39,7 @@ abstract class Core {
 	 * Version del Framework
 	 *
 	 */
-	const FRAMEWORK_VERSION = '1.7beta';
+	const FRAMEWORK_VERSION = '1.7GA';
 
 	/**
 	 * PATH donde esta instalada la instancia del framework
@@ -82,7 +82,7 @@ abstract class Core {
 	private static $_testingMode = false;
 
 	/**
-	 * Indica si la aplicacion esta corriendo bajo IBM Websphere
+	 * Indica si la aplicación esta corriendo bajo IBM Websphere
 	 *
 	 * @var boolean
 	 */
@@ -96,7 +96,7 @@ abstract class Core {
 	private static $_frameworkPath = "";
 
 	/**
-	 * Inicializa el entorno de aplicacion
+	 * Inicializa el entorno de aplicación
 	 *
 	 * @access public
 	 * @static
@@ -114,7 +114,7 @@ abstract class Core {
 		Extensions::loadBooteable();
 
 		/**
-		 * Carga los plug-in de la aplicacion actual
+		 * Carga los plug-in de la aplicación actual
 		 */
 		PluginManager::loadApplicationPlugins();
 
@@ -152,7 +152,7 @@ abstract class Core {
 	 * @static
 	 */
 	static public function restoreInitialPath(){
-		if(self::$_frameworkPath!=""){
+		if(self::$_frameworkPath!=''){
 			if(self::$_frameworkPath!=getcwd()){
 				chdir(self::$_frameworkPath);
 			}
@@ -266,7 +266,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Ejecuta el evento de inicializar la aplicacion
+	 * Ejecuta el evento de inicializar la aplicación
 	 *
 	 * @access 	public
 	 * @static
@@ -706,7 +706,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Indica si un archivo existe en la aplicacion actual
+	 * Indica si un archivo existe en la aplicación actual
 	 *
 	 * @param string $path
 	 */
@@ -840,7 +840,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Indica si una aplicacion existe
+	 * Indica si una aplicación existe
 	 *
 	 * @access	public
 	 * @param	string $application
@@ -852,7 +852,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Devuelve el directorio de vistas de la aplicacion activa
+	 * Devuelve el directorio de vistas de la aplicación activa
 	 *
 	 * @access public
 	 * @return string
@@ -863,7 +863,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Devuelve el directorio de modelos de la aplicacion activa
+	 * Devuelve el directorio de modelos de la aplicación activa
 	 *
 	 * @access public
 	 * @return string
@@ -874,7 +874,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Devuelve el directorio de controladores de la aplicacion activa
+	 * Devuelve el directorio de controladores de la aplicación activa
 	 *
 	 * @access public
 	 * @return string
@@ -1000,7 +1000,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Establece que la aplicacion se esta ejecutando bajo IBM Websphere
+	 * Establece que la aplicación se esta ejecutando bajo IBM Websphere
 	 *
 	 * @param boolean $webSphere
 	 */
