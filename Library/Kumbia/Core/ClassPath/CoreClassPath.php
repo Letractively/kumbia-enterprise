@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		Core
  * @subpackage	CoreClassPath
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -30,7 +30,7 @@
  *
  * @category	Kumbia
  * @package		Core
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @abstract
@@ -123,7 +123,7 @@ abstract class CoreClassPath {
 		'DbLoader' => 'Db/Loader/DbLoader',
 		'DbLoaderException' => 'Db/Loader/DbLoaderException',
 		'DbRawValue' => 'Db/DbRawValue/DbRawValue',
-		'DbProfiler' => 'Db/DbProfiler/DbProfiler',
+		'DbProfiler' => 'Db/Profiler/DbProfiler',
 		'DbSQLGrammarException' => 'Db/DbSQLGrammarException',
 		'Debug' => 'Debug/Debug',
 		'DebugException' => 'Debug/DebugException',
