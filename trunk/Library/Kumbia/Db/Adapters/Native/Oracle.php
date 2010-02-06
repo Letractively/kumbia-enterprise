@@ -84,8 +84,8 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	/**
 	 * Constructor de la Clase
 	 *
-	 * @access public
-	 * @param stdClass $descriptor
+	 * @access	public
+	 * @param	stdClass $descriptor
 	 */
 	public function __construct($descriptor=''){
 		if($descriptor==''){
@@ -95,15 +95,15 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Hace una conexion a la base de datos de Oracle
+	 * Hace una conexión a la base de datos de Oracle
 	 *
-	 * @param string $dbhost
-	 * @param string $dbuser
-	 * @param string $dbpass
-	 * @param string $dbname
-	 * @param string $dbport
-	 * @param string $dbdsn
-	 * @return resource
+	 * @param	string $dbhost
+	 * @param	string $dbuser
+	 * @param	string $dbpass
+	 * @param	string $dbname
+	 * @param	string $dbport
+	 * @param	string $dbdsn
+	 * @return	resource
 	 */
 	public function connect($descriptor=''){
 		if($descriptor==''){
@@ -119,19 +119,19 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 		} else {
 			$dbstring = '//'.$host.'/'.$instance;
 		}
-		if($this->_idConnection = @oci_new_connect($username, $password, $dbstring, $charset)){
-			$sort = isset($descriptor->sort) ? $descriptor->sort : 'binary_ci';
+		if($this->_idConnection = @oci_connect($username, $password, $dbstring, $charset)){
+			/*$sort = isset($descriptor->sort) ? $descriptor->sort : 'binary_ci';
 			$comp = isset($descriptor->comp) ? $descriptor->comp : 'linguistic';
 			$language = isset($descriptor->language) ? $descriptor->language : 'spanish';
 			$territory = isset($descriptor->territory) ? $descriptor->territory : 'spain';
 			$date_format = isset($descriptor->date_format) ? $descriptor->date_format : 'YYYY-MM-DD HH24:MI:SS';
-			$this->query("ALTER SESSION SET nls_date_format='$date_format' nls_territory=$territory nls_language=$language nls_sort=$sort nls_comp=$comp");
+			$this->query("ALTER SESSION SET nls_date_format='$date_format' nls_territory=$territory nls_language=$language nls_sort=$sort nls_comp=$comp");*/
 			parent::__construct($descriptor);
 		}
 		if(!$this->_idConnection){
 			throw new DbException($this->error($php_errormsg), $this->noError(), false);
 		} else {
-			register_shutdown_function(array($this, 'close'));
+			//register_shutdown_function(array($this, 'close'));
 			return true;
 		}
 	}
@@ -139,8 +139,8 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	/**
 	 * Efectua operaciones SQL sobre la base de datos
 	 *
-	 * @param string $sqlQuery
-	 * @return resource|false
+	 * @param	string $sqlQuery
+	 * @return	resource|false
 	 */
 	public function query($sqlQuery){
 		$this->debug($sqlQuery);
@@ -189,8 +189,9 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 					break;
 				case 2291:
 				case 2292:
-					throw new DbConstraintViolationException($errorMessage, $errorCode, true, $this);
 				case 1:
+					throw new DbConstraintViolationException($errorMessage, $errorCode, true, $this);
+				case 11:
 					throw new DbLockAdquisitionException($errorMessage, $errorCode, true, $this);
 				default:
 					throw new DbException($errorMessage, $errorCode, true, $this);
@@ -201,23 +202,23 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Cierra la Conexion al Motor de Base de datos
+	 * Cierra la conexión al motor de Base de datos
 	 *
-	 * @return boolean
+	 * @return	boolean
 	 */
 	public function close(){
-		if($this->_idConnection) {
+		/*if($this->_idConnection) {
 			return oci_close($this->_idConnection);
-		}
+		}*/
 	}
 
 	/**
 	 * Devuelve fila por fila el contenido de un select
 	 *
-	 * @access public
-	 * @param resource $resultQuery
-	 * @param integer $opt
-	 * @return array
+	 * @access	public
+	 * @param	resource $resultQuery
+	 * @param	integer $opt
+	 * @return	array
 	 */
 	public function fetchArray($resultQuery=''){
 		if(!$this->_idConnection){
@@ -239,42 +240,46 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Devuelve el numero de filas de la ultima sentencia SELECT ejecutada
+	 * Devuelve el número de filas de la última sentencia SELECT ejecutada
 	 *
-	 * @param resource $resultQuery
-	 * @return intger|boolean
+	 * @param	resource $resultQuery
+	 * @return	intger|boolean
 	 */
 	public function numRows($resultQuery=''){
 		if(!$this->_idConnection){
 			return false;
 		}
 		$sql = $this->_lastQuery;
-		$fromPosition = stripos($sql, 'FROM');
-		if($fromPosition===false){
-			return 0;
+		if(preg_match('/SELECT [COUNT|MIN|MAX|AVG]/i', $sql)===false){
+			$fromPosition = stripos($sql, 'FROM');
+			if($fromPosition===false){
+				return 0;
+			} else {
+				$sqlQuery = 'SELECT COUNT(*) '.substr($sql, $fromPosition);
+				$resultQuery = @oci_parse($this->_idConnection, $sqlQuery);
+				if($this->_autoCommit==true){
+					$commit = OCI_COMMIT_ON_SUCCESS;
+				} else {
+					$commit = OCI_DEFAULT;
+				}
+				if(@oci_execute($resultQuery, $commit)){
+					$count = oci_fetch_array($resultQuery, OCI_NUM);
+					return $count[0];
+				} else {
+					return false;
+				}
+			}
 		} else {
-			$sqlQuery = 'SELECT COUNT(*) '.substr($sql, $fromPosition);
-			$resultQuery = @oci_parse($this->_idConnection, $sqlQuery);
-			if($this->_autoCommit==true){
-				$commit = OCI_COMMIT_ON_SUCCESS;
-			} else {
-				$commit = OCI_DEFAULT;
-			}
-			if(@oci_execute($resultQuery, $commit)){
-				$count = oci_fetch_array($resultQuery, OCI_NUM);
-				return $count[0];
-			} else {
-				return false;
-			}
+			return 1;
 		}
 	}
 
 	/**
-	 * Devuelve el nombre de un campo en el resultado de un select
+	 * Devuelve el nombre de un campo en el resultado de un SELECT
 	 *
-	 * @param integer $number
-	 * @param resource $resultQuery
-	 * @return string
+	 * @param	integer $number
+	 * @param	resource $resultQuery
+	 * @return	string
 	 */
 	public function fieldName($number, $resultQuery=''){
 		if(!$this->_idConnection){
@@ -298,11 +303,11 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Se Mueve al resultado indicado por $number en un select
+	 * Se mueve al resultado indicado por $number en un SELECT
 	 *
-	 * @param integer $number
-	 * @param resource $resultQuery
-	 * @return boolean
+	 * @param	integer $number
+	 * @param	resource $resultQuery
+	 * @return	boolean
 	 */
 	public function dataSeek($number, $resultQuery=''){
 		if(!$resultQuery){
@@ -456,8 +461,8 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	/**
 	 * Hace commit sobre una transacción si es posible
 	 *
-	 * @access public
-	 * @return boolean
+	 * @access	public
+	 * @return	boolean
 	 */
 	public function commit(){
 		if($this->isUnderTransaction()==true){
@@ -472,197 +477,115 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Devuelve un LIMIT valido para un SELECT del RBDM
+	 * Devuelve un LIMIT válido para un SELECT del RBDM
 	 *
-	 * @param string $sql
-	 * @param integer $number
-	 * @return string
+	 * @param	string $sql
+	 * @param	integer $number
+	 * @return	string
 	 */
 	public function limit($sql, $number){
-		if(!is_numeric($number)||$number<0){
-			return $sql;
-		}
-		if(preg_match('/ORDER[\t\n\r ]+BY/i', $sql)){
-			if(stripos($sql, 'WHERE')){
-				return preg_replace('/ORDER[\t\n\r ]+BY/i', "AND ROWNUM <= $number ORDER BY", $sql);
-			} else {
-				return preg_replace('/ORDER[\t\n\r ]+BY/i', "WHERE ROWNUM <= $number ORDER BY", $sql);
-			}
-		} else {
-			if(stripos($sql, 'WHERE')){
-				return $sql.' AND ROWNUM <= '.$number;
-			} else {
-				return $sql.' WHERE ROWNUM <= '.$number;
-			}
-		}
+		return OracleSQLDialect::limit($sql, $number);
 	}
 
 	/**
 	 * Devuelve un FOR UPDATE valido para un SELECT del RBDM
 	 *
-	 * @param string $sql
-	 * @return string
+	 * @param	string $sql
+	 * @return	string
 	 */
 	public function forUpdate($sql){
-		return $sql.' FOR UPDATE';
+		return OracleSQLDialect::forUpdate($sql);
 	}
 
 	/**
 	 * Devuelve un SHARED LOCK valido para un SELECT del RBDM
 	 *
-	 * @param string $sql
-	 * @return string
+	 * @param	string $sql
+	 * @return	string
 	 */
 	public function sharedLock($sql){
-		return $sql;
+		return OracleSQLDialect::sharedLock($sql);
 	}
 
 	/**
 	 * Borra una tabla de la base de datos
 	 *
-	 * @param string $table
-	 * @param boolean $ifExists
-	 * @return boolean
+	 * @param	string $table
+	 * @param	boolean $ifExists
+	 * @return	boolean
 	 */
 	public function dropTable($table, $ifExists=true){
 		if($ifExists==true){
 			if($this->tableExists($table)){
-				return $this->query("DROP TABLE $table");
+				$sql = OracleSQLDialect::dropTable($table);
+				return $this->query($sql);
 			} else {
 				return true;
 			}
 		} else {
-			return $this->query("DROP TABLE $table");
+			$sql = OracleSQLDialect::dropTable($table);
+			return $this->query($sql);
 		}
 	}
 
 	/**
 	 * Crea una tabla utilizando SQL nativo del RDBM
 	 *
-	 * TODO:
-	 * - Falta que el parametro index funcione. Este debe listar indices compuestos multipes y unicos
-	 * - Agregar el tipo de tabla que debe usarse (Oracle)
-	 * - Soporte para campos autonumericos
-	 * - Soporte para llaves foraneas
-	 *
-	 * @access public
-	 * @param string $table
-	 * @param array $definition
-	 * @param array $index
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	array $definition
+	 * @param	array $index
+	 * @return	boolean
 	 */
 	public function createTable($table, $definition, $index=array(), $tableOptions=array()){
-		$create_sql = "CREATE TABLE $table (";
-		if(!is_array($definition)){
-			new DbException("Definición invalida para crear la tabla '$table'");
-			return false;
+		$sqlStatements = OracleSQLDialect::createTable($table, $definition, $index, $tableOptions);
+		foreach($sqlStatements as $sqlStatement){
+			$this->query($sqlStatement);
 		}
-		$create_lines = array();
-		$index = array();
-		$unique_index = array();
-		$primary = array();
-		$not_null = "";
-		$size = "";
-		foreach($definition as $field => $field_def){
-			if(isset($field_def['not_null'])){
-				$not_null = $field_def['not_null'] ? 'NOT NULL' : '';
-			} else {
-				$not_null = "";
-			}
-			if(isset($field_def['size'])){
-				$size = $field_def['size'] ? '('.$field_def['size'].')' : '';
-			} else {
-				$size = "";
-			}
-			if(isset($field_def['index'])){
-				if($field_def['index']){
-					$index[] = "INDEX($field)";
-				}
-			}
-			if(isset($field_def['unique_index'])){
-				if($field_def['unique_index']){
-					$index[] = "UNIQUE($field)";
-				}
-			}
-			if(isset($field_def['primary'])){
-				if($field_def['primary']){
-					$primary[] = "$field";
-				}
-			}
-			if(isset($field_def['auto'])){
-				if($field_def['auto']){
-					$this->query("CREATE SEQUENCE {$table}_{$field}_seq START WITH 1");
-				}
-			}
-			if(isset($field_def['extra'])){
-				$extra = $field_def['extra'];
-			} else {
-				$extra = "";
-			}
-			$create_lines[] = "$field ".$field_def['type'].$size.' '.$not_null.' '.$extra;
-		}
-		$create_sql.= join(',', $create_lines);
-		$last_lines = array();
-		if(count($primary)){
-			$last_lines[] = 'PRIMARY KEY('.join(",", $primary).')';
-		}
-		if(count($index)){
-			$last_lines[] = join(',', $index);
-		}
-		if(count($unique_index)){
-			$last_lines[] = join(',', $unique_index);
-		}
-		if(count($last_lines)){
-			$create_sql.= ','.join(',', $last_lines).')';
-		}
-		return $this->query($create_sql);
-
+		return true;
 	}
 
 	/**
-	 * Listado de Tablas
+	 * Devuelve un array con el listado de tablas del usuario
 	 *
-	 * @param string $table
-	 * @return boolean
+	 * @access 	public
+	 * @param	string $table
+	 * @return	boolean
 	 */
 	public function listTables($schema=''){
 		if($schema==''){
-			$query = "SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '".strtoupper($this->getUsername())."'";
+			$sql = OracleSQLDialect::listTables($this->getUsername());
 		} else {
-			$query = "SELECT TABLE_NAME FROM ALL_TABLES WHERE OWNER = '".strtoupper($schema)."'";
+			$sql = OracleSQLDialect::listTables($schema);
 		}
 		$fetchMode = $this->_fetchMode;
 		$this->_fetchMode = self::DB_NUM;
-		$tables = $this->fetchAll($query);
+		$tables = $this->fetchAll($sql);
 		$allTables = array();
 		foreach($tables as $table){
 			$allTables[] = $table[0];
 		}
 		$this->_fetchMode = $fetchMode;
 		return $allTables;
-
 	}
 
 	/**
 	 * Indica si el RBDM requiere de secuencias y devuelve el nombre por convencion
 	 *
-	 * @param string $tableName
-	 * @param array $primaryKey
+	 * @access 	public
+	 * @param	string $tableName
+	 * @param	array $primaryKey
 	 */
 	public function getRequiredSequence($tableName='', $identityColumn='', $sequenceName=''){
-		if($sequenceName==""){
-			return "\"".strtoupper($tableName)."_".strtoupper($identityColumn)."_SEQ\".NEXTVAL";
-		} else {
-			return "\"".strtoupper($sequenceName)."\".NEXTVAL";
-		}
+		return OracleSQLDialect::getRequiredSequence($tableName, $identityColumn, $sequenceName);
 	}
 
 	/**
-	 * Devuelve el ultimo id autonumerico generado en la BD
+	 * Devuelve el último id autonumérico generado en la BD
 	 *
-	 * @param string $table
-	 * @param array $identityColumn
-	 * @return integer
+	 * @param	string $table
+	 * @param	array $identityColumn
+	 * @return	integer
 	 */
 	public function lastInsertId($table='', $identityColumn='', $sequenceName=''){
 		if(!$this->_idConnection){
@@ -672,10 +595,10 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 		 * Oracle No soporta columnas identidad
 		 */
 		if($table&&$identityColumn){
-			if($sequenceName==""){
-				$sequenceName = "\"".strtoupper($table)."_".$identityColumn."_SEQ\"";
+			if($sequenceName==''){
+				$sequenceName = i18n::strtoupper($table).'_'.$identityColumn.'_SEQ';
 			}
-			$value = $this->fetchOne("SELECT \"".strtoupper($sequenceName)."\".CURRVAL FROM dual");
+			$value = $this->fetchOne('SELECT "'.i18n::strtoupper($sequenceName).'".CURRVAL FROM dual');
 			return $value[0];
 		}
 		return false;
@@ -684,16 +607,37 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	/**
 	 * Verifica si una tabla existe o no
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param string $schema
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	string $schema
+	 * @return	boolean
 	 */
 	public function tableExists($table, $schema=''){
-		if($schema!=""){
-			$sql = "SELECT COUNT(*) FROM ALL_TABLES WHERE TABLE_NAME = UPPER('$table') AND OWNER = UPPER('$schema')";
+		if($schema!=''){
+			$sql = OracleSQLDialect::tableExists($table, $schema);
 		} else {
-			$sql = "SELECT COUNT(*) FROM ALL_TABLES WHERE TABLE_NAME = UPPER('$table') AND OWNER = UPPER('".$this->getUsername()."')";
+			$sql = OracleSQLDialect::tableExists($table, $this->getUsername());
+		}
+		$fetchMode = $this->_fetchMode;
+		$this->_fetchMode = OCI_NUM;
+		$num = $this->fetchOne($sql);
+		$this->_fetchMode = $fetchMode;
+		return $num[0];
+	}
+
+	/**
+	 * Verifica si una vista existe o no
+	 *
+	 * @access	public
+	 * @param	string $table
+	 * @param	string $schema
+	 * @return	boolean
+	 */
+	public function viewExists($view, $schema=''){
+		if($schema!=''){
+			$sql = OracleSQLDialect::viewExists($view, $schema);
+		} else {
+			$sql = OracleSQLDialect::viewExists($view, $this->getUsername());
 		}
 		$fetchMode = $this->_fetchMode;
 		$this->_fetchMode = OCI_NUM;
@@ -705,74 +649,105 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	/**
 	 * Listar los campos de una tabla
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param string $schema
-	 * @return array
+	 * @access	public
+	 * @param	string $table
+	 * @param	string $schema
+	 * @return	array
 	 */
 	public function describeTable($table, $schema=''){
-		if($schema==""){
+		if($schema==''){
 			$schema = $this->getUsername();
 		}
-		$sql = "SELECT LOWER(ALL_TAB_COLUMNS.COLUMN_NAME) AS FIELD,
-		LOWER(ALL_TAB_COLUMNS.DATA_TYPE) AS TYPE,
-		ALL_TAB_COLUMNS.NULLABLE AS ISNULL,
-		ALL_TAB_COLUMNS.DATA_SCALE,
-		ALL_TAB_COLUMNS.DATA_PRECISION,
-		ALL_CONSTRAINTS.CONSTRAINT_TYPE AS KEY,
-		ALL_CONS_COLUMNS.POSITION
-		FROM ALL_TAB_COLUMNS
-		LEFT JOIN (ALL_CONS_COLUMNS JOIN ALL_CONSTRAINTS
-		ON (ALL_CONS_COLUMNS.CONSTRAINT_NAME = ALL_CONSTRAINTS.CONSTRAINT_NAME AND
-		ALL_CONS_COLUMNS.TABLE_NAME = ALL_CONSTRAINTS.TABLE_NAME AND
-		ALL_CONSTRAINTS.CONSTRAINT_TYPE = 'P'))
-		ON ALL_TAB_COLUMNS.TABLE_NAME = ALL_CONS_COLUMNS.TABLE_NAME AND
-		ALL_TAB_COLUMNS.COLUMN_NAME = ALL_CONS_COLUMNS.COLUMN_NAME
-		JOIN ALL_TABLES ON (ALL_TABLES.TABLE_NAME = ALL_TAB_COLUMNS.TABLE_NAME
-		AND ALL_TABLES.OWNER = ALL_TAB_COLUMNS.OWNER)
-		WHERE
-		UPPER(ALL_TAB_COLUMNS.TABLE_NAME) = UPPER('$table') AND
-		UPPER(ALL_TAB_COLUMNS.OWNER) = UPPER('$schema')
-		ORDER BY COLUMN_ID";
+		$sql = OracleSQLDialect::describeTable($table, $schema);
  		$fetchMode = $this->_fetchMode;
  		$this->_fetchMode = OCI_ASSOC;
 		$describe = $this->fetchAll($sql);
-		$this->_fetchMode = $fetchMode;
-		$finalDescribe = array();
-		$fields = array();
-		foreach($describe as $key => $value){
-			if(!in_array($value['field'], $fields)){
-				if($value['data_precision']!=''){
-					if($value['data_scale']==0){
-						$type = $value['type'].'('.$value['data_precision'].')';
+		if(count($describe)>0){
+			$this->_fetchMode = $fetchMode;
+			$finalDescribe = array();
+			$fields = array();
+			foreach($describe as $key => $value){
+				if(!in_array($value['field'], $fields)){
+					if($value['data_precision']!=''){
+						if($value['data_scale']==0){
+							$type = $value['type'].'('.$value['data_precision'].')';
+						} else {
+							$type = $value['type'].'('.$value['data_precision'].','.$value['data_scale'].')';
+						}
 					} else {
-						$type = $value['type'].'('.$value['data_precision'].','.$value['data_scale'].')';
+						$type = $value['type'];
 					}
-				} else {
-					$type = $value['type'];
+					$finalDescribe[] = array(
+						'Field' => $value['field'],
+						'Type' => $type,
+						'Null' => $value['isnull'] == 'Y' ? 'YES' : 'NO',
+						'Key' => $value['key'] == 'P' ? 'PRI' : ''
+					);
+					$fields[] = $value['field'];
 				}
-				$finalDescribe[] = array(
-					'Field' => $value['field'],
-					'Type' => $type,
-					'Null' => $value['isnull'] == 'Y' ? 'YES' : 'NO',
-					'Key' => $value['key'] == 'P' ? 'PRI' : ''
-				);
-				$fields[] = $value['field'];
 			}
+			return $finalDescribe;
+		} else {
+			throw new DbException('No se pudo obtener la descripción de la tabla "'.$table.'.'.$schema.'"', 0);
 		}
-		return $finalDescribe;
+	}
+
+	/**
+	 * Listar los campos de una vista
+	 *
+	 * @access	public
+	 * @param	string $view
+	 * @return	array
+	 */
+	public function describeView($view, $schema=''){
+		if($schema==''){
+			$schema = $this->getUsername();
+		}
+		$sql = OracleSQLDialect::describeView($view, $schema);
+ 		$fetchMode = $this->_fetchMode;
+ 		$this->_fetchMode = OCI_ASSOC;
+		$describe = $this->fetchAll($sql);
+		if(count($describe)>0){
+			$this->_fetchMode = $fetchMode;
+			$finalDescribe = array();
+			$fields = array();
+			foreach($describe as $key => $value){
+				if(!in_array($value['field'], $fields)){
+					if($value['data_precision']!=''){
+						if($value['data_scale']==0){
+							$type = $value['type'].'('.$value['data_precision'].')';
+						} else {
+							$type = $value['type'].'('.$value['data_precision'].','.$value['data_scale'].')';
+						}
+					} else {
+						$type = $value['type'];
+					}
+					$finalDescribe[] = array(
+						'Field' => $value['field'],
+						'Type' => $type,
+						'Null' => $value['isnull'] == 'Y' ? 'YES' : 'NO',
+						'Key' => $value['key'] == 'P' ? 'PRI' : ''
+					);
+					$fields[] = $value['field'];
+				}
+			}
+			return $finalDescribe;
+		} else {
+			throw new DbException('No se pudo obtener la descripción de la tabla "'.$table.'.'.$schema.'"', 0);
+		}
 	}
 
 	/**
 	 * Devuelve una fecha formateada de acuerdo al RBDM
 	 *
-	 * @param string $date
-	 * @param string $format
-	 * @return string
+	 * @access 	public
+	 * @param	string $date
+	 * @param	string $format
+	 * @return	string
 	 */
-	public function getDateUsingFormat($date, $format='YYYY-MM-DD HH:MI:SS'){
+	public function getDateUsingFormat($date, $format='YYYY-MM-DD HH24:MI:SS'){
 		if(strlen($date)<=10){
-			$format = "YYYY-MM-DD";
+			$format = 'YYYY-MM-DD';
 		}
 		return "TO_DATE('$date', '$format')";
 	}

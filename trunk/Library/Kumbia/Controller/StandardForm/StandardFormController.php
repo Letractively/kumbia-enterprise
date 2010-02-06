@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		Controller
  * @subpackage	StandardForm
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -119,14 +119,14 @@ abstract class StandardForm extends Controller {
 	 *
 	 * @var string
 	 */
-	public $successInsertMessage = "";
+	public $successInsertMessage = '';
 
 	/**
 	 * Mensaje de Fallo al insertar
 	 *
 	 * @var string
 	 */
-	public $failureInsertMessage = "";
+	public $failureInsertMessage = '';
 
 	/**
 	 * Mensaje de Suceso al Actualizar
@@ -218,15 +218,15 @@ abstract class StandardForm extends Controller {
 			}
 		}
 
-		Generator::scaffold(&$this->form, $this->scaffold);
+		Generator::scaffold($this->form, $this->scaffold);
 		GeneratorReport::generate($this->form);
 
 		/**
 		 * Busca si existe un método o un llamado variable al método
-		 * after_insert, si este método devuelve false termina la ejecución
+		 * afterInsert, si este método devuelve false termina la ejecución
 		 * de la acción
 		 */
-		if(method_exists($this, "afterReport")){
+		if(method_exists($this, 'afterReport')){
 			if($this->afterReport()===false){
 				return null;
 			}
@@ -252,7 +252,7 @@ abstract class StandardForm extends Controller {
 	 * @return string
 	 */
 	public function getSource(){
-		if($this->source==""){
+		if($this->source==''){
 			$controller = Router::getController();
 			ActiveRecordUtils::sqlSanizite($controller);
 			$this->source = $controller;
@@ -271,9 +271,9 @@ abstract class StandardForm extends Controller {
 		if($controllerRequest->isPost()){
 
 			$this->view = 'index';
-			$this->keep_action = "";
+			$this->keep_action = '';
 
-			Generator::scaffold(&$this->form, $this->scaffold);
+			Generator::scaffold($this->form, $this->scaffold);
 
 			$modelName = EntityManager::getEntityName($this->getSource());
 			if(!EntityManager::isEntity($modelName)){
@@ -434,9 +434,9 @@ abstract class StandardForm extends Controller {
 	public function updateAction(){
 
 		$this->view = 'index';
-		$this->keep_action = "";
+		$this->keep_action = '';
 
-		Generator::scaffold(&$this->form, $this->scaffold);
+		Generator::scaffold($this->form, $this->scaffold);
 
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
@@ -615,7 +615,7 @@ abstract class StandardForm extends Controller {
 
 		$this->view = 'index';
 
-		Generator::scaffold(&$this->form, $this->scaffold);
+		Generator::scaffold($this->form, $this->scaffold);
 
 
 		$modelName = EntityManager::getEntityName($this->getSource());
@@ -713,7 +713,7 @@ abstract class StandardForm extends Controller {
 
 		$this->view = 'index';
 
-		Generator::scaffold(&$this->form, $this->scaffold);
+		Generator::scaffold($this->form, $this->scaffold);
 
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
@@ -899,7 +899,7 @@ abstract class StandardForm extends Controller {
 		$row = $rows[$num];
 		$conditions = array();
 		foreach($row as $key => $value){
-			$conditions[] = $key.' = "'.$value.'"';
+			$conditions[] = $key.' = \''.$value.'\'';
 		}
 
 		$record = $model->findFirst(join(' AND ', $conditions));
@@ -909,8 +909,7 @@ abstract class StandardForm extends Controller {
 		$_REQUEST['id'] = $num;
 
 		/**
-		 * Busca si existe un método o un llamado variable al método
-		 * after_delete
+		 * Busca si existe un método o un llamado variable al métodp afterDelete
 		 */
 		if(method_exists($this, 'afterFetch')){
 			$this->afterFetch();
@@ -1001,9 +1000,10 @@ abstract class StandardForm extends Controller {
 	 * @access public
 	 */
 	public function _save_helperAction(){
+
 		$this->set_response('view');
 		$db = db::rawConnect();
-		Generator::scaffold(&$this->form, $this->scaffold);
+		Generator::scaffold($this->form, $this->scaffold);
 
 		$field = $this->form['components'][$this->request('name')];
 		ActiveRecord::sql_item_sanizite($field['foreignTable']);
@@ -1021,7 +1021,7 @@ abstract class StandardForm extends Controller {
 
 		$this->set_response('xml');
 		$db = db::rawConnect();
-		Generator::scaffold(&$this->form, $this->scaffold);
+		Generator::scaffold($this->form, $this->scaffold);
 
 		$name = $this->request('name');
 		$com = $this->form['components'][$this->request('name')];

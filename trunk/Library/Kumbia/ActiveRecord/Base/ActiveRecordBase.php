@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordBase
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2007-2007 Roger Jose Padilla Camacho (rogerjose81 at gmail.com)
  * @copyright	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
@@ -370,7 +370,12 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		$schema = $this->_schema;
 		if(!ActiveRecordMetaData::existsMetaData($table, $schema)) {
 			$this->_dumped = true;
-			if($this->_db->tableExists($table, $schema)){
+			if($this->isView==true){
+				$exists = $this->_db->viewExists($table, $schema);
+			} else {
+				$exists = $this->_db->tableExists($table, $schema);
+			}
+			if($exists==true){
 				$this->_dumpInfo($table, $schema);
 			} else {
 				if($schema!=''){
@@ -415,7 +420,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Vuelca la información de la tabla $table en la base de datos
+	 * Volca la información de la tabla ó vista $table en la base de datos
 	 * para crear los atributos y meta-data del ActiveRecord
 	 *
 	 * @access protected
@@ -426,7 +431,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	protected function _dumpInfo($tableName, $schemaName=''){
 		$this->_dumpLock = true;
 		if(!ActiveRecordMetaData::existsMetaData($tableName, $schemaName)){
-			$metaData = $this->_db->describeTable($tableName, $schemaName);
+			if($this->isView==true){
+				$metaData = $this->_db->describeView($tableName, $schemaName);
+			} else {
+				$metaData = $this->_db->describeTable($tableName, $schemaName);
+			}
 			ActiveRecordMetaData::dumpMetaData($tableName, $schemaName, $metaData);
 		}
 		$fields = ActiveRecordMetaData::getAttributes($tableName, $schemaName);
@@ -2011,7 +2020,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Devuelve el codigo de la ultima operación realizada
+	 * Devuelve el código de la última operación realizada
 	 *
 	 * @return boolean
 	 */

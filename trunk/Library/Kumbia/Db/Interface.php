@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Db
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2006-2007 Giancarlo Corzo Vigil (www.antartec.com)
  * @license		New BSD License
@@ -29,7 +29,7 @@
  *
  * @category	Kumbia
  * @package		Db
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2007-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2006-2007 Giancarlo Corzo Vigil (www.antartec.com)
  * @license		New BSD License
@@ -69,6 +69,7 @@ interface DbBaseInterface {
 	public function createTable($tableName, $definition, $index=array(), $tableOptions=array());
 	public function dropTable($tableName, $ifExists=false);
 	public function tableExists($tableName, $schema='');
+	public function viewExists($tableName, $schema='');
 	public function getDateUsingFormat($date, $format='YYYY-MM-DD');
 	public function getHaveAutoCommit();
 	public function setIsolationLevel($isolationLevel);

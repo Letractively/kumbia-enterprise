@@ -15,7 +15,7 @@
  * @category 	Kumbia
  * @package 	Router
  * @subpackage 	Adapters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -28,7 +28,7 @@
  * @category 	Kumbia
  * @package 	Router
  * @subpackage 	Adapters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -39,29 +39,86 @@ class SoapRouter implements RouterInterface {
 	 *
 	 * @var string
 	 */
-	private $_xmlSchemaNamespace = "http://www.w3.org/2001/XMLSchema-instance";
+	private $_xmlSchemaNamespace = 'http://www.w3.org/2001/XMLSchema-instance';
+
+	/**
+	 * Namespace para SOAP-ENC
+	 *
+	 * @var string
+	 */
+	private $_xmlSoapEnc = 'http://schemas.xmlsoap.org/soap/encoding/';
+
+	/**
+	 * Devuelve un SOAP:Array como un array numérico
+	 *
+	 * @access	private
+	 * @param	DOMElement $actionParam
+	 */
+	private function _decodeSoapArray($actionParam){
+		$soapArray = array();
+		foreach($actionParam->childNodes as $item){
+			if($item->nodeType==1){
+				if($item->localName=='item'){
+					$paramType = $item->getAttributeNS($this->_xmlSchemaNamespace, 'type');
+					if($paramType=='ns2:Map'){
+						$soapArray[] = $this->_getXSIMap($item);
+					} else {
+						if($paramType=='SOAP-ENC:Array'){
+							$soapArray[] = $this->_decodeSoapArray($item);
+						} else {
+							$soapArray[] = $this->_decodeXSDType($paramType, $item->nodeValue);
+						}
+					}
+				}
+			}
+		}
+		return $soapArray;
+	}
 
 	/**
 	 * Devuelve un mapa XSI como un array asociativo
 	 *
-	 * @access private
-	 * @param DOMElement $actionParam
+	 * @access	private
+	 * @param	DOMElement $actionParam
 	 */
 	private function _getXSIMap($actionParam){
 		$arrayMap = array();
-		foreach($actionParam->getElementsByTagName('item') as $item){
-			foreach($item->getElementsByTagName('key') as $keyIndex){
-				$index = (string) $keyIndex->nodeValue;
-			}
-			foreach($item->getElementsByTagName('value') as $valueElement){
-				$paramType = $valueElement->getAttributeNS($this->_xmlSchemaNamespace, 'type');
-				if($this->_isTypeLiteral($paramType)==true){
-					$value = $valueElement->nodeValue;
-				} else {
+		foreach($actionParam->childNodes as $item){
+			if($item->nodeType==1){
+				if($item->localName=='item'){
+					$index = null;
 					$value = null;
+					foreach($item->childNodes as $node){
+						if($node->nodeType==1){
+							if($node->localName=='key'){
+								$index = (string) $node->nodeValue;
+							} else {
+								if($node->localName=='value'){
+									$paramType = $node->getAttributeNS($this->_xmlSchemaNamespace, 'type');
+									if($this->_isTypeLiteral($paramType)==true){
+										$value = $this->_decodeXSDType($paramType, $node->nodeValue);
+									} else {
+										if($paramType=='ns2:Map'){
+											$value = $this->_getXSIMap($node);
+										} else {
+											if($paramType=='SOAP-ENC:Array'){
+												$value = $this->_getSoapArray($node);
+											} else {
+												$value = null;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+					if($index!==null){
+						$arrayMap[$index] = $value;
+					} else {
+						$arrayMap[] = $value;
+					}
 				}
 			}
-			$arrayMap[$index] = $value;
 		}
 		return $arrayMap;
 	}
@@ -98,6 +155,7 @@ class SoapRouter implements RouterInterface {
 				return $returnValue=='true' ? true : false;
 				break;
 		}
+		return null;
 	}
 
 	/**
@@ -124,7 +182,11 @@ class SoapRouter implements RouterInterface {
 					if($paramType=='ns2:Map'){
 						$parameters[] = $this->_getXSIMap($actionParam);
 					} else {
-						$parameters[] = $this->_decodeXSDType($paramType, $actionParam->nodeValue);
+						if($paramType=='SOAP-ENC:Array'){
+							$parameters[] = $this->_decodeSoapArray($actionParam);
+						} else {
+							$parameters[] = $this->_decodeXSDType($paramType, $actionParam->nodeValue);
+						}
 					}
 				}
 			}

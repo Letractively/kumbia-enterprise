@@ -100,7 +100,7 @@ abstract class Generator {
 	 * @return	boolean
 	 * @static
 	 */
-	static public function dumpFieldInformation($form){
+	static public function dumpFieldInformation(&$form){
 		/*$modelName = Router::getController();
 		$model = EntityManager::getEntityInstance(Utils::camelize($modelName));
 		$table = $model->getSource();
@@ -267,7 +267,7 @@ abstract class Generator {
 	 * @param boolean $scaffold
 	 * @return boolean
 	 */
-	static function scaffold($form, $scaffold = false){
+	static function scaffold(&$form, $scaffold = false){
 
 		if(!is_array($form)){
 			$form = array();
@@ -313,11 +313,11 @@ abstract class Generator {
 			$form['scaffold'] = false;
 		}
 		if((!$form['components'])||$form['scaffold']||$scaffold){
-			if(!self::dumpFieldInformation(&$form)){
+			if(!self::dumpFieldInformation($form)){
 				return false;
 			}
 			if($form['type']=='master-detail'){
-				self::dumpFieldInformation(&$form['detail']);
+				self::dumpFieldInformation($form['detail']);
 				$form['detail']['dataFilter'] = "{$form['detail']['source']}.{$form['source']}_id = '@id'";
 				foreach($form["detail"]['components'] as $k => $f){
 					if($k=='id'){
@@ -374,7 +374,7 @@ abstract class Generator {
 
 		//self::$outForm = "";
 
-		Generator::scaffold(&$form, $scaffold);
+		Generator::scaffold($form, $scaffold);
 
 		if(!$form['components']){
 			return false;

@@ -13,11 +13,11 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package	Db
+ * @package		Db
  * @subpackage	Adapters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license	New BSD License
+ * @license		New BSD License
  * @version 	$Id$
  */
 
@@ -29,13 +29,13 @@
  * La documentacion de MySQL puede encontrarse en http://dev.mysql.com/doc/.
  *
  * @category	Kumbia
- * @package	Db
+ * @package		Db
  * @subpackage	Adapters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license	New BSD License
- * @link	http://www.php.net/manual/es/ref.mysql.php
- * @access	Public
+ * @license		New BSD License
+ * @link		http://www.php.net/manual/es/ref.mysql.php
+ * @access		Public
  */
 class DbMySQL extends DbBase implements DbBaseInterface  {
 
@@ -434,7 +434,17 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 		$this->_fetchMode = MYSQL_NUM;
 		$num = $this->fetchOne($sql);
 		$this->_fetchMode = $fetchMode;
-		return $num[0];
+		return (bool) $num[0];
+	}
+
+	/**
+	 * Verifica si una vista existe ó no
+	 *
+	 * @param string $viewName
+	 * @param string $schemaName
+	 */
+	public function viewExists($viewName, $schemaName=''){
+		return $this->tableExists($viewName, $schemaName);
 	}
 
 	/**

@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Db
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2006-2007 Giancarlo Corzo Vigil (www.antartec.com)
  * @license 	New BSD License
@@ -42,7 +42,7 @@ require 'Library/Kumbia/Db/Interface.php';
 class DbBase extends Object {
 
 	/**
-	 * Parametros de conexion al gestor relacional
+	 * Parámetros de conexion al gestor relacional
 	 *
 	 * @var stdClass
 	 */
@@ -56,7 +56,7 @@ class DbBase extends Object {
 	protected $_fetchMode;
 
 	/**
-	 * Indica si esta en modo debug o no
+	 * Indica si está en modo debug o no
 	 *
 	 * @var boolean
 	 */
@@ -77,7 +77,7 @@ class DbBase extends Object {
 	private $_tracedSQL = array();
 
 	/**
-	 * Indica si debe loggear todo el SQL enviado mediante el objeto o no (tambi&eacute;n permite establecer el nombre del log)
+	 * Indica si debe loggear todo el SQL enviado mediante el objeto o no (también permite establecer el nombre del log)
 	 *
 	 * @var mixed
 	 */
@@ -112,28 +112,28 @@ class DbBase extends Object {
 	private $_isReadOnly = false;
 
 	/**
-	 * Indica si el gestor esta en modo autocommit
+	 * Indica si el gestor está en modo autocommit
 	 *
 	 * @var boolean
 	 */
 	protected $_autoCommit = true;
 
 	/**
-	 * Resource de la conexion de bajo nivel
+	 * Resource de la conexión de bajo nivel
 	 *
 	 * @var resource
 	 */
 	protected $_idConnection;
 
 	/**
-	 * Ultimo Recurso de una Query
+	 * Ultimo recurso de una Query
 	 *
 	 * @var resource
 	 */
 	protected $_lastResultQuery;
 
 	/**
-	 * Ultima sentencia SQL enviada a Oracle
+	 * Última sentencia SQL enviada a Oracle
 	 *
 	 * @var string
 	 */
@@ -153,13 +153,13 @@ class DbBase extends Object {
 	const DB_ASSOC = 1;
 
 	/**
-	 * Resultado de Array Asociativo y Numerico
+	 * Resultado de Array Asociativo y Numérico
 	 *
 	 */
 	const DB_BOTH = 2;
 
 	/**
-	 * Resultado de Array Numerico
+	 * Resultado de Array Numérico
 	 *
 	 */
 	const DB_NUM = 3;
@@ -237,14 +237,14 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Hace un select de una forma mas corta, listo para usar en un foreach
+	 * Hace un SELECT de una forma más corta, listo para usar en un foreach
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param string $where
-	 * @param string $fields
-	 * @param string $orderBy
-	 * @return array
+	 * @access	public
+	 * @param	string $table
+	 * @param	string $where
+	 * @param	string $fields
+	 * @param	string $orderBy
+	 * @return	array
 	 */
 	public function find($table, $where="", $fields="*", $orderBy="1"){
 		ActiveRecord::sqlItemSanizite($table);
@@ -263,12 +263,12 @@ class DbBase extends Object {
 
 	/**
 	 * Realiza un query SQL y devuelve un array con los array resultados en forma
-	 * indexada por numeros y asociativamente
+	 * indexada por números y asociativamente
 	 *
-	 * @access public
-	 * @param string $sqlQuery
-	 * @param integer $type
-	 * @return array
+	 * @access	public
+	 * @param	string $sqlQuery
+	 * @param	integer $type
+	 * @return	array
 	 */
 	public function inQuery($sqlQuery){
 		$resultQuery = $this->query($sqlQuery);
@@ -283,11 +283,11 @@ class DbBase extends Object {
 
 	/**
 	 * Realiza un query SQL y devuelve un array con los array resultados en forma
-	 * indexada por numeros y asociativamente (Alias para inQuery)
+	 * indexada por números y asociativamente (Alias para inQuery)
 	 *
-	 * @param string $sqlQuery
-	 * @param integer $type
-	 * @return array
+	 * @param	string $sqlQuery
+	 * @param	integer $type
+	 * @return	array
 	 */
 	public function fetchAll($sqlQuery){
 		return $this->inQuery($sqlQuery);
@@ -315,11 +315,11 @@ class DbBase extends Object {
 
 	/**
 	 * Realiza un query SQL y devuelve un array con los array resultados en forma
-	 * numerica
+	 * numérica
 	 *
-	 * @param string $sqlQuery
-	 * @param integer $type
-	 * @return array
+	 * @param	string $sqlQuery
+	 * @param	integer $type
+	 * @return	array
 	 */
 	public function inQueryNum($sqlQuery){
 		$resultQuery = $this->query($sqlQuery);
@@ -336,16 +336,16 @@ class DbBase extends Object {
 	/**
 	 * Devuelve un array del resultado de un select de un solo registro
 	 *
-	 * @access public
-	 * @param string $sqlQuery
-	 * @param integer $fetchType
-	 * @return array
+	 * @access	public
+	 * @param	string $sqlQuery
+	 * @param	integer $fetchType
+	 * @return	array
 	 */
 	public function fetchOne($sqlQuery){
 		$resultQuery = $this->query($sqlQuery);
 		if($resultQuery){
 			if($this->numRows($resultQuery)>1){
-				Flash::warning("Una sentencia SQL: \"$sqlQuery\" retornó m&aacute;s de una fila cuando se esperaba una sola");
+				Flash::warning("Una sentencia SQL: \"$sqlQuery\" retornó más de una fila cuando se esperaba una sola");
 			}
 			return $this->fetchArray($resultQuery);
 		} else {
@@ -356,12 +356,12 @@ class DbBase extends Object {
 	/**
 	 * Realiza una inserción
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param array $values
-	 * @param array $fields
-	 * @param boolean $automaticQuotes
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	array $values
+	 * @param	array $fields
+	 * @param	boolean $automaticQuotes
+	 * @return	boolean
 	 */
 	public function insert($table, $values, $fields=null, $automaticQuotes=false){
 		$insertSQL = '';
@@ -396,13 +396,13 @@ class DbBase extends Object {
 	/**
 	 * Actualiza registros en una tabla
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param array $fields
-	 * @param array $values
-	 * @param string $whereCondition
-	 * @param boolean $automaticQuotes
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	array $fields
+	 * @param	array $values
+	 * @param	string $whereCondition
+	 * @param	boolean $automaticQuotes
+	 * @return	boolean
 	 */
 	public function update($table, $fields, $values, $whereCondition=null, $automaticQuotes=false){
 		if($this->isReadOnly()==true){
@@ -435,10 +435,10 @@ class DbBase extends Object {
 	/**
 	 * Borra registros de una tabla
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param string $whereCondition
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	string $whereCondition
+	 * @return	boolean
 	 */
 	public function delete($table, $whereCondition=''){
 		if($this->isReadOnly()==true){
@@ -454,8 +454,8 @@ class DbBase extends Object {
 	/**
 	 * Inicia una transacción si es posible
 	 *
-	 * @access public
-	 * @return boolean
+	 * @access	public
+	 * @return	boolean
 	 */
 	public function begin(){
 		$this->_autoCommit = false;
@@ -510,9 +510,9 @@ class DbBase extends Object {
 	/**
 	 * Loggea las operaciones sobre la base de datos si estan habilitadas
 	 *
-	 * @access protected
-	 * @param string $sqlStatement
-	 * @param string $type
+	 * @access	protected
+	 * @param	string $sqlStatement
+	 * @param	string $type
 	 */
 	protected function log($sqlStatement, $type){
 		if($this->_logger){
@@ -536,8 +536,8 @@ class DbBase extends Object {
 	/**
 	 * Almacena una traza interna de todo el SQL en una conexión
 	 *
-	 * @access protected
-	 * @param string $sqlStatement
+	 * @access	protected
+	 * @param	string $sqlStatement
 	 */
 	protected function trace($sqlStatement){
 		if($this->_trace==true){
@@ -556,10 +556,10 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Muestra Mensajes de Debug en Pantalla si esta habilitado
+	 * Muestra mensajes de debug en pantalla si está habilitado
 	 *
-	 * @access protected
-	 * @param string $sqlStatement
+	 * @access	protected
+	 * @param	string $sqlStatement
 	 */
 	protected function debug($sqlStatement){
 		if($this->_debug==true){
@@ -574,17 +574,17 @@ class DbBase extends Object {
 	 * $newConnection = Si es verdadero devuelve un objeto
 	 * db nuevo y no el del singleton
 	 *
-	 * @access public
-	 * @param boolean $renovate
-	 * @param boolean $newConnection
-	 * @return DbBase
+	 * @access	public
+	 * @param	boolean $renovate
+	 * @param	boolean $newConnection
+	 * @return	DbBase
 	 * @static
 	 */
 	public static function rawConnect($newConnection=false, $renovate=false){
 		$config = CoreConfig::readEnviroment();
 		if($newConnection==true){
 			if(isset($config->database)==false){
-				throw new DbException('No se ha definido los par&aacute;metros de conexión al gestor relacional en enviroment.ini', 0, true, $this);
+				throw new DbException('No se ha definido los parámetros de conexión al gestor relacional en enviroment.ini', 0, true, $this);
 			}
 			$connection = new db($config->database);
 			if($renovate==true){
@@ -592,7 +592,7 @@ class DbBase extends Object {
 			}
 		} else {
 			if(isset($config->database)==false){
-				throw new DbException('No se ha definido los par&aacute;metros de conexión al gestor relacional en enviroment.ini');
+				throw new DbException('No se ha definido los parámetros de conexión al gestor relacional en enviroment.ini');
 			}
 			if(self::$_rawConnection==null){
 				self::$_rawConnection = new db($config->database);
@@ -621,7 +621,7 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Establece si va a realizar Profile en la conexion
+	 * Establece si va a realizar Profile en la conexión
 	 *
 	 * @param DbProfiler|boolean $profiler
 	 */
@@ -715,8 +715,8 @@ class DbBase extends Object {
 	/**
 	 * Ejecuta una sentencia SQL en el gestor relacional
 	 *
-	 * @param string $sqlStatement
-	 * @return boolean
+	 * @param	string $sqlStatement
+	 * @return	boolean
 	 */
 	public function query($sqlStatement){
 		return false;
@@ -725,7 +725,7 @@ class DbBase extends Object {
 	/**
 	 * Devuelve el nombre de la base de datos
 	 *
-	 * @return string
+	 * @return	string
 	 */
 	public function getDatabaseName(){
 		if(isset($this->_descriptor->name)){
@@ -738,7 +738,7 @@ class DbBase extends Object {
 	/**
 	 * Devuelve el nombre del usuario de la base de datos ó propietario del schema
 	 *
-	 * @return string
+	 * @return	string
 	 */
 	public function getUsername(){
 		if(isset($this->_descriptor->username)){
@@ -749,9 +749,10 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Devuelve el nombre del host o direccion IP del servidor del RBDM
+	 * Devuelve el nombre del host o dirección IP del servidor del RBDM
 	 *
-	 * @return string
+	 * @access 	public
+	 * @return	string
 	 */
 	public function getHostName(){
 		if(isset($this->_descriptor->host)){
@@ -762,17 +763,18 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Devuelve el id de Conexion generado por el driver
+	 * Devuelve el id de conexión generado por el driver
 	 *
-	 * @param boolean $asString
-	 * @return resource
+	 * @access 	public
+	 * @param	boolean $asString
+	 * @return	resource
 	 */
 	public function getConnectionId($asString=false){
 		return $this->_idConnection;
 	}
 
 	/**
-	 * Devuelve el ultimo cursor generado por el driver
+	 * Devuelve el último cursor generado por el driver
 	 *
 	 * @return resource
 	 */

@@ -439,6 +439,7 @@ abstract class Dispatcher {
 							}
 						}
 					}
+					$controller->prepareForPersist();
 					if(isset($_SESSION['KCON'][$instanceName][$activeApp][$module][$appController])){
 						$_SESSION['KCON'][$instanceName][$activeApp][$module][$appController] = array(
 							'data' => serialize($controller),
