@@ -51,6 +51,7 @@ require 'Library/Kumbia/ActiveRecord/Interface.php';
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordBase
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2007-2007 Roger Jose Padilla Camacho(rogerjose81 at gmail.com)
  * @copyright	Copyright (C) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
@@ -199,7 +200,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	const OP_UPDATE = 2;
 
 	/**
-	 * Indica que la ultima operación fue una eliminación
+	 * Indica que la última operación fue una eliminación
 	 *
 	 */
 	const OP_DELETE = 3;
@@ -707,11 +708,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Crea un Resultset creado por _createSQLSelect
+	 * Crea un resultset creado por _createSQLSelect
 	 *
-	 * @access private
-	 * @param string $select
-	 * @return boolean|ActiveRecordResulset
+	 * @access	private
+	 * @param	string $select
+	 * @return	boolean|ActiveRecordResulset
 	 */
 	private function _createResultset($select, $resultResource){
 		if($select['return']=='1'){
@@ -776,10 +777,10 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Find data on Relational Map table and locks Resultset using SharedLock
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return ActiveRecordResulset
-	 * @throws ActiveRecordException
+	 * @access	public
+	 * @param	string $params
+	 * @return	ActiveRecordResulset
+	 * @throws	ActiveRecordException
 	 */
 	public function findWithSharedLock($params=''){
 		$this->_connect();
@@ -800,9 +801,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	 * 	$select = "SELECT * FROM Clientes";
 	 *	$select.= $this->convertParamsToSql($params);
      *
-     * @access public
-	 * @param string $params
-	 * @return string
+     * @access	public
+	 * @param	string $params
+	 * @return	string
 	 */
 	public function convertParamsToSql($params = ''){
 		$select = '';
@@ -874,11 +875,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Obtiene ó crea una instancia dadas unas condiciones
 	 *
-	 * @param string $entityName
-	 * @param array $conditions
-	 * @param array $findOptions
+	 * @param	string $entityName
+	 * @param	array $conditions
+	 * @param	array $findOptions
 	 * @static
-	 * @return ActiveRecord
+	 * @return	ActiveRecord
 	 */
 	static public function getInstance($entityName, array $conditions, array $findOptions=array()){
 		$criteria = array();
@@ -904,9 +905,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Realiza un SELECT distinct de una columna del Modelo
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return array
+	 * @access	public
+	 * @param	string $params
+	 * @return	array
 	 */
 	public function distinct($params=''){
 		$this->_connect();
@@ -948,9 +949,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Realiza un SELECT que ejecuta funciones del RBDM
 	 *
-	 * @access public
-	 * @param string $sql
-	 * @return array
+	 * @access	public
+	 * @param	string $sql
+	 * @return	array
 	 * @static
 	 */
 	static public function singleSelect($sql){
@@ -967,10 +968,10 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Devuelve el resultado del agrupamiento
 	 *
-	 * @param array $params
-	 * @param string $selectStatement
-	 * @param string $alias
-	 * @return mixed
+	 * @param	array $params
+	 * @param 	string $selectStatement
+	 * @param	string $alias
+	 * @return	mixed
 	 */
 	private function _getGroupResult(array $params, $selectStatement, $alias){
 		if(isset($params['group'])){
@@ -992,9 +993,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Realiza un conteo de filas
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return integer
+	 * @access	public
+	 * @param	string $params
+	 * @return	integer
 	 */
 	public function count($params=''){
 		$this->_connect();
@@ -1047,8 +1048,8 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Realiza un promedio sobre el campo $params
 	 *
-	 * @param string $params
-	 * @return array
+	 * @param	string $params
+	 * @return	array
 	 */
 	public function average($params=''){
 		$this->_connect();
@@ -1242,8 +1243,8 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Realiza un conteo directo mediante $sql
 	 *
-	 * @param string $sqlQuery
-	 * @return mixed
+	 * @param	string $sqlQuery
+	 * @return	mixed
 	 */
 	public function countBySql($sqlQuery){
 		CoreType::assertString($sqlQuery);
@@ -1258,8 +1259,8 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	 * en un nuevo objeto con sus correspondientes
 	 * atributos de la clase
 	 *
-	 * @param array $result
-	 * @return ActiveRecord
+	 * @param	array $result
+	 * @return	ActiveRecord
 	 */
 	public function dumpResult(array $result){
 		$this->_connect();
@@ -1305,7 +1306,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Obtiene los mensajes de error generados en el proceso de validacion
+	 * Obtiene los mensajes de error generados en el proceso de validación
 	 *
 	 * @return array
 	 */
@@ -2049,9 +2050,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Permite establecer el tipo de generador de valores únicos a usar
 	 *
-	 * @param string $adapter
-	 * @param string $column
-	 * @param array $options
+	 * @param	string $adapter
+	 * @param	string $column
+	 * @param	array $options
 	 */
 	public function setIdGenerator($adapter, $column, $options=array()){
 		EntityManager::setEntityGenerator(get_class($this), $adapter, $column, $options);
@@ -2060,10 +2061,10 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Find All data in the Relational Table
 	 *
-	 * @access public
-	 * @param string $field
-	 * @param string $value
-	 * @return ActiveRecordResultset
+	 * @access	public
+	 * @param	string $field
+	 * @param	string $value
+	 * @return	ActiveRecordResultset
 	 */
 	public function findAllBy($field, $value){
 		CoreType::assertString($field);
@@ -2073,9 +2074,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Updates Data in the Relational Table
 	 *
-	 * @param mixed $values
-	 * @return boolean
-	 * @throws ActiveRecordException
+	 * @param	mixed $values
+	 * @return	boolean
+	 * @throws	ActiveRecordException
 	 */
 	public function update($values=''){
 		$this->_connect();
@@ -2108,9 +2109,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Deletes data from Relational Map Table
 	 *
-	 * @access public
-	 * @param mixed $params
-	 * @return boolean
+	 * @access	public
+	 * @param	mixed $params
+	 * @return	boolean
 	 */
 	public function delete($params=''){
 		$this->_connect();
@@ -2170,9 +2171,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	 * $Clientes->updateAll("estado='A', fecha='2005-02-02'", "id>100");
 	 * $Clientes->updateAll("estado='A', fecha='2005-02-02'", "id>100", "limit: 10");
 	 *
-	 * @access public
-	 * @param string $values
-	 * @return boolean
+	 * @access	public
+	 * @param	string $values
+	 * @return	boolean
 	 */
 	public function updateAll($values){
 		$this->_connect();
@@ -2289,8 +2290,8 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 
 	/**
 	 * *********************************************************************************
-	 * Metodos de Validacion
-	 * *********************************************************************************
+	 * Métodos de Validación
+	 * ********************************************************************************
 	 */
 
 	/**
@@ -2427,10 +2428,10 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Crea una relacion 1-1 inversa entre dos entidades
 	 *
-	 * @param mixed $fields
-	 * @param string $referenceTable
-	 * @param string $referencedFields
-	 * @param string $relationName
+	 * @param	mixed $fields
+	 * @param	string $referenceTable
+	 * @param	string $referencedFields
+	 * @param	string $relationName
 	 */
 	protected function belongsTo($fields='', $referenceTable='', $referencedFields='', $relationName=''){
 		EntityManager::addBelongsTo(get_class($this), $fields, $referenceTable, $referencedFields, $relationName);
@@ -2439,9 +2440,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Crea una relacion 1-n entre dos entidades
 	 *
-	 * @param mixed $fields
-	 * @param string $referenceTable
-	 * @param string $referencedFields
+	 * @param	mixed $fields
+	 * @param	string $referenceTable
+	 * @param	string $referencedFields
 	 */
 	protected function hasMany($fields='', $referenceTable='', $referencedFields=''){
 		EntityManager::addHasMany(get_class($this), $fields, $referenceTable, $referencedFields);
@@ -2510,17 +2511,17 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Reescribiendo este metodo se puede controlar las excepciones generadas en los modelos
+	 * Reescribiendo este método se puede controlar las excepciones generadas en los modelos
 	 *
-	 * @param Exception $e
-	 * @throws Exception
+	 * @param	Exception $e
+	 * @throws	Exception
 	 */
 	public function exceptions($e){
 		throw $e;
 	}
 
 	/**
-	 * Implementacion de __toString Standard
+	 * Implementación de __toString Standard
 	 *
 	 * @return string
 	 */
@@ -2541,9 +2542,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
      * Valida que los valores que sean leidos del objeto ActiveRecord esten definidos
      * previamente o sean atributos de la entidad
      *
-     * @access public
-     * @param string $property
-     * @throws ActiveRecordException
+     * @access	public
+     * @param	string $property
+     * @throws	ActiveRecordException
      */
 	public function __get($property){
 		$this->_connect();
@@ -2571,9 +2572,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	 * Valida que los valores que sean asignados al objeto ActiveRecord esten definidos
 	 * o sean atributos de la entidad
 	 *
-	 * @param string $property
-	 * @param mixed $value
-	 * @throws ActiveRecordException
+	 * @param	string $property
+	 * @param	mixed $value
+	 * @throws	ActiveRecordException
 	 */
 	public function __set($property, $value){
 		$this->_connect();
@@ -2588,10 +2589,10 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	/**
 	 * Valida los llamados a los metodos del modelo cuando se llame un metodo que no exista
 	 *
-	 * @param string $method
-	 * @param array $args
-	 * @return mixed
-	 * @throws ActiveRecordException
+	 * @param	string $method
+	 * @param	array $args
+	 * @return	mixed
+	 * @throws	ActiveRecordException
 	 */
 	public function __call($method, $args = array()){
 		$this->_connect();
