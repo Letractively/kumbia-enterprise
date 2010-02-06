@@ -14,24 +14,27 @@
  *
  * @category	Kumbia
  * @package		Db
- * @subpackage	Adapters
+ * @subpackage	SQLDialects
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license		New BSD License
- * @version 	$Id: Mysql.php 90 2009-09-21 01:29:23Z gutierrezandresfelipe@gmail.com $
+ * @version 	$Id$
  */
 
 /**
- * MySQL Database Support
+ * MySQL SQL Dialect
  *
- * Estas funciones le permiten acceder a servidores de bases de datos MySQL.
- * Puede encontrar mas informacion sobre MySQL en http://www.mysql.com/.
- * La documentacion de MySQL puede encontrarse en http://dev.mysql.com/doc/.
+ * Funciones de traductor de SQL para MySQL
+ * Puede encontrar mas información sobre MySQL en http://www.mysql.com/.
+ * La documentación de MySQL puede encontrarse en http://dev.mysql.com/doc/.
  *
  * @category	Kumbia
  * @package		Db
- * @subpackage	Adapters
+ * @subpackage	SQLDialects
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license		New BSD License
  * @link		http://www.php.net/manual/es/ref.mysql.php
  * @access		Public
  */
+class MysqlSQLDialect {
+
+}
