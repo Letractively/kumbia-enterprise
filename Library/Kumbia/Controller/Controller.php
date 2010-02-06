@@ -731,9 +731,6 @@ class Controller extends ControllerBase {
 	 * @access public
 	 */
 	public function __wakeup(){
-		$this->_logger = false;
-		$this->_cacheView = 0;
-		$this->_cacheLayout = 0;
 		if(method_exists($this, 'initialize')){
 			$this->initialize();
 		}
@@ -874,6 +871,18 @@ class Controller extends ControllerBase {
 		$this->_controllerName = null;
 		$this->_actionName = null;
 		$this->_id = null;
+	}
+
+	/**
+	 * Indica los atributos que no deben ser serializados
+	 *
+	 * @return array
+	 */
+	public function _sleep(){
+		return array(
+			'_logger', '_cacheLayout', '_cacheView', '_id', '_actionName',
+			'_controllerName', '_parameters', '_allParameters'
+		);
 	}
 
 }
