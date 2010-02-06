@@ -583,6 +583,7 @@ abstract class Tag {
 		} else {
 			$value = self::getValueFromAction($params[0]);
 		}
+
 		if($value){
 			$ano = substr($value, 0, 4);
 			$mes = substr($value, 5, 2);
@@ -700,8 +701,10 @@ abstract class Tag {
 	 * @static
 	 */
 	public static function localeDateField($params, $traslate){
+
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
+
 		if(!isset($params[0])){
 			$params[0] = $params['id'];
 		}
@@ -1222,16 +1225,13 @@ abstract class Tag {
 	 * @return 	string
 	 * @static
 	 */
-	public static function submitImage($caption, $src){
+	public static function submitImage($src){
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
-		if(!isset($params['caption'])){
-			$params['caption'] = $params[0];
-		}
 		if(!isset($params['src'])){
-			$params['src'] = $params[1];
+			$params['src'] = Core::getInstancePath().'img/'.$params[0];
 		}
-		$code = "<input type='image' src='{$params['src']}' value='{$params['caption']}' ";
+		$code = "<input type='image' src='{$params['src']}' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$code.="$key='$value' ";

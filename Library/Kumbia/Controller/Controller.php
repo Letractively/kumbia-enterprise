@@ -863,4 +863,17 @@ class Controller extends ControllerBase {
 		return Validation::getMessages();
 	}
 
+	/**
+	 * Ejecuta acciones previas a la serialización
+	 *
+	 * @access 	public
+	 */
+	public function prepareForPersist(){
+		$this->_allParameters = array();
+		$this->_parameters = array();
+		$this->_controllerName = null;
+		$this->_actionName = null;
+		$this->_id = null;
+	}
+
 }

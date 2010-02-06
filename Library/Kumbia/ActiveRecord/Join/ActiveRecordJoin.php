@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordJoin
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -32,14 +32,14 @@
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordJoin
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
 class ActiveRecordJoin extends Object {
 
 	/**
-	 * Conexion al motor con el que se hara la consulta
+	 * Conexion al motor con el que se hará la consulta
 	 *
 	 * @access private
 	 * @var dbBase
@@ -47,7 +47,7 @@ class ActiveRecordJoin extends Object {
 	private $_db;
 
 	/**
-	 * Consulta generada apartir de los parametros
+	 * Consulta generada apartir de los parámetros
 	 *
 	 * @access private
 	 * @var string
@@ -245,7 +245,7 @@ class ActiveRecordJoin extends Object {
 						if(in_array($regs[1], $params['entities'])){
 							$params['order'][$key] = str_replace("{#$regs[1]}", $entitiesSources[$regs[1]], $valueOrder);
 						} else {
-							throw new DbSQLGrammarException("No se encuentra la entidad '{$regs[1]}' en la lista de ordenamiento");
+							throw new DbSQLGrammarException("No se encuentra la entidad '{$regs[1]}' en la lista de ordenamiento", 0);
 						}
 					}
 				}

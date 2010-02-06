@@ -111,19 +111,37 @@ abstract class i18n {
 	/**
 	 * Obtiene una parte de un String
 	 *
-	 * @param string $str
-	 * @param int $start
-	 * @param int $length
-	 * @return string
+	 * @param	string $str
+	 * @param	int $start
+	 * @param	int $length
+	 * @return	string
 	 */
 	static public function substr($str, $start, $length=null){
 		if(self::$_multiByteEnabled==false){
-			return substr($str, $start, $length);
+			if($length===null){
+				return substr($str, $start);
+			} else {
+				return substr($str, $start, $length);
+			}
 		} else {
 			if($length===null){
 				$length = mb_strlen($str);
 			}
 			return mb_substr($str, $start, $length, self::$_defaultCharset);
+		}
+	}
+
+	/**
+	 * Obtiene el tamaño de un string
+	 *
+	 * @param	string $str
+	 * @return	int
+	 */
+	static public function strlen($str){
+		if(self::$_multiByteEnabled==false){
+			return strlen($str);
+		} else {
+			return mb_strlen($str, self::$_defaultCharset);
 		}
 	}
 

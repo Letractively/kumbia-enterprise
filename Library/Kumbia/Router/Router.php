@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Router
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
  * @license 	New BSD License
@@ -106,6 +106,13 @@ abstract class Router {
 	 * @var boolean
 	 */
 	static private $_routed;
+
+	/**
+	 * Indica si la invocación de una acción fue producida por un enrutamiento
+	 *
+	 * @var boolean
+	 */
+	static private $_wasRouted = false;
 
 	/**
 	 * Detector de enrutamiento ciclico
@@ -335,6 +342,7 @@ abstract class Router {
 				}
 
 			} else {
+
 				//En parameters quedan los valores de parametros por URL
 				if(self::$_application=='default'){
 					unset($urlItems[0], $urlItems[1]);
@@ -591,6 +599,7 @@ abstract class Router {
 	static public function routeToURI($uri){
 		self::validateRouter();
 		self::$_routed = false;
+		self::$_wasRouted = true;
 		$items = explode('/', $uri);
 		self::$_allParameters = array();
 		if(isset($items[1])){
@@ -636,6 +645,7 @@ abstract class Router {
 		}
 		self::validateRouter();
 		self::$_routed = false;
+		self::$_wasRouted = true;
 		$cyclicRouting = false;
 		self::$_allParameters = array();
 		if(isset($route['controller'])){
@@ -756,6 +766,16 @@ abstract class Router {
 		$instancePath = Core::getInstancePath();
 		$response = ControllerResponse::getInstance();
 		$response->setHeader('Location: '.$instancePath.'/'.$uri, true);
+	}
+
+	/**
+	 * Indica si la invocación de una acción fue producida por un enrutamiento
+	 *
+	 * @access 	public
+	 * @static
+	 */
+	static public function wasRouted(){
+		return self::$_wasRouted;
 	}
 
 	/**

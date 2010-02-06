@@ -12,10 +12,12 @@
  * obtain it through the world-wide-web, please send an email
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
- * @category Kumbia
- * @package Currency
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @category	Kumbia
+ * @package		Currency
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @license		New BSD License
+ * @version		$Id$
  */
 
 /**
@@ -23,11 +25,11 @@
  *
  * Toma un patrón unicode y lo aplica a una cantidad
  *
- * @category Kumbia
- * @package Currency
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
- * @access public
+ * @category	Kumbia
+ * @package		Currency
+ * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @license		New BSD License
+ * @access		public
  */
 class CurrencyFormat {
 
@@ -39,7 +41,7 @@ class CurrencyFormat {
 	private $_quantity;
 
 	/**
-	 * Numero de decimales
+	 * Número de decimales
 	 *
 	 * @var int
 	 */
@@ -73,13 +75,13 @@ class CurrencyFormat {
 	}
 
 	/**
-	 * Establece el patron
+	 * Establece el patrón
 	 *
 	 * @param double $currency
 	 */
 	public function setPattern($currency){
 		if(preg_match('/0'.$currency['decimal'].'([0]+)/', $currency['pattern'], $matches)){
-			$decimalPlaces = strlen($matches[1]);
+			$decimalPlaces = i18n::strlen($matches[1]);
 		} else {
 			$decimalPlaces = 2;
 		}

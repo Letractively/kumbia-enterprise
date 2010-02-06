@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package 	Db
  * @subpackage	Loader
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -38,9 +38,9 @@ abstract class DbLoader {
 	/**
 	 * Carga un adaptador de base de datos segun parametros
 	 *
-	 * @param string $adapterName
-	 * @param array $options
-	 * @return DbBase
+	 * @param	string $adapterName
+	 * @param	array $options
+	 * @return	DbBase
 	 */
 	public static function factory($adapterName, $options){
 		$descriptor = new stdClass();
@@ -100,6 +100,9 @@ abstract class DbLoader {
 		}
 		if(!class_exists($className)){
 			throw new DbLoaderException('No existe la clase '.$className.', necesaria para iniciar el adaptador', 0);
+		}
+		if(!class_exists($type.'SQLDialect')){
+			require 'Library/Kumbia/Db/SQLDialects/'.ucfirst($type).'.php';
 		}
 		return $className;
 	}

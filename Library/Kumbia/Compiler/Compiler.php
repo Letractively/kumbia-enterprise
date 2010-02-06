@@ -422,7 +422,6 @@ class Compiler {
 	public static function compileFile($file){
 		#self::$_compilation.="#$file".PHP_EOL;
 		#file_put_contents('file.txt', $file);
-		print $file."<br>";
 		self::compileSource(file_get_contents($file));
 	}
 
@@ -588,8 +587,22 @@ class Compiler {
 		}
 	}
 
+	/**
+	 * Obtiene el resultado temporal de la compilacion
+	 *
+	 * @return string
+	 */
 	public static function getCompilation(){
 		return self::$_compilation;
+	}
+
+	/**
+	 * Resetea la compilación
+	 *
+	 * @return string
+	 */
+	public static function resetCompilation(){
+		self::$_compilation = "";
 	}
 
 }
