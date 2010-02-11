@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		Core
  * @subpackage	CoreConfig
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -30,7 +30,7 @@
  * @category	Kumbia
  * @package		Core
  * @subpackage	CoreConfig
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
@@ -99,7 +99,7 @@ abstract class CoreConfig {
 		//Carga las variables de la seccion [project]
 		if(isset($config->project)){
 			foreach($config->project as $conf => $value){
-				if(preg_match("/([a-z0-9A-Z]+)\.([a-z0-9A-Z]+)/", $conf, $registers)){
+				if(preg_match('/([a-z0-9A-Z]+)\.([a-z0-9A-Z]+)/', $conf, $registers)){
 					if(!isset($config->{$registers[1]})){
 						$config->{$registers[1]} = new stdClass();
 					}

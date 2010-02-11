@@ -410,30 +410,30 @@ abstract class EntityManager {
 		$relation = self::$_belongsTo[$entityName][$relationRequested];
 		if(!is_array($relation['rf'])){
 			$value = $record->readAttribute($relation['fi']);
-			$condition = "{$relation['rf']} = '$value'";
+			$condition = $relation['rf'].' = \''.$value.'\'';
 		} else {
 			$i = 0;
 			$conditions = array();
 			foreach($relation['rf'] as $referencedField){
 				$value = $record->readAttribute($relation['fi'][$i]);
-				$conditions[] = "{$relation['rf'][$i]} = '$value'";
+				$conditions[] = $relation['rf'][$i].' = \''.$value.'\'';
 				++$i;
 			}
-			$condition = join(" AND ", $conditions);
+			$condition = join(' AND ', $conditions);
 		}
 		$arguments = func_get_args();
 		$arguments = array_merge(array($condition), array_slice($arguments, 3));
 		$referenceTable = ucfirst(Utils::camelize($relation['rt']));
 		if(self::$_autoInitialize==true){
 			if(isset(self::$_entities[$referenceTable])){
-				$returnedRecord = call_user_func_array(array(self::$_entities[$referenceTable], "findFirst"), $arguments);
+				$returnedRecord = call_user_func_array(array(self::$_entities[$referenceTable], 'findFirst'), $arguments);
 				return $returnedRecord;
 			} else {
-				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación n-1");
+				throw new EntityManagerException('No existe la entidad "'.$referenceTable.'" para realizar la relación n-1');
 			}
 		} else {
 			$entity = self::getEntityInstance($referenceTable);
-			$returnedRecord = call_user_func_array(array($entity, "findFirst"), $arguments);
+			$returnedRecord = call_user_func_array(array($entity, 'findFirst'), $arguments);
 			return $returnedRecord;
 		}
 	}
@@ -452,13 +452,13 @@ abstract class EntityManager {
 		$relation = self::$_hasOne[$entityName][$relationRequested];
 		if(!is_array($relation['rf'])){
 			$value = $record->readAttribute($relation['fi']);
-			$condition = "{$relation['rf']} = '$value'";
+			$condition = $relation['rf']." = '".$value."'";
 		} else {
 			$i = 0;
 			$conditions = array();
 			foreach($relation['rf'] as $referencedField){
 				$value = $record->readAttribute($relation['fi'][$i]);
-				$conditions[] = "{$relation['rf'][$i]} = '$value'";
+				$conditions[] = $relation['rf'][$i]." = '".$value."'";
 				++$i;
 			}
 			$condition = join(" AND ", $conditions);
@@ -492,13 +492,13 @@ abstract class EntityManager {
 		$relation = self::$_hasMany[$entityName][$relationRequested];
 		if(!is_array($relation['fi'])){
 			$value = $record->readAttribute($relation['rf']);
-			$condition = "{$relation['fi']} = '$value'";
+			$condition = $relation['fi']." = '".$value."'";
 		} else {
 			$i = 0;
 			$conditions = array();
 			foreach($relation['fi'] as $referencedField){
 				$value = $record->readAttribute($relation['rf'][$i]);
-				$conditions[] = "{$relation['fi'][$i]} = '$value'";
+				$conditions[] = $relation['fi'][$i]." = '".$value."'";
 				++$i;
 			}
 			$condition = join(' AND ', $conditions);
@@ -517,7 +517,7 @@ abstract class EntityManager {
 				$findParams[] = $allParams[$i];
 			}
 			if($conditionsKey==false){
-				$findParams[] = 'conditions: $condition';
+				$findParams[] = 'conditions: '.$condition;
 			}
 		} else {
 			$findParams = array($condition);

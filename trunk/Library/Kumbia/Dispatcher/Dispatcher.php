@@ -163,7 +163,9 @@ abstract class Dispatcher {
 		if(!$applicationController){
 			$applicationController = new ApplicationController();
 		}
+		#if[no-plugins]
 		PluginManager::notifyFromController('beforeNotFoundAction', $applicationController);
+		#endif
 		if(method_exists($applicationController, 'notFoundAction')){
 			call_user_func_array(array($applicationController, 'notFoundAction'), Router::getAllParameters());
 			return true;
@@ -210,7 +212,9 @@ abstract class Dispatcher {
    	     * El metodo beforeFilter es llamado antes de ejecutar una accion en un
 		 * controlador, puede servir para realizar ciertas validaciones
 		 */
+		#if[dispatcher-status]
 		self::$_requestStatus = self::STATUS_RUNNING_BEFORE_FILTERS;
+		#endif
 		if(method_exists($appController, 'beforeFilter')){
 			if(call_user_func_array(array(self::$_controller, 'beforeFilter'), $params)===false){
 				return false;
@@ -238,7 +242,9 @@ abstract class Dispatcher {
 		 * El metodo afterFilter es llamado despues de ejecutar una accion en un
 		 * controlador, puede servir para realizar ciertas validaciones
 		 */
+		#if[dispatcher-status]
 		self::$_requestStatus = self::STATUS_RUNNING_BEFORE_FILTERS;
+		#endif
 		if(method_exists($appController, 'afterFilter')){
 			call_user_func_array(array(self::$_controller, 'afterFilter'), $params);
 		} else {
@@ -371,7 +377,9 @@ abstract class Dispatcher {
 
 			    //Se ejecuta el metodo con el nombre de la accion en la clase mas el sufijo Action
 				$actionMethod = $action.'Action';
+				#if[dispatcher-status]
 				self::$_requestStatus = self::STATUS_DISPATCHING;
+				#endif
 				if(method_exists(self::$_controller, $actionMethod)==false){
 					if(method_exists(self::$_controller, 'notFoundAction')){
 						call_user_func_array(array(self::$_controller, 'notFoundAction'), Router::getAllParameters());
@@ -383,7 +391,9 @@ abstract class Dispatcher {
 					}
 				}
 
+				#if[dispatcher-status]
 				self::$_requestStatus = self::STATUS_RUNNING_CONTROLLER_ACTION;
+				#endif
 				#if[compile-time]
 				$method = new ReflectionMethod($appController, $actionMethod);
 				if($method->isPublic()==false){
@@ -405,13 +415,19 @@ abstract class Dispatcher {
 
 			 	//Corre los filtros after
 				self::_runAfterFilters($appController, $controller, $action, $parameters);
+				#if[dispatcher-status]
 				self::$_requestStatus = self::STATUS_RENDER_PRESENTATION;
+				#endif
 
 			}
 			catch(Exception $e){
 
+				$cancelThrowException = false;
+
 				// Notifica la excepcion a los Plugins
+				#if[no-plugins]
 				$cancelThrowException = PluginManager::notifyFromApplication('onControllerException', $e);
+				#endif
 
 				if(method_exists(self::$_controller, 'onException')){
 					self::$_controller->onException($e);
@@ -426,7 +442,9 @@ abstract class Dispatcher {
 			if(self::$_controller->getPersistance()==true){
 				$controller = clone self::$_controller;
 				try {
+					#if[dispatcher-status]
 					self::$_requestStatus = self::STATUS_RUNNING_BEFORE_STORE_PERSISTENCE;
+					#endif
 					if(method_exists($controller, 'beforeStorePersistence')){
 						$controller->beforeStorePersistence();
 					}
@@ -447,7 +465,9 @@ abstract class Dispatcher {
 							'status' => 'N'
 						);
 					}
+					#if[dispatcher-status]
 					self::$_requestStatus = self::STATUS_RUNNING_AFTER_STORE_PERSISTENCE;
+					#endif
 				}
 				catch(PDOException $e){
 					throw new CoreException($e->getMessage(), $e->getCode());

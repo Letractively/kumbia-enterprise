@@ -117,10 +117,10 @@ class ProcessInstance {
 	private function _doTransition(ProcessNode $node){
 		$destination = $node->getAttribute('to');
 		if($destination->value==''){
-			throw new ProcessInstanceException("Debe indicar el destino de la transición (state={$this->_activeState})");
+			throw new ProcessInstanceException("Debe indicar el destino de la transición (state=".$this->_activeState.")");
 		} else {
 			$state = $this->_lookupState($destination->value);
-			print "Internal: Haciendo Transición a : $destination->value\n";
+			echo "Internal: Haciendo Transición a : ".$destination->value."\n";
 			$this->_executeNodes($state->getChildNodes());
 		}
 	}
@@ -145,10 +145,10 @@ class ProcessInstance {
 				}
 				$expression = str_replace($matches[0], $var, $expression);
 			} else {
-				throw new ProcessInstanceException("No existe la variable '{$matches[1]}' (state={$this->_activeState})");
+				throw new ProcessInstanceException("No existe la variable '".$matches[1]."' (state=".$this->_activeState.")");
 			}
 		}
-		print "Internal: Expression ".$expression."\n";
+		echo "Internal: Expression ".$expression."\n";
 		return eval("return $expression;");
 	}
 
@@ -163,27 +163,27 @@ class ProcessInstance {
 				$condition = $node->getAttribute('condition');
 				if($condition->value!=''){
 					if($this->_evaluateExpression($condition->value)==false){
-						print "Internal: Evaluation ".$node->getAttribute('to')->value." FAILED\n";
+						echo "Internal: Evaluation ".$node->getAttribute('to')->value." FAILED\n";
 						continue;
 					} else {
-						print "Internal: Evaluation ".$node->getAttribute('to')->value." OK\n";
+						echo "Internal: Evaluation ".$node->getAttribute('to')->value." OK\n";
 					}
 				}
 				$destination = $node->getAttribute('to');
 				if($destination->value==''){
-					throw new ProcessInstanceException("Debe indicar el destino de la transición (state={$this->_activeState})");
+					throw new ProcessInstanceException("Debe indicar el destino de la transición (state=".$this->_activeState.")");
 				} else {
 					$this->_doTransition($node);
 					break;
 				}
 			} else {
-				throw new ProcessInstanceException("No se permite usar '".$node->getType()."' en este lugar (state={$this->_activeState})");
+				throw new ProcessInstanceException("No se permite usar '".$node->getType()."' en este lugar (state=".$this->_activeState.")");
 			}
 		}
 	}
 
 	private function _doTask(ProcessNode $node){
-		print "Internal: Ejecutando Task : ".$node->getName()." (state={$this->_activeState})\n";
+		echo "Internal: Ejecutando Task : ".$node->getName()." (state=".$this->_activeState.")\n";
 		$handler = $node->getAttribute('handler');
 			if($handler->value==''){
 				throw new ProcessInstanceException('Debe indicar el gestor de la tarea');
@@ -213,7 +213,7 @@ class ProcessInstance {
 				continue;
 			}
 			if($node->getType()=='decision'){
-				print "Internal: Evaluando decisión : ".$node->getName()."\n";
+				echo "Internal: Evaluando decisión : ".$node->getName()."\n";
 				$handler = $node->getAttribute('handler');
 				if($handler->value==''){
 					throw new ProcessInstanceException('Debe indicar el gestor de la decision');
@@ -228,7 +228,7 @@ class ProcessInstance {
 				continue;
 			}
 			if($node->getType()=='task-node'){
-				print "Internal: Ejecutando bloque : ".$node->getName()."\n";
+				echo "Internal: Ejecutando bloque : ".$node->getName()."\n";
 				$this->_executeNodes($node->getChildNodes());
 				continue;
 			}

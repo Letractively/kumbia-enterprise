@@ -180,7 +180,7 @@ class DbMySQLi extends DbBase implements DbBaseInterface  {
 			if(isset($descriptor->charset)){
 				if(@mysqli_set_charset($this->_idConnection, $descriptor->charset)==false){
 					$this->_idConnection = null;
-					throw new DbException($this->error("Charset invalido '{$descriptor->charset}'"), $this->noError(), false);
+					throw new DbException($this->error("Charset inválido '".$descriptor->charset."'"), $this->noError(), false);
 					return false;
 				}
 			}
@@ -759,13 +759,22 @@ class DbMySQLi extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Devuelve la extension o extensiones de PHP requeridas para
+	 * Devuelve la extension ó extensiones de PHP requeridas para
 	 * usar el adaptador
 	 *
 	 * @return string|array
 	 */
 	public static function getPHPExtensionRequired(){
 		return 'mysqli';
+	}
+
+	/**
+	 * Devuelve el SQL Dialect usado
+	 *
+	 * @return string
+	 */
+	public function getSQLDialect(){
+		return 'MysqlSQLDialect';
 	}
 
 }

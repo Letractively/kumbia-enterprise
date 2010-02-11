@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordJoin
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -29,12 +29,16 @@
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordJoin
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-20010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
  */
-class ActiveRecordRow extends Object implements ActiveRecordResultInterface {
+class ActiveRecordRow extends Object
+#if[compile-time]
+	implements ActiveRecordResultInterface
+#endif
+	{
 
 	/**
 	 * Conexion al motor con el que se hara la consulta
@@ -146,10 +150,10 @@ class ActiveRecordRow extends Object implements ActiveRecordResultInterface {
 			if(isset($this->_columns[$property])){
 				return $this->$property;
 			} else {
-				throw new ActiveRecordException("El método '{$method}' ó miembro '{$property}' del resultset no existe");
+				throw new ActiveRecordException("El método '".$method."' ó miembro '".$property."' del resultset no existe");
 			}
 		} else {
-			throw new ActiveRecordException("El método ó miembro '{$method}' del resultset no existe");
+			throw new ActiveRecordException("El método ó miembro '".$method."' del resultset no existe");
 		}
 	}
 

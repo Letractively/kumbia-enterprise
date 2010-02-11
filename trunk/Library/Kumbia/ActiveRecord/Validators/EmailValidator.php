@@ -44,7 +44,7 @@ class EmailValidator extends ActiveRecordValidator implements ActiveRecordValida
 		if($this->isRequired()){
 			if(!preg_match('/^[a-zA-Z0-9_\.\+]+@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*$/', $this->getValue(), $regs)){
 				if($regs[0]!=$this->getValue()){
-					$this->appendMessage("El valor del campo '{$this->getFieldName()}' debe ser un e-mail valido");
+					$this->appendMessage("El valor del campo '".$this->getFieldName()."' debe ser un e-mail válido");
 					return false;
 				}
 			}

@@ -74,7 +74,7 @@ class Report extends Object {
 		$adapter = (string) $adapter;
 		$className = $adapter.'Report';
 		if(class_exists($className)==false){
-			$classPath = "Library/Kumbia/Report/Adapters/$adapter.php";
+			$classPath = "Library/Kumbia/Report/Adapters/".$adapter.".php";
 			if(Core::fileExists($classPath)){
 				Core::requireFile('Report/Adapters/'.$adapter);
 			} else {
@@ -94,7 +94,7 @@ class Report extends Object {
 	 */
 	public function __call($method, $args){
 		if(method_exists($this->_adapter, $method)==false){
-			throw new ReportException("No existe el método '$method' en el Adaptador '{$this->_adapterName}'");
+			throw new ReportException("No existe el método '$method' en el Adaptador '".$this->_adapterName."'");
 		}
 		return call_user_func_array(array($this->_adapter, $method), $args);
 	}

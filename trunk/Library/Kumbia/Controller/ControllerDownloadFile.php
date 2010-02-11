@@ -146,7 +146,7 @@ class ControllerDownloadFile extends Object {
 			$downloadLength = $selectedRange[1]-$selectedRange[0]+1;
 			$controllerResponse->setHeader('HTTP/1.1 206 Partial Content');
 			$controllerResponse->setHeader('Content-Length', $downloadLength);
-			$controllerResponse->setHeader('Content-Range', "bytes {$selectedRange[0]}-{$selectedRange[1]}/{$this->_fileSize}");
+			$controllerResponse->setHeader('Content-Range', 'bytes '.$selectedRange[0].'-'.$selectedRange[1].'/'.$this->_fileSize);
 		} else {
 			$downloadLength = $this->_fileSize;
 			$controllerResponse->setHeader('Content-Length', $this->_fileSize);

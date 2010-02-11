@@ -57,11 +57,11 @@ class FormatValidator extends ActiveRecordValidator implements ActiveRecordValid
 		$validateFails = false;
 		if(preg_match($this->getOption('format'), $this->getValue(), $matches)){
 			if($matches[0]!=$this->getValue()){
-				$this->appendMessage("El campo '{$this->getFieldName()}' no tiene un formato valido");
+				$this->appendMessage("El campo '".$this->getFieldName()."' no tiene un formato válido");
 				$validateFails = true;
 			}
 		} else {
-			$this->appendMessage("El campo '{$this->getFieldName()}' no tiene un formato valido");
+			$this->appendMessage("El campo '".$this->getFieldName()."' no tiene un formato válido");
 			$validateFails = true;
 		}
 		if($validateFails){

@@ -250,7 +250,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 		foreach($attributes as $attributeName => $value){
 			switch($attributeName){
 				case 'fontSize':
-					$style[] = "font-size:{$value}px";
+					$style[] = "font-size:".$value."px";
 					break;
 				case 'fontWeight':
 					$style[] = "font-weight:$value";

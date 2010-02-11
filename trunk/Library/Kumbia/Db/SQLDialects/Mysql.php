@@ -24,7 +24,7 @@
  * MySQL SQL Dialect
  *
  * Funciones de traductor de SQL para MySQL
- * Puede encontrar mas información sobre MySQL en http://www.mysql.com/.
+ * Puede encontrar más información sobre MySQL en http://www.mysql.com/.
  * La documentación de MySQL puede encontrarse en http://dev.mysql.com/doc/.
  *
  * @category	Kumbia
@@ -36,5 +36,35 @@
  * @access		Public
  */
 class MysqlSQLDialect {
+
+	/**
+	 * Verifica si una tabla existe o no
+	 *
+	 * @access	public
+	 * @param	string $table
+	 * @param	string $schema
+	 * @return	string
+	 * @static
+	 */
+	public static function tableExists($tableName, $schemaName=''){
+		if($schemaName==''){
+			return 'SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \''.$tableName.'\'';
+		} else {
+			$schemaName = addslashes("$schemaName");
+			return 'SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME =  \''.$tableName.'\' AND TABLE_SCHEMA = \''.$schemaName.'\'';
+		}
+	}
+
+	/**
+	 * Devuelve un FOR UPDATE valido para un SELECT del RBDM
+	 *
+	 * @access
+	 * @param	string $sqlQuery
+	 * @return	string
+	 * @static
+	 */
+	public static function forUpdate($sqlQuery){
+		return $sqlQuery.' FOR UPDATE';
+	}
 
 }

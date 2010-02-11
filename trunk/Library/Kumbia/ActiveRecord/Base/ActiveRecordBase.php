@@ -60,7 +60,11 @@ require 'Library/Kumbia/ActiveRecord/Interface.php';
  * @access		public
  * @abstract
  */
-abstract class ActiveRecordBase extends Object implements ActiveRecordResultInterface {
+abstract class ActiveRecordBase extends Object
+#if[compile-time]
+	implements ActiveRecordResultInterface
+#endif
+	{
 
 	/**
 	 * Resource de conexion a la base de datos
@@ -796,9 +800,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 	}
 
 	/**
-	 * Arma una consulta SQL con el parametro $params, aso:
+	 * Arma una consulta SQL con el parámetro $params, aso:
 	 * 	$params = Utils::getParams(func_get_args());
-	 * 	$select = "SELECT * FROM Clientes";
+	 * 	$select = "SELECT * FROM clientes";
 	 *	$select.= $this->convertParamsToSql($params);
      *
      * @access	public
@@ -1068,9 +1072,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			$table = $this->_source;
 		}
 		if(isset($params['group'])&&$params['group']){
-			$select = "SELECT {$params['group']},AVG({$params['column']}) AS average FROM $table " ;
+			$select = 'SELECT '.$params['group'].',AVG('.$params['column'].') AS average FROM '.$table.' ';
 		} else {
-			$select = "SELECT AVG({$params['column']}) AS average FROM $table " ;
+			$select = 'SELECT AVG('.$params['column'].') AS average FROM '.$table.' ';
 		}
 		if(isset($params['conditions'])&&$params['conditions']){
 			$select.= ' WHERE '.$params['conditions'].' ';
@@ -1120,9 +1124,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			$table = $this->_source;
 		}
 		if(isset($params['group'])&&$params['group']){
-			$select = "SELECT {$params['group']},SUM({$params['column']}) AS sumatory FROM $table " ;
+			$select = 'SELECT '.$params['group'].',SUM('.$params['column'].') AS sumatory FROM '.$table.' ';
 		} else {
-			$select = "SELECT SUM({$params['column']}) AS sumatory FROM $table " ;
+			$select = 'SELECT SUM('.$params['column'].') AS sumatory FROM '.$table.' ';
 		}
 		if(isset($params['conditions'])&&$params['conditions']){
 			$select.= ' WHERE '.$params['conditions'].' ';
@@ -1168,9 +1172,9 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 			$table = $this->_source;
 		}
 		if(isset($params['group'])&&$params['group']){
-			$select = "SELECT {$params['group']},MAX({$params['column']}) AS maximum FROM $table " ;
+			$select = 'SELECT '.$params['group'].',MAX('.$params['column'].') AS maximum FROM '.$table.' ';
 		} else {
-			$select = "SELECT MAX({$params['column']}) AS maximum FROM $table " ;
+			$select = 'SELECT MAX('.$params['column'].') AS maximum FROM '.$table.' ';
 		}
 		if(isset($params['conditions'])&&$params['conditions']){
 			$select.= ' WHERE '.$params['conditions'].' ';
@@ -1576,7 +1580,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 						if(isset($this->$k)){
 							$this->$k = $r;
 						} else {
-							throw new ActiveRecordException("No existe el Atributo '$k' en la entidad '{$this->_source}' al ejecutar la inserción");
+							throw new ActiveRecordException('No existe el Atributo "'.$k.'" en la entidad "'.$this->_source.'" al ejecutar la inserción');
 						}
 					}
 					if($primaryKeys[0]=='id'){
@@ -1592,7 +1596,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 					if(isset($this->$k)){
 						$this->$k = $r;
 					} else {
-						throw new ActiveRecordException("No existe el Atributo '$k' en la entidad '{$this->_source}' al ejecutar la insercion");
+						throw new ActiveRecordException('No existe el atributo "'.$k.'" en la entidad "'.$this->_source.'" al ejecutar la inserción');
 					}
 				}
 				if($primaryKeys[0]=='id'){
@@ -1747,7 +1751,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 					if(isset($keyDescription['op']['message'])){
 						$userMessage = $keyDescription['op']['message'];
 					} else {
-						$userMessage = "El valor de '{$keyDescription['fi']}' no existe en la tabla referencia";
+						$userMessage = 'El valor de "'.$keyDescription['fi'].'" no existe en la tabla referencia';
 					}
 					$message = new ActiveRecordMessage($userMessage, $keyDescription['fi'], 'ConstraintViolation');
 					$this->appendMessage($message);
@@ -2087,7 +2091,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				if(isset($this->$key)){
 					$this->$key = $value;
 				} else {
-					throw new ActiveRecordException("No existe el Atributo '$key' en la entidad '{$this->_source}' al ejecutar la insercion");
+					throw new ActiveRecordException('No existe el atributo "'.$key.'" en la entidad "'.$this->_source.'" al ejecutar la inserción');
 				}
 			}
 			if($this->_exists()==true){
@@ -2348,9 +2352,11 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(class_exists($className)==false){
 			throw new ActiveRecordException("No se encontró el validador de entidades '$className'");
 		}
+		#if[compile-time]
 		if(!in_array('ActiveRecordValidatorInterface', class_implements($className))){
 			throw new ActiveRecordException("La clase validador '$className' debe implementar la interface ActiveRecordValidatorInteface");
 		}
+		#endif
 		if(is_array($options)){
 			if(!isset($options['field'])){
 				throw new ActiveRecordException("No ha indicado el campo a validar para '$className'");
@@ -2599,7 +2605,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(substr($method, 0, 6)=='findBy'){
 			$field = Utils::uncamelize(Utils::lcfirst(substr($method, 6)));
 			if (isset($args[0])) {
-				$arg = array("conditions: $field = {$this->_db->addQuotes($args[0]) }");
+				$arg = array('conditions' => $field.' = '.$this->_db->addQuotes($args[0]));
 				unset($args[0]);
 			} else {
 				$arg = array();
@@ -2609,7 +2615,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(substr($method, 0, 7)=='countBy'){
 			$field = Utils::uncamelize(Utils::lcfirst(substr($method, 7)));
 			if (isset($args[0])) {
-				$arg = array("$field = {$this->_db->addQuotes($args[0]) }");
+				$arg = array($field.' = '.$this->_db->addQuotes($args[0]));
 				unset($args[0]);
 			} else {
 				$arg = array();
@@ -2619,7 +2625,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 		if(substr($method, 0, 9)=='findAllBy'){
 			$field = Utils::uncamelize(Utils::lcfirst(substr($method, 9)));
 			if (isset($args[0])) {
-				$arg = array("$field = {$this->_db->addQuotes($args[0]) }");
+				$arg = array($field.' = '.$this->_db->addQuotes($args[0]));
 				unset($args[0]);
 			} else {
 				$arg = array();
@@ -2643,7 +2649,7 @@ abstract class ActiveRecordBase extends Object implements ActiveRecordResultInte
 				return EntityManager::getHasOneRecords($entityName, $requestedRelation, $this);
 			}
 		}
-		throw new ActiveRecordException("No se encontró el método '$method' en el modelo '".get_class($this)."'");
+		throw new ActiveRecordException('No se encontró el método "'.$method.'" en el modelo "'.get_class($this).'"');
 
 		/*
 		if(array_key_exists($mmodel, $this->_hasAndBelongsToMany)) {

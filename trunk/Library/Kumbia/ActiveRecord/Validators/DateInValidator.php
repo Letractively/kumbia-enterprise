@@ -44,7 +44,7 @@ class DateInValidator extends ActiveRecordValidator implements ActiveRecordValid
 		if($this->isRequired()){
 			if(!preg_match('/^[0-9]{4}[-\/](0[1-9]|1[12])[-\/](0[1-9]|[12][0-9]|3[01])$/', $this->getValue(), $regs)){
 				if($regs[0]!=$this->getValue()){
-					$this->appendMessage("El valor del campo '{$this->getFieldName()}' debe ser una fecha valida");
+					$this->appendMessage("El valor del campo '".$this->getFieldName()."' debe ser una fecha valida");
 					return false;
 				}
 			}

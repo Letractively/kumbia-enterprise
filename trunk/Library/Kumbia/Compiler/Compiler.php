@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Compiler
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -34,7 +34,7 @@
  *
  * @category	Kumbia
  * @package		Compiler
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
@@ -55,6 +55,13 @@ class Compiler {
 	private static $_levelScope = 0;
 
 	/**
+	 * BracketLevel
+	 *
+	 * @var int
+	 */
+	private static $_bracketLevel = 0;
+
+	/**
 	 * Numero de caracteres
 	 *
 	 * @var int
@@ -67,6 +74,27 @@ class Compiler {
 	 * @var array
 	 */
 	private static $_requiredFiles = array();
+
+	/**
+	 * Scope activo de variables
+	 *
+	 * @var int
+	 */
+	private static $_scope = 0;
+
+	/**
+	 * Mapa de variables por cada scope
+	 *
+	 * @var array
+	 */
+	private static $_mapScope = array();
+
+	/**
+	 * Simbolos de reemplazo
+	 *
+	 * @var array
+	 */
+	private static $_replaceSymbol = array();
 
 	/**
 	 * Tokens que deben añadir un espacio al principio
@@ -112,6 +140,18 @@ class Compiler {
 	 */
 	private static $_breakTokens = array(
 		T_OPEN_TAG, T_COMMENT, T_DOC_COMMENT, T_WHITESPACE, T_BAD_CHARACTER
+	);
+
+	/**
+	 * Compiler Flags
+	 *
+	 * @var array
+	 */
+	private static $_compilerFlags = array(
+		'compile-time' => true,
+		'no-plugins' => true,
+		'no-common-event' => true,
+		'dispatcher-status' => false
 	);
 
 	/**
@@ -164,7 +204,7 @@ class Compiler {
 	 * Compila la aplicacion actual
 	 *
 	 */
-	public static function compileFramework($otherFiles=array()){
+	public static function compileFramework($outputFile, $otherFiles=array()){
 		set_time_limit(0);
 		$exceptions = array('public/index.php');
 		self::$_requiredFiles = get_required_files();
@@ -209,7 +249,7 @@ class Compiler {
 		self::$_compilation = '';
 		self::compileFile('public/index.php');
 		self::$_compilation = str_replace('chdir(\'..\');', 'chdir(\'..\');'.$compilation, self::$_compilation);
-		file_put_contents('compile.php', '<?php '.self::$_compilation);
+		file_put_contents($outputFile, '<?php '.self::$_compilation);
 		if(isset(self::$_messages[self::MESSAGE_ERROR])){
 			if(count(self::$_messages[self::MESSAGE_ERROR])>0){
 				return false;
@@ -221,18 +261,16 @@ class Compiler {
 
 	public static function compileSource($source){
 		self::$_oldToken = 0;
+		self::$_replaceSymbol = array(97);
+		self::$_mapScope = array();
+		self::$_scope = 0;
+		self::$_bracketLevel = 0;
 		$tokens = token_get_all($source);
 		$numberTokens = count($tokens);
-		#print '<table>';
 		for($i=0;$i<$numberTokens;++$i){
 			$jp = false;
 			$token = $tokens[$i];
 			if(is_array($token)){
-				#print '<tr>';
-				#print '<td>'.$i.'</td>';
-				#print '<td>'.token_name($token[0]).'</td>';
-				#print '<td>'.$token[1].'</td>';
-				#print '</tr>';
 				if(!in_array($token[0], self::$_breakTokens)){
 					if(self::$_deusableCode==false){
 						switch($token[0]){
@@ -289,16 +327,56 @@ class Compiler {
 									$i = $r+1;
 								}
 								break;*/
+							case T_VARIABLE:
+								if(preg_match('/^\$/', $token[1])==false){
+									if($tokens[$i-2][0]==T_FUNCTION){
+										self::$_scope++;
+										self::$_replaceSymbol[self::$_scope] = 97;
+									}
+								} else {
+									if(!in_array($token[1], array('$this', '$php_errormsg', '$_GET', '$_POST', '$_SERVER', '$_COOKIE', '$_ENV', '$_REQUEST', '$_SESSION'))){
+										if(isset($tokens[$i-2][1])&&in_array($tokens[$i-2][1], array('private', 'public', 'var', 'protected'))){
+
+										} else {
+											if(isset($tokens[$i-2][1])&&$tokens[$i-2][1]=='self'&&$tokens[$i-1][0]==T_DOUBLE_COLON){
+
+											} else {
+												if(isset($tokens[$i-2][1])&&$tokens[$i-2][1]=='static'){
+													if(self::$_scope>0){
+														self::$_mapScope[self::$_scope][$token[1]] = $token[1];
+													}
+												} else {
+													if(!isset(self::$_mapScope[self::$_scope][$token[1]])){
+														self::$_mapScope[self::$_scope][$token[1]] = '$'.chr(self::$_replaceSymbol[self::$_scope]);
+														self::$_replaceSymbol[self::$_scope]++;
+														if(self::$_replaceSymbol[self::$_scope]>122){
+															self::$_replaceSymbol[self::$_scope] = 65;
+														}
+													}
+													$token[1] = self::$_mapScope[self::$_scope][$token[1]];
+												}
+											}
+										}
+									}
+								}
+								break;
+							case T_PUBLIC:
+								if($tokens[$i+2][0]==T_FUNCTION||$tokens[$i+4][0]==T_FUNCTION){
+									$token[1] = "";
+								}
+								break;
 						}
 						if($jp==false){
 							if(in_array($token[0], self::$_beforeSpaceTokens)){
 								if(self::$_oldToken!=T_WHITESPACE){
-									self::$_compilation.=" ";
+									self::$_compilation.=' ';
+									self::$_oldToken = T_WHITESPACE;
 								}
 							} else {
 								if(isset(self::$_forcedSpace[$token[0]])){
 									if(in_array(self::$_oldToken, self::$_forcedSpace[$token[0]])){
-										self::$_compilation.=" ";
+										self::$_compilation.=' ';
+										self::$_oldToken = T_WHITESPACE;
 									}
 								}
 							}
@@ -306,7 +384,7 @@ class Compiler {
 								self::$_compilation.=$token[1];
 							}
 							if(in_array($token[0], self::$_afterSpaceTokens)){
-								self::$_compilation.=" ";
+								self::$_compilation.=' ';
 							}
 						}
 						self::$_oldToken = $token[0];
@@ -314,9 +392,18 @@ class Compiler {
 				} else {
 					if(isset($token[1])){
 						if($token[0]==T_COMMENT){
-							if(strpos($token[1], '#if[compile-time]')===0){
-								self::$_deusableCode = true;
-								self::$_compilation.=';';
+							if(strpos($token[1], '#if[')===0){
+								if(preg_match('/if\[([a-z\-]+)\]/', $token[1], $matches)){
+									if(isset(self::$_compilerFlags[$matches[1]])){
+										$activated = self::$_compilerFlags[$matches[1]];
+										if($activated){
+											self::$_deusableCode = true;
+											self::$_compilation.=' ';
+										}
+									} else {
+										throw new CoreException("Directiva del preprocesador desconocida ".$token[1]);
+									}
+								}
 							}
 							if(strpos($token[1], '#endif')===0){
 								self::$_deusableCode = false;
@@ -325,14 +412,26 @@ class Compiler {
 					}
 				}
 			} else {
-				#print '<tr>';
-				#print '<td>'.$i.'</td>';
-				#print '<td>T_NPI</td>';
-				#print '<td>'.$token.'</td>';
-				#print '</tr>';
 				if(self::$_deusableCode==false){
 					self::$_compilation.=$token;
 					self::$_oldToken = 0;
+					switch($token){
+						case '{':
+							self::$_bracketLevel++;
+							//self::$_compilation.=self::$_bracketLevel.' '.self::$_scope;
+							break;
+						case '}':
+							self::$_bracketLevel--;
+							if(self::$_bracketLevel==0){
+								unset(self::$_mapScope[self::$_scope]);
+								self::$_scope--;
+								if(self::$_scope<0){
+									self::$_scope = 0;
+								}
+							}
+							//self::$_compilation.=self::$_bracketLevel.' '.self::$_scope;
+							break;
+					}
 				}
 			}
 			if(self::$_deusableCode==false){
@@ -344,9 +443,10 @@ class Compiler {
 				}
 			}
 		}
-		#print '</table>';
-		#print '</pre>';
 		self::$_compilation.=';';
+
+		//print_r(self::$_mapScope);
+
 		if(isset(self::$_messages[self::MESSAGE_ERROR])){
 			if(count(self::$_messages[self::MESSAGE_ERROR])>0){
 				return false;
@@ -417,21 +517,21 @@ class Compiler {
 	/**
 	 * Compila un archivo
 	 *
-	 * @param string $file
+	 * @access 	public
+	 * @param	string $file
+	 * @static
 	 */
 	public static function compileFile($file){
-		#self::$_compilation.="#$file".PHP_EOL;
-		#file_put_contents('file.txt', $file);
 		self::compileSource(file_get_contents($file));
 	}
 
 	/**
 	 * Optimiza sentencias FOR con conteos en su evaluación
 	 *
-	 * @param array $token
-	 * @param int $i
-	 * @param array $tokens
-	 * @return int
+	 * @param	array $token
+	 * @param	int $i
+	 * @param	array $tokens
+	 * @return	int
 	 */
 	private static function _analizeForStatement($token, $i, $tokens){
 		$ii = $i;
@@ -560,9 +660,9 @@ class Compiler {
 	/**
 	 * Verifica si es necesario incluir un archivo
 	 *
-	 * @param array $requireToken
-	 * @param int $position
-	 * @return boolean
+	 * @param	array $requireToken
+	 * @param	int $position
+	 * @return	boolean
 	 */
 	private static function _checkRequire($requireToken){
 		if($requireToken[0]==T_CONSTANT_ENCAPSED_STRING){
@@ -570,11 +670,6 @@ class Compiler {
 				$posiblePath = getcwd().'/'.substr($requireToken[1], 1, strlen($requireToken[1])-2);
 				foreach(self::$_requiredFiles as $file){
 					if($file==$posiblePath){
-						#print '<tr bgcolor=yellow>';
-						#print '<td>?</td>';
-						#print '<td>'.token_name($requireToken[0]).'</td>';
-						#print '<td>'.$requireToken[1].'</td>';
-						#print '</tr>';
 						return -1;
 					}
 				}

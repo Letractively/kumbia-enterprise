@@ -93,7 +93,7 @@ abstract class View {
 	 *
 	 * @var string
 	 */
-	static private $_content = "";
+	static private $_content = '';
 
 	/**
 	 * Variables de la Vista
@@ -140,7 +140,7 @@ abstract class View {
 	 */
 	public static function getContent($returnContent=false){
 		if($returnContent==false){
-			print self::$_content;
+			echo self::$_content;
 		} else {
 			return self::$_content;
 		}
@@ -173,7 +173,9 @@ abstract class View {
 		//Establece la ubicacion actual
 		$location = $controllerName.'/'.$actionName;
 		$controllerResponse->setHeader('X-Application-Location: '.$location, true);
+		#if[no-plugins]
 		call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('beforeRender', $controllerResponse));
+		#endif
 	}
 
 	/**
@@ -225,7 +227,7 @@ abstract class View {
 	}
 
 	/**
-	 * Toma el objeto controlador y ejecuta la presentaci&oacute;n correspondiente a este
+	 * Toma el objeto controlador y ejecuta la presentación correspondiente a este
 	 *
 	 * @access 	public
 	 * @param 	Controller $controller
@@ -236,7 +238,9 @@ abstract class View {
 		$_valueReturned = Dispatcher::getValueReturned();
 		if($controllerResponse->getResponseType()!=ControllerResponse::RESPONSE_NORMAL){
 			self::_handleResponseAdapter($_valueReturned);
+			#if[no-plugins]
 			call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
+			#endif
 			return;
 		}
 		$controllerName = $controller->getControllerName();
@@ -244,7 +248,7 @@ abstract class View {
 		self::_startResponse($controllerName, $actionName);
 		if(!empty($controllerName)){
 			foreach(EntityManager::getEntities() as $_entityName => $_entity){
-					$$_entityName = $_entity;
+				$$_entityName = $_entity;
 			}
 			if($controller->isExportable()==true){
 				foreach($controller as $_var => $_value) {
@@ -254,27 +258,27 @@ abstract class View {
 			foreach(self::$_data as $_key => $_value){
 				$$_key = $_value;
 			}
-			if(!isset($id)){
-				$id = $controller->getId();
+			if(!isset(${'id'})){
+				${'id'} = $controller->getId();
 			}
 
 			/**
-			 * View busca un los templates correspondientes al nombre de la accion y el layout
-			 * del controlador. Si el controlador tiene un atributo $template tambien va a
+			 * View busca un los templates correspondientes al nombre de la acción y el layout
+			 * del controlador. Si el controlador tiene un atributo $template también va a
 			 * cargar la vista ubicada en layouts con el valor de esta
 			 *
 			 * en views/$controller/$action
 			 * en views/layouts/$controller
 			 * en views/layouts/$template
 			 *
-			 * Los archivos con extension .phtml son archivos template de kumbia que
+			 * Los archivos con extensión .phtml son archivos template de kumbia que
 			 * tienen codigo html y php y son el estandar
 			 *
 			 */
 			self::$_content = ob_get_contents();
 
 			/**
-			 * Verifica si existe cache para el layout, vista &oacute; template
+			 * Verifica si existe cache para el layout, vista ó template
 	 		 * sino, crea un directorio en cache
 	 		 */
 			if($controllerName!=""){
@@ -285,6 +289,7 @@ abstract class View {
 				/**
 				 * Crear los directorios de cache si es necesario
 				 */
+				#if[compile-time]
 				if($controller->getViewCache()||$controller->getLayoutCache()){
 					$viewCacheDir = 'cache/'.session_id().'/';
 					if(!Core::fileExists('cache/'.session_id().'/')){
@@ -296,53 +301,56 @@ abstract class View {
 						mkdir($viewCacheDir);
 					}
 				}
+				#endif
 
 				/**
 				 * Insertar la vista si es necesario
 				 */
+
 				if(self::$_renderLevel>=self::LEVEL_ACTION_VIEW){
 					if(Core::fileExists($_viewsDir.'/'.$controllerName.'/'.$actionName.'.phtml')){
 						ob_clean();
 						/**
 						 * Aqui verifica si existe un valor en minutos para el cache
 				 		 */
+						#if[compile-time]
 						if($controller->getViewCache()>0){
 							/**
 					 		 * Busca el archivo en el directorio de cache que se crea
 					 		 * a partir del valor $_SESSION['SID'] para que sea único
-					 		 * para cada sesi&oacute;n
+					 		 * para cada sesión
 					 		 */
 							if(Core::fileExists($viewCacheDir.'/'.$actionName)==false){
 								include $_viewsDir.'/'.$controllerName.'/'.$actionName.'.phtml';
 								file_put_contents($viewCacheDir."/$actionName", ob_get_contents());
 							} else {
 								$time_cache = $controller->get_view_cache();
-								if((time()-$time_cache*60)<filemtime("$viewCacheDir/$actionName")){
-									include "$viewCacheDir/$actionName";
+								if((time()-$time_cache*60)<filemtime($viewCacheDir.'/'.$actionName)){
+									include $viewCacheDir.'/'.$actionName;
 								} else {
-									include "$_viewsDir/$controllerName/$actionName.phtml";
-									file_put_contents($viewCacheDir."/$actionName", ob_get_contents());
+									include $_viewsDir.'/'.$controllerName.'/'.$actionName.'.phtml';
+									file_put_contents($viewCacheDir.'/'.$actionName, ob_get_contents());
 								}
 							}
 						} else {
+							#endif
 							include $_viewsDir.'/'.$controllerName.'/'.$actionName.'.phtml';
+							#if[compile-time]
 						}
+						#endif
 						self::$_content = ob_get_contents();
 					}
 				}
 
-				/**
-				 * Incluir el/los Template(s) before
-				 */
+				// Incluir el/los Template(s) before
 				if(self::$_renderLevel>=self::LEVEL_BEFORE_TEMPLATE){
 					$_template = $controller->getTemplateBefore();
 					if($_template!=""){
 						if(is_array($_template)==false){
-							/**
-							 * Aqui verifica si existe un valor en minutos para el cache
-						 	 */
+							// Aqui verifica si existe un valor en minutos para el cache
 							if(Core::fileExists($_viewsDir.'/layouts/'.$controller->getTemplateBefore().'.phtml')){
 								ob_clean();
+								#if[compile-time]
 								if($controller->getLayoutCache()){
 									/**
 							   		 * Busca el archivo en el directorio de cache que se crea
@@ -362,8 +370,11 @@ abstract class View {
 										}
 									}
 								} else {
+									#endif
 									include $_viewsDir.'/layouts/'.$controller->getTemplateBefore().'.phtml';
+									#if[compile-time]
 								}
+								#endif
 								self::$_content = ob_get_contents();
 							} else {
 								throw new ViewException("No existe el template '$_template' en views/layouts");
@@ -375,6 +386,7 @@ abstract class View {
 							 	 */
 								if(Core::fileExists("$_viewsDir/layouts/$_singleTemplate.phtml")){
 									ob_clean();
+									#if[compile-time]
 									if($controller->getLayoutCache()){
 										/**
 								   		 * Busca el archivo en el directorio de cache que se crea
@@ -394,8 +406,11 @@ abstract class View {
 											}
 										}
 									} else {
+										#endif
 										include "$_viewsDir/layouts/$_singleTemplate.phtml";
+										#if[compile-time]
 									}
+									#endif
 									self::$_content = ob_get_contents();
 								} else {
 									throw new ViewException("No existe el template '$_singleTemplate' en views/layouts");
@@ -411,6 +426,7 @@ abstract class View {
 				if(self::$_renderLevel>=self::LEVEL_LAYOUT){
 					if(Core::fileExists($_viewsDir.'/layouts/'.$controllerName.'.phtml')){
 						ob_clean();
+						#if[compile-time]
 						if($controller->getLayoutCache()){
 							/**
 				 			 * Busca el archivo en el directorio de cache que se crea
@@ -430,8 +446,11 @@ abstract class View {
 								}
 							}
 						} else {
+							#endif
 							include $_viewsDir.'/layouts/'.$controllerName.'.phtml';
+							#if[compile-time]
 						}
+						#endif
 						self::$_content = ob_get_contents();
 					}
 				}
@@ -449,6 +468,7 @@ abstract class View {
 						 */
 						if(Core::fileExists($_viewsDir.'/layouts/'.$controller->getTemplateAfter().'.phtml')){
 							ob_clean();
+							#if[compile-time]
 							if($controller->getLayoutCache()){
 								/**
 							   	 * Busca el archivo en el directorio de cache que se crea
@@ -468,8 +488,11 @@ abstract class View {
 									}
 								}
 							} else {
+								#endif
 								include $_viewsDir.'/layouts/'.$controller->getTemplateAfter().'.phtml';
+								#if[compile-time]
 							}
+							#endif
 							self::$_content = ob_get_contents();
 						} else {
 							throw new ViewException("No existe el template '$_template' en views/layouts");
@@ -481,6 +504,7 @@ abstract class View {
 							 */
 							if(Core::fileExists($_viewsDir.'/layouts/'.$_singleTemplate.'.phtml')){
 								ob_clean();
+								#if[compile-time]
 								if($controller->getLayoutCache()){
 									/**
 								   	 * Busca el archivo en el directorio de cache que se crea
@@ -500,8 +524,11 @@ abstract class View {
 										}
 									}
 								} else {
+									#endif
 									include $_viewsDir.'/layouts/'.$_singleTemplate.'.phtml';
+									#if[compile-time]
 								}
+								#endif
 								self::$_content = ob_get_contents();
 							} else {
 								throw new ViewException("No existe el template '$_singleTemplate' en views/layouts");
@@ -528,7 +555,9 @@ abstract class View {
 				ob_end_flush();
 			}
 		}
+		#if[no-plugins]
 		call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
+		#endif
 	}
 
 	/**
@@ -564,7 +593,7 @@ abstract class View {
 				$controllerResponse->setHeader('Pragma: no-cache', true);
 				$controllerResponse->setHeader('Expires: 0', true);
 				ob_end_clean();
-				print $e->showMessageAsXML();
+				echo $e->showMessageAsXML();
 			} else {
 				// Si no es una Accion AJAX incluye index.phtml y muestra
 				// el contenido de las excepciones dentro de este.
@@ -619,7 +648,7 @@ abstract class View {
 			foreach($controller as $_var => $_value) {
 				$$_var = $_value;
 			}
-			$id = $controller->getId();
+			${'id'} = $controller->getId();
 		}
 		$$_partialView = $_partialValue;
 		include $partialPath;
@@ -643,7 +672,7 @@ abstract class View {
 				foreach(self::$_data as $_key => $_value){
 					$$_key = $_value;
 				}
-				$id = $_controller->getId();
+				${'id'} = $_controller->getId();
 			}
 			include $_viewsDir.'/'.$_view.'.phtml';
 		} else {
@@ -861,7 +890,9 @@ abstract class View {
 			}
 
 			$controllerResponse = ControllerResponse::getInstance();
+			#if[no-plugins]
 			call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
+			#endif
 		} else {
 			throw new ViewException('No existe el proxy a "'.self::$_proxyProvider.'"');
 		}
@@ -893,16 +924,16 @@ abstract class View {
  	 */
 	public static function xhtmlTemplate($template='template'){
 		Tag::stylesheetLink("style");
-		print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
   '.Tag::getDocumentTitle().'
   <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />'."\n";
 		Core::stylesheetLinkTags();
-		print '</head>
+		echo '</head>
  <body class="'.$template.'">';
-		print View::getContent();
-		print '
+		echo View::getContent();
+		echo '
  </body>
 </html>';
 	}

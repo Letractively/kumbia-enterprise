@@ -34,6 +34,7 @@ require 'Library/Kumbia/Db/Interface.php';
  *
  * @category	Kumbia
  * @package		Db
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2006-2007 Giancarlo Corzo Vigil (www.antartec.com)
  * @license		New BSD License
@@ -186,7 +187,9 @@ class DbBase extends Object {
 			}
 		}
 		$this->_descriptor = $descriptor;
+		#if[no-plugins]
 		PluginManager::notifyFrom('Db', 'onCreateConnection', $this);
+		#endif
 	}
 
 	/**
@@ -233,7 +236,9 @@ class DbBase extends Object {
 	 * @access protected
 	 */
 	protected function close(){
+		#if[no-plugins]
 		PluginManager::notifyFrom('Db', 'onCloseConnection', $this);
+		#endif
 	}
 
 	/**
@@ -664,7 +669,7 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Permite establecer si se encuentra bajo transaccion
+	 * Permite establecer si se encuentra bajo transacción
 	 *
 	 * @param boolean $underTransaction
 	 */

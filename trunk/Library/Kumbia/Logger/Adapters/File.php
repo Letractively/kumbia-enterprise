@@ -78,7 +78,7 @@ class FileLogger extends LoggerAdapter implements LoggerInterface {
 			$this->_fileLogger = @fopen($this->_path, 'ab');
 		}
 		if($this->_fileLogger==false){
-			throw new LoggerException("No se pudo abrir el log en '{$this->_path}'");
+			throw new LoggerException("No se pudo abrir el log en '".$this->_path."'");
 		}
 	}
 
@@ -91,7 +91,7 @@ class FileLogger extends LoggerAdapter implements LoggerInterface {
 	 */
 	public function log($msg, $type){
 		if(!$this->_fileLogger){
-			throw new LoggerException("No se puede enviar mensaje al log porque es invalido");
+			throw new LoggerException("No se puede enviar mensaje al log porque es inválido");
 		}
 		if(is_array($msg)||is_object($msg)){
 			$msg = print_r($msg, true);

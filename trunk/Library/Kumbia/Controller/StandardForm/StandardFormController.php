@@ -34,7 +34,7 @@
  * @category	Kumbia
  * @package		Controller
  * @subpackage	StandardForm
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
@@ -179,7 +179,7 @@ abstract class StandardForm extends Controller {
 	 *
 	 * @access public
 	 */
-	public public function reportAction(){
+	public function reportAction(){
 		$this->view = 'index';
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
@@ -1028,20 +1028,20 @@ abstract class StandardForm extends Controller {
 
 		if($com['extraTables']){
 			ActiveRecord::sql_item_sanizite($com['extraTables']);
-			$com['extraTables']=",".$com['extraTables'];
+			$com['extraTables']=','.$com['extraTables'];
 		}
 
 		ActiveRecordUtils::sqlSanizite($com['orderBy']);
 
-		if(!$com["orderBy"]){
+		if(!$com['orderBy']){
 			$ordb = $name;
 		} else {
-			$ordb = $com["orderBy"];
+			$ordb = $com['orderBy'];
 		}
 		if($com['whereCondition']){
-			$where = "where ".$com['whereCondition'];
+			$where = 'where '.$com['whereCondition'];
 		} else {
-			$where = "";
+			$where = '';
 		}
 
 		ActiveRecord::sql_item_sanizite($name);

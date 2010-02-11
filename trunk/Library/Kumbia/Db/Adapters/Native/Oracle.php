@@ -323,7 +323,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			$commit = OCI_DEFAULT;
 		}
 		if(!@oci_execute($resultQuery, $commit)){
-			$errorMessage = $php_errormsg." al ejecutar <i>'{$this->_lastQuery}'</i>";
+			$errorMessage = $php_errormsg." al ejecutar <i>'".$this->_lastQuery."'</i>";
 			throw new DbException($this->error($errorMessage), $this->noError());
 			return false;
 		}
@@ -798,6 +798,15 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	 */
 	public static function getPHPExtensionRequired(){
 		return 'oci8';
+	}
+
+	/**
+	 * Devuelve el SQL Dialect usado
+	 *
+	 * @return string
+	 */
+	public function getSQLDialect(){
+		return 'OracleSQLDialect';
 	}
 
 }
