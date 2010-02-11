@@ -121,21 +121,21 @@ class DigestAuth implements AuthInterface {
 		if($this->_resource==null){
 			$this->_resource = @fopen($this->filename, "r");
 			if($this->_resource===false){
-				throw new AuthException("No existe ó no se puede leer el archivo '{$this->filename}'");
+				throw new AuthException("No existe ó no se puede leer el archivo '".$this->filename."'");
 			}
 		}
 		$existsUser = false;
 		if(is_callable($this->algorithm)){
 			$callback = $this->algorithm;
 		} else {
-			throw new AuthException("El algoritmo de comprobación del password es invalido");
+			throw new AuthException('El algoritmo de comprobación del password es inválido');
 		}
 		if(isset($this->charset)){
 			$charset = $this->charset;
 		} else {
-			$charset = "UTF-8";
+			$charset = 'UTF-8';
 		}
-		if(function_exists("mb_ereg_match")){
+		if(function_exists('mb_ereg_match')){
 			$multibyte = true;
 			mb_regex_encoding($charset);
 		} else {

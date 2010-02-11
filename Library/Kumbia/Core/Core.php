@@ -116,7 +116,9 @@ abstract class Core {
 		/**
 		 * Carga los plug-in de la aplicación actual
 		 */
+		#if[no-plugins]
 		PluginManager::loadApplicationPlugins();
+		#endif
 
 		/**
 		 * Establece el timezone del sistema
@@ -207,8 +209,8 @@ abstract class Core {
 		$exceptionThrown = false;
 		$path = substr(str_replace(array('/public/index.php', '/index.php'), '', $_SERVER['PHP_SELF']), 1);
 		if(!isset($_SESSION['_INSTANCE_NAME'])){
-			Facility::setFacility(Facility::FRAMEWORK_CORE);
 			#if[compile-time]
+			Facility::setFacility(Facility::FRAMEWORK_CORE);
 			if(version_compare(PHP_VERSION, '5.2.0', '<')){
 				$message = CoreLocale::getErrorMessage(-10, PHP_VERSION);
 				throw new CoreException($message, -10);
@@ -272,14 +274,18 @@ abstract class Core {
 	 * @static
 	 */
 	public static function runStartApplicationEvent(){
+		#if[no-plugins]
 		PluginManager::notifyFromApplication('beforeStartApplication');
+		#endif
 		if(class_exists('ControllerBase')){
 			$controllerBase = new ControllerBase();
 			if(method_exists($controllerBase, 'onStartApplication')){
 				$controllerBase->onStartApplication();
 			}
 		}
+		#if[no-plugins]
 		PluginManager::notifyFromApplication('afterStartApplication');
+		#endif
 	}
 
 	/**
@@ -289,14 +295,18 @@ abstract class Core {
 	 * @static
 	 */
 	public static function runChangeInstanceEvent(){
+		#if[no-plugins]
 		PluginManager::notifyFromApplication('beforeChangeInstance');
+		#endif
 		if(class_exists('ControllerBase')){
 			$controllerBase = new ControllerBase();
 			if(method_exists($controllerBase, 'onChangeInstance')){
 				$controllerBase->onChangeApplication(self::getInstanceName());
 			}
 		}
+		#if[no-plugins]
 		PluginManager::notifyFromApplication('afterChangeInstance');
+		#endif
 	}
 
 	/**
@@ -526,8 +536,10 @@ abstract class Core {
 		/**
 		 * Inicializa los plug-ins
 		 */
+		#if[no-plugins]
 		PluginManager::initializePlugins();
 		PluginManager::notifyFromApplication('beforeStartRequest');
+		#endif
 		Facility::setFacility(Facility::USER_LEVEL);
 
 		/**
@@ -542,7 +554,9 @@ abstract class Core {
 		/**
 		 * Ejectutar Plugin::beforeDispatchLoop()
 		 */
+		#if[no-plugins]
 		PluginManager::notifyFromController('beforeDispatchLoop', $controller);
+		#endif
 
 		/**
 		 * Establecer directorio de controladores
@@ -558,7 +572,9 @@ abstract class Core {
 			/**
 			 * Ejectutar Plugin::beforeDispatch()
 			 */
+			#if[no-plugins]
 			$controllerName = PluginManager::notifyFromController('beforeDispatch', $controller);
+			#endif
 
 			/**
 			 * Si no hay controlador ejecuta ControllerBase::init()
@@ -575,7 +591,9 @@ abstract class Core {
 				/**
 				  * Ejectutar Plugin::beforeExecuteRoute()
 				  */
+				#if[no-plugins]
 				PluginManager::notifyFromController('beforeExecuteRoute', $controller);
+				#endif
 
 				$controller = Dispatcher::executeRoute(Router::getModule(), Router::getController(), Router::getAction(),
 				Router::getParameters(), Router::getAllParameters());
@@ -583,22 +601,30 @@ abstract class Core {
 				/**
 				  * Ejectutar Plugin::afterExecuteRoute()
 				  */
+				#if[no-plugins]
 				PluginManager::notifyFromController('afterExecuteRoute', $controller);
+				#endif
 
 			}
 
 			Router::ifRouted();
 
 			// Ejectutar Plugin::afterDispatch()
+			#if[no-plugins]
 			$controllerName = PluginManager::notifyFromController('afterDispatch', $controller);
+			#endif
 
 		}
 
 		/**
 		 * Ejectutar Plugin::afterDispatchLoop() y CommonEventManager::notifyEvent()
 		 */
+		#if[no-common-event]
 		CommonEventManager::notifyEvent('afterDispatchLoop');
+		#endif
+		#if[no-plugins]
 		$controllerName = PluginManager::notifyFromController('afterDispatchLoop', $controller);
+		#endif
 		$controller = Dispatcher::getController();
 
 		/**
@@ -609,8 +635,12 @@ abstract class Core {
 			$handler = $controller->getViewHandler();
 			call_user_func_array($handler, array($controller));
 		}
+		#if[no-common-event]
 		CommonEventManager::notifyEvent('finishRequest');
+		#endif
+		#if[no-plugins]
 		PluginManager::notifyFromApplication('beforeFinishRequest');
+		#endif
 
 		return $controller;
 	}
@@ -625,7 +655,9 @@ abstract class Core {
 	 */
 	private static function _handleException($e, $controller){
 		//Notifica la excepcion a los Plugins
+		#if[no-plugins]
 		PluginManager::notifyFromApplication('beforeUncaughtException', $e);
+		#endif
 
 		$controller = Dispatcher::getController();
 		Session::storeSessionData();

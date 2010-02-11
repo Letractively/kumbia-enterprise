@@ -186,15 +186,15 @@ class DbPdoOracle extends DbPDO {
 			}
 			if(isset($field_def['auto'])){
 				if($field_def['auto']){
-					$this->query("CREATE SEQUENCE {$table}_{$field}_seq START WITH 1");
+					$this->query('CREATE SEQUENCE '.$table.'_'.$field.'_seq START WITH 1');
 				}
 			}
 			if(isset($field_def['extra'])){
 				$extra = $field_def['extra'];
 			} else {
-				$extra = "";
+				$extra = '';
 			}
-			$create_lines[] = "$field ".$field_def['type'].$size.' '.$not_null.' '.$extra;
+			$create_lines[] = $field.' '.$field_def['type'].$size.' '.$not_null.' '.$extra;
 		}
 		$create_sql.= join(',', $create_lines);
 		$last_lines = array();
@@ -211,7 +211,6 @@ class DbPdoOracle extends DbPDO {
 			$create_sql.= ','.join(',', $last_lines).')';
 		}
 		return $this->query($create_sql);
-
 	}
 
 	/**
@@ -221,7 +220,7 @@ class DbPdoOracle extends DbPDO {
 	 * @return boolean
 	 */
 	function list_tables(){
-		return $this->fetch_all("SELECT table_name FROM all_tables");
+		return $this->fetch_all('SELECT table_name FROM all_tables');
 	}
 
 	/**
@@ -234,8 +233,8 @@ class DbPdoOracle extends DbPDO {
 		 * Oracle No soporta columnas autonum&eacute;ricas
 		 */
 		if($table&&$primary_key){
-			$sequence = $table."_".$primary_key."_seq";
-			$value = $this->fetch_one("SELECT $sequence.CURRVAL FROM dual");
+			$sequence = $table.'_'.$primary_key.'_seq';
+			$value = $this->fetch_one('SELECT '.$sequence.'.CURRVAL FROM dual');
 			return $value[0];
 		}
 		return false;
@@ -258,18 +257,18 @@ class DbPdoOracle extends DbPDO {
 	 * @param string $table
 	 * @return array
 	 */
-	public function describe_table($table, $schema=''){
+	public function describeTable($table, $schema=''){
 		/**
 		 * Soporta schemas?
 		 */
-		$describe = $this->fetch_all("SELECT LOWER(ALL_TAB_COLUMNS.COLUMN_NAME) AS FIELD, LOWER(ALL_TAB_COLUMNS.DATA_TYPE) AS TYPE, ALL_TAB_COLUMNS.DATA_LENGTH AS LENGTH, (SELECT COUNT(*) FROM ALL_CONS_COLUMNS WHERE TABLE_NAME = '".strtoupper($table)."' AND ALL_CONS_COLUMNS.COLUMN_NAME = ALL_TAB_COLUMNS.COLUMN_NAME AND ALL_CONS_COLUMNS.POSITION IS NOT NULL) AS KEY, ALL_TAB_COLUMNS.NULLABLE AS ISNULL FROM ALL_TAB_COLUMNS WHERE ALL_TAB_COLUMNS.TABLE_NAME = '".strtoupper($table)."'");
+		$describe = $this->fetchAll("SELECT LOWER(ALL_TAB_COLUMNS.COLUMN_NAME) AS FIELD, LOWER(ALL_TAB_COLUMNS.DATA_TYPE) AS TYPE, ALL_TAB_COLUMNS.DATA_LENGTH AS LENGTH, (SELECT COUNT(*) FROM ALL_CONS_COLUMNS WHERE TABLE_NAME = '".strtoupper($table)."' AND ALL_CONS_COLUMNS.COLUMN_NAME = ALL_TAB_COLUMNS.COLUMN_NAME AND ALL_CONS_COLUMNS.POSITION IS NOT NULL) AS KEY, ALL_TAB_COLUMNS.NULLABLE AS ISNULL FROM ALL_TAB_COLUMNS WHERE ALL_TAB_COLUMNS.TABLE_NAME = '".strtoupper($table)."'");
 		$final_describe = array();
 		foreach($describe as $key => $value){
 			$final_describe[] = array(
-				"Field" => $value["field"],
-				"Type" => $value["type"],
-				"Null" => $value["isnull"] == "Y" ? "YES" : "NO",
-				"Key" => $value["key"] == 1 ? "PRI" : ""
+				'Field' => $value['field'],
+				'Type' => $value['type'],
+				'Null' => $value['isnull'] == 'Y' ? 'YES' : 'NO',
+				'Key' => $value['key'] == 1 ? 'PRI' : ''
 			);
 		}
 		return $final_describe;

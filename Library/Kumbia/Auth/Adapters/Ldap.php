@@ -87,14 +87,14 @@ class LdapAuth implements AuthInterface {
 			} else {
 				$identityAttributes = array('cn', 'uid');
 			}
-			$ldapResult = ldap_search($this->_ldapResource, $this->baseDN, "uid={$dnParts['uid']}", $identityAttributes);
+			$ldapResult = ldap_search($this->_ldapResource, $this->baseDN, "uid=".$dnParts['uid'], $identityAttributes);
 		}
 		$numberEntries = ldap_count_entries($this->_ldapResource, $ldapResult);
 		$identity = array();
 		if($numberEntries>0){
 			$entries = ldap_get_entries($this->_ldapResource, $ldapResult);
 			if($numberEntries>1){
-				throw new AuthException("M&uacute;ltiples identidades para '{$this->userName}'");
+				throw new AuthException("Múltiples identidades para '".$this->userName."'");
 			} else {
 				foreach($identityAttributes as $attribute){
 					$identity[$attribute] = $entries[0][$attribute][0];
@@ -108,7 +108,7 @@ class LdapAuth implements AuthInterface {
 				}
 			}
 		} else {
-			throw new AuthException("No se pudo obtener los datos de identidad de '{$this->userName}'");
+			throw new AuthException("No se pudo obtener los datos de identidad de '".$this->userName."'");
 		}
 		return $identity;
 	}
@@ -120,10 +120,10 @@ class LdapAuth implements AuthInterface {
 	 * @return array
 	 */
 	private function _getDNAttributes($distinguishedName){
-		$dnParts = explode(",", $distinguishedName);
+		$dnParts = explode(',', $distinguishedName);
 		$returnedDNParts = array();
 		foreach($dnParts as $dnPart){
-			$entry = explode("=", $dnPart);
+			$entry = explode('=', $dnPart);
 			$returnedDNParts[$entry[0]] = $entry[1];
 		}
 		return $returnedDNParts;
@@ -143,20 +143,20 @@ class LdapAuth implements AuthInterface {
 			$canonicalName = str_replace("\\\\", "", $canonicalName);
 			$cnParts = explode("\\", $canonicalName);
 			$dc = array();
-			foreach(explode(".", $cn[0]) as $domainPart){
-				$dc[] = "DC=$domainPart";
+			foreach(explode('.', $cn[0]) as $domainPart){
+				$dc[] = 'DC='.$domainPart;
 			}
-			return "uid={$cnParts[1]},".join(",", $dc);
+			return 'uid='.$cnParts[1].','.join(',', $dc);
 		}
 		if($this->accountCanonicalForm==4){
-			$cnParts = explode("@", $canonicalName);
+			$cnParts = explode('@', $canonicalName);
 			$dc = array();
-			foreach(explode(".", $cn[0]) as $domainPart){
-				$dc[] = "DC=$domainPart";
+			foreach(explode('.', $cn[0]) as $domainPart){
+				$dc[] = 'DC='.$domainPart;
 			}
-			return "uid={$cnParts[1]},".join(",", $dc);
+			return 'uid='.$cnParts[1].','.join(',', $dc);
 		}
-		throw new AuthException("Uso de accountCanonicalForm indefinido '{$this->accountCanonicalForm}'");
+		throw new AuthException("Uso de accountCanonicalForm indefinido '".$this->accountCanonicalForm."'");
 	}
 
 	/**

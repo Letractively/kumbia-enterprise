@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Transactions
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright  	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -37,7 +37,11 @@ require 'Library/Kumbia/Transactions/Interface.php';
  * @license 	New BSD License
  * @abstract
  */
-abstract class TransactionManager implements TransactionManagerInterface {
+abstract class TransactionManager
+#if[compile-time]
+	implements TransactionManagerInterface
+#endif
+	{
 
 	/**
 	 * Lista en la que se administran las transacciones
@@ -141,7 +145,7 @@ abstract class TransactionManager implements TransactionManagerInterface {
 	}
 
 	/**
-	 * Notifica el rollback de una transaccion administrada
+	 * Notifica el rollback de una transacción administrada
 	 *
 	 * @param ActiveRecordTransaction $transaction
 	 */
@@ -149,16 +153,36 @@ abstract class TransactionManager implements TransactionManagerInterface {
 		foreach(EntityManager::getAllCreatedGenerators() as $generator){
 			$generator->finalizeConsecutive();
 		}
+		self::_collectTransaction($transaction);
 	}
 
 	/**
-	 * Notifica el commit de una transaccion administrada
+	 * Notifica el commit de una transacción administrada
 	 *
 	 * @param ActiveRecordTransaction $transaction
 	 */
 	public static function notifyCommit($transaction){
 		foreach(EntityManager::getAllCreatedGenerators() as $generator){
 			$generator->finalizeConsecutive();
+		}
+		self::_collectTransaction($transaction);
+	}
+
+	/**
+	 * Destruye la transacción activa del TransactionManager
+	 *
+	 * @param ActiveRecordTransaction $transaction
+	 */
+	private static function _collectTransaction($transaction){
+		if(count(self::$_transactions)>0){
+			$number = 0;
+			foreach(self::$_transactions as $managedTransaction){
+				if($managedTransaction==$transaction){
+					unset(self::$_transactions[$number]);
+					unset($transaction);
+				}
+				$number++;
+			}
 		}
 	}
 

@@ -59,7 +59,7 @@ class InclusionInValidator extends ActiveRecordValidator implements ActiveRecord
 			$validateFails = false;
 			if($this->isSetOption('domain')){
 				if(!in_array($this->getValue(), $this->getOption('domain'))){
-					$this->appendMessage("El valor del campo '{$this->getFieldName()}' debe ser parte del rango ".join(", ", $this->getOption('domain')));
+					$this->appendMessage("El valor del campo '".$this->getFieldName()."' debe ser parte del rango ".join(", ", $this->getOption('domain')));
 					$validateFails = true;
 				}
 			}

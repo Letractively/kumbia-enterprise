@@ -59,7 +59,7 @@ class WebServiceController extends Controller {
 	public final function indexAction(){
 		$this->_soapOptions = array(
 			'uri' => 'http://app-services',
-			'actor' => "http://{$_SERVER['SERVER_ADDR']}/".Core::getInstanceName()."/".$this->getControllerName(),
+			'actor' => 'http://'.$_SERVER['SERVER_ADDR'].'/'.Core::getInstanceName().'/'.$this->getControllerName(),
 			'soap_version' => SOAP_1_2,
 			'encoding' => 'UTF-8'
 		);

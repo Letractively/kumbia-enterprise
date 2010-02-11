@@ -174,9 +174,9 @@ abstract class Security extends Object {
 					return generateRSAKey($kumbia);
 				} else {
 					if($kumbia){
-						formsPrint("<input type='hidden' id='rsa32_key' value=\"{$_SESSION['rsa_key']}\"/> \r\n");
+						formsPrint("<input type='hidden' id='rsa32_key' value=\"".$_SESSION['rsa_key']."\"/> \r\n");
 					} else {
-						echo "<input type='hidden' id='rsa32_key' value=\"{$_SESSION['rsa_key']}\"/> \r\n";
+						echo "<input type='hidden' id='rsa32_key' value=\"".$_SESSION['rsa_key']."\"/> \r\n";
 					}
 				}
 			} else {

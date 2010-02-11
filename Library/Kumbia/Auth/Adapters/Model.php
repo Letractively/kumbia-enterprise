@@ -33,7 +33,11 @@
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
-class ModelAuth implements AuthInterface {
+class ModelAuth
+#if[compile-time]
+	implements AuthInterface
+#endif
+	{
 
 	/**
 	 * Nombre del archivo (si es utilizado)
@@ -88,7 +92,7 @@ class ModelAuth implements AuthInterface {
 			}
 		}
 		if(EntityManager::isEntity($extraArgs['class'])==false){
-			throw new AuthException("No existe el modelo '{$extraArgs['class']}' para realizar la autenticación");
+			throw new AuthException("No existe el modelo '".$extraArgs['class']."' para realizar la autenticación");
 		}
 		unset($extraArgs[0]);
 		unset($extraArgs['class']);

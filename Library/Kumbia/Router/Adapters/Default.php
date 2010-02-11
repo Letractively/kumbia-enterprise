@@ -30,7 +30,11 @@
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
  */
-class DefaultRouter implements RouterInterface {
+class DefaultRouter
+#if[compile-time]
+	implements RouterInterface
+#endif
+	{
 
 	/**
 	 * Administra la petición de enrutamiento

@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordTransaction
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -28,7 +28,7 @@
  *
  * @package		ActiveRecord
  * @subpackage	ActiveRecordTransaction
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
@@ -271,6 +271,13 @@ class ActiveRecordTransaction {
 		return $this->_messages;
 	}
 
-	//public function
+	/**
+	 * Indica si aún no se ha hecho commit ó rollback a la transacción
+	 *
+	 * @return boolean
+	 */
+	public function isValid(){
+		return $this->_db->isUnderTransaction();
+	}
 
 }

@@ -47,7 +47,7 @@ class ActiveRecordException extends CoreException {
 		Flash::warning("
                 <span style='font-size:16px;color:black'>KumbiaWarning: $title</span><br/>
                 <div>$message<br>
-                <span style='font-size:12px;color:black'>En el modelo <i>{$source}</i> al ejecutar <i>$controller_name/$action</i></span></div>", true);
+                <span style='font-size:12px;color:black'>En el modelo <i>$source</i> al ejecutar <i>$controller_name/$action</i></span></div>", true);
 		echo "<pre style='border:1px solid #969696;background:#FFFFE8;color:black;font-size:11px'>";
 		echo debug_print_backtrace()."\n";
 		echo "</pre>";

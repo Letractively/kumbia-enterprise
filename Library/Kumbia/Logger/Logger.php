@@ -155,7 +155,7 @@ class Logger extends Object {
 			require "Library/Kumbia/Logger/Adapters/$adapter.php";
 		}
 		if(!class_exists($className, false)){
-			throw new LoggerException("No se encontr&oacute; el adaptador '$className'");
+			throw new LoggerException("No se encontró el adaptador '$className'");
 		}
 		$this->_objectLogger = new $className($name, $options);
 	}
@@ -257,7 +257,7 @@ class Logger extends Object {
 				call_user_func_array(array($this->_objectLogger, "log"), $args);
 				break;
 			default:
-				throw new LoggerException("Tipo indefinido de excepci&oacute;n [".$args[0]."]", 0);
+				throw new LoggerException("Tipo indefinido de excepción [".$args[0]."]", 0);
 		}
 	}
 

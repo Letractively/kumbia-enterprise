@@ -44,7 +44,7 @@ class NumericalityValidator extends ActiveRecordValidator implements ActiveRecor
 	public function validate(){
 		if($this->isRequired()==true){
 			if(!is_numeric($this->getValue())){
-				$this->appendMessage("El valor del campo '{$this->getFieldName()}' debe ser num&eacute;rico");
+				$this->appendMessage("El valor del campo '".$this->getFieldName()."' debe ser numérico");
 				return false;
 			}
 		}

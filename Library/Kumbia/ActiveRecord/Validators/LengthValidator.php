@@ -63,9 +63,9 @@ class LengthValidator extends ActiveRecordValidator implements ActiveRecordValid
 				if($this->getOption('minimum')==1){
 					$text = "un caracter";
 				} else {
-					$text = "{$this->getOption('minimum')} caracteres";
+					$text = $this->getOption('minimum')." caracteres";
 				}
-				$this->appendMessage("El campo '{$this->getFieldName()}' debe tener al menos $text");
+				$this->appendMessage("El campo '".$this->getFieldName()."' debe tener al menos ".$text);
 				$validateFails = true;
 			}
 		}
@@ -74,9 +74,9 @@ class LengthValidator extends ActiveRecordValidator implements ActiveRecordValid
 				if($this->getOption('maximum')==1){
 					$text = "un caracter";
 				} else {
-					$text = "{$this->getOption('maximum')} caracteres";
+					$text = $this->getOption('maximum')." caracteres";
 				}
-				$this->appendMessage("El campo '{$this->getFieldName()}' debe tener m&aacute;ximo $text");
+				$this->appendMessage("El campo '".$this->getFieldName()."' debe tener máximo ".$text);
 				$validateFails = true;
 			}
 		}

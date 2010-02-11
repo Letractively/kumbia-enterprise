@@ -37,7 +37,11 @@
  * @link		http://www.php.net/manual/es/ref.mysql.php
  * @access		Public
  */
-class DbMySQL extends DbBase implements DbBaseInterface  {
+class DbMySQL extends DbBase
+#if[compile-time]
+	implements DbBaseInterface
+#endif
+	{
 
 	/**
 	 * SELECT statements are performed in a non-locking fashion
@@ -424,12 +428,8 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	 */
 	public function tableExists($tableName, $schemaName=''){
 		$tableName = addslashes($tableName);
-		if($schemaName==''){
-			$sql = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '$tableName'";
-		} else {
-			$schemaName = addslashes("$schemaName");
-			$sql = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '$tableName' AND TABLE_SCHEMA = '$schemaName'";
-		}
+		$sql = MysqlSQLDialect::tableExists($tableName, $schemaName);
+		$sql = "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '$tableName'";
 		$fetchMode = $this->_fetchMode;
 		$this->_fetchMode = MYSQL_NUM;
 		$num = $this->fetchOne($sql);
@@ -450,10 +450,10 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	/**
 	 * Verifica si una tabla temporal existe o no
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param string $schema
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	string $schema
+	 * @return	boolean
 	 */
 	public function temporaryTableExists($tableName, $schemaName=''){
 		try {
@@ -646,14 +646,25 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	 */
 	public function describeTable($table, $schema=''){
 		if($schema==''){
-			$query = "DESCRIBE `$table`";
+			$query = 'DESCRIBE `'.$table.'`';
 		} else {
-			$query = "DESCRIBE `$schema`.`$table`";
+			$query = 'DESCRIBE `'.$schema.'`.`'.$table.'`';
 		}
 		$this->_fetchMode = MYSQL_ASSOC;
 		$describe = $this->fetchAll($query);
 		$this->_fetchMode = MYSQL_BOTH;
 		return $describe;
+	}
+
+	/**
+	 * Listar los campos de una vista
+	 *
+	 * @param string $table
+	 * @param string $schema
+	 * @return array
+	 */
+	public function describeView($table, $schema=''){
+		return $this->describeTable($table, $schema);
 	}
 
 	/**
@@ -736,6 +747,15 @@ class DbMySQL extends DbBase implements DbBaseInterface  {
 	 */
 	public static function getPHPExtensionRequired(){
 		return array('mysql', 'mysqlnd');
+	}
+
+	/**
+	 * Devuelve el SQL Dialect usado
+	 *
+	 * @return string
+	 */
+	public function getSQLDialect(){
+		return 'MysqlSQLDialect';
 	}
 
 }

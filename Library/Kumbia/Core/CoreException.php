@@ -170,8 +170,8 @@ class CoreException extends Exception {
 		if($this->_isRemote==true){
 			$message.= "Remote &gt; ";
 		}
-		$message.= get_class($this).": $this->message ({$this->getCode()})<br>
-		<span class='exceptionLocation'>En el archivo <i>{$file}</i> en la línea: <i>{$this->getLine()}</i></div>";
+		$message.= get_class($this).": $this->message (".$this->getCode().")<br>
+		<span class='exceptionLocation'>En el archivo <i>$file</i> en la línea: <i>".$this->getLine()."</i></div>";
 		echo $message;
 		$config = CoreConfig::readAppConfig();
 		$activeApp = Router::getApplication();
@@ -207,8 +207,8 @@ class CoreException extends Exception {
 						<tr bgcolor='$bgcolor'>
 							<td align='center'>$i</td>
 							<td><pre>".wordwrap(htmlentities(print_r($message['value'], true), 100))."</pre></td>
-							<td>{$message['class']}::{$message['function']}</td>
-							<td align='center'>{$message['line']}</td>
+							<td>".$message['class']."::".$message['function']."</td>
+							<td align='center'>".$message['line']."</td>
 							<td>$file</td>
 							<td align='center'>$time</td>
 						</tr>";
@@ -244,11 +244,11 @@ class CoreException extends Exception {
 				if($this->_isRemote==true){
 					$color = '#151515';
 					if(count($this->_remoteBacktrace)){
-						print "<pre class='exceptionRemoteContainer'>";
-						print "<div class='exceptionRemoteTitle'>Remote Backtrace <span class='exceptionActor'>(Actor: ".$this->_remoteActor.")</span></div>";
+						echo "<pre class='exceptionRemoteContainer'>";
+						echo "<div class='exceptionRemoteTitle'>Remote Backtrace <span class='exceptionActor'>(Actor: ".$this->_remoteActor.")</span></div>";
 						foreach($this->_remoteBacktrace as $remoteTrace){
 							if(isset($remoteTrace['file'])){
-								echo "<div class='exceptionRemoteTrace'>{$remoteTrace['file']} <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
+								echo "<div class='exceptionRemoteTrace'>".$remoteTrace['file']." <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
 							}
 						}
 						echo "</pre>";
@@ -471,7 +471,7 @@ class CoreException extends Exception {
 					if(!isset($trace['function'])){
 						$trace['function'] = "";
 					}
-					echo "#$i $file -&gt; {$trace['class']}{$trace['type']}{$trace['function']} ({$trace['line']})\n";
+					echo "#$i $file -&gt; ".$trace['class'].$trace['type'].$trace['function']." (".$trace['line'].")\n";
 					++$i;
 				}
 				echo '</pre>';
@@ -505,8 +505,8 @@ class CoreException extends Exception {
 		$file = CoreException::getSafeFileName($e->getFile());
 		echo "\n<div class='exceptionContainer'>\n";
 		$message = "<div class='exceptionDescription'>".
-		get_class($e).": {$e->getMessage()} ({$e->getCode()})<br>
-		<span class='exceptionLocation'>En el archivo <i>{$file}</i> en la línea: <i>{$e->getLine()}</i></div>";
+		get_class($e).": ".$e->getMessage()." (".$e->getCode().")<br>
+		<span class='exceptionLocation'>En el archivo <i>$file</i> en la línea: <i>".$e->getLine()."</i></div>";
 		echo $message;
 
 		echo "<div class='exceptionBacktraceSimple'>";

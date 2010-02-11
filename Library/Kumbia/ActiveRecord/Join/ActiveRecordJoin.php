@@ -75,7 +75,7 @@ class ActiveRecordJoin extends Object {
 				foreach($params['groupFields'] as $alias => $field){
 					if(preg_match('/\{\#([a-zA-Z0-9\_]+)\}/', $field, $regs)){
 						if(!isset($entitiesSources[$regs[1]])){
-							throw new ActiveRecordException("La entidad '{$regs[1]}' en los campos solicitados no se encontró en la lista de entidades a agrupar");
+							throw new ActiveRecordException("La entidad '".$regs[1]."' en los campos solicitados no se encontró en la lista de entidades a agrupar");
 						} else {
 							$sqlField = str_replace($regs[0], $entitiesSources[$regs[1]], $field);
 							if(!is_numeric($alias)){
@@ -108,7 +108,7 @@ class ActiveRecordJoin extends Object {
 						$replacedField = $field;
 						while(preg_match('/\{\#([a-zA-Z0-9\_]+)\}/', $replacedField, $regs)){
 							if(!isset($entitiesSources[$regs[1]])){
-								throw new ActiveRecordException("La entidad '{$regs[1]}' en los campos solicitados no se encontró en la lista de entidades con acumulado de sumatoria");
+								throw new ActiveRecordException("La entidad '".$regs[1]."' en los campos solicitados no se encontró en la lista de entidades con acumulado de sumatoria");
 							} else {
 								$replacedField = str_replace($regs[0], $entitiesSources[$regs[1]], $replacedField);
 								if(is_numeric($alias)){
@@ -171,11 +171,11 @@ class ActiveRecordJoin extends Object {
 									$belongsTo = $relations['belongsTo'][$relationEntity];
 									$source = $entitiesSources[$entityName];
 									if(!is_array($belongsTo['rf'])){
-										$join[] = "{$belongsTo['rt']}.{$belongsTo['rf']} = $source.{$belongsTo['fi']}";
+										$join[] = $belongsTo['rt'].'.'.$belongsTo['rf'].' = '.$source.'.'.$belongsTo['fi'];
 									} else {
 										$i = 0;
 										foreach($belongsTo['rf'] as $rf){
-											$join[] = "{$belongsTo['rt']}.{$rf} = $source.{$belongsTo['fi'][$i]}";
+											$join[] = $belongsTo['rt'].'.'.$rf.' = '.$source.'.'.$belongsTo['fi'][$i];
 											++$i;
 										}
 									}
@@ -190,11 +190,11 @@ class ActiveRecordJoin extends Object {
 									$hasMany = $relations['hasMany'][$relationEntity];
 									$source = $entitiesSources[$entityName];
 									if(!is_array($hasMany['rf'])){
-										$join[] = "$source.{$hasMany['rf']} = {$hasMany['rt']}.{$hasMany['fi']}";
+										$join[] = $source.'.'.$hasMany['rf'].' = '.$hasMany['rt'].'.'.$hasMany['fi'];
 									} else {
 										$i = 0;
 										foreach($hasMany['rf'] as $rf){
-											$join[] = "$source.{$rf} = {$hasMany['rt']}.{$hasMany['fi'][$i]}";
+											$join[] = $source.'.'.$rf.' = '.$hasMany['rt'].'.'.$hasMany['fi'][$i];
 											++$i;
 										}
 									}
@@ -245,7 +245,7 @@ class ActiveRecordJoin extends Object {
 						if(in_array($regs[1], $params['entities'])){
 							$params['order'][$key] = str_replace("{#$regs[1]}", $entitiesSources[$regs[1]], $valueOrder);
 						} else {
-							throw new DbSQLGrammarException("No se encuentra la entidad '{$regs[1]}' en la lista de ordenamiento", 0);
+							throw new DbSQLGrammarException("No se encuentra la entidad '".$regs[1]."' en la lista de ordenamiento", 0);
 						}
 					}
 				}

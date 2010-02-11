@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Controller
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -27,7 +27,7 @@
  *
  * @category	Kumbia
  * @package		Controller
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
@@ -313,11 +313,11 @@ class Controller extends ControllerBase {
 	}
 
 	/**
-	 * Establece el valor de un parametro enviado por $_REQUEST;
+	 * Establece el valor de un parámetro enviado por $_REQUEST;
 	 *
-	 * @access protected
-	 * @param mixed $index
-	 * @param mixed $value
+	 * @access	protected
+	 * @param	mixed $index
+	 * @param	mixed $value
 	 */
 	protected function setRequestParam($index, $value){
 		$funcGetArgs = func_get_args();
@@ -325,11 +325,11 @@ class Controller extends ControllerBase {
 	}
 
 	/**
-	 * Establece el valor de un parametro enviado por $_POST;
+	 * Establece el valor de un parámetro enviado por $_POST;
 	 *
-	 * @access protected
-	 * @param mixed $index
-	 * @param mixed $value
+	 * @access	protected
+	 * @param	mixed $index
+	 * @param	mixed $value
 	 */
 	protected function setPostParam($index, $value){
 		$funcGetArgs = func_get_args();
@@ -337,11 +337,11 @@ class Controller extends ControllerBase {
 	}
 
 	/**
-	 * Establece el valor de un parametro enviado por $_GET;
+	 * Establece el valor de un parámetro enviado por $_GET;
 	 *
-	 * @access protected
-	 * @param mixed $index
-	 * @param mixed $value
+	 * @access	protected
+	 * @param	mixed $index
+	 * @param	mixed $value
 	 */
 	protected function setQueryParam($index, $value){
 		$funcGetArgs = func_get_args();
@@ -349,11 +349,11 @@ class Controller extends ControllerBase {
 	}
 
 	/**
-	 * Establece el valor de un parametro enviado por $_COOKIE;
+	 * Establece el valor de un parámetro enviado por $_COOKIE;
 	 *
-	 * @access protected
-	 * @param mixed $index
-	 * @param mixed $value
+	 * @access	protected
+	 * @param	mixed $index
+	 * @param	mixed $value
 	 */
 	protected function setCookie($index, $value){
 		$funcGetArgs = func_get_args();
@@ -363,9 +363,9 @@ class Controller extends ControllerBase {
 	/**
 	 * Sube un archivo al directorio img/upload si esta en $_FILES
 	 *
-	 * @access protected
-	 * @param string $name
-	 * @return string
+	 * @access	protected
+	 * @param	string $name
+	 * @return	string
 	 */
 	protected function uploadImage($name){
 		if(isset($_FILES[$name])){
@@ -389,7 +389,7 @@ class Controller extends ControllerBase {
 			return false;
 		}
 		if($_FILES[$name]){
-			return move_uploaded_file($_FILES[$name]['tmp_name'], htmlspecialchars("$dir/{$_FILES[$name]['name']}"));
+			return move_uploaded_file($_FILES[$name]['tmp_name'], htmlspecialchars($dir.'/'.$_FILES[$name]['name']));
 		} else {
 			return false;
 		}
@@ -880,7 +880,7 @@ class Controller extends ControllerBase {
 	 */
 	public function _sleep(){
 		return array(
-			'_logger', '_cacheLayout', '_cacheView', '_id', '_actionName',
+			'_logger', '_cacheTemplate', '_cacheLayout', '_cacheView', '_id', '_actionName',
 			'_controllerName', '_parameters', '_allParameters'
 		);
 	}

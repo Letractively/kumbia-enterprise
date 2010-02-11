@@ -221,10 +221,10 @@ class SocketsCommunicator {
 	 */
 	public function send(){
 		if($this->_method=='GET'){
-			$this->_httpRequest = "GET /{$this->_uri} HTTP/1.1\r\n";
+			$this->_httpRequest = "GET /".$this->_uri." HTTP/1.1\r\n";
 		} else {
 			if($this->_method=='POST'){
-				$this->_httpRequest = "POST /{$this->_uri} HTTP/1.1\r\n";
+				$this->_httpRequest = "POST /".$this->_uri." HTTP/1.1\r\n";
 			}
 		}
 		foreach($this->_headers as $headerName => $headerValue){

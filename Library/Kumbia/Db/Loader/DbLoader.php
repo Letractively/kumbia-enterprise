@@ -36,7 +36,7 @@
 abstract class DbLoader {
 
 	/**
-	 * Carga un adaptador de base de datos segun parametros
+	 * Carga un adaptador de base de datos segun parámetros
 	 *
 	 * @param	string $adapterName
 	 * @param	array $options

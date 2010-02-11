@@ -131,7 +131,7 @@ class HiloGenerator implements ActiveRecordGeneratorInterface {
 	public function setIdentifier($record){
 		if(count($this->_consecutives)==0){
 			$this->_connection = $record->getConnection();
-			$sql = "SELECT {$this->_column} FROM {$this->_table}";
+			$sql = 'SELECT '.$this->_column.' FROM '.$this->_table;
 			if($this->_connection->isUnderTransaction()==true){
 				$sql = $this->_connection->forUpdate($sql);
 				$row = $this->_connection->fetchOne($sql);
@@ -155,7 +155,7 @@ class HiloGenerator implements ActiveRecordGeneratorInterface {
 	public function updateConsecutive($record){
 		if(count($this->_consecutives)==0){
 			$newConsecutive = $this->_activeConsecutive+1;
-			$sql = "UPDATE {$this->_table} SET {$this->_column} = $newConsecutive WHERE {$this->_column} = {$this->_initialConsecutive}";
+			$sql = 'UPDATE '.$this->_table.' SET '.$this->_column.' = '.$newConsecutive.' WHERE '.$this->_column.' = '.$this->_initialConsecutive;
 			$this->_connection->query($sql);
 		}
 		return true;
@@ -168,7 +168,7 @@ class HiloGenerator implements ActiveRecordGeneratorInterface {
 	public function finalizeConsecutive(){
 		if(count($this->_consecutives)!=0){
 			$newConsecutive = $this->_activeConsecutive+1;
-			$sql = "UPDATE {$this->_table} SET {$this->_column} = $newConsecutive WHERE {$this->_column} = {$this->_initialConsecutive}";
+			$sql = 'UPDATE '.$this->_table.' SET '.$this->_column.' = '.$newConsecutive.' WHERE '.$this->_column.' = '.$this->_initialConsecutive;
 			$this->_connection->query($sql);
 		}
 	}

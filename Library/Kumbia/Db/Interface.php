@@ -64,6 +64,7 @@ interface DbBaseInterface {
 	public function commit();
 	public function listTables($schemaName='');
 	public function describeTable($tableName, $schema='');
+	public function describeView($tableName, $schema='');
 	public function getRequiredSequence($tableName='', $identityColumn='', $sequenceName='');
 	public function lastInsertId($tableName='', $identityColumn='', $sequenceName='');
 	public function createTable($tableName, $definition, $index=array(), $tableOptions=array());

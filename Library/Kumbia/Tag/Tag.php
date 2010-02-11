@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Tag
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
@@ -32,7 +32,7 @@
  *
  * @category 	Kumbia
  * @package	Tag
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
@@ -69,9 +69,11 @@ abstract class Tag {
 	 * @param string $value
 	 */
 	public static function displayTo($id, $value){
+		#if[compile-time]
 		if(is_object($value)||is_array($value)||is_resource($value)){
-			throw new TagException('Solo valores escalares pueden ser asiganados a los componentes UI');
+			throw new TagException('Solo valores escalares pueden ser asignados a los componentes UI');
 		}
+		#endif
 		self::$_displayValues[$id] = $value;
 	}
 
@@ -123,7 +125,7 @@ abstract class Tag {
 				if(!isset($action['onclick'])){
 					$action['onclick'] = "";
 				}
-				$action['onclick'] = "if(!confirm(\"{$action['confirm']}\")) { return false; }; ".$action['onclick'];
+				$action['onclick'] = "if(!confirm(\"".$action['confirm']."\")) { return false; }; ".$action['onclick'];
 				unset($action['confirm']);
 			}
 			$code = "<a href='".Utils::getKumbiaUrl($action)."' ";
@@ -162,16 +164,16 @@ abstract class Tag {
 		$controller_name = Router::getController();
 		if(is_array($action)){
 			if(isset($action['confirm'])){
-				$action['onclick'] = "if(!confirm(\"{$action['confirm']}\")) if(document.all) event.returnValue = false; else event.preventDefault(); ".$action['onclick'];
+				$action['onclick'] = "if(!confirm(\"".$action['confirm']."\")) if(document.all) event.returnValue = false; else event.preventDefault(); ".$action['onclick'];
 				unset($action['confirm']);
 			}
-			$code = "<a href='".Utils::getKumbiaUrl("$controller_name/{$action[0]}")."' ";
+			$code = "<a href='".Utils::getKumbiaUrl($controller_name."/".$action[0])."' ";
 			foreach($action as $key => $value){
 				if(!is_integer($key)){
 					$code.=' '.$key.'=\''.$value.'\'';
 				}
 			}
-			$code.=">{$action[1]}</a>";
+			$code.=">".$action[1]."</a>";
 			return $code;
 		} else {
 			if(!$text) {
@@ -223,7 +225,7 @@ abstract class Tag {
 		}
 		$code = "<a href=\"#\" onclick=\"";
 		if(isset($params['confirm'])){
-			$code.= "if(confirm('{$params['confirm']}')){";
+			$code.= "if(confirm('".$params['confirm']."')){";
 		}
 		$code.= "new Ajax.Request(Utils.getKumbiaURL('$action'), {";
 		$call = array();
@@ -236,19 +238,19 @@ abstract class Tag {
 			unset($params['asynchronous']);
 		}
 		if(isset($params['onLoading'])){
-			$call[] = "onLoading: function(){ {$params['onLoading']} }";
+			$call[] = "onLoading: function(){ ".$params['onLoading']." }";
 			unset($params['onLoading']);
 		}
 		if(isset($params['onSuccess'])){
-			$call[] = "onSuccess: function(transport){ {$params['onSuccess']} }";
+			$call[] = "onSuccess: function(transport){ ".$params['onSuccess']." }";
 			unset($params['onSuccess']);
 		}
 		if(isset($params['onFailure'])){
-			$call[] = "onFailure: function(transport){ {$params['onFailure']} }";
+			$call[] = "onFailure: function(transport){ ".$params['onFailure']." }";
 			unset($params['onFailure']);
 		}
 		if(isset($params['onComplete'])){
-			$call[] = "onComplete: function(transport){ {$params['onComplete']}; $('$update').update(transport.responseText); }";
+			$call[] = "onComplete: function(transport){ ".$params['onComplete']."; $('$update').update(transport.responseText); }";
 			unset($params['onComplete']);
 		} else {
 			$call[] = "onComplete: function(transport){ $('$update').update(transport.responseText); }";
@@ -299,7 +301,7 @@ abstract class Tag {
 		if(!isset($params['param_name'])||!$params['param_name']) {
 			$params['param_name'] = $params[0];
 		}
-		$code = "<input type='text' id='{$params[0]}' name='{$params['name']}'";
+		$code = "<input type='text' id='".$params[0]."' name='".$params['name']."'";
 		foreach($params as $key => $value){
 			if(!in_array($key, array('id', 'name', 'param_name', 'message', 'action', 'after_update'))){
 				if(!is_integer($key)){
@@ -309,11 +311,11 @@ abstract class Tag {
 		}
 		$instancePath = Core::getInstancePath();
 		$code.= " />
-		<span id='indicator$hash' style='display: none'><img src='{$instancePath}img/spinner.gif' alt='{$params['message']}'/></span>
-		<div id='{$params[0]}_choices' class='autocomplete'></div>
+		<span id='indicator$hash' style='display: none'><img src='".$instancePath."img/spinner.gif' alt='".$params['message']."'/></span>
+		<div id='".$params[0]."_choices' class='autocomplete'></div>
 		<script type='text/javascript'>
 		// <![CDATA[
-		new Ajax.Autocompleter(\"{$params[0]}\", \"{$params[0]}_choices\", Utils.getKumbiaURL(\"{$params['action']}\"), { minChars: 2, indicator: 'indicator$hash', afterUpdateElement : {$params['after_update']}, paramName: '{$params['param_name']}'});
+		new Ajax.Autocompleter(\"".$params[0]."\", \"".$params[0]."_choices\",Utils.getKumbiaURL(\"".$params['action']."\"), { minChars: 2, indicator: 'indicator$hash', afterUpdateElement : ".$params['after_update'].", paramName: '".$params['param_name']."'});
 		// ]]>
 		</script>";
 		return $code;
@@ -344,7 +346,7 @@ abstract class Tag {
 		} else {
 			$value = $configuration['value'];
 		}
-		return "<textarea id=\"{$configuration['name']}\" name=\"{$configuration['name']}\" cols=\"{$configuration['cols']}\" rows=\"{$configuration['rows']}\">$value</textarea>\r\n";
+		return "<textarea id=\"".$configuration['name']."\" name=\"".$configuration['name']."\" cols=\"".$configuration['cols']."\" rows=\"".$configuration['rows']."\">".$value."</textarea>\r\n";
 	}
 
 	/**
@@ -374,7 +376,7 @@ abstract class Tag {
 		} else {
 			$params['onkeydown'].=";valNumeric(event)";
 		}
-		$code = "<input type='text' id='{$params[0]}' value='$value' ";
+		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$code.="$key='$value' ";
@@ -416,33 +418,33 @@ abstract class Tag {
         }
         if(isset($params['objectFormat'])){
 		    if(!isset($params['onblur'])) {
-			    $params['onblur'] = "this.value={$params['objectFormat']}.money(this.value);";
+			    $params['onblur'] = "this.value=".$params['objectFormat'].".money(this.value);";
 		    } else {
-			    $params['onblur'].= ";this.value={$params['objectFormat']}.money(this.value);";
+			    $params['onblur'].= ";this.value=".$params['objectFormat'].".money(this.value);";
 		    }
 		    if(!isset($params['onfocus'])) {
-			    $params['onfocus'] = "this.value={$params['objectFormat']}.deFormat(this.value,\"money\");this.activate();";
+			    $params['onfocus'] = "this.value=".$params['objectFormat'].".deFormat(this.value,\"money\");this.activate();";
 		    } else {
-			    $params['onfocus'].= ";this.value={$params['objectFormat']}.deFormat(this.value,\"money\");this.activate();";
+			    $params['onfocus'].= ";this.value=".$params['objectFormat'].".deFormat(this.value,\"money\");this.activate();";
 		    }
-            $codeAlt = "<script type='text/javascript'>\n\t$('{$params[0]}').value={$params['objectFormat']}.money($('{$params[0]}').value);\n</script>\r\n";
+            $codeAlt = "<script type='text/javascript'>\n\t$('".$params[0]."').value=".$params['objectFormat'].".money($('".$params[0]."').value);\n</script>\r\n";
             unset($params['objectFormat']);
         }else{
 		    if(!isset($params['onblur'])) {
-			    $params['onblur'] = "defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.money(this.value);";
+			    $params['onblur'] = "defaultFormater=new Format(".$params['formatOptions'].");this.value=defaultFormater.money(this.value);";
 		    } else {
-			    $params['onblur'].=";defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.money(this.value);";
+			    $params['onblur'].=";defaultFormater=new Format(".$params['formatOptions'].");this.value=defaultFormater.money(this.value);";
 		    }
 		    if(!isset($params['onfocus'])) {
-			    $params['onfocus'] = "defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.deFormat(this.value,\"money\");this.activate();";
+			    $params['onfocus'] = "defaultFormater=new Format(".$params['formatOptions'].");this.value=defaultFormater.deFormat(this.value,\"money\");this.activate();";
 		    } else {
-			    $params['onfocus'].= ";defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.deFormat(this.value,\"money\");this.activate();";
+			    $params['onfocus'].= ";defaultFormater=new Format(".$params['formatOptions'].");this.value=defaultFormater.deFormat(this.value,\"money\");this.activate();";
 		    }
-            $codeAlt = "<script type='text/javascript'>\n\tdefaultFormater=new Format({$params['formatOptions']});\n\t$('{$params[0]}').value=defaultFormater.money($('{$params[0]}').value);\n</script>\r\n";
+            $codeAlt = "<script type='text/javascript'>\n\tdefaultFormater=new Format(".$params['formatOptions'].");\n\t$('".$params[0]."').value=defaultFormater.money($('".$params[0]."').value);\n</script>\r\n";
         }
         unset($params['formatOptions']);
         $params['format'] = 'money';
-		$code = "<input type='text' id='{$params[0]}' value='$value' ";
+		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $val){
 			if(!is_integer($key)){
 				$code.="$key='$val' ";
@@ -487,33 +489,33 @@ abstract class Tag {
         }
         if(isset($params['objectFormat'])){
 		    if(!isset($params['onblur'])) {
-			    $params['onblur'] = "this.value={$params['objectFormat']}.percent(this.value);";
+			    $params['onblur'] = "this.value=".$params['objectFormat'].".percent(this.value);";
 		    } else {
-			    $params['onblur'].= ";this.value={$params['objectFormat']}.percent(this.value);";
+			    $params['onblur'].= ";this.value=".$params['objectFormat'].".percent(this.value);";
 		    }
 		    if(!isset($params['onfocus'])) {
-			    $params['onfocus'] = "this.value={$params['objectFormat']}.deFormat(this.value,\"percent\");this.activate();";
+			    $params['onfocus'] = "this.value=".$params['objectFormat'].".deFormat(this.value,\"percent\");this.activate();";
 		    } else {
-			    $params['onfocus'].= ";this.value={$params['objectFormat']}.deFormat(this.value,\"percent\");this.activate();";
+			    $params['onfocus'].= ";this.value=".$params['objectFormat'].".deFormat(this.value,\"percent\");this.activate();";
 		    }
-            $codeAlt = "<script type='text/javascript'>\n\t$('{$params[0]}').value={$params['objectFormat']}.percent($('{$params[0]}').value);\n</script>\r\n";
+            $codeAlt = "<script type='text/javascript'>\n\t$('".$params[0]."').value=".$params['objectFormat'].".percent($('".$params[0]."').value);\n</script>\r\n";
             unset($params['objectFormat']);
         }else{
 		    if(!isset($params['onblur'])) {
-			    $params['onblur'] = "defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.percent(this.value);";
+			    $params['onblur'] = "defaultFormater=new Format(".$params['formatOptions'].");this.value=defaultFormater.percent(this.value);";
 		    } else {
-			    $params['onblur'].=";defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.percent(this.value);";
+			    $params['onblur'].=";defaultFormater=new Format(".$params['formatOptions'].");this.value=defaultFormater.percent(this.value);";
 		    }
 		    if(!isset($params['onfocus'])) {
-			    $params['onfocus'] = "defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.deFormat(this.value,\"percent\");this.activate();";
+			    $params['onfocus'] = "defaultFormater=new Format(".$params['formatOptions'].");this.value=defaultFormater.deFormat(this.value,\"percent\");this.activate();";
 		    } else {
-			    $params['onfocus'].= ";defaultFormater=new Format({$params['formatOptions']});this.value=defaultFormater.deFormat(this.value,\"percent\");this.activate();";
+			    $params['onfocus'].= ";defaultFormater=new Format(".$params['formatOptions'].");this.value=defaultFormater.deFormat(this.value,\"percent\");this.activate();";
 		    }
-            $codeAlt = "<script type='text/javascript'>\n\tdefaultFormater=new Format({$params['formatOptions']});\n\t$('{$params[0]}').value=defaultFormater.percent($('{$params[0]}').value);\n</script>\r\n";
+            $codeAlt = "<script type='text/javascript'>\n\tdefaultFormater=new Format(".$params['formatOptions'].");\n\t$('".$params[0]."').value=defaultFormater.percent($('".$params[0]."').value);\n</script>\r\n";
         }
         unset($params['formatOptions']);
         $params['format'] = 'percent';
-		$code = "<input type='text' id='{$params[0]}' value='$value' ";
+		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $val){
 			if(!is_integer($key)){
 				$code.="$key='$val' ";
@@ -550,7 +552,7 @@ abstract class Tag {
 		} else {
 			$params['onkeydown'].=";valNumeric(event)";
 		}
-		$code = "<input type='password' id='{$params[0]}' value='$value' ";
+		$code = "<input type='password' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$code.="$key='$value' ";
@@ -632,7 +634,7 @@ abstract class Tag {
 		} else {
 			$displayJS = '';
 		}
-		$code .= "<select id='{$params[0]}_month' onchange=\"$displayJS$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+\$F('{$params[0]}_month')+'-'+\$F('{$params[0]}_day')\">";
+		$code .= "<select id='".$params[0]."_month' onchange=\"$displayJS$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+\$F('".$params[0]."_month')+'-'+\$F('".$params[0]."_day')\">";
 		if($useDummy){
 			$code.="<option value='@'>Sel...</option>\n";
 		}
@@ -650,7 +652,7 @@ abstract class Tag {
 		} else {
 			$display = '';
 		}
-		$code.="<select id='{$params[0]}_day' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value;\" $display>";
+		$code.="<select id='".$params[0]."_day' onchange=\"$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+$('".$params[0]."_month').options[$('".$params[0]."_month').selectedIndex].value+'-'+$('".$params[0]."_day').options[$('".$params[0]."_day').selectedIndex].value;\" $display>";
 		for($i=1;$i<=31;++$i){
 			$n = $i<10 ? '0'.$i : $i;
 			if($n==$dia){
@@ -665,7 +667,7 @@ abstract class Tag {
 		} else {
 			$display = '';
 		}
-		$code.="<select id='{$params[0]}_year' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value\" $display>\n";
+		$code.="<select id='".$params[0]."_year' onchange=\"$('".$params[0]."').value = \$F('".$params[0]."_year')+'-'+\$F('".$params[0]."_month')+'-'+\$F('".$params[0]."_day')\" $display>\n";
 		if(isset($params['startYear'])){
 			$startYear = $params['startYear'];
 		} else {
@@ -685,7 +687,7 @@ abstract class Tag {
 		}
 		$code.="</select></td><td>";
 		$code.="</table>";
-		$code.="<input type='hidden' id='{$params[0]}' name='{$params[0]}' value='$value' />";
+		$code.="<input type='hidden' id='".$params[0]."' name='".$params[0]."' value='$value' />";
 
 		return $code;
 	}
@@ -752,7 +754,7 @@ abstract class Tag {
 			'11' => $traslate->_('Nov'),
 			'12' => $traslate->_('Dic'),
 		);
-		$code .= "<select name='{$params[0]}_month' id='{$params[0]}_month' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value\">";
+		$code .= "<select name='".$params[0]."_month' id='".$params[0]."_month' onchange=\"$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+$('".$params[0]."_month').options[$('".$params[0]."_month').selectedIndex].value+'-'+$('".$params[0]."_day').options[$('".$params[0]."_day').selectedIndex].value\">";
 		foreach($meses as $numero_mes => $nombre_mes){
 			if($numero_mes==$mes){
 				$code.="<option value='$numero_mes' selected='selected'>$nombre_mes</option>\n";
@@ -762,7 +764,7 @@ abstract class Tag {
 		}
 		$code.="</select></td><td>";
 
-		$code.="<select name='{$params[0]}_day' id='{$params[0]}_day' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value\">";
+		$code.="<select name='".$params[0]."_day' id='".$params[0]."_day' onchange=\"$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+$('".$params[0]."_month').options[$('".$params[0]."_month').selectedIndex].value+'-'+$('".$params[0]."_day').options[$('".$params[0]."_day').selectedIndex].value\">";
 		for($i=1;$i<=31;++$i){
 			$n = sprintf("%02s", $i);
 			if($n==$dia){
@@ -773,7 +775,7 @@ abstract class Tag {
 		}
 		$code.="</select></td><td>";
 
-		$code.="<select name='{$params[0]}_year' id='{$params[0]}_year' onchange=\"$('{$params[0]}').value = $('{$params[0]}_year').options[$('{$params[0]}_year').selectedIndex].value+'-'+$('{$params[0]}_month').options[$('{$params[0]}_month').selectedIndex].value+'-'+$('{$params[0]}_day').options[$('{$params[0]}_day').selectedIndex].value\">";
+		$code.="<select name='".$params[0]."_year' id='".$params[0]."_year' onchange=\"$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+$('".$params[0]."_month').options[$('".$params[0]."_month').selectedIndex].value+'-'+$('".$params[0]."_day').options[$('".$params[0]."_day').selectedIndex].value\">";
 		if(isset($params['startYear'])){
 			$startYear = $params['startYear'];
 		} else {
@@ -794,7 +796,7 @@ abstract class Tag {
 		$code.="</select></td><td>";
 		$code.="</table>";
 
-		$code.="<input type='hidden' id='{$params[0]}' name='{$params[0]}' value='$value' />";
+		$code.="<input type='hidden' id='".$params[0]."' name='".$params[0]."' value='$value' />";
 
 		return $code;
 	}
@@ -817,7 +819,7 @@ abstract class Tag {
 			} else {
 				$value = $params['value'];
 			}
-			$code ="<select id='{$params[0]}' name='{$params[0]}' ";
+			$code ="<select id='".$params[0]."' name='".$params[0]."' ";
 			if(!isset($params['dummyValue'])){
 				$dummyValue = '@';
 			} else {
@@ -894,7 +896,7 @@ abstract class Tag {
 				}
 				unset($params['option_callback']);
 			}
-			$code ="<select id='{$params[0]}' name='{$params[0]}' ";
+			$code ="<select id='".$params[0]."' name='".$params[0]."' ";
 			if(is_array($params)){
 				foreach($params as $at => $val){
 					if(!is_integer($at)){
@@ -945,7 +947,7 @@ abstract class Tag {
 			} else {
 				if(is_array($params[1])){
 					foreach($params[1] as $d){
-						$code.="\t<option value='{$d[0]}'>{$d[1]}</option>\r\n";
+						$code.="\t<option value='".$d[0]."'>".$d[1]."</option>\r\n";
 					}
 				} else {
 					throw new TagException("La collección de opciones no es valida");
@@ -989,7 +991,7 @@ abstract class Tag {
 				}
 				unset($params['option_callback']);
 			}
-			$code ="<select id='{$params[0]}' name='{$params[0]}' ";
+			$code ="<select id='".$params[0]."' name='".$params[0]."' ";
 			if(is_array($params)){
 				foreach($params as $at => $val){
 					if(!is_integer($at)){
@@ -1011,9 +1013,9 @@ abstract class Tag {
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
-							$code.="\t<option selected='selected' value='{$o->readAttribute($using[0])}'>".$traslate->_($o->readAttribute($using[1]))."</option>\r\n";
+							$code.="\t<option selected='selected' value='".$o->readAttribute($using[0])."'>".$traslate->_($o->readAttribute($using[1]))."</option>\r\n";
 						} else {
-							$code.="\t<option value='{$o->readAttribute($using[0])}'>".$traslate->_($o->readAttribute($using[1]))."</option>\r\n";
+							$code.="\t<option value='".$o->readAttribute($using[0])."'>".$traslate->_($o->readAttribute($using[1]))."</option>\r\n";
 						}
 					} else {
 						$code.=call_user_func_array($callback, array($o, $value));
@@ -1021,7 +1023,7 @@ abstract class Tag {
 				}
 			} else {
 				foreach($params[1] as $d){
-					$code.="\t<option value='{$d[0]}'>{$d[1]}</option>\r\n";
+					$code.="\t<option value='".$d[0]."'>".$d[1]."</option>\r\n";
 				}
 			}
 			$code.= "</select>\r\n";
@@ -1064,7 +1066,7 @@ abstract class Tag {
 				}
 				unset($params['option_callback']);
 			}
-			$code ="<select id='{$params[0]}' name='{$params[0]}' ";
+			$code ="<select id='".$params[0]."' name='".$params[0]."' ";
 			if(is_array($params)){
 				foreach($params as $_attribute => $_value){
 					if(!is_integer($_attribute)){
@@ -1095,9 +1097,9 @@ abstract class Tag {
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
-							$code.="\t<option selected='selected' value='{$o->readAttribute($using[0])}'>{$o->readAttribute($using[1])}</option>\r\n";
+							$code.="\t<option selected='selected' value='".$o->readAttribute($using[0])."'>".$o->readAttribute($using[1])."</option>\r\n";
 						} else {
-							$code.="\t<option value='{$o->readAttribute($using[0])}'>{$o->readAttribute($using[1])}</option>\r\n";
+							$code.="\t<option value='".$o->readAttribute($using[0])."'>".$o->readAttribute($using[1])."</option>\r\n";
 						}
 					} else {
 						$code.=call_user_func_array($callback, array($o, $value));
@@ -1105,7 +1107,7 @@ abstract class Tag {
 				}
 			} else {
 				foreach($params[1] as $d){
-					$code.="\t<option value='{$d[0]}'>{$d[1]}</option>\r\n";
+					$code.="\t<option value='".$d[0]."'>".$d[1]."</option>\r\n";
 				}
 			}
 			$code.= "</select>\r\n";
@@ -1187,7 +1189,7 @@ abstract class Tag {
 			}
 		}
 		$instancePath = Core::getInstancePath();
-		return "<script type='text/javascript' src='{$instancePath}javascript/$src'></script>\r\n";
+		return "<script type='text/javascript' src='".$instancePath."javascript/".$src."'></script>\r\n";
 	}
 
 	/**
@@ -1231,7 +1233,7 @@ abstract class Tag {
 		if(!isset($params['src'])){
 			$params['src'] = Core::getInstancePath().'img/'.$params[0];
 		}
-		$code = "<input type='image' src='{$params['src']}' ";
+		$code = "<input type='image' src='".$params['src']."' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$code.="$key='$value' ";
@@ -1293,9 +1295,9 @@ abstract class Tag {
 		$code = "";
 		if(!isset($params['src'])||!$params['src']){
 			$instancePath = Core::getInstancePath();
-			$code.="<img src=\"{$instancePath}img/{$params[0]}\" ";
+			$code.="<img src=\"".$instancePath."img/".$params[0]."\" ";
 		} else {
-			$code.="<img src=\"{$params['src']}\" ";
+			$code.="<img src=\"".$params['src']."\" ";
 			unset($params['src']);
 		}
 		if(!isset($params['alt'])||!$params['alt']) {
@@ -1345,14 +1347,14 @@ abstract class Tag {
 			}
 			$requiredFields = join(',', $requiredFields);
 			$code = "<form action='".Utils::getKumbiaUrl($params['action'].'/'.$id)."' method='post'
-			onsubmit='if(validaForm(this,new Array({$requiredFields}))){ return ajaxRemoteForm(this,\"{$params['update']}\",{".join(",",$params['callbacks'])."}); } else{ return false; }'";
+			onsubmit='if(validaForm(this,new Array(".$requiredFields."))){ return ajaxRemoteForm(this,\"".$params['update']."\",{".join(",",$params['callbacks'])."}); } else{ return false; }'";
 			unset($params['required']);
 		} else{
 			if(!isset($params['update'])){
 				throw new ViewException('Debe indicar el contenedor a actualizar con el parámetro "update"');
 			}
 			$code = "<form action='".Utils::getKumbiaUrl($params['action'].'/'.$id)."' method='post'
-			onsubmit='return ajaxRemoteForm(this, \"{$params['update']}\", { ".join(",", $params['callbacks'])." });'";
+			onsubmit='return ajaxRemoteForm(this, \"".$params['update']."\", { ".join(",", $params['callbacks'])." });'";
 		}
 		foreach($params as $at => $val){
 			if(!is_integer($at)&&(!in_array($at, array('action', 'complete', 'before', 'success', 'callbacks')))){
@@ -1384,13 +1386,13 @@ abstract class Tag {
 		if($params['success']){
 			$params['callbacks'][] = " success: function(){ ".$params['success']." }";
 		}
-		$code = "<input type='submit' value='{$params['caption']}' ";
+		$code = "<input type='submit' value='".$params['caption']."' ";
 		foreach($params as $at => $value){
 			if(!is_integer($at)&&(!in_array($at, array("action", "complete", "before", "success", "callbacks", "caption", "update")))){
 				$code.="$at='$value' ";
 			}
 		}
-		$code.=" onclick='return ajaxRemoteForm(this.form, \"{$params['update']}\")' />\r\n";
+		$code.=" onclick='return ajaxRemoteForm(this.form, \"".$params['update']."\")' />\r\n";
 		return $code;
 	}
 
@@ -1553,7 +1555,7 @@ abstract class Tag {
 			$params['method'] = 'post';
 		}
 		if(isset($params['confirm'])&&$params['confirm']){
-			$params['onsubmit'].= $params['onsubmit'].";if(!confirm(\"{$params['confirm']}\")) { return false; }";
+			$params['onsubmit'].= $params['onsubmit'].";if(!confirm(\"".$params['confirm']."\")) { return false; }";
 			unset($params['confirm']);
 		}
 		if($id===null||$id===''){
@@ -1607,7 +1609,7 @@ abstract class Tag {
 		} else {
 			$value = self::getValueFromAction($params[0]);
 		}
-		$code = "<input type='text' id='{$params[0]}' value='$value' ";
+		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $_key => $_value){
 			if(!is_integer($_key)){
 				$code.="$_key='$_value' ";
@@ -1638,7 +1640,7 @@ abstract class Tag {
 			if(!isset($params['value'])){
 				$params['value'] = self::getValueFromAction($params[0]);
 			}
-			$code = "<input type='password' id='{$params[0]}' ";
+			$code = "<input type='password' id='".$params[0]."' ";
 			foreach($params as $key => $value){
 				if(!is_integer($key)){
 					$code.="$key='$value' ";
@@ -1667,7 +1669,7 @@ abstract class Tag {
 				$params['caption'] = $params[0];
 			}
 		}
-		$code = "<input type='submit' value='{$params['caption']}' ";
+		$code = "<input type='submit' value='".$params['caption']."' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$code.="$key='$value' ";
@@ -1699,7 +1701,7 @@ abstract class Tag {
 		if($value!==""&&$value!==null){
 			$params['checked'] = "checked";
 		}
-		$code = "<input type='checkbox' id='{$params[0]}' ";
+		$code = "<input type='checkbox' id='".$params[0]."' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$code.="$key='$value' ";
@@ -1737,7 +1739,7 @@ abstract class Tag {
 		} else {
 			$params['onblur'].=";keyUpper2(this)";
 		}
-		$code = "<input type='text' id='{$params[0]}' value='$value' ";
+		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $_key => $_value){
 			if(!is_integer($_key)){
 				$code.="$_key='$_value' ";
@@ -1765,7 +1767,7 @@ abstract class Tag {
 		if(!isset($params['name'])||!$params['name']){
 			$params['name'] = $params[0];
 		}
-		$code = "<input type='file' id='{$params[0]}' ";
+		$code = "<input type='file' id='".$params[0]."' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$code.="$key='$value' ";
@@ -1801,14 +1803,14 @@ abstract class Tag {
 			$code = "<table><tr>";
 			foreach($params[1] as $key=>$text){
 				if($value==$key){
-					$code.= "<td><input type='radio' name='{$params[0]}' id='{$params[0]}' value='$key' checked='checked' /></td><td>$text</td>\r\n";
+					$code.= "<td><input type='radio' name='".$params[0]."' id='".$params[0]."' value='$key' checked='checked' /></td><td>$text</td>\r\n";
 				} else {
-					$code.= "<td><input type='radio' name='{$params[0]}' id='{$params[0]}' value='$key' /></td><td>$text</td>\r\n";
+					$code.= "<td><input type='radio' name='".$params[0]."' id='".$params[0]."' value='$key' /></td><td>$text</td>\r\n";
 				}
 			}
 			$code.= "</tr></table>";
 		} else {
-			$code = "<input type='radio' name='{$params[0]}' value='$value' ";
+			$code = "<input type='radio' name='".$params[0]."' value='$value' ";
 			foreach($params as $key => $value){
 				if(!is_integer($key)){
 					$code.="$key='$value' ";
@@ -1839,7 +1841,7 @@ abstract class Tag {
 		if(!isset($params['value'])){
 			$params['value'] = self::getValueFromAction($params[0]);
 		}
-		$code="<input type='hidden' id='{$params[0]}'";
+		$code="<input type='hidden' id='".$params[0]."'";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
 				$code.="$key='$value' ";
@@ -1891,8 +1893,8 @@ abstract class Tag {
 		if(!isset($params['name'])){
 			$params['name'] = $params[0];
 		}
-		$code.="<span id='{$params['name']}_span_pre'>
-		<select name='{$params[0]}' id='{$params[0]}' onchange='show_upload_image(this)'>";
+		$code.="<span id='".$params['name']."_span_pre'>
+		<select name='".$params[0]."' id='".$params[0]."' onchange='show_upload_image(this)'>";
 		$code.="<option value='@'>Seleccione...\n";
 		foreach(scandir("public/img/upload") as $file){
 			if($file!='index.html'&&$file!='.'&&$file!='..'&&$file!='Thumbs.db'&&$file!='desktop.ini'){
@@ -1909,10 +1911,10 @@ abstract class Tag {
 				}
 			}
 		}
-		$code.="</select> <a href='#{$params['name']}_up' name='{$params['name']}_up' id='{$params['name']}_up' onclick='enable_upload_file(\"{$params['name']}\")'>Subir Imagen</a></span>
-		<span style='display:none' id='{$params['name']}_span'>
-		<input type='file' id='{$params['name']}_file' onchange='upload_file(\"{$params['name']}\")' />
-		<a href='#{$params['name']}_can' name='{$params['name']}_can' id='{$params['name']}_can' style='color:red' onclick='cancel_upload_file(\"{$params['name']}\")'>Cancelar</a></span>
+		$code.="</select> <a href='#".$params['name']."_up' name='".$params['name']."_up' id='".$params['name']."_up' onclick='enable_upload_file(\"".$params['name']."\")'>Subir Imagen</a></span>
+		<span style='display:none' id='".$params['name']."_span'>
+		<input type='file' id='".$params['name']."_file' onchange='upload_file(\"".$params['name']."\")' />
+		<a href='#".$params['name']."_can' name='".$params['name']."_can' id='".$params['name']."_can' style='color:red' onclick='cancel_upload_file(\"".$params['name']."\")'>Cancelar</a></span>
 		";
 		if(!isset($params['width'])){
 			$params['width'] = 128;
@@ -1941,7 +1943,7 @@ abstract class Tag {
 		if(!$params['name']){
 			$params['name'] = $params[0];
 		}
-		return "<script type=\"text/javascript\">Droppables.add('{$params['name']}', {hoverclass: '{$params['hover_class']}',onDrop:{$params['action']}})</script>";
+		return "<script type=\"text/javascript\">Droppables.add('".$params['name']."', {hoverclass: '".$params['hover_class']."',onDrop:".$params['action']."})</script>";
 	}
 
 	/**
@@ -2020,7 +2022,7 @@ abstract class Tag {
 		if(!$i) {
 			$i = 1;
 		}
-		print "<tr bgcolor=\"{$colors[$i-1]}\"";
+		echo "<tr bgcolor=\"".$colors[$i-1]."\"";
 		if(count($colors)==$i) {
 			$i = 1;
 		} else {
@@ -2053,7 +2055,7 @@ abstract class Tag {
 		if(!$i) {
 			$i = 1;
 		}
-		$code = "<tr class=\"{$classes[$i-1]}\"";
+		$code = "<tr class=\"".$classes[$i-1]."\"";
 		if(count($classes)==$i) {
 			$i = 1;
 		} else {
@@ -2114,7 +2116,7 @@ abstract class Tag {
 		if(!isset($params['update'])){
 			$params['update'] = "";
 		}
-		$code = "<button onclick='AJAX.execute({action:\"{$params['action']}\", container:\"{$params['update']}\", callbacks: { success: function(){{$params['success']}}, before: function(){{$params['before']}} } })'";
+		$code = "<button onclick='AJAX.execute({action:\"".$params['action']."\", container:\"".$params['update']."\", callbacks: { success: function(){".$params['success']."}, before: function(){".$params['before']."} } })'";
 		unset($params['action']);
 		unset($params['success']);
 		unset($params['before']);
@@ -2124,7 +2126,7 @@ abstract class Tag {
 				$code.=" $k='$v' ";
 			}
 		}
-		$code.=">{$params['caption']}</button>";
+		$code.=">".$params['caption']."</button>";
 		return $code;
 	}
 
@@ -2152,8 +2154,8 @@ abstract class Tag {
 		}
 		$code = "
 		<select multiple onchange='AJAX.viewRequest({
-			action: \"{$params['action']}/\"+selectedItem($(\"{$params['id']}\")).value,
-			container: \"{$params['container']}\"
+			action: \"".$params['action']."/\"+selectedItem($(\"".$params['id']."\")).value,
+			container: \"".$params['container']."\"
 		})' ";
 		unset($params['container']);
 		unset($params['update']);
@@ -2191,7 +2193,7 @@ abstract class Tag {
 			if(is_object($items)){
 				if($items instanceof ActiveRecordResultset){
 					if($start<0){
-						throw new CoreException("El n&uacute;mero de la página es negativo ó cero ($start)");
+						throw new CoreException("El número de la página es negativo ó cero ($start)");
 					}
 					$page->items = array();
 					$total = count($items);
@@ -2244,7 +2246,7 @@ abstract class Tag {
 			}
 			$ww = (int) ($width * 0.22);
 			$www = (int) ($width * 0.21);
-			$code.="<td align='center' width='{$ww}' class='tab_td'><div style='width:{$www}px;' id='tabdiv_$p' onclick='showTab($p, this)' class='tab_div $className'>".$tab['caption']."</div></td>";
+			$code.="<td align='center' width='$ww' class='tab_td'><div style='width:".$www."px;' id='tabdiv_$p' onclick='showTab($p, this)' class='tab_div $className'>".$tab['caption']."</div></td>";
 			++$p;
 			$w-=$ww;
 		}
@@ -2292,8 +2294,8 @@ abstract class Tag {
 		} else {
 			$value = "";
 		}
-		$html = "<div><div id='{$name}1' ondblclick=\"$('$name').show();$('$name').activate();this.hide()\" onmouseover='this.style.background=\"#ffffcc\"' onmouseout='this.style.background=\"transparent\"'>$value</div>";
-		$html.= "<input id='{$name}' type='text' value='$value' style='display:none' onblur='$(\"{$name}1\").show();this.hide();$(\"{$name}1\").innerHTML=this.value'";
+		$html = "<div><div id='".$name."1' ondblclick=\"$('$name').show();$('$name').activate();this.hide()\" onmouseover='this.style.background=\"#ffffcc\"' onmouseout='this.style.background=\"transparent\"'>$value</div>";
+		$html.= "<input id='$name' type='text' value='$value' style='display:none' onblur='$(\"".$name."1\").show();this.hide();$(\"{$name}1\").innerHTML=this.value'";
 		unset($params['value']);
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
