@@ -15,7 +15,7 @@
  * @category 	Kumbia
  * @package 	Soap
  * @subpackage 	Client
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -28,10 +28,9 @@
  *
  * @category	Kumbia
  * @package 	Soap
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
- * @abstract
  */
 class WebServiceClient {
 
@@ -41,7 +40,7 @@ class WebServiceClient {
 	 * @var string
 	 * @staticvar
 	 */
-	private static $_envelopeNS = 'http://www.w3.org/2003/05/soap-envelope';
+	private static $_envelopeNS = 'http://schemas.xmlsoap.org/soap/envelope/';
 
 	/**
 	 * Namespace del XML Schema Instance (xsi)
@@ -166,8 +165,8 @@ class WebServiceClient {
 	/**
 	 * Agrega un parámetro a la petición SOAP
 	 *
-	 * @param int $n
-	 * @param string $param
+	 * @param	int $n
+	 * @param	string $param
 	 */
 	private function _encodeItem($nodeType, $param){
 		if(is_resource($param)){
@@ -200,9 +199,25 @@ class WebServiceClient {
 			$selfType = null;
 			$type = null;
 			$isArray = is_array($param);
+
+			$numberElement = 0;
+			$asociativeArray = false;
+			foreach($param as $keyName => $item){
+				if($asociativeArray==false){
+					$asociativeArray = true;
+				}
+			}
+
 			foreach($param as $keyName => $item){
 				if($isArray==true){
-					$itemNodeXML.=$this->_encodeItem('item', $item);
+					if($asociativeArray==false){
+						$itemNodeXML.=$this->_encodeItem('item', $item);
+					} else {
+						$itemNodeXML.='<item>';
+						$itemNodeXML.=$this->_encodeItem('key', $keyName);
+						$itemNodeXML.=$this->_encodeItem('value', $item);
+						$itemNodeXML.='</item>';
+					}
 				} else {
 					$itemNodeXML.=$this->_encodeItem($keyName, $item);
 				}
@@ -216,6 +231,7 @@ class WebServiceClient {
 						}
 					}
 				}
+				$numberElement++;
 			}
 			if($selfType==true){
 				$xsdType = $this->_getXSDTypeByCode($type);
@@ -223,7 +239,11 @@ class WebServiceClient {
 				$xsdType = 'xsd:ur-type';
 			}
 			if($isArray==true){
-				return '<'.$nodeType.' SOAP-ENC:arrayType="'.$xsdType.'['.count($param).']" xsi:type="SOAP-ENC:Array">'.$itemNodeXML.'</'.$nodeType.'>';
+				if($asociativeArray==false){
+					return '<'.$nodeType.' SOAP-ENC:arrayType="'.$xsdType.'['.count($param).']" xsi:type="SOAP-ENC:Array">'.$itemNodeXML.'</'.$nodeType.'>';
+				} else {
+					return '<'.$nodeType.' xsi:type="ns2:Map">'.$itemNodeXML.'</'.$nodeType.'>';
+				}
 			} else {
 				return '<'.$nodeType.' xsi:type="SOAP-ENC:Struct">'.$itemNodeXML.'</'.$nodeType.'>';
 			}
@@ -233,8 +253,8 @@ class WebServiceClient {
 	/**
 	 * Devuelve true si el XSD corresponde a un literal
 	 *
-	 * @access private
-	 * @param string $xsdDataType
+	 * @access	private
+	 * @param	string $xsdDataType
 	 */
 	private function _isTypeLiteral($xsdDataType){
 		return in_array($xsdDataType, array('xsd:string', 'xsd:boolean', 'xsd:int', 'xsd:float'));
@@ -243,18 +263,18 @@ class WebServiceClient {
 	/**
 	 * Agrega el SOAP Envelope a un Mensaje SOAP
 	 *
-	 * @return string
+	 * @return	string
 	 */
 	private function _createMessageEnvelope($message){
 		return '<?xml version="1.0" encoding="UTF-8"?>
-<SOAP-ENV:Envelope xmlns:SOAP-ENV="'.self::$_envelopeNS.'" xmlns:ns1="'.$this->_options['uri'].'" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body>'.$message.'</SOAP-ENV:Body></SOAP-ENV:Envelope>';
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="'.self::$_envelopeNS.'" xmlns:ns1="'.$this->_options['uri'].'" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"  xmlns:ns2="http://xml.apache.org/xml-soap" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><SOAP-ENV:Body>'.$message.'</SOAP-ENV:Body></SOAP-ENV:Envelope>';
 	}
 
 	/**
 	 * Realiza el llamado a una función del servicio
 	 *
-	 * @param string $method
-	 * @param array $arguments
+	 * @param	string $method
+	 * @param	array $arguments
 	 */
 	public function __call($method, $arguments){
 		$this->_transport->addHeader('SOAPAction', '"'.$this->_options['uri'].'#'.$method.'"');
@@ -267,6 +287,7 @@ class WebServiceClient {
 		$messageRequest.='</ns1:'.$method.'>';
 		$this->_transport->setRawPostData($this->_createMessageEnvelope($messageRequest));
 		$this->_transport->send();
+
 		$responseBody = $this->_transport->getResponseBody();
 		$responseCode = $this->_transport->getResponseCode();
 		return $this->_processResponse($method, $responseCode, &$responseBody);
@@ -293,8 +314,8 @@ class WebServiceClient {
 	/**
 	 * Analiza la respuesta SOAP y la convierte en datos nativos PHP
 	 *
-	 * @param string $responseBody
-	 * @param string $method
+	 * @param	string $responseBody
+	 * @param	string $method
 	 */
 	private function _bindResponseData($method, $responseBody){
 		if($responseBody!=''){
@@ -304,22 +325,38 @@ class WebServiceClient {
 			$responseNodes = $this->_domDocument->getElementsByTagNameNS($this->_options['uri'], $localName);
 			foreach($responseNodes as $element){
 				foreach($element->getElementsByTagName('return') as $returnElement){
-					$xsdDataType = $returnElement->getAttributeNS(self::$_xmlSchemaInstanceNS, 'type');
-					return $this->_decodeXSDType($xsdDataType, $returnElement->nodeValue);
-
+					return $this->_getNativeValue($returnElement);
 				}
 			}
 		} else {
-			throw new SoapException('El mensaje SOAP fue vacio');
+			throw new SoapException('El mensaje SOAP está vacio');
+		}
+	}
+
+	/**
+	 * Analiza el tipo XSI y devuelve un dato nativo PHP
+	 *
+	 * @return	mixed
+	 */
+	private function _getNativeValue($element){
+		$xsdDataType = $element->getAttribute('xsi:type');
+		if($xsdDataType=='SOAP-ENC:Array'){
+			return $this->_decodeSOAPArray($element);
+		} else {
+			if($xsdDataType=='ns2:Map'){
+				return $this->_decodeSOAPMap($element);
+			} else {
+				return $this->_decodeXSDType($xsdDataType, $element->nodeValue);
+			}
 		}
 	}
 
 	/**
 	 * Convierte el valor XSD a un valor nativo PHP
 	 *
-	 * @param string $xsdDataType
-	 * @param mixed $returnValue
-	 * @return mixed
+	 * @param	string $xsdDataType
+	 * @param	mixed $returnValue
+	 * @return	mixed
 	 */
 	private function _decodeXSDType($xsdDataType, $returnValue){
 		switch($xsdDataType){
@@ -339,7 +376,52 @@ class WebServiceClient {
 	}
 
 	/**
-	 * Lanza una excepcion
+	 * Decodifica un SOAP-ENC:Array a un valor nativo PHP
+	 *
+	 * @param  $returnElement
+	 */
+	private function _decodeSOAPArray($returnElement){
+		$nativeArray = array();
+		foreach($returnElement->childNodes as $element){
+			if($element->localName=='item'){
+				if($element->nodeType==1){
+					$nativeArray[] = $this->_getNativeValue($element);
+				} else {
+					$nativeArray[] = $element->nodeValue;
+				}
+			}
+		}
+		return $nativeArray;
+	}
+
+	/**
+	 * Decodifica un ns2:Map asociativo a un valor nativo PHP
+	 *
+	 * @param  $returnElement
+	 */
+	private function _decodeSOAPMap($returnElement){
+		$nativeArray = array();
+		foreach($returnElement->childNodes as $element){
+			if($element->localName=='item'){
+				$keyName = null;
+				$value = null;
+				foreach($element->childNodes as $itemElement){
+					if($itemElement->localName=='key'){
+						$keyName = $itemElement->nodeValue;
+					} else {
+						if($itemElement->localName=='value'){
+							$value = $this->_getNativeValue($itemElement);
+						}
+					}
+				}
+				$nativeArray[$keyName] = $value;
+			}
+		}
+		return $nativeArray;
+	}
+
+	/**
+	 * Lanza una excepción
 	 *
 	 * @param string $responseBody
 	 */
@@ -347,6 +429,7 @@ class WebServiceClient {
 		$this->_transport->getResponseCookies();
 		$this->_domDocument = new DOMDocument();
 		$this->_domDocument->loadXML($responseBody);
+		//$this->_domDocument->normalizeDocument();
 		$subcodeNode = $this->_domDocument->getElementsByTagNameNS(self::$_envelopeNS, 'Subcode');
 		$exceptionClassName = '';
 		foreach($subcodeNode as $element){

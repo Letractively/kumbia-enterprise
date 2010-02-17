@@ -102,26 +102,41 @@ abstract class Soap {
 	 * @static
 	 */
 	static public function serverHandler($controller){
+
 		$response = ControllerResponse::getInstance();
 		$response->setContentType('application/soap+xml; charset=utf-8');
 		$soapAction = explode('#', str_replace('"', '', $_SERVER['HTTP_SOAPACTION'])); ;
 		$serviceNamespace = $soapAction[0];
 		$bodyElement = self::_createSOAPEnvelope();
-		self::$_domDocument->createAttributeNS($serviceNamespace, 'ns1:dummy');
-		self::$_domDocument->createAttributeNS('http://www.w3.org/2001/XMLSchema', 'xsd:dummy');
-		self::$_domDocument->createAttributeNS('http://schemas.xmlsoap.org/soap/encoding', 'SOAP-ENC:dummy');
-		self::$_domDocument->createAttributeNS(self::$_xmlSchemaInstanceNS, 'xsi:dummy');
+
+		//Service Namespace
+		$attributeNS = new DOMAttr('xmlns:ns1', $serviceNamespace);
+		self::$_rootElement->setAttributeNodeNS($attributeNS);
+
+		//XSI Namespace
+		$attributeNS = new DOMAttr('xmlns:xsi', self::$_xmlSchemaInstanceNS);
+		self::$_rootElement->setAttributeNodeNS($attributeNS);
+
+		//SOAP-ENC Namespace
+		$attributeNS = new DOMAttr('xmlns:SOAP-ENC', 'http://schemas.xmlsoap.org/soap/encoding/');
+		self::$_rootElement->setAttributeNodeNS($attributeNS);
+
+		//XSD Namespace
+		$attributeNS = new DOMAttr('xmlns:xsd', 'http://www.w3.org/2001/XMLSchema');
+		self::$_rootElement->setAttributeNodeNS($attributeNS);
+
+		//NS2 Namespace
+		$attributeNS = new DOMAttr('xmlns:ns2', 'http://xml.apache.org/xml-soap');
+		self::$_rootElement->setAttributeNodeNS($attributeNS);
+
 		self::$_rootElement->setAttributeNS(self::$_envelopeNS, 'encondingStyle', 'http://schemas.xmlsoap.org/soap/encoding/');
 
-		$responseElement = self::$_domDocument->createElementNS($serviceNamespace, $soapAction[1].'Response');
+		$responseElement = self::$_domDocument->createElement('ns1:'.$soapAction[1].'Response');
 		$dataEncoded = self::_getDataEncoded();
 		if($dataEncoded!=null){
 			$responseElement->appendChild($dataEncoded);
 		}
 		$bodyElement->appendChild($responseElement);
-
-		#file_put_contents('fx.txt', self::$_domDocument->saveXML());
-
 		echo self::$_domDocument->saveXML();
 	}
 
@@ -184,6 +199,8 @@ abstract class Soap {
 			$element = self::$_domDocument->createElement($nodeType);
 			$dataType = '';
 			$oldDataType = '';
+			$associativeArray = false;
+			$numberKey = 0;
 			foreach($valueReturned as $key => $value){
 				if($dataType!='mixed'){
 					$dataType = gettype($value);
@@ -196,16 +213,33 @@ abstract class Soap {
 						$oldDataType = $dataType;
 					}
 				}
+				if($associativeArray==false){
+					if($numberKey!==$key){
+						$associativeArray = true;
+					}
+					$numberKey++;
+				}
+			}
+			if($associativeArray==false){
+				if($dataType=='mixed'){
+					$element->setAttribute('SOAP-ENC:arrayType', 'xsd:ur-type['.count($valueReturned).']');
+				} else {
+					$element->setAttribute('SOAP-ENC:arrayType', 'xsd:'.self::_getDataXSD($dataType).'['.count($valueReturned).']');
+				}
+				$element->setAttribute('xsi:type', 'SOAP-ENC:Array');
+			} else {
+				$element->setAttribute('xsi:type', 'ns2:Map');
 			}
 			$returnString = '';
-			if($dataType=='mixed'){
-				$element->setAttribute('SOAP-ENC:arrayType', 'xsd:ur-type['.count($valueReturned).']');
-			} else {
-				$element->setAttribute('SOAP-ENC:arrayType', 'xsd:'.self::_getDataXSD($dataType).'['.count($valueReturned).']');
-			}
-			$element->setAttribute('xsi:type', 'SOAP-ENC:Array');
 			foreach($valueReturned as $key => $value){
-				$element->appendChild(self::_getDataEncoded($value, 'item'));
+				if($associativeArray==false){
+					$element->appendChild(self::_getDataEncoded($value, 'item'));
+				} else {
+					$itemElement = self::$_domDocument->createElement('item');
+					$itemElement->appendChild(self::_getDataEncoded($key, 'key'));
+					$itemElement->appendChild(self::_getDataEncoded($value, 'value'));
+					$element->appendChild($itemElement);
+				}
 			}
 			return $element;
 		}
