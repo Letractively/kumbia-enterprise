@@ -326,7 +326,7 @@ class Compiler {
 									$jp = true;
 									$i = $r+1;
 								}
-								break;*/
+								break;
 							case T_VARIABLE:
 								if(preg_match('/^\$/', $token[1])==false){
 									if($tokens[$i-2][0]==T_FUNCTION){
@@ -365,6 +365,7 @@ class Compiler {
 									$token[1] = "";
 								}
 								break;
+							*/
 						}
 						if($jp==false){
 							if(in_array($token[0], self::$_beforeSpaceTokens)){
