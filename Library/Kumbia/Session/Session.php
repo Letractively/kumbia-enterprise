@@ -245,8 +245,10 @@ abstract class Session {
 				}
 			}
 		}
-		session_start();
-		register_shutdown_function(array('Session', 'storeSessionData'));
+		if(Core::isHurricane()==false){
+			session_start();
+			register_shutdown_function(array('Session', 'storeSessionData'));
+		}
 		self::$_sessionStarted = true;
 		return true;
 	}

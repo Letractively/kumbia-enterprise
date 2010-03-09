@@ -49,6 +49,13 @@ abstract class Debug {
 	private static $_variables = array();
 
 	/**
+	 * Handlers de debugs a archivos
+	 *
+	 * @var array
+	 */
+	private static $_fileDebugs = array();
+
+	/**
 	 * Accion para generar una excepcion al terminar la peticion
 	 *
 	 */
@@ -278,6 +285,19 @@ abstract class Debug {
 		$exception = new DebugException('Visualizando entorno de seguimiento');
 		$exception->setUserCatchable(false);
 		throw $exception;
+	}
+
+	/**
+	 * Envia un debug a un archivo
+	 *
+	 * @param string $filePath
+	 * @param mixed $value
+	 */
+	public static function addToFile($filePath, $value){
+		if(!isset(self::$_fileDebugs[$filePath])){
+			self::$_fileDebugs[$filePath] = fopen($filePath, 'w');
+		}
+		fputs(self::$_fileDebugs[$filePath], print_r($value, true));
 	}
 
 }

@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		EntityManager
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -30,7 +30,7 @@
  *
  * @category	Kumbia
  * @package		EntityManager
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @abstract
@@ -245,9 +245,11 @@ abstract class EntityManager {
 			throw new EntityManagerException("No se encontró la clase \"$entityName\", es necesario definir una clase en el modelo '$model' llamado '$entityName' para que esto funcione correctamente.");
 		} else {
 			self::$_entities[$entityName] = new $entityName();
+			#if[compile-time]
 			if(!is_subclass_of(self::$_entities[$entityName], 'ActiveRecordBase')){
 				throw new EntityManagerException("Error inicializando modelo '$entityName', el modelo '$model' debe heredar ActiveRecord");
 			}
+			#endif
 			$sourceName = self::$_entities[$entityName]->getSource();
 			if($sourceName==""){
 				self::$_entities[$entityName]->setSource($model);
@@ -287,16 +289,18 @@ abstract class EntityManager {
 	 */
 	public static function initModels($modelsDir){
 		foreach(scandir($modelsDir) as $model){
-			if(!in_array($model, array('.', '..', 'base'))){
-				if(is_dir($modelsDir."/".$model)){
-					self::initModels($modelsDir."/".$model);
+			if(!in_array($model, array('.', '..', 'base', 'metadata'))){
+				if(is_dir($modelsDir.'/'.$model)){
+					self::initModels($modelsDir.'/'.$model);
 				}
 			}
 			if(preg_match('/([a-zA-Z_0-9]+)\.php$/', $model, $matches)==true){
 				require "$modelsDir/$model";
 				$objectModel = Utils::camelize($matches[1]);
 				self::_initializeModel($objectModel, $matches[1]);
+				unset($matches);
 			}
+			unset($model);
 		}
 	}
 
@@ -358,6 +362,21 @@ abstract class EntityManager {
 	}
 
 	/**
+	 * Resetea las entidades a la conexión por defecto si ya tiene una
+	 *
+	 * @access 	public
+	 * @static
+	 */
+	static public function resetEntites(){
+		$connection = DbBase::rawConnect();
+		foreach(self::$_entities as $entity){
+			if($entity->getConnection(false)!=null){
+				$entity->setConnection($connection);
+			}
+		}
+	}
+
+	/**
 	 * Indica si hay una relacion tipo belongsTo en la entidad solicitada
 	 *
 	 * @access 	public
@@ -397,7 +416,7 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Devuelve los registros de la relacion 1-1 ó n-1
+	 * Devuelve los registros de la relación 1-1 ó n-1
 	 *
 	 * @access 	public
 	 * @param 	string $entityName
@@ -479,7 +498,7 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Devuelve los registros de la relacion n-1
+	 * Devuelve los registros de la relación n-1
 	 *
 	 * @access 	public
 	 * @param 	string $entityName
@@ -536,7 +555,7 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Agrega una nueva relacion n-1
+	 * Agrega una nueva relación n-1
 	 *
 	 * @access 	public
 	 * @param 	string $entityName
@@ -594,7 +613,7 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Agrega una nueva relacion n-1
+	 * Agrega una nueva relación n-1
 	 *
 	 * @access 	public
 	 * @param 	mixed $fields
@@ -647,7 +666,7 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Agrega una nueva relacion 1-1
+	 * Agrega una nueva relación 1-1
 	 *
 	 * @access 	public
 	 * @param 	mixed $fields

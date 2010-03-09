@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	View
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -44,7 +44,7 @@
  *
  * @category 	Kumbia
  * @package 	View
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @access	public
@@ -234,6 +234,7 @@ abstract class View {
 	 * @static
 	 */
 	static public function handleViewRender($controller){
+
 		$controllerResponse = ControllerResponse::getInstance();
 		$_valueReturned = Dispatcher::getValueReturned();
 		if($controllerResponse->getResponseType()!=ControllerResponse::RESPONSE_NORMAL){
@@ -241,11 +242,14 @@ abstract class View {
 			#if[no-plugins]
 			call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
 			#endif
+			unset($_valueReturned);
 			return;
 		}
+
 		$controllerName = $controller->getControllerName();
 		$actionName = $controller->getActionName();
 		self::_startResponse($controllerName, $actionName);
+
 		if(!empty($controllerName)){
 			foreach(EntityManager::getEntities() as $_entityName => $_entity){
 				$$_entityName = $_entity;
@@ -277,18 +281,17 @@ abstract class View {
 			 */
 			self::$_content = ob_get_contents();
 
+			//Obtener directorio de vistas activo
+			$activeApp = Router::getActiveApplication();
+			$_viewsDir = Core::getActiveViewsDir();
+
 			/**
 			 * Verifica si existe cache para el layout, vista ó template
 	 		 * sino, crea un directorio en cache
 	 		 */
 			if($controllerName!=""){
 
-				$activeApp = Router::getActiveApplication();
-				$_viewsDir = Core::getActiveViewsDir();
-
-				/**
-				 * Crear los directorios de cache si es necesario
-				 */
+				//Crear los directorios de cache si es necesario
 				#if[compile-time]
 				if($controller->getViewCache()||$controller->getLayoutCache()){
 					$viewCacheDir = 'cache/'.session_id().'/';
@@ -303,16 +306,11 @@ abstract class View {
 				}
 				#endif
 
-				/**
-				 * Insertar la vista si es necesario
-				 */
-
+				//Insertar la vista si es necesario
 				if(self::$_renderLevel>=self::LEVEL_ACTION_VIEW){
 					if(Core::fileExists($_viewsDir.'/'.$controllerName.'/'.$actionName.'.phtml')){
 						ob_clean();
-						/**
-						 * Aqui verifica si existe un valor en minutos para el cache
-				 		 */
+						// Aqui verifica si existe un valor en minutos para el cache
 						#if[compile-time]
 						if($controller->getViewCache()>0){
 							/**
@@ -420,9 +418,7 @@ abstract class View {
 					}
 				}
 
-				/**
-				 * Incluir Layout
-				 */
+				//Incluir Layout
 				if(self::$_renderLevel>=self::LEVEL_LAYOUT){
 					if(Core::fileExists($_viewsDir.'/layouts/'.$controllerName.'.phtml')){
 						ob_clean();
@@ -456,9 +452,7 @@ abstract class View {
 				}
 			}
 
-			/**
-			 * Incluir el/los Template(s) After
-			 */
+			//Incluir el/los Template(s) After
 			if(self::$_renderLevel>=self::LEVEL_AFTER_TEMPLATE){
 				$_template = $controller->getTemplateAfter();
 				if($_template!=""){
@@ -551,9 +545,12 @@ abstract class View {
 				if(Core::isTestingMode()==true){
 					ob_clean();
 				}
-			} else {
-				ob_end_flush();
 			}
+
+			unset($_valueReturned);
+			unset($activeApp);
+			unset($_viewsDir);
+			unset($controller);
 		}
 		#if[no-plugins]
 		call_user_func_array(array(self::$_pluginManager, 'notifyFromView'), array('afterRender', $controllerResponse));
@@ -570,19 +567,23 @@ abstract class View {
 	 */
 	static public function handleViewExceptions($e, $controller){
 		if(Core::isTestingMode()==false){
+
 			if(!$controller){
 				$controller = new Controller();
 			}
 			$controllerResponse = ControllerResponse::getInstance();
 			$controllerRequest = ControllerRequest::getInstance();
+
 			//Se está solicitando contenido estático
 			if($controllerRequest->isRequestingStaticContent()==true){
 				$controllerResponse->setHeader('X-Application-State: Exception', true);
 				$controllerResponse->setHeader('HTTP/1.1 500 Application Exception', true);
-				if(get_class($e)=='DisptacherException'){
+				if(get_class($e)=='DispatcherException'){
 					return;
 				}
+
 			}
+
 			//Se genera un encabezado HTTP de problema
 			$controllerResponse->setHeader('X-Application-State: Exception', true);
 			$controllerResponse->setHeader('HTTP/1.1 500 Application Exception', true);
@@ -723,6 +724,14 @@ abstract class View {
 	 */
 	public static function getViewParams(){
 		return self::$_data;
+	}
+
+	/**
+	 * Elimina todas las variables de vistas definida
+	 *
+	 */
+	public static function cleanViewParams(){
+		self::$_data = array();
 	}
 
 	/**
@@ -871,7 +880,6 @@ abstract class View {
 				}
 			}
 
-
 			/**
 			 * Incluir Vista Principal
 			 */
@@ -885,8 +893,6 @@ abstract class View {
 				if(Core::isTestingMode()==true){
 					ob_clean();
 				}
-			} else {
-				ob_end_flush();
 			}
 
 			$controllerResponse = ControllerResponse::getInstance();

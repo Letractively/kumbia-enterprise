@@ -155,10 +155,15 @@ abstract class Router {
 	static private $_enableStaticRoutes = false;
 
 	/**
-	 * Tipos de Enrutamiento
+	 * Tipo de Enrutamiento por defecto (Web/HTML)
 	 *
 	 */
 	const ROUTING_DEFAULT = 0;
+
+	/**
+	 * Tipo de Enrutamiento distino a Web/HTML
+	 *
+	 */
 	const ROUTING_OTHER = 1;
 
 	/**
@@ -516,7 +521,7 @@ abstract class Router {
 	}
 
 	/**
-	 * Establece el ID de la ruta (primer parametro adicional)
+	 * Establece el ID de la ruta (primer parámetro adicional)
 	 *
 	 * @access public
 	 * @param string $id
@@ -799,13 +804,16 @@ abstract class Router {
 		/**
 		 * @see RouterInterface
 		 */
-		require 'Library/Kumbia/Router/Interface.php';
+		if(!interface_exists('RouterInterface')){
+			require 'Library/Kumbia/Router/Interface.php';
+		}
 		$className = self::$_routingAdapterType.'Router';
 		if(class_exists($className, false)==false){
 			require 'Library/Kumbia/Router/Adapters/'.self::$_routingAdapterType.'.php';
 		}
 		self::$_routerAdapter = new $className();
 		self::$_routerAdapter->handleRouting();
+		unset($className);
 	}
 
 	/**
@@ -830,6 +838,26 @@ abstract class Router {
 	 */
 	static public function getRoutingAdapter(){
 		return self::$_routerAdapter;
+	}
+
+	/**
+	 * Reinicializa el Router para atender una segunda petición
+	 *
+	 * @access 	public
+	 * @static
+	 */
+	static public function cleanRouter(){
+		self::$_application = null;
+		self::$_module = null;
+		self::$_controller = null;
+		self::$_action = null;
+		self::$_id = null;
+		self::$_url = null;
+		self::$_allParameters = null;
+		self::$_parameters = null;
+		self::$_routed = null;
+		self::$_wasRouted = null;
+		self::$_routedCyclic = null;
 	}
 
 }

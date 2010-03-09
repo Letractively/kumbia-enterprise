@@ -17,7 +17,7 @@
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
- * @version 	$Id$
+ * @version 	$Id: migrate_to_kef.php,v 7d4421ec642c 2010/03/04 15:12:36 andres $
  */
 
 require 'Library/Kumbia/Core/ClassPath/CoreClassPath.php';

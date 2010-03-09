@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Xml
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright  	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -27,7 +27,7 @@
  *
  * @category 	Kumbia
  * @package 	Xml
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @access 		public
@@ -53,8 +53,8 @@ class SimpleXMLResponse extends Object {
 	 *
 	 */
 	public function __construct(){
-		$this->_domDocument = new DOMDocument("1.0", "UTF-8");
-		$this->_rootElement = $this->_domDocument->createElement("response");
+		$this->_domDocument = new DOMDocument('1.0', 'UTF-8');
+		$this->_rootElement = $this->_domDocument->createElement('response');
 		$this->_domDocument->appendChild($this->_rootElement);
 	}
 
@@ -64,7 +64,7 @@ class SimpleXMLResponse extends Object {
 	 * @param array $dataArray
 	 */
 	public function addNode($dataArray){
-		$rowElement = new DOMElement("row");
+		$rowElement = new DOMElement('row');
 		foreach($dataArray as $key => $value){
 			$rowElement->setAttribute($key, $value);
 		}
@@ -78,7 +78,7 @@ class SimpleXMLResponse extends Object {
 	 */
 	public function addData($val){
 		$cdDataElement = $this->_domDocument->createCDATASection((string)$val);
-		$dataElement = $this->_domDocument->createElement("data");
+		$dataElement = $this->_domDocument->createElement('data');
 		$dataElement->appendChild($cdDataElement);
 		$this->_rootElement->appendChild($dataElement);
 	}
@@ -89,7 +89,7 @@ class SimpleXMLResponse extends Object {
 	 * @access public
 	 */
 	public function outXMLResponse(){
-		print $this->_domDocument->saveXML();
+		echo $this->_domDocument->saveXML();
 	}
 
 	/**

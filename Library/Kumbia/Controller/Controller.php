@@ -23,7 +23,7 @@
 /**
  * Controller
  *
- * Componente de Controladores
+ * Componente base para controladores
  *
  * @category	Kumbia
  * @package		Controller
@@ -34,33 +34,33 @@
 class Controller extends ControllerBase {
 
 	/**
-	 * Nombre del controlador actual
+	 * Nombre del controlador activo
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private $_controllerName = '';
+	private static $_controllerName = array();
 
 	/**
 	 * Nombre de la accion actual
 	 *
-	 * @var string
+	 * @var array
 	 */
-	private $_actionName = '';
+	private static $_actionName = array();
 
 	/**
-	 * Nombre del primer parametro despues de action
+	 * Nombre del primer parámetro después de action
 	 * en la URL
-	 *
-	 * @var string
-	 */
-	private $_id;
-
-	/**
-	 * Parametros enviados por una clean URL
 	 *
 	 * @var array
 	 */
-	private $_parameters = array();
+	private static $_id = array();
+
+	/**
+	 * Parámetros enviados por una clean URL
+	 *
+	 * @var array
+	 */
+	private static $_parameters = array();
 
 
 	/**
@@ -68,57 +68,57 @@ class Controller extends ControllerBase {
 	 *
 	 * @var array
 	 */
-	private $_allParameters = array();
+	private static $_allParameters = array();
 
 	/**
-	 * Numero de minutos que ser&aacute; cacheada la vista actual
+	 * Numero de minutos que será cacheada la vista actual
 	 *
 	 * @var integer
 	 */
-	private $_cacheView = 0;
+	private static $_cacheView = array();
 
 	/**
-	 * Numero de minutos que ser&aacute; cacheada el layout actual
+	 * Numero de minutos que será cacheada el layout actual
 	 *
 	 * @var integer
 	 */
-	private $_cacheLayout = 0;
+	private static $_cacheLayout = array();
 
 	/**
-	 * Numero de minutos que ser&aacute; cacheado el template actual
+	 * Numero de minutos que será cacheado el template actual
 	 *
 	 * @var integer
 	 */
-	private $_cacheTemplate = 0;
+	private static $_cacheTemplate = array();
 
 	/**
-	 * Template del Controlador que se insertan antes del layout del controlador
+	 * Template del controlador que se insertan antes del layout del controlador
 	 *
 	 * @var string
 	 */
-	private $_templateBefore = '';
+	private static $_templateBefore = array();
 
 	/**
-	 * Template del Controlador que se insertan despues del layout del controlador
+	 * Template del controlador que se insertan despues del layout del controlador
 	 *
 	 * @var string
 	 */
-	private $_templateAfter = '';
+	private static $_templateAfter = array();
 
 	/**
 	 * Indica si el controlador soporta persistencia
 	 *
 	 * @var boolean
 	 */
-	private $_persistance = false;
+	private static $_persistance = false;
 
 	/**
-	 * Tipo de Respuesta que sera generado
+	 * Tipo de respuesta que será generada
 	 *
 	 * @access private
 	 * @var string
 	 */
-	private $_response = '';
+	private static $_response = '';
 
 	/**
 	 * Indica si el controlador es persistente o no
@@ -135,14 +135,14 @@ class Controller extends ControllerBase {
 	 * @access private
 	 * @var string
 	 */
-	private $_logger;
+	private static $_logger;
 
 	/**
-	 * Permite asignar attributos sin generar una excepcion
+	 * Permite asignar attributos sin generar una excepción
 	 *
 	 * @var boolean
 	 */
-	private $_settingLock = false;
+	private static $_settingLock = array();
 
 	/**
 	 * Constructor de la clase
@@ -162,7 +162,7 @@ class Controller extends ControllerBase {
 	 * @param int $minutes
 	 */
 	protected function cacheView($minutes){
-		$this->_cacheView = $minutes;
+		self::$_cacheView[get_class($this)] = $minutes;
 	}
 
 	/**
@@ -173,7 +173,11 @@ class Controller extends ControllerBase {
 	 * @return string
 	 */
 	public function getViewCache(){
-		return $this->_cacheView;
+		if(isset(self::$_cacheView[get_class($this)])){
+			return self::$_cacheView[get_class($this)];
+		} else {
+			return 0;
+		}
 	}
 
 	/**
@@ -184,7 +188,7 @@ class Controller extends ControllerBase {
 	 * @param integer $minutes
 	 */
 	protected function cacheLayout($minutes){
-		$this->_cacheLayout = $minutes;
+		self::$_cacheLayout[get_class($this)] = $minutes;
 	}
 
 	/**
@@ -192,10 +196,14 @@ class Controller extends ControllerBase {
 	 * layout actual
 	 *
 	 * @access public
-	 * @return string
+	 * @return int
 	 */
 	public function getLayoutCache(){
-		return $this->_cacheLayout;
+		if(isset(self::$_cacheLayout[get_class($this)])){
+			return self::$_cacheLayout[get_class($this)];
+		} else {
+			return 0;
+		}
 	}
 
 	/**
@@ -405,7 +413,7 @@ class Controller extends ControllerBase {
 	 * @param 	boolean $value
 	 */
 	protected function setPersistance($value){
-		$this->_persistance = $value;
+		self::$_persistance[get_class($this)] = $value;
 	}
 
 	/**
@@ -415,16 +423,20 @@ class Controller extends ControllerBase {
 	 * @return	boolean
 	 */
 	public function getPersistance(){
-		return $this->_persistance;
+		if(isset(self::$_persistance[get_class($this)])){
+			return self::$_persistance[get_class($this)];
+		} else {
+			return false;
+		}
 	}
 
 	/**
-	 * Redirecciona la ejecucion a otro controlador en un
-	 * tiempo de ejecucion determinado
+	 * Redirecciona la ejecución a otro controlador en un
+	 * tiempo de ejecución determinado
 	 *
-	 * @access protected
-	 * @param string $controller
-	 * @param integer $seconds
+	 * @access	protected
+	 * @param	string $controller
+	 * @param	integer $seconds
 	 */
 	protected function redirect($controller, $seconds=0.5){
 		$config = CoreConfig::readEnviroment();
@@ -490,18 +502,20 @@ class Controller extends ControllerBase {
 	/**
 	 * Crea un log sino existe y guarda un mensaje
 	 *
-	 * @access protected
-	 * @param string $msg
-	 * @param integer $type
+	 * @access	protected
+	 * @param	string $message
+	 * @param	integer $type
 	 */
-	protected function log($msg, $type=Logger::DEBUG){
-		if(is_array($msg)){
-			$msg = print_r($msg, true);
+	protected function log($message, $type=Logger::DEBUG){
+		if(is_array($message)||is_object($message)){
+			$message = print_r($message, true);
 		}
-		if(!$this->_logger){
-			$this->_logger = new Logger($this->controllerName.'.txt');
+		$className = get_class($this);
+		if(!isset(self::$_logger[$className])){
+			$controllerName = self::$_controllerName[$className];
+			self::$_logger[$className] = new Logger('File', $controllerName.'.txt');
 		}
-		$this->_logger->log($msg, $type);
+		self::$_logger[$className]->log($message, $type);
 	}
 
 	/**
@@ -543,7 +557,7 @@ class Controller extends ControllerBase {
 	 * @return string
 	 */
 	public function getControllerName(){
-		return $this->_controllerName;
+		return self::$_controllerName[get_class($this)];
 	}
 
 	/**
@@ -553,7 +567,7 @@ class Controller extends ControllerBase {
 	 * @param string $controllerName
 	 */
 	public function setControllerName($controllerName){
-		$this->_controllerName = $controllerName;
+		self::$_controllerName[get_class($this)] = $controllerName;
 	}
 
 	/**
@@ -563,27 +577,27 @@ class Controller extends ControllerBase {
 	 * @return string
 	 */
 	public function getActionName(){
-		return $this->_actionName;
+		return self::$_actionName[get_class($this)];
 	}
 
 	/**
 	 * Establece el nombre de la accion actual
 	 *
-	 * @access public
-	 * @param string $actionName
+	 * @access	public
+	 * @param	string $actionName
 	 */
 	public function setActionName($actionName){
-		$this->_actionName = $actionName;
+		self::$_actionName[get_class($this)] = $actionName;
 	}
 
 	/**
 	 * Establece el valor del parametro id del controlador
 	 *
-	 * @access public
-	 * @param string $id
+	 * @access	public
+	 * @param	string $id
 	 */
 	public function setId($id){
-		$this->_id = $id;
+		self::$_id[get_class($this)] = $id;
 	}
 
 	/**
@@ -592,27 +606,27 @@ class Controller extends ControllerBase {
 	 * @access public
 	 */
 	public function getId(){
-		return $this->_id;
+		return self::$_id[get_class($this)];
 	}
 
 	/**
 	 * Establece el valor de los parametros adicionales en el controlador
 	 *
-	 * @access public
-	 * @param array $parameters
+	 * @access	public
+	 * @param	array $parameters
 	 */
 	public function setParameters($parameters){
-		$this->_parameters = $parameters;
+		self::$_parameters[get_class($this)] = $parameters;
 	}
 
 	/**
 	 * Establece el valor de todos los parametros adicionales en el controlador
 	 *
-	 * @access public
-	 * @param array $allParameters
+	 * @access	public
+	 * @param	array $allParameters
 	 */
 	public function setAllParameters($allParameters){
-		$this->_allParameters = $allParameters;
+		self::$_allParameters[get_class($this)] = $allParameters;
 	}
 
 	/**
@@ -643,7 +657,7 @@ class Controller extends ControllerBase {
 	 * @param string|array $template
 	 */
 	public final function setTemplateBefore($template){
-		$this->_templateBefore = $template;
+		self::$_templateBefore[get_class($this)] = $template;
 	}
 
 	/**
@@ -652,7 +666,7 @@ class Controller extends ControllerBase {
 	 * @access public
 	 */
 	public final function cleanTemplateBefore(){
-		$this->_templateBefore = '';
+		self::$_templateBefore[get_class($this)] = '';
 	}
 
 	/**
@@ -662,7 +676,7 @@ class Controller extends ControllerBase {
 	 * @param 	string|array $template
 	 */
 	public final function setTemplateAfter($template){
-		$this->_templateAfter = $template;
+		self::$_templateAfter[get_class($this)] = $template;
 	}
 
 	/**
@@ -671,17 +685,21 @@ class Controller extends ControllerBase {
 	 * @access public
 	 */
 	public final function cleanTemplateAfter(){
-		$this->_templateAfter = '';
+		self::$_templateAfter[get_class($this)] = '';
 	}
 
 	/**
 	 * Devuelve el/los nombre(s) del Template Before Actual
 	 *
 	 * @access public
-	 * @return string|array
+	 * @return string|array|null
 	 */
 	public final function getTemplateBefore(){
-		return $this->_templateBefore;
+		if(isset(self::$_templateBefore[get_class($this)])){
+			return self::$_templateBefore[get_class($this)];
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -691,7 +709,11 @@ class Controller extends ControllerBase {
 	 * @return 	string|array
 	 */
 	public final function getTemplateAfter(){
-		return $this->_templateAfter;
+		if(isset(self::$_templateAfter[get_class($this)])){
+			return self::$_templateAfter[get_class($this)];
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -743,7 +765,7 @@ class Controller extends ControllerBase {
 	 * @param 	boolean $lock
 	 */
 	public function setSettingLock($lock){
-		$this->_settingLock = $lock;
+		self::$_settingLock[get_class($this)] = $lock;
 	}
 
 	/**
@@ -765,7 +787,7 @@ class Controller extends ControllerBase {
 	 * @param string $value
 	 */
 	public function __set($property, $value){
-		if($this->_settingLock==false){
+		if(self::$_settingLock[get_class($this)]==false){
 			if(EntityManager::isModel($property)==false){
 				throw new ApplicationControllerException('Asignando propiedad indefinida "'.$property.'" al controlador');
 			}
@@ -785,36 +807,37 @@ class Controller extends ControllerBase {
 		if(EntityManager::isModel($property)==false){
 			throw new ApplicationControllerException('Leyendo propiedad indefinida "'.$property.'" del controlador');
 		} else {
+			$className = get_class($this);
 			$entity = EntityManager::getEntityInstance($property);
-			$this->_settingLock = true;
+			self::$_settingLock[$className] = true;
 			$this->$property = $entity;
-			$this->_settingLock = false;
+			self::$_settingLock[$className] = false;
 			return $this->$property;
 		}
 	}
 
 	/**
-	 * Carga los modelos como propiedades
+	 * Carga los modelos como atributos del controlador
 	 *
 	 */
 	public function loadModel(){
+		$className = get_class($this);
 		foreach(func_get_args() as $model){
 			$entity = EntityManager::getEntityInstance($model);
-			$this->_settingLock = true;
+			self::$_settingLock[$className] = true;
 			$this->$model = $entity;
-			$this->_settingLock = false;
+			self::$_settingLock[$className] = false;
 		}
 	}
 
 	/**
 	 * Obtiene una instancia de un servicio web del contenedor ó mediante Naming Directory
 	 *
-	 * @param 	string $serviceName
+	 * @param 	mixed $serviceNDI
 	 * @return  WebServiceClient
 	 */
-	public function getService($serviceName){
-		$service = Resolver::lookUp($serviceName);
-		return $service;
+	public function getService($serviceNDI){
+		return Resolver::lookUp($serviceNDI);
 	}
 
 	/**
@@ -858,31 +881,6 @@ class Controller extends ControllerBase {
 	 */
 	public function getValidationMessages(){
 		return Validation::getMessages();
-	}
-
-	/**
-	 * Ejecuta acciones previas a la serialización
-	 *
-	 * @access 	public
-	 */
-	public function prepareForPersist(){
-		$this->_allParameters = array();
-		$this->_parameters = array();
-		$this->_controllerName = null;
-		$this->_actionName = null;
-		$this->_id = null;
-	}
-
-	/**
-	 * Indica los atributos que no deben ser serializados
-	 *
-	 * @return array
-	 */
-	public function _sleep(){
-		return array(
-			'_logger', '_cacheTemplate', '_cacheLayout', '_cacheView', '_id', '_actionName',
-			'_controllerName', '_parameters', '_allParameters'
-		);
 	}
 
 }

@@ -367,7 +367,9 @@ abstract class Generator {
 	 */
 	static function buildForm($form, $scaffold=false){
 
-		require "Library/Kumbia/Generator/Components.php";
+		if(!class_exists('Component')){
+			require "Library/Kumbia/Generator/Components.php";
+		}
 
 		$controller_name = Router::getController();
 		$action_name = Router::getAction();
@@ -437,7 +439,9 @@ abstract class Generator {
 
 		//Standard Forms
 		if($form['type']=='standard'){
-			require "Library/Kumbia/Generator/StandardBuild.php";
+			if(!class_exists('StandardGenerator')){
+				require "Library/Kumbia/Generator/StandardBuild.php";
+			}
 			StandardGenerator::buildFormStandard($form);
 		}
 

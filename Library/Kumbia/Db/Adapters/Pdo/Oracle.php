@@ -283,4 +283,14 @@ class DbPdoOracle extends DbPDO {
 		return 'pdo_oracle';
 	}
 
+	/**
+	 * Devuelve el SQL Dialect que debe ser usado
+	 *
+	 * @return	string
+	 * @static
+	 */
+	public static function getSQLDialect(){
+		return 'OracleSQLDialect';
+	}
+
 }

@@ -380,7 +380,17 @@ class ControllerRequest extends Object {
         	if(isset($_SERVER['HTTP_'.$header])){
         		return $_SERVER['HTTP_'.$header];
         	} else {
-        		return '';
+        		if(Core::isHurricane()==false){
+        			return '';
+        		} else {
+        			//Normalizar encabezado
+	        		$header = str_replace('_', ' ', strtolower($header));
+					$header = str_replace(' ', '-', ucwords($header));
+					if(preg_match('/^Http/', $header)){
+						$header = substr($header, 5);
+					}
+        			return HurricaneServer::getHeader($header);
+        		}
         	}
         }
     }

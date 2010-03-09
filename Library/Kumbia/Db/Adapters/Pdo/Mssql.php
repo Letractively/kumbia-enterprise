@@ -286,4 +286,14 @@ class DbPdoMsSQL extends DbPDO {
 		return 'pdo_odbc';
 	}
 
+	/**
+	 * Devuelve el SQL Dialect que debe ser usado
+	 *
+	 * @return	string
+	 * @static
+	 */
+	public static function getSQLDialect(){
+		return null;
+	}
+
 }

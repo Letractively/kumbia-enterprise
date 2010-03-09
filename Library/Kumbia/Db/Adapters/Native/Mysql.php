@@ -209,17 +209,21 @@ class DbMySQL extends DbBase
 		} else {
 			$this->_lastResultQuery = false;
 			$errorMessage = $this->error(" al ejecutar <i>\"$sqlStatement\"</i> en la conexión \"".$this->getConnectionId(true)."\"");
-			if($this->noError()==1205||$this->noError()==1213){
-				throw new DbLockAdquisitionException($errorMessage, $this->noError(), true, $this);
+			$numberError = $this->noError();
+			if($numberError==1205||$numberError==1213){
+				throw new DbLockAdquisitionException($errorMessage, $numberError, true, $this);
 			}
-			if($this->noError()==1064||$this->noError()==1054){
-				throw new DbSQLGrammarException($errorMessage, $this->noError(), true, $this);
+			if($numberError==1064||$numberError==1054){
+				throw new DbSQLGrammarException($errorMessage, $numberError, true, $this);
 			}
-			if($this->noError()==1451){
-				throw new DbConstraintViolationException($errorMessage, $this->noError(), true, $this);
+			if($numberError==1451||$numberError==1062){
+				throw new DbConstraintViolationException($errorMessage, $numberError, true, $this);
 			}
-			if($this->noError()==1292){
-				throw new DbInvalidFormatException($errorMessage, $this->noError(), true, $this);
+			if($numberError==1292){
+				throw new DbInvalidFormatException($errorMessage, $numberError, true, $this);
+			}
+			if($numberError==2006){
+				$this->connect();
 			}
 			throw new DbException($errorMessage, $this->noError(), true, $this);
 			return false;
@@ -743,18 +747,20 @@ class DbMySQL extends DbBase
 	 * Devuelve la extension ó extensiones de PHP requeridas para
 	 * usar el adaptador
 	 *
-	 * @return string|array
+	 * @return	string|array
+	 * @static
 	 */
 	public static function getPHPExtensionRequired(){
 		return array('mysql', 'mysqlnd');
 	}
 
 	/**
-	 * Devuelve el SQL Dialect usado
+	 * Devuelve el SQL Dialect que debe ser usado
 	 *
-	 * @return string
+	 * @return	string
+	 * @static
 	 */
-	public function getSQLDialect(){
+	public static function getSQLDialect(){
 		return 'MysqlSQLDialect';
 	}
 
