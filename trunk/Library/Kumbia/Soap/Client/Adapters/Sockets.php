@@ -16,7 +16,7 @@
  * @package 	Soap
  * @subpackage 	Client
  * @subpackage 	Client
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
  * @version 	$Id$
  */
@@ -29,7 +29,7 @@
  * @category	Kumbia
  * @package 	Soap
  * @subpackage 	Client
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
  * @abstract
  */
@@ -48,6 +48,13 @@ class SocketsCommunicator {
 	 * @var string
 	 */
 	private $_httpRequest;
+
+	/**
+	 * Host dirección de la petición
+	 *
+	 * @var string
+	 */
+	private $_host = '';
 
 	/**
 	 * Metodo utilizado para realizar la peticion
@@ -71,11 +78,25 @@ class SocketsCommunicator {
 	private $_queryParams = array();
 
 	/**
-	 * Encabezados de la peticion
+	 * Encabezados de la petición
 	 *
 	 * @var array
 	 */
 	private $_headers = array('Accept' => '*/*');
+
+	/**
+	 * Cookies de la petición
+	 *
+	 * @var array
+	 */
+	private $_cookies = array();
+
+	/**
+	 * Habilita el envio automático de las cookies recibidas
+	 *
+	 * @var boolean
+	 */
+	private $_enableCookies = false;
 
 	/**
 	 * Response status de la respuesta
@@ -103,7 +124,7 @@ class SocketsCommunicator {
 	 *
 	 * @var string
 	 */
-	private $_responseBody;
+	private $_responseBody = '';
 
 	/**
 	 * Raw Post Data
@@ -123,17 +144,19 @@ class SocketsCommunicator {
 	 * Constructor del SocketCommunicator
 	 *
 	 * @param string $scheme
+	 * @param string $host
 	 * @param string $uri
 	 * @param string $method
 	 * @param int $port
 	 */
-	public function __construct($scheme, $address, $uri, $method, $port=80){
+	public function __construct($scheme, $host, $uri, $method, $port=80){
 		if($scheme=='https'){
-			$address = "ssl://$address";
+			$address = 'ssl://'.$host;
 		} else {
-			$address = "tcp://$address";
+			$address = 'tcp://'.$host;
 		}
-		$this->_socketHandler = @fsockopen($address, $port, $errorString);
+		$this->_host = $host;
+		$this->_socketHandler = @pfsockopen($host, $port, $errorString);
 		if(!$this->_socketHandler){
 			throw new SoapException($errorString);
 		}
@@ -162,7 +185,6 @@ class SocketsCommunicator {
 		foreach($headers as $headerName => $headerValue){
 			$this->_headers[$headerName] = $headerValue;
 		}
-		$this->_headers['Connection'] = 'Close';
 		unset($this->_headers['Accept-Encoding']);
 	}
 
@@ -186,6 +208,15 @@ class SocketsCommunicator {
 	 */
 	public function addHeader($name, $value){
 		$this->_headers[$name] = $value;
+	}
+
+	/**
+	 * Establece las cookies de la petición
+	 *
+	 * @param array $cookies
+	 */
+	public function setCookies($cookies){
+		$this->_cookies = $cookies;
 	}
 
 	/**
@@ -228,7 +259,19 @@ class SocketsCommunicator {
 			}
 		}
 		foreach($this->_headers as $headerName => $headerValue){
-			$this->_httpRequest.="$headerName: $headerValue\r\n";
+			$this->_httpRequest.=$headerName.': '.$headerValue."\r\n";
+		}
+		if(count($this->_cookies)>0||$this->_enableCookies==true){
+			$this->_httpRequest.='Cookie: ';
+			foreach($this->_cookies as $cookieName => $cookieValue){
+				 $this->_httpRequest.=$cookieName.'='.$cookieValue.';';
+			}
+			if(isset($_SESSION['KHC'][$this->_host])){
+				foreach($_SESSION['KHC'][$this->_host] as $cookieName => $cookieValue){
+					$this->_httpRequest.=$cookieName.'='.$cookieValue.';';
+				}
+			}
+			$this->_httpRequest.="\r\n";
 		}
 		if($this->_method=='POST'){
 			if($this->_rawPostData==''){
@@ -245,7 +288,7 @@ class SocketsCommunicator {
 				}*/
 				$this->_httpRequest.="\r\n";
 			} else {
-				$this->_httpRequest.="Content-Length: ".strlen($this->_rawPostData)."\r\n";
+				$this->_httpRequest.="Content-Length: ".i18n::strlen($this->_rawPostData)."\r\n";
 				$this->_httpRequest.="\r\n";
 				$this->_httpRequest.=$this->_rawPostData;
 			}
@@ -253,40 +296,59 @@ class SocketsCommunicator {
 			$this->_httpRequest.="\r\n";
 		}
 		fwrite($this->_socketHandler, $this->_httpRequest);
+
 		$response = '';
 		$header = true;
 		$i = 0;
-		$this->_responseBody = '';
 		$this->_responseHeaders = array();
-		$all = '';
 		while(!feof($this->_socketHandler)){
 			$line = fgets($this->_socketHandler);
 			if($header==true){
 				if($i==0){
-					$fline = explode(' ', $line);
-					$this->_responseCode = $fline[1];
-					$this->_responseStatus = rtrim($fline[2]);
+					if($line!==false){
+						$fline = split(' ', $line);
+						$this->_responseCode = $fline[1];
+						$this->_responseStatus = rtrim($fline[2]);
+					} else {
+						throw new CoreException('La respuesta fue vacia', 0);
+					}
 				} else {
 					if($line!="\r\n"){
-						$pline = explode(": ", $line, 2);
+						$pline = split(': ', $line, 2);
 						if(count($pline)==2){
 							$this->_responseHeaders[$pline[0]] = substr($pline[1], 0, strlen($pline[1])-2);
 						} else {
-							$header = false;
+							break;
 						}
 					} else {
-						$header = false;
+						break;
 					}
 				}
-				++$i;
-			} else {
-				$this->_responseBody.=$line;
 			}
+			++$i;
+    	}
+
+    	$this->_responseBody = '';
+    	if(isset($this->_responseHeaders['Content-Length'])){
+    		$contentLength = $this->_responseHeaders['Content-Length'];
+    		for($i=0;$i<$contentLength;$i++){
+    			$this->_responseBody.=fgetc($this->_socketHandler);
+    		}
+    	} else {
+    		throw new CoreException('La respuesta no incluia el encabezado Content-Length', 0);
+    	}
+
+    	print $this->_responseBody;
+
+    	if($this->_enableCookies==true){
+    		if(!isset($_SESSION['KHC'][$this->_host])){
+    			$_SESSION['KHC'][$this->_host] = $this->getResponseCookies();
+    		}
     	}
 	}
 
 	/**
-	 * Devuelve los headers recibidos de la peticion
+	 * Devuelve los headers recibidos de la petición
 	 *
 	 * @return array
 	 */
@@ -304,7 +366,7 @@ class SocketsCommunicator {
 	}
 
 	/**
-	 * Devuelve el codigo de la respuesta HTTP
+	 * Devuelve el código de la respuesta HTTP
 	 *
 	 * @return string
 	 */
@@ -320,14 +382,25 @@ class SocketsCommunicator {
 	public function getResponseCookies(){
 		if(isset($this->_responseHeaders['Set-Cookie'])){
 			$responseCookies = array();
-			$cookies = explode(';', $this->_responseHeaders['Set-Cookie']);
+			$cookies = split('; ', $this->_responseHeaders['Set-Cookie']);
 			foreach($cookies as $cookie){
-				$cook = explode('=', $cookie);
-				$responseCookies[$cook[0]] = $cook[1];
+				$cook = split('=', $cookie);
+				if(!in_array($cook[0], array('path', 'expires', 'domain', 'secure'))){
+					$responseCookies[$cook[0]] = $cook[1];
+				}
 			}
 			return $responseCookies;
 		}
 		return array();
+	}
+
+	/**
+	 * Habilita el envio automático de las cookies recibidas
+	 *
+	 * @param boolean $enableCookies
+	 */
+	public function enableCookies($enableCookies){
+		$this->_enableCookies = $enableCookies;
 	}
 
 }

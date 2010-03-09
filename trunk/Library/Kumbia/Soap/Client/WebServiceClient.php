@@ -28,6 +28,7 @@
  *
  * @category	Kumbia
  * @package 	Soap
+ * @subpackage 	Client
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
@@ -40,7 +41,7 @@ class WebServiceClient {
 	 * @var string
 	 * @staticvar
 	 */
-	private static $_envelopeNS = 'http://schemas.xmlsoap.org/soap/envelope/';
+	private static $_envelopeNS = 'http://www.w3.org/2003/05/soap-envelope';
 
 	/**
 	 * Namespace del XML Schema Instance (xsi)
@@ -127,6 +128,16 @@ class WebServiceClient {
 	}
 
 	/**
+	 * Establece una Cookie de la petición
+	 *
+	 * @param string $name
+	 * @param string $value
+	 */
+	public function __setCookie($name, $value){
+		$this->_transport->setCookies(array($name => $value));
+	}
+
+	/**
 	 * Obtiene el transporte HTTP
 	 *
 	 * @param 	string $url
@@ -137,7 +148,9 @@ class WebServiceClient {
 			require 'Library/Kumbia/Soap/Client/Adapters/Sockets.php';
 		}
 		$uri = new HttpUri($url);
-		return new SocketsCommunicator($uri->getSchema(), $uri->getHostname(), $uri->getUri(), 'POST', $uri->getPort());
+		$transport = new SocketsCommunicator($uri->getSchema(), $uri->getHostname(), $uri->getUri(), 'POST', $uri->getPort());
+		$transport->enableCookies(true);
+		return $transport;
 	}
 
 	/**
@@ -263,6 +276,7 @@ class WebServiceClient {
 	/**
 	 * Agrega el SOAP Envelope a un Mensaje SOAP
 	 *
+	 * @param 	string $message
 	 * @return	string
 	 */
 	private function _createMessageEnvelope($message){
@@ -275,8 +289,10 @@ class WebServiceClient {
 	 *
 	 * @param	string $method
 	 * @param	array $arguments
+	 * @return 	mixed
 	 */
 	public function __call($method, $arguments){
+
 		$this->_transport->addHeader('SOAPAction', '"'.$this->_options['uri'].'#'.$method.'"');
 		$n = 0;
 		$messageRequest = '<ns1:'.$method.'>';
@@ -316,6 +332,7 @@ class WebServiceClient {
 	 *
 	 * @param	string $responseBody
 	 * @param	string $method
+	 * @return	mixed
 	 */
 	private function _bindResponseData($method, $responseBody){
 		if($responseBody!=''){
@@ -336,6 +353,7 @@ class WebServiceClient {
 	/**
 	 * Analiza el tipo XSI y devuelve un dato nativo PHP
 	 *
+	 * @param 	DOMElement $element
 	 * @return	mixed
 	 */
 	private function _getNativeValue($element){
@@ -379,6 +397,7 @@ class WebServiceClient {
 	 * Decodifica un SOAP-ENC:Array a un valor nativo PHP
 	 *
 	 * @param  $returnElement
+	 * @return array
 	 */
 	private function _decodeSOAPArray($returnElement){
 		$nativeArray = array();
@@ -398,6 +417,7 @@ class WebServiceClient {
 	 * Decodifica un ns2:Map asociativo a un valor nativo PHP
 	 *
 	 * @param  $returnElement
+	 * @return array
 	 */
 	private function _decodeSOAPMap($returnElement){
 		$nativeArray = array();
@@ -429,9 +449,8 @@ class WebServiceClient {
 		$this->_transport->getResponseCookies();
 		$this->_domDocument = new DOMDocument();
 		$this->_domDocument->loadXML($responseBody);
-		//$this->_domDocument->normalizeDocument();
-		$subcodeNode = $this->_domDocument->getElementsByTagNameNS(self::$_envelopeNS, 'Subcode');
 		$exceptionClassName = '';
+		$subcodeNode = $this->_domDocument->getElementsByTagNameNS(self::$_envelopeNS, 'Subcode');
 		foreach($subcodeNode as $element){
 			$subcodeParts = explode(':', $element->nodeValue);
 			if(isset($subcodeParts[1])){
@@ -459,9 +478,14 @@ class WebServiceClient {
 					foreach($trace->childNodes as $detailNode){
 						if($detailNode->localName=='File'){
 							$remoteTrace['file'] = $detailNode->nodeValue;
-						}
-						if($detailNode->localName=='Line'){
-							$remoteTrace['line'] = $detailNode->nodeValue;
+						} else {
+							if($detailNode->localName=='Line'){
+								$remoteTrace['line'] = $detailNode->nodeValue;
+							} else {
+								if($detailNode->localName=='Function'){
+									$remoteTrace['function'] = $detailNode->nodeValue;
+								}
+							}
 						}
 					}
 					$remoteBacktrace[] = $remoteTrace;

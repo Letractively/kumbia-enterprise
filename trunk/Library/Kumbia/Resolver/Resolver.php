@@ -41,54 +41,61 @@ abstract class Resolver {
 	static private $_resolvedServices = array();
 
 	/**
-	 * Almacena el context-id de un servicio
-	 *
-	 * @access 	protected
-	 * @static
-	 */
-	protected static function _setContextId($serviceName){
-		$activeApp = Router::getActiveApplication();
-		$instanceName = Core::getInstanceName();
-		if(!isset($_SESSION['KRS'][$instanceName][$activeApp][$serviceName])){
-			if(!isset($_SESSION['KRS'])){
-				$_SESSION['KRS'] = array();
-			}
-			if(!isset($_SESSION['KRS'][$instanceName])){
-				$_SESSION['KRS'][$instanceName] = array();
-			}
-			if(!isset($_SESSION['KRS'][$instanceName][$activeApp])){
-				$_SESSION['KRS'][$instanceName][$activeApp] = array();
-			}
-			if(!isset($_SESSION['KRS'][$instanceName][$activeApp][$serviceName])){
-				$contextId = md5(uniqid());
-				$_SESSION['KRS'][$instanceName][$activeApp][$serviceName] = $contextId;
-			}
-		} else {
-			$contextId = $_SESSION['KRS'][$instanceName][$activeApp][$serviceName];
-		}
-		#self::$_resolvedServices[$serviceName]->__setCookie('PHPSESSID', $contextId);
-	}
-
-	/**
 	 * Localiza la ubicación de un servicio web
 	 *
 	 * @access 	public
-	 * @param 	string $serviceName
+	 * @param 	mixed $serviceNDI
 	 * @return 	WebServiceClient
 	 * @static
 	 */
-	public static function lookUp($serviceName){
+	public static function lookUp($serviceNDI){
+		if(is_array($serviceNDI)){
+			if(isset($serviceNDI['contextId'])){
+				$serviceName = $serviceNDI['contextId'];
+			} else {
+				$serviceName = array();
+				if(isset($serviceNDI['app'])){
+					$serviceName[] = $serviceNDI['app'];
+				}
+				if(isset($serviceNDI['uri'])){
+					$serviceName[] = $serviceNDI['uri'];
+				}
+				$serviceName = join('.', $serviceName);
+			}
+		} else {
+			$serviceName = $serviceNDI;
+			$serviceNDI = array();
+			if(strpos($serviceName, '.')===false){
+				$serviceNDI['uri'] = $serviceName;
+			} else {
+				$serviceItems = split('\.', $serviceName);
+				$serviceNDI['app'] = $serviceItems[0];
+				$serviceNDI['uri'] = $serviceItems[1];
+			}
+		}
 		if(!isset(self::$_resolvedServices[$serviceName])){
 			$instancePath = Core::getInstancePath();
-			$activeApp = Router::getApplication();
-			$servicePath = str_replace('.', '/', $serviceName);
-			$serviceURL = 'http://'.$_SERVER['HTTP_HOST'].$instancePath.$activeApp.'/'.$servicePath;
+			if(is_array($serviceNDI)){
+				if(!isset($serviceNDI['app'])){
+					$serviceApp = Router::getApplication();
+				} else {
+					$serviceApp = $serviceNDI['app'];
+				}
+				if(!isset($serviceNDI['uri'])){
+					$serviceURI = Router::getApplication();
+				} else {
+					$serviceURI = $serviceNDI['uri'];
+				}
+			} else {
+				$serviceApp = Router::getApplication();
+				$serviceURI = str_replace('.', '/', $serviceName);
+			}
+			$serviceURL = 'http://'.$_SERVER['HTTP_HOST'].$instancePath.$serviceApp.'/'.$serviceURI;
 			self::$_resolvedServices[$serviceName] = new WebServiceClient(array(
 				'actor' => 'http://app-services/'.$serviceName,
 				'location' => $serviceURL,
 				'compression' => 0
 			));
-			self::_setContextId($serviceName);
 		}
 		return self::$_resolvedServices[$serviceName];
 	}

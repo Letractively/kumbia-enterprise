@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Dispatcher
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -433,6 +433,25 @@ abstract class Dispatcher {
 					self::$_controller->onException($e);
 				} else {
 					if($cancelThrowException==false){
+						if(is_subclass_of($e, 'CoreException')){
+							$fileTraced = false;
+							foreach($e->getTrace() as $trace){
+								if(isset($trace['file'])){
+									if($trace['file']==$e->getFile()){
+										$fileTraced = true;
+									}
+								}
+							}
+							if($fileTraced==false){
+								$exceptionFile = array(array(
+									'file' => $e->getFile(),
+									'line' => $e->getLine()
+								));
+								$e->setExtendedBacktrace(array_merge($exceptionFile, $e->getTrace()));
+							} else {
+								$e->setExtendedBacktrace($e->getTrace());
+							}
+						}
 						throw $e;
 					}
 				}
@@ -454,10 +473,12 @@ abstract class Dispatcher {
 								if(is_subclass_of($value, $className)){
 									unset($controller->{$property});
 								}
+								unset($className);
 							}
 						}
+						unset($property);
+						unset($value);
 					}
-					$controller->prepareForPersist();
 					if(isset($_SESSION['KCON'][$instanceName][$activeApp][$module][$appController])){
 						$_SESSION['KCON'][$instanceName][$activeApp][$module][$appController] = array(
 							'data' => serialize($controller),
@@ -473,6 +494,14 @@ abstract class Dispatcher {
 					throw new CoreException($e->getMessage(), $e->getCode());
 				}
 			}
+			unset($module);
+			unset($controller);
+			unset($action);
+			unset($parameters);
+			unset($allParameters);
+			unset($instanceName);
+			unset($appController);
+			unset($activeApp);
 			return self::$_controller;
 		} else {
 			if($notFoundExecuted==false){

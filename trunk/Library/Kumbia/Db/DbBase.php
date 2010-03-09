@@ -16,7 +16,7 @@
  * @package		Db
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright	Copyright (C) 2006-2007 Giancarlo Corzo Vigil (www.antartec.com)
+ * @copyright	Copyright (c) 2006-2007 Giancarlo Corzo Vigil (www.antartec.com)
  * @license 	New BSD License
  * @version 	$Id$
  */
@@ -124,7 +124,7 @@ class DbBase extends Object {
 	 *
 	 * @var resource
 	 */
-	protected $_idConnection;
+	protected $_idConnection = null;
 
 	/**
 	 * Ultimo recurso de una Query
@@ -251,14 +251,11 @@ class DbBase extends Object {
 	 * @param	string $orderBy
 	 * @return	array
 	 */
-	public function find($table, $where="", $fields="*", $orderBy="1"){
-		ActiveRecord::sqlItemSanizite($table);
-		ActiveRecord::sqlSanizite($fields);
-		ActiveRecord::sqlSanizite($orderBy);
+	public function find($table, $where='', $fields='*', $orderBy='1'){
 		if($where!=''){
 			$where = 'WHERE '.$where;
 		}
-		$q = $this->query("SELECT $fields FROM $table WHERE $where ORDER BY $orderBy");
+		$q = $this->query('SELECT '.$fields.' FROM '.$table.' WHERE '.$where.' ORDER BY '.$orderBy);
 		$results = array();
 		while($row = $this->fetchArray($q)){
 			$results[] = $row;
@@ -371,12 +368,14 @@ class DbBase extends Object {
 	public function insert($table, $values, $fields=null, $automaticQuotes=false){
 		$insertSQL = '';
 		if($this->isReadOnly()==true){
-			throw new DbException("No se puede efectuar la operación. La transacción es de solo lectura");
+			throw new DbException("No se puede efectuar la operación. La transacción es de solo lectura", 0, true, $this);
 		}
 		if(is_array($values)==true){
+			#if[compile-time]
 			if(count($values)==0){
 				throw new DbException("Imposible realizar inserción en $table sin datos");
 			} else {
+			#endif
 				if($automaticQuotes==true){
 					foreach($values as $key => $value){
 						if(is_object($value)&&($value instanceof DbRawValue)){
@@ -386,7 +385,9 @@ class DbBase extends Object {
 						}
 					}
 				}
+			#if[compile-time]
 			}
+			#endif
 			if(is_array($fields)==true){
 				$insertSQL = 'INSERT INTO '.$table.' ('.join(', ', $fields).') VALUES ('.join(', ', $values).')';
 			} else {
@@ -415,7 +416,7 @@ class DbBase extends Object {
 		}
 		$updateSql = 'UPDATE '.$table.' SET ';
 		if(count($fields)!=count($values)){
-			throw new DbException('Los n&uacute;mero de valores a actualizar no es el mismo de los campos', 0, true, $this);
+			throw new DbException('Los número de valores a actualizar no es el mismo de los campos', 0, true, $this);
 		}
 		$i = 0;
 		$updateValues = array();
@@ -623,6 +624,24 @@ class DbBase extends Object {
 	 */
 	public function setLogger($logger){
 		$this->_logger = $logger;
+	}
+
+	/**
+	 * Devuelve logger interno del adaptador
+	 *
+	 * @return Logger
+	 */
+	public function getLogger(){
+		return $this->_logger;
+	}
+
+	/**
+	 * Alias de setLogger
+	 *
+	 * @param boolean $logging
+	 */
+	public function setLogging($logging){
+		$this->_logger = $logging;
 	}
 
 	/**

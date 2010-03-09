@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Soap
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -23,11 +23,11 @@
 /**
  * Soap
  *
- * Clase que administra el SoapServer
+ * Clase que administra el SoapServer y las excepciones SoapFault
  *
  * @category 	Kumbia
  * @package 	Soap
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @abstract
@@ -105,7 +105,7 @@ abstract class Soap {
 
 		$response = ControllerResponse::getInstance();
 		$response->setContentType('application/soap+xml; charset=utf-8');
-		$soapAction = explode('#', str_replace('"', '', $_SERVER['HTTP_SOAPACTION'])); ;
+		$soapAction = split('#', str_replace('"', '', $_SERVER['HTTP_SOAPACTION'])); ;
 		$serviceNamespace = $soapAction[0];
 		$bodyElement = self::_createSOAPEnvelope();
 
@@ -137,6 +137,9 @@ abstract class Soap {
 			$responseElement->appendChild($dataEncoded);
 		}
 		$bodyElement->appendChild($responseElement);
+
+		//Debug::addToFile('x.txt', self::$_domDocument->saveXML());
+
 		echo self::$_domDocument->saveXML();
 	}
 
@@ -187,7 +190,7 @@ abstract class Soap {
 							if($valueReturned===false){
 								$stringValue = 'false';
 							} else {
-								$stringValue = 'boolean';
+								$stringValue = 'true';
 							}
 							$element->nodeValue = $stringValue;
 						}
@@ -261,6 +264,7 @@ abstract class Soap {
 		$controllerResponse->setHeader('HTTP/1.1 500 Application Exception', true);
 
 		if(isset($_SERVER['HTTP_SOAPACTION'])){
+
 			$faultMessage = str_replace('\n', '', html_entity_decode($e->getMessage(), ENT_COMPAT, 'UTF-8'));
 			$controllerResponse->setResponseType(ControllerResponse::RESPONSE_OTHER);
 			$controllerResponse->setResponseAdapter('soap');
@@ -321,7 +325,12 @@ abstract class Soap {
 			if(isset($config->application->debug)&&$config->application->debug){
 				$faultBacktrace = new DOMElement('Backtrace', '', self::$_faultsNS);
 				$detailElement->appendChild($faultBacktrace);
-				foreach($e->getTrace() as $trace){
+				if(is_subclass_of($e, 'CoreException')){
+					$backtrace = $e->getCompleteTrace();
+				} else {
+					$backtrace = $e->getTrace();
+				}
+				foreach($backtrace as $trace){
 					$faultTrace = new DOMElement('Trace', '', self::$_faultsNS);
 					$faultBacktrace->appendChild($faultTrace);
 					if(isset($trace['file'])){
@@ -333,18 +342,20 @@ abstract class Soap {
 						$faultTrace->appendChild($faultLine);
 					}
 					if(!isset($trace['class'])){
-						$trace['class'] = "";
-						$trace['type'] = "";
+						$trace['class'] = '';
+						$trace['type'] = '';
 					}
 					if(!isset($trace['function'])){
-						$trace['function'] = "";
+						$trace['function'] = '';
 					}
 					$functionLocation = $trace['class'].$trace['type'].$trace['function'];
 					$faultFunction = new DOMElement('Function', $functionLocation, self::$_faultsNS);
 					$faultTrace->appendChild($faultFunction);
 				}
 			}
+
 			echo self::$_domDocument->saveXML();
+
 		}
 	}
 

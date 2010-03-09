@@ -50,7 +50,9 @@ class XmlViewResponse {
 		$controllerResponse->setHeader('Expires: 0', true);
 
 		if($valueReturned!==null){
-			require 'Library/Kumbia/Xml/Xml.php';
+			if(!class_exists('SimpleXMLResponse')){
+				require 'Library/Kumbia/Xml/Xml.php';
+			}
 			$xml = new SimpleXMLResponse();
 			$xml->addData($valueReturned);
 			$xml->outXMLResponse();

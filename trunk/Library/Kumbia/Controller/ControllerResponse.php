@@ -85,10 +85,22 @@ class ControllerResponse extends Object {
 	 * @static
 	 */
 	public static function getInstance(){
-		if(self::$_instance==null){
+		if(self::$_instance===null){
 			self::$_instance = new ControllerResponse();
 		}
 		return self::$_instance;
+	}
+
+	/**
+	 * Resetea la respuesta para generar una nueva
+	 *
+	 * @static
+	 */
+	public static function resetResponse(){
+		if(self::$_instance!==null){
+			self::$_instance->_responseType = 0;
+			self::$_instance->_responseAdapter = null;
+		}
 	}
 
 	/**
@@ -99,7 +111,12 @@ class ControllerResponse extends Object {
 	 * @param 	boolean $replace
 	 */
 	public function setHeader($header, $replace=true){
-		header($header, $replace);
+		if(Core::isHurricane()==false){
+			header($header, $replace);
+		} else {
+			$header = split(': ', $header);
+			HurricaneServer::setHeader($header[0], $header[1]);
+		}
 	}
 
 	/**
@@ -148,7 +165,7 @@ class ControllerResponse extends Object {
 	}
 
 	/**
-	 * Devuelve el tipo de respuesta que generara la peticion
+	 * Devuelve el tipo de respuesta que generara la petición
 	 *
 	 * @access	public
 	 * @return	integer
@@ -181,7 +198,7 @@ class ControllerResponse extends Object {
 	 * @param	string $contentType
 	 */
 	public function setContentType($contentType){
-		$this->setHeader('Content-Type', $contentType);
+		$this->setHeader('Content-Type: '.$contentType);
 	}
 
 }

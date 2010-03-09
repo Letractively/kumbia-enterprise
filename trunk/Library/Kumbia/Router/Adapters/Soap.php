@@ -169,7 +169,7 @@ class SoapRouter implements RouterInterface {
 		$domDocument = new DOMDocument();
 		$xmlValidation = @$domDocument->loadXML($soapRawRequest);
 		if($xmlValidation==false){
-			$soapException = new SoapException($php_errormsg);
+			$soapException = new SoapException('SOAP Envelope mal formado. '.$php_errormsg);
 			$soapException->setFaultCode('Sender');
 			throw $soapException;
 		}

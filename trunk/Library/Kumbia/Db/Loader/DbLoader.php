@@ -24,12 +24,12 @@
 /**
  * DbLoader
  *
- * Clase encargada de cargar el adaptador de conexion a bases de datos
+ * Clase encargada de cargar el adaptador de conexión a bases de datos
  *
  * @category	Kumbia
  * @package		Db
  * @subpackage	Loader
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierezandresfelipe at gmail.com)
  * @license		New BSD License
  */
@@ -93,22 +93,33 @@ abstract class DbLoader {
 					require 'Library/Kumbia/Db/Adapters/Jdbc/'.ucfirst($type).'.php';
 				}
 				break;
+			case 'nosql':
+				$className = 'Db'.$type;
+				if(class_exists($className, false)==false){
+					require 'Library/Kumbia/Db/Adapters/NoSQL/'.ucfirst($type).'.php';
+				}
+				break;
 			case 'none':
 				break;
 			default:
 				throw new DbLoaderException('No se pudo determinar el tipo de capa de acceso a gestores relacionales', 0);
 		}
-		if(!class_exists($className)){
+		if(!class_exists($className, false)){
 			throw new DbLoaderException('No existe la clase '.$className.', necesaria para iniciar el adaptador', 0);
 		}
-		if(!class_exists($type.'SQLDialect')){
-			require 'Library/Kumbia/Db/SQLDialects/'.ucfirst($type).'.php';
+
+		//Verificar si requiere de un SQLDialect
+		$sqlDialect = call_user_func_array(array($className, 'getSQLDialect'), array());
+		if($sqlDialect!==null){
+			if(!class_exists($type.'SQLDialect', false)){
+				require 'Library/Kumbia/Db/SQLDialects/'.ucfirst($type).'.php';
+			}
 		}
 		return $className;
 	}
 
 	/**
-	 * Carga un driver Kumbia segun lo especificado en enviroment.ini
+	 * Carga un driver según lo especificado en environment.ini
 	 *
 	 * @static
 	 * @return boolean
@@ -148,7 +159,7 @@ abstract class DbLoader {
 	}
 
 	/**
-	 * Crea una conexion apartir
+	 * Crea una conexión apartir de un descriptor
 	 *
 	 * @param string $descriptor
 	 * @static

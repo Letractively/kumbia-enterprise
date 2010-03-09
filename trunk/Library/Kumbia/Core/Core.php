@@ -82,11 +82,18 @@ abstract class Core {
 	private static $_testingMode = false;
 
 	/**
-	 * Indica si la aplicación esta corriendo bajo IBM Websphere
+	 * Indica si la aplicación está corriendo bajo IBM Websphere
 	 *
 	 * @var boolean
 	 */
 	private static $_isWebSphere = false;
+
+	/**
+	 * Indica si la aplicación está corriendo bajo HurricaneServer
+	 *
+	 * @var boolean
+	 */
+	private static $_isHurricane = false;
 
 	/**
 	 * Framework Path Inicial
@@ -108,21 +115,15 @@ abstract class Core {
 		 */
 		require 'Library/Kumbia/Extensions/Extensions.php';
 
-		/**
-		 * Carga las extensiones del boot.ini
-		 */
+		//Carga las extensiones del boot.ini
 		Extensions::loadBooteable();
 
-		/**
-		 * Carga los plug-in de la aplicación actual
-		 */
+		//Carga los plug-in de la aplicación actual
 		#if[no-plugins]
 		PluginManager::loadApplicationPlugins();
 		#endif
 
-		/**
-		 * Establece el timezone del sistema
-		 */
+		//Establece el timezone del sistema
 		self::setTimeZone();
 
 	}
@@ -180,6 +181,7 @@ abstract class Core {
 		if(date_default_timezone_set($timezone)==false){
 			throw new CoreException('Timezone inválido \''.$timezone.'\'');
 		}
+		unset($timezone);
 	}
 
 	/**
@@ -197,31 +199,38 @@ abstract class Core {
 	 * Inicializar el _INSTANCE_NAME
 	 *
 	 * @access	public
+	 * @param 	string $instanceName
 	 * @return	boolean
 	 * @static
 	 */
-	static public function setInstanceName(){
+	static public function setInstanceName($instanceName=null){
+
 		if(self::$_instanceName!==null){
 			return false;
 		}
 
 		//Crear el _INSTANCE_NAME
 		$exceptionThrown = false;
-		$path = substr(str_replace(array('/public/index.php', '/index.php'), '', $_SERVER['PHP_SELF']), 1);
-		if(!isset($_SESSION['_INSTANCE_NAME'])){
-			#if[compile-time]
-			Facility::setFacility(Facility::FRAMEWORK_CORE);
-			if(version_compare(PHP_VERSION, '5.2.0', '<')){
-				$message = CoreLocale::getErrorMessage(-10, PHP_VERSION);
-				throw new CoreException($message, -10);
-			}
-			if(!is_writable('public/temp')){
+		if($instanceName===null){
+			$path = substr(str_replace(array('/public/index.php', '/index.php'), '', $_SERVER['PHP_SELF']), 1);
+			if(!isset($_SESSION['_INSTANCE_NAME'])){
+				#if[compile-time]
 				Facility::setFacility(Facility::FRAMEWORK_CORE);
-				$message = CoreLocale::getErrorMessage(-11);
-				throw new CoreException($message, -11);
+				if(version_compare(PHP_VERSION, '5.2.0', '<')){
+					$message = CoreLocale::getErrorMessage(-10, PHP_VERSION);
+					throw new CoreException($message, -10);
+				}
+				if(!is_writable('public/temp')){
+					Facility::setFacility(Facility::FRAMEWORK_CORE);
+					$message = CoreLocale::getErrorMessage(-11);
+					throw new CoreException($message, -11);
+				}
+				#endif
+				$_SESSION['_INSTANCE_NAME'] = '';
 			}
-			#endif
-			$_SESSION['_INSTANCE_NAME'] = '';
+		} else {
+			$_SESSION['_INSTANCE_NAME'] = $instanceName;
+			$path = $instanceName;
 		}
 
 		//Ejecutar onStartApplication y onChangeInstance
@@ -456,14 +465,10 @@ abstract class Core {
 			//Inicializa la respuesta
 			$controller = null;
 
-			/**
-			 * Iniciar el buffer de salida
-			 */
+			//Iniciar el buffer de salida
 			ob_start();
 
-			/**
- 	 	     * El driver de la BD es cargado segun lo que diga en config.ini
-     	     */
+ 	 	    //El driver de la BD es cargado segun lo que diga en config.ini
 			if(DbLoader::loadDriver()==false){
 				return false;
 			}
@@ -478,13 +483,13 @@ abstract class Core {
 				EntityManager::initModels(self::$_activeModelsDir);
 			}
 
-			// Inicializa el administrador de transacciones
+			//Inicializa el administrador de transacciones
 			TransactionManager::initializeManager();
 
 		 	//Inicializa el administrador de acceso
 			Security::initAccessManager();
 
-			// Atiende la peticion
+			//Atiende la petición
 			$controller = self::handleRequest();
 
 			//Ejecuta el GC
@@ -495,9 +500,7 @@ abstract class Core {
 			return self::_handleException($e, $controller);
 		}
 		catch(Exception $e){
-			/**
-			 * Las excepciones se convierten en CoreException sin perder la traza
-			 */
+			//Las excepciones se convierten en CoreException sin perder la traza
 			try {
 				$fileTraced = false;
 				foreach($e->getTrace() as $trace){
@@ -542,9 +545,7 @@ abstract class Core {
 		#endif
 		Facility::setFacility(Facility::USER_LEVEL);
 
-		/**
-		 * Inicializar componente Router
-		 */
+		//Inicializar componente Router
 		Router::initialize();
 		Router::setRouted(true);
 		Router::ifRouted();
@@ -671,7 +672,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Determina el excepction handler adecuado para dar respuesta
+	 * Determina el exception handler adecuado para dar respuesta
 	 *
 	 * @access public
 	 * @return callback
@@ -947,13 +948,18 @@ abstract class Core {
 	}
 
 	/**
-	 * Resetea la peticion
+	 * Resetea la petición
 	 *
 	 * @access public
 	 * @static
 	 */
 	public static function resetRequest(){
-		Tag::resetCssStylesheets();
+		Tag::resetStylesheetLinks();
+		Router::cleanRouter();
+		ControllerResponse::resetResponse();
+		View::setContent('');
+		View::setRenderLevel(View::LEVEL_MAIN_VIEW);
+		View::cleanViewParams();
 	}
 
 	/**
@@ -998,11 +1004,15 @@ abstract class Core {
 		} else {
 			return file_exists($filePath);
 		}*/
-		//Debug::add(self::$_frameworkPath.$filePath);
-		#file_put_contents('/Users/andresgutierrez/xs.txt', self::$_frameworkPath.$filePath);
 		return file_exists(self::$_frameworkPath.$filePath);
 	}
 
+	/**
+	 * Obtiene el PATH a un archivo
+	 *
+	 * @param	string $path
+	 * @return	string
+	 */
 	public static function getFilePath($path){
 		/*
 		//Permite el debug usando Zend Platform
@@ -1017,8 +1027,8 @@ abstract class Core {
 	/**
 	 * Indica si un directorio existe en el sistema de archivos
 	 *
-	 * @param string $path
-	 * @return string
+	 * @param	string $path
+	 * @return	string
 	 */
 	public static function isDir($path){
 		/*
@@ -1034,7 +1044,7 @@ abstract class Core {
 	/**
 	 * Establece que la aplicación se esta ejecutando bajo IBM Websphere
 	 *
-	 * @param boolean $webSphere
+	 * @param	boolean $webSphere
 	 */
 	public static function setIsWebsphere($webSphere){
 		self::$_isWebSphere = $webSphere;
@@ -1043,10 +1053,28 @@ abstract class Core {
 	/**
 	 * Indica si se esta usando la aplicación en IBM® Websphere
 	 *
-	 * @return boolean
+	 * @return	boolean
 	 */
 	public static function isWebsphere(){
 		return self::$_isWebSphere;
+	}
+
+	/**
+	 * Establece que la aplicación se está ejecutando bajo HurricaneServer
+	 *
+	 * @param	boolean $hurricane
+	 */
+	public static function setIsHurricane($hurricane){
+		self::$_isHurricane = $hurricane;
+	}
+
+	/**
+	 * Indica si la aplicación se está ejecutando bajo HurricaneServer
+	 *
+	 * @return	boolean
+	 */
+	public static function isHurricane(){
+		return self::$_isHurricane;
 	}
 
 }

@@ -801,11 +801,12 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	}
 
 	/**
-	 * Devuelve el SQL Dialect usado
+	 * Devuelve el SQL Dialect que debe ser usado
 	 *
-	 * @return string
+	 * @return	string
+	 * @static
 	 */
-	public function getSQLDialect(){
+	public static function getSQLDialect(){
 		return 'OracleSQLDialect';
 	}
 

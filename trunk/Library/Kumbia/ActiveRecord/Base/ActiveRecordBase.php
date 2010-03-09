@@ -295,7 +295,7 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-     * Establece la conexion con la que trabajará el modelo
+     * Establece la conexión con la que trabajará el modelo
      *
      * @access public
      * @param string $mode
@@ -540,12 +540,15 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve el objeto interno de conexión a la base de datos
 	 *
-	 * @access public
-	 * @return DbBase
+	 * @access	public
+	 * @param 	boolean $shouldConnect
+	 * @return	DbBase
 	 */
-	public function getConnection(){
-		if(!$this->_db){
-			$this->_connect();
+	public function getConnection($shouldConnect=true){
+		if($shouldConnect==true){
+			if(!$this->_db){
+				$this->_connect();
+			}
 		}
 		return $this->_db;
 	}
@@ -681,7 +684,7 @@ abstract class ActiveRecordBase extends Object
 						throw new ActiveRecordException('No se ha definido una llave primaria para este objeto');
 					}
 				} else {
-					if($params[0]==''){
+					if($params[0]===''){
 						$params['conditions'] = $primaryKeys[0]." = ''";
 					} else {
 						$params['conditions'] = $params[0];
@@ -1627,13 +1630,13 @@ abstract class ActiveRecordBase extends Object
 	 * @return	bool
 	 */
 	private function _exists($wherePk=''){
-		if($this->_forceExists==false){
+		if($this->_forceExists===false){
 			if($this->_schema){
 				$table = $this->_schema.'.'.$this->_source;
 			} else {
 				$table = $this->_source;
 			}
-			if($wherePk==''){
+			if($wherePk===''){
 				$wherePk = array();
 				$primaryKeys = $this->_getPrimaryKeyAttributes();
 				if(count($primaryKeys)>0){
@@ -1679,7 +1682,6 @@ abstract class ActiveRecordBase extends Object
 				return 0;
 			}
 		}
-
 	}
 
 	/**

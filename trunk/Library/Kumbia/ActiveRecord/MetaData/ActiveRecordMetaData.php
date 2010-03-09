@@ -15,9 +15,9 @@
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordMetaData
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright	Copyright (C) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright 	Copyright (C) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
  * @license		New BSD License
  * @version 	$Id$
  */
@@ -25,7 +25,7 @@
 /**
  * ActiveRecordMetaData
  *
- * Gran parte de la ciencia en la implementación de ActiveRecord esta
+ * Gran parte de la ciencia en la implementación de ActiveRecord está
  * relacionada con la administración de los metadatos de las tablas
  * mapeadas.
  *
@@ -36,143 +36,279 @@
  * El subcomponente ActiveRecordMetadata implementa el patrón
  * Metadata Mapping el cual permite crear un data map por schema sobre
  * la información de las tablas y así reducir el consumo de memoria
- * por objeto ActiveRecord y consolidar una base de datos in-memory
+ * por objeto ActiveRecord consolidando una base de datos in-memory
  * de las características de cada entidad utilizada en la aplicación.
  *
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordMetaData
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright	Copyright (C) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
  */
 abstract class ActiveRecordMetaData {
 
 	/**
-	 * Persistance Models Meta-data
+	 * Indica si esta disponible SHMOP
+	 *
+	 * @var boolean
+	 */
+	static private $_hasSharedMemory = null;
+
+	/**
+	 * Id de acceso para el bloque de memoria compartida
+	 *
+	 * @var int
+	 */
+	static private $_sharedId;
+
+	/**
+	 * Identificadores unicos para memoria compartida
+	 *
+	 * @var boolean
+	 */
+	static private $_sharedKeys = array();
+
+	/**
+	 * Meta-data temporal para modelos
 	 *
 	 * @var array
 	 * @staticvar
 	 */
-	static private $_models;
+	static private $_metaData;
 
 	/**
-	 * Meta-Data de los nombres de los campos de los modelos
+	 * Constante para indexar los atributos de los modelos
 	 *
-	 * @var array
-	 * @staticvar
 	 */
-	static private $_modelsAttributes = array();
+	const MODELS_ATTRIBUTES = 0;
 
 	/**
-	 * Meta-Data de los nombres de los campos que son llave primaria de los modelos
+	 * Constante para indexar la llave primaria de los modelos
 	 *
-	 * @var array
-	 * @staticvar
 	 */
-	static private $_modelsPrimaryKeys = array();
+	const MODELS_PRIMARY_KEY = 1;
 
 	/**
-	 * Meta-Data de los nombres de los campos que no son llave primaria de los modelos
+	 * Constante para indexar los campos que no son llave primaria de los modelos
 	 *
-	 * @var array
-	 * @staticvar
 	 */
-	static private $_modelsNonPrimaryKeys = array();
+	const MODELS_NON_PRIMARY_KEY = 2;
 
 	/**
-	 * Meta-Data de los nombres de los campos que no pueden ser nulos de los modelos
+	 * Constante para indexar los campos que no nulos
 	 *
-	 * @var array
-	 * @staticvar
 	 */
-	static private $_modelsNotNull = array();
+	const MODELS_NOT_NULL = 3;
 
 	/**
-	 * Meta-Data de los nombres de los campos que no pueden ser nulos de los modelos
+	 * Constante para indexar los tipos de datos
 	 *
-	 * @var array
-	 * @staticvar
 	 */
-	static private $_modelsDataType = array();
+	const MODELS_DATA_TYPE = 4;
 
 	/**
-	 * Meta-Data de los nombres de los campos que no pueden ser nulos de los modelos
+	 * Constante para indexar campos de fecha automática al crear
 	 *
-	 * @var array
-	 * @staticvar
 	 */
-	static private $_modelsDatesAt = array();
+	const MODELS_DATE_AT = 5;
 
 	/**
-	 * Meta-Data de los nombres de los campos que no pueden ser nulos de los modelos
+	 * Constante para indexar campos de fecha automática al modificar
 	 *
-	 * @var array
-	 * @staticvar
 	 */
-	static private $_modelsDatesIn = array();
+	const MODELS_DATE_IN = 6;
 
 	/**
-	 * Escribe en la ruta de sesión asignada al modelo
+	 * Permite definir los atributos de un modelo en forma de memoria compartida
 	 *
-	 * @access private
-	 * @param string $schema
-	 * @param string $table
-	 * @param string $index
-	 * @param mixed $value
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @param	array $attributes
 	 * @static
 	 */
-	private static function _sessionWrite($table, $schema, $index, $value){
-		$activeApp = Router::getActiveApplication();
-		$instanceName = Core::getInstanceName();
-		if(!isset($_SESSION['KMD'])){
-			$_SESSION['KMD'] = array();
-		}
-		if(!isset($_SESSION['KMD'][$instanceName])){
-			$_SESSION['KMD'][$instanceName] = array();
-		}
-		if(!isset($_SESSION['KMD'][$instanceName][$activeApp])){
-			$_SESSION['KMD'][$instanceName][$activeApp] = array();
-		}
-		if(!isset($_SESSION['KMD'][$instanceName][$activeApp][$schema])){
-			$_SESSION['KMD'][$instanceName][$activeApp][$schema] = array();
-		}
-		if(!isset($_SESSION['KMD'][$instanceName][$activeApp][$schema][$table])){
-			$_SESSION['KMD'][$instanceName][$activeApp][$schema][$table] = array();
-		}
-		$_SESSION['KMD'][$instanceName][$activeApp][$schema][$table][$index] = $value;
+	static public function setAttributes($tableName, $schemaName, $attributes){
+		self::$_modelsAttributes[$schemaName][$tableName][self::MODELS_ATTRIBUTES] = $attributes;
 	}
 
 	/**
-	 * Indica si se ha definido un valor de meta-datos de la tabla
+	 * Obtiene los atributos de un modelo en forma de memoria compartida
 	 *
-	 * @access private
-	 * @param string $table
-	 * @param string $schema
-	 * @param string $index
-	 * @return mixed
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @return	array
 	 * @static
 	 */
-	private static function _sessionIsSet($table, $schema, $index){
-		$activeApp = Router::getActiveApplication();
-		$instanceName = Core::getInstanceName();
-		return isset($_SESSION['KMD'][$instanceName][$activeApp][$schema][$table][$index]);
+	static public function getAttributes($tableName, $schemaName){
+		if(isset(self::$_metaData[$schemaName][$tableName][self::MODELS_ATTRIBUTES])){
+			return self::$_metaData[$schemaName][$tableName][self::MODELS_ATTRIBUTES];
+		} else {
+			return array();
+		}
 	}
 
 	/**
-	 * Lee un valor de meta-datos de la tabla
+	 * Permite definir los atributos que son llave primaria de un modelo en forma de memoria compartida
 	 *
-	 * @access private
-	 * @param string $table
-	 * @param string $index
-	 * @return mixed
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @param	array $primaryKey
+	 * @return	array
 	 * @static
 	 */
-	private static function _sessionRead($table, $schema, $index){
-		$activeApp = Router::getActiveApplication();
-		$instanceName = Core::getInstanceName();
-		return $_SESSION['KMD'][$instanceName][$activeApp][$schema][$table][$index];
+	static public function setPrimaryKeys($tableName, $schemaName, $primaryKey){
+		self::$_modelsPrimaryKeys[$schemaName][$tableName][self::MODELS_PRIMARY_KEY] = $primaryKey;
+	}
+
+	/**
+	 * Obtiene los atributos de un modelo que son llave primaria en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @return	array
+	 */
+	static public function getPrimaryKeys($tableName, $schemaName){
+		if(isset(self::$_metaData[$schemaName][$tableName][self::MODELS_PRIMARY_KEY])){
+			return self::$_metaData[$schemaName][$tableName][self::MODELS_PRIMARY_KEY];
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 * Permite definir los atributos que no son llave primaria de un modelo en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @param	array $nonPrimaryKey
+	 */
+	static public function setNonPrimaryKeys($tableName, $schemaName, $nonPrimaryKey){
+		self::$_modelsNonPrimaryKeys[$schemaName][$tableName][self::MODELS_NON_PRIMARY_KEY] = $nonPrimaryKey;
+	}
+
+	/**
+	 * Obtiene los atributos de un modelo que no son llave primaria en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @return	array
+	 */
+	static public function getNonPrimaryKeys($tableName, $schemaName){
+		if(isset(self::$_metaData[$schemaName][$tableName][self::MODELS_NON_PRIMARY_KEY])){
+			return self::$_metaData[$schemaName][$tableName][self::MODELS_NON_PRIMARY_KEY];
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 * Permite definir los atributos que no permiten nulos de un modelo en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @param	array $notNull
+	 */
+	static public function setNotNull($tableName, $schemaName, $notNull){
+		self::$_modelsNonPrimaryKeys[$schemaName][$tableName][self::MODELS_NOT_NULL] = $notNull;
+	}
+
+	/**
+	 * Obtiene los atributos de un modelo que no permiten nulos en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @return	array
+	 */
+	static public function getNotNull($tableName, $schemaName){
+		if(isset(self::$_metaData[$schemaName][$tableName][self::MODELS_NOT_NULL])){
+			return self::$_metaData[$schemaName][$tableName][self::MODELS_NOT_NULL];
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 * Permite definir los tipos de datos de atributos de un modelo en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @param	array $dataType
+	 * @static
+	 */
+	static public function setDataType($tableName, $schemaName, $dataType){
+		self::$_modelsNonPrimaryKeys[$schemaName][$tableName][self::MODELS_DATA_TYPE] = $dataType;
+	}
+
+	/**
+	 * Obtiene los tipos de datos de atributos en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @return	array
+	 */
+	static public function getDataTypes($tableName, $schemaName){
+		if(isset(self::$_metaData[$schemaName][$tableName][self::MODELS_DATA_TYPE])){
+			return self::$_metaData[$schemaName][$tableName][self::MODELS_DATA_TYPE];
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 * Permite definir los tipos de datos de atributos de un modelo en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @param	array $datesAt
+	 * @static
+	 */
+	static public function setDatesAt($tableName, $schemaName, $datesAt){
+		self::$_modelsNonPrimaryKeys[$schemaName][$tableName][self::MODELS_DATE_AT] = $datesAt;
+	}
+
+	/**
+	 * Obtiene los tipos de datos de atributos en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @return	array
+	 * @static
+	 */
+	static public function getDatesAt($tableName, $schemaName){
+		if(isset(self::$_metaData[$schemaName][$tableName][self::MODELS_DATE_AT])){
+			return self::$_metaData[$schemaName][$tableName][self::MODELS_DATE_AT];
+		} else {
+			return array();
+		}
+	}
+
+	/**
+	 * Permite definir los campos con fecha de atributo _in
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @param	array $datesIn
+	 * @static
+	 */
+	static public function setDatesIn($tableName, $schemaName, $datesIn){
+		self::$_modelsNonPrimaryKeys[$schemaName][$tableName][self::MODELS_DATE_IN] = $datesIn;
+	}
+
+	/**
+	 * Obtiene los campos con fecha de atributo _in
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @return	array
+	 * @static
+	 */
+	static public function getDatesIn($tableName, $schemaName){
+		if(isset(self::$_metaData[$schemaName][$tableName][self::MODELS_DATE_IN])){
+			return self::$_metaData[$schemaName][$tableName][self::MODELS_DATE_IN];
+		} else {
+			return array();
+		}
 	}
 
 	/**
@@ -183,273 +319,79 @@ abstract class ActiveRecordMetaData {
 	 * @param array $metaData
 	 */
 	static public function existsMetaData($table, $schema){
-		if(isset(self::$_models[$schema][$table])){
+		if(isset(self::$_metaData[$schema][$table])){
 			return true;
 		} else {
-			if(self::_sessionIsSet($table, $schema, 'dp')){
-				self::$_modelsAttributes[$schema][$table] = self::_sessionRead($table, $schema, 'at');
-				self::$_modelsPrimaryKeys[$schema][$table] = self::_sessionRead($table, $schema, 'pk');
-				self::$_modelsNonPrimaryKeys[$schema][$table] = self::_sessionRead($table, $schema, 'npk');
-				self::$_modelsNotNull[$schema][$table] = self::_sessionRead($table, $schema, 'nn');
-				self::$_modelsDataType[$schema][$table] = self::_sessionRead($table, $schema, 'dt');
-				self::$_modelsDatesAt[$schema][$table] = self::_sessionRead($table, $schema, 'da');
-				self::$_modelsDatesIn[$schema][$table] = self::_sessionRead($table, $schema, 'di');
-				self::_sessionWrite($table, $schema, 'dp', Core::getProximityTime());
-				if(!isset($_models[$schema])){
-					self::$_models[$schema] = array();
+			if($schema){
+				$source = $schema.'.'.$table;
+			} else {
+				$source = $table;
+			}
+			self::_initializeSharedMemory();
+			if(self::$_hasSharedMemory==true){
+				$sharedKey = self::_getSharedKey($source);
+				$metadata = @shm_get_var(self::$_sharedId, $sharedKey);
+				if($metadata!==false){
+					self::$_metaData[$schema][$table] = $metadata;
+					return true;
+				} else {
+					return false;
 				}
-				self::$_models[$schema][$table] = true;
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Crea los meta-datos del modelo indicado
-	 *
-	 * @param string $table
-	 * @param string $schema
-	 * @static
-	 */
-	static public function createMetaData($table, $schema){
-		self::_sessionWrite($table, $schema, 'dp', Core::getProximityTime());
-		if(!isset($_models[$schema])){
-			self::$_models[$schema] = array();
-		}
-		self::$_models[$schema][$table] = true;
-	}
-
-	/**
-	 * Permite definir los atributos de un modelo en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @param array $attributes
-	 * @static
-	 */
-	static public function setAttributes($tableName, $schemaName, $attributes){
-		self::_sessionWrite($tableName, $schemaName, 'at', $attributes);
-		if(!isset(self::$_modelsAttributes[$schemaName])){
-			self::$_modelsAttributes[$schemaName] = array();
-		}
-		self::$_modelsAttributes[$schemaName][$tableName] = $attributes;
-	}
-
-	/**
-	 * Obtiene los atributos de un modelo en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @return array
-	 * @static
-	 */
-	static public function getAttributes($tableName, $schemaName){
-		if(!isset(self::$_modelsAttributes[$schemaName][$tableName])){
-			if(self::_sessionIsSet($tableName, $schemaName, 'at')){
-				self::$_modelsAttributes[$schemaName][$tableName] = self::_sessionRead($tableName, $schemaName, 'at');
-				return self::$_modelsAttributes[$schemaName][$tableName];
 			} else {
-				return array();
+				$modelsDir = Core::getActiveModelsDir();
+				if(file_exists($modelsDir.'/metadata/'.$source.'.php')){
+					$metadata = file_get_contents($modelsDir.'/metadata/'.$source.'.php');
+					self::$_metaData[$schema][$table] = unserialize($metadata);
+					return true;
+				} else {
+					return false;
+				}
 			}
-		} else {
-			return self::$_modelsAttributes[$schemaName][$tableName];
 		}
 	}
 
 	/**
-	 * Permite definir los atributos que son llave primaria de un modelo en forma de memoria compartida
+	 * Inicializa el puntero de memoria compartida
 	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @param array $primaryKey
-	 * @return array
-	 * @static
 	 */
-	static public function setPrimaryKeys($tableName, $schemaName, $primaryKey){
-		self::_sessionWrite($tableName, $schemaName, 'pk', $primaryKey);
-		if(!isset(self::$_modelsPrimaryKeys[$schemaName])){
-			self::$_modelsPrimaryKeys[$schemaName] = array();
-		}
-		self::$_modelsPrimaryKeys[$schemaName][$tableName] = $primaryKey;
-	}
-
-	/**
-	 * Obtiene los atributos de un modelo que son llave primaria en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @return array
-	 */
-	static public function getPrimaryKeys($tableName, $schemaName){
-		if(!isset(self::$_modelsPrimaryKeys[$schemaName])){
-			return array();
-		}
-		return self::$_modelsPrimaryKeys[$schemaName][$tableName];
-	}
-
-	/**
-	 * Permite definir los atributos que no son llave primaria de un modelo en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @param array $nonPrimaryKey
-	 */
-	static public function setNonPrimaryKeys($tableName, $schemaName, $nonPrimaryKey){
-		self::_sessionWrite($tableName, $schemaName, 'npk', $nonPrimaryKey);
-		if(!isset(self::$_modelsNonPrimaryKeys[$schemaName])){
-			self::$_modelsNonPrimaryKeys[$schemaName] = array();
-		}
-		self::$_modelsNonPrimaryKeys[$schemaName][$tableName] = $nonPrimaryKey;
-	}
-
-	/**
-	 * Obtiene los atributos de un modelo que no son llave primaria en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @return array
-	 */
-	static public function getNonPrimaryKeys($tableName, $schemaName){
-		if(!isset(self::$_modelsNonPrimaryKeys[$schemaName][$tableName])){
-			if(self::_sessionIsSet($tableName, $schemaName, 'npk')){
-				self::$_modelsNonPrimaryKeys[$schemaName][$tableName] = self::_sessionRead($tableName, $schemaName, 'npk');
-				return self::$_modelsNonPrimaryKeys[$schemaName][$tableName];
+	static public function _initializeSharedMemory(){
+		if(self::$_hasSharedMemory===null){
+			if(function_exists('shm_attach')){
+				self::$_sharedId = shm_attach(0xff7, 0xffff, 0644);
+				self::$_hasSharedMemory = true;
 			} else {
-				return array();
+				self::$_hasSharedMemory = false;
 			}
-		} else {
-			return self::$_modelsNonPrimaryKeys[$schemaName][$tableName];
 		}
 	}
 
 	/**
-	 * Permite definir los atributos que no permiten nulos de un modelo en forma de memoria compartida
+	 * Devuelve un identicador unico de acuerdo al source
 	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @param array $NotNull
+	 * @param	string $source
+	 * @return	int
 	 */
-	static public function setNotNull($tableName, $schemaName, $NotNull){
-		self::_sessionWrite($tableName, $schemaName, 'nn', $NotNull);
-		if(!isset(self::$_modelsNotNull[$schemaName])){
-			self::$_modelsNotNull[$schemaName] = array();
-		}
-		self::$_modelsNotNull[$tableName] = $NotNull;
-	}
-
-	/**
-	 * Obtiene los atributos de un modelo que no permiten nulos en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @return array
-	 */
-	static public function getNotNull($tableName, $schemaName){
-		if(!isset(self::$_modelsNotNull[$schemaName][$tableName])){
-			if(self::_sessionIsSet($tableName, $schemaName, 'nn')){
-				self::$_modelsNotNull[$schemaName][$tableName] = self::_sessionRead($tableName, $schemaName, 'nn');
-				return self::$_modelsNotNull[$schemaName][$tableName];
-			} else {
-				return array();
+	static private function _getSharedKey($source){
+		if(!isset(self::$_sharedKeys[$source])){
+			$pad = 1;
+			$sharedKey = 0;
+			$sourceKey = Router::getApplication().$source;
+			$length = strlen($sourceKey);
+			for($j=0;$j<$length;++$j){
+				$sharedKey+=($pad*ord($sourceKey[$j]));
+				$pad+=10;
 			}
-		} else {
-			return self::$_modelsNotNull[$schemaName][$tableName];
+			self::$_sharedKeys[$source] = $sharedKey;
 		}
-	}
-
-	/**
-	 * Permite definir los tipos de datos de atributos de un modelo en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @param array $DataType
-	 * @static
-	 */
-	static public function setDataType($tableName, $schemaName, $DataType){
-		self::_sessionWrite($tableName, $schemaName, 'dt', $DataType);
-		self::$_modelsDataType[$schemaName][$tableName] = $DataType;
-	}
-
-	/**
-	 * Obtiene los tipos de datos de atributos en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @return array
-	 */
-	static public function getDataTypes($tableName, $schemaName){
-		if(isset(self::$_modelsDataType[$schemaName][$tableName])){
-			return self::$_modelsDataType[$schemaName][$tableName];
-		} else {
-			return array();
-		}
-	}
-
-	/**
-	 * Permite definir los tipos de datos de atributos de un modelo en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @param array $DatesAt
-	 * @static
-	 */
-	static public function setDatesAt($tableName, $schemaName, $DatesAt){
-		self::_sessionWrite($tableName, $schemaName, 'da', $DatesAt);
-		self::$_modelsDatesAt[$schemaName][$tableName] = $DatesAt;
-	}
-
-	/**
-	 * Obtiene los tipos de datos de atributos en forma de memoria compartida
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @return array
-	 * @static
-	 */
-	static public function getDatesAt($tableName, $schemaName){
-		if(isset(self::$_modelsDatesAt[$schemaName][$tableName])){
-			return self::$_modelsDatesAt[$schemaName][$tableName];
-		} else {
-			return array();
-		}
-	}
-
-	/**
-	 * Permite definir los campos con fecha de atributo _at
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @param array $DatesIn
-	 * @static
-	 */
-	static public function setDatesIn($tableName, $schemaName, $DatesIn){
-		self::_sessionWrite($tableName, $schemaName, 'di', $DatesIn);
-		self::$_modelsDatesIn[$schemaName][$tableName] = $DatesIn;
-	}
-
-	/**
-	 * Obtiene los campos con fecha de atributo _in
-	 *
-	 * @param string $tableName
-	 * @param string $schemaName
-	 * @return array
-	 * @static
-	 */
-	static public function getDatesIn($tableName, $schemaName){
-		if(isset(self::$_modelsDatesIn[$schemaName][$tableName])){
-			return self::$_modelsDatesIn[$schemaName][$tableName];
-		} else {
-			return array();
-		}
+		return self::$_sharedKeys[$source];
 	}
 
 	/**
 	 * Trae los metadatos de la base de tatos
 	 *
-	 * @param string $table
-	 * @param string $schema
-	 * @param array $metaData
+	 * @param	string $table
+	 * @param	string $schema
+	 * @param	array $metaData
 	 * @static
 	 */
 	static public function dumpMetaData($table, $schema, $metaData){
@@ -457,9 +399,9 @@ abstract class ActiveRecordMetaData {
 		$primaryKey = array();
 		$nonPrimary = array();
 		$notNull = array();
-		$_dataType = array();
-		$_at = array();
-		$_in = array();
+		$dataType = array();
+		$at = array();
+		$in = array();
 		foreach($metaData as $field){
 			$fields[] = $field['Field'];
 			if($field['Key']=='PRI'){
@@ -471,30 +413,58 @@ abstract class ActiveRecordMetaData {
 				$notNull[] = $field['Field'];
 			}
 			if($field['Type']){
-				$_dataType[$field['Field']] = strtolower($field['Type']);
+				$dataType[$field['Field']] = strtolower($field['Type']);
 			}
 			if(preg_match('/_at$/', $field['Field'])){
-				$_at[$field['Field']] = 1;
+				$at[$field['Field']] = 1;
 			} else {
 				if(preg_match('/_in$/', $field['Field'])){
-					$_in[$field['Field']] = 1;
+					$in[$field['Field']] = 1;
 				}
 			}
+			unset($field);
+		}
+		if($schema){
+			$source = $schema.'.'.$table;
+		} else {
+			$source = $table;
 		}
 		if(count($fields)==0){
-			if($schema){
-				$table = $schema.'\'.\''.$table;
-			}
-			throw new ActiveRecordMetaDataException("Meta-datos invalidos para '$table'");
+			throw new ActiveRecordMetaDataException("Meta-datos inválidos para '$table'");
 		}
-		ActiveRecordMetaData::createMetaData($table, $schema);
-		ActiveRecordMetaData::setAttributes($table, $schema, $fields);
-		ActiveRecordMetaData::setPrimaryKeys($table, $schema,  $primaryKey);
-		ActiveRecordMetaData::setNonPrimaryKeys($table, $schema, $nonPrimary);
-		ActiveRecordMetaData::setNotNull($table, $schema, $notNull);
-		ActiveRecordMetaData::setDataType($table, $schema, $_dataType);
-		ActiveRecordMetaData::setDatesAt($table, $schema, $_at);
-		ActiveRecordMetaData::setDatesIn($table, $schema, $_in);
+		self::$_metaData[$schema][$table][self::MODELS_ATTRIBUTES] = $fields;
+		self::$_metaData[$schema][$table][self::MODELS_PRIMARY_KEY] = $primaryKey;
+		self::$_metaData[$schema][$table][self::MODELS_NON_PRIMARY_KEY] = $nonPrimary;
+		self::$_metaData[$schema][$table][self::MODELS_NOT_NULL] = $notNull;
+		self::$_metaData[$schema][$table][self::MODELS_DATA_TYPE] = $dataType;
+		self::$_metaData[$schema][$table][self::MODELS_DATE_AT] = $at;
+		self::$_metaData[$schema][$table][self::MODELS_DATE_IN] = $in;
+
+		//Grabar meta-data en un archivo persistente
+
+		$modelsDir = Core::getActiveModelsDir();
+		self::_initializeSharedMemory();
+		if(self::$_hasSharedMemory==true){
+			$sharedKey = self::_getSharedKey($source);
+			shm_put_var(self::$_sharedId, $sharedKey, self::$_metaData[$schema][$table]);
+			unset($sharedKey);
+		} else {
+			if(!file_exists($modelsDir.'/metadata')){
+				mkdir($modelsDir.'/metadata');
+			}
+			file_put_contents($modelsDir.'/metadata/'.$source.'.php', serialize(self::$_metaData[$schema][$table]));
+		}
+		unset($modelsDir);
+		unset($schema);
+		unset($table);
+		unset($source);
+		unset($fields);
+		unset($primaryKey);
+		unset($nonPrimary);
+		unset($notNull);
+		unset($dataType);
+		unset($at);
+		unset($in);
 	}
 
 }

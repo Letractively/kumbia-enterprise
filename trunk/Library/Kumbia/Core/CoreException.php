@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Core
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -23,11 +23,12 @@
 /**
  * CoreException
  *
- * Clase principal de Implementación de Excepciones
+ * Clase principal de implementación de excepciones, genera salidas en HTML (extendido, compacto) y en XML
+ * Permite combinar backtraces de otras excepciones para que no se pierdan al ser relanzados
  *
  * @category	Kumbia
  * @package		Core
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
@@ -53,11 +54,11 @@ class CoreException extends Exception {
 	protected $_userCatchable = true;
 
 	/**
-	 * Backtrace adicional
+	 * Backtrace extendido
 	 *
 	 * @var array
 	 */
-	protected $extendedBacktrace = array();
+	protected $_extendedBacktrace = array();
 
 	/**
 	 * Indica si la excepcion se generó remotamente
@@ -91,7 +92,7 @@ class CoreException extends Exception {
 	 */
 	public function __construct($message, $errorCode = 0, $showTrace=true, $backtrace=array()){
 		$this->show_trace = $showTrace;
-		$this->extendedBacktrace = $backtrace;
+		$this->_extendedBacktrace = $backtrace;
 		if(is_numeric($errorCode)){
 			parent::__construct($message, $errorCode);
 		} else {
@@ -116,6 +117,24 @@ class CoreException extends Exception {
 	 */
 	public function isUserCatchable(){
 		return $this->_userCatchable;
+	}
+
+	/**
+	 * Adicionar un backtrace extendido a la excepción
+	 *
+	 * @param array $extendedBacktrace
+	 */
+	public function setExtendedBacktrace($extendedBacktrace){
+		$this->_extendedBacktrace = $extendedBacktrace;
+	}
+
+	/**
+	 * Obtiene el backtrace extendido
+	 *
+	 * @return array
+	 */
+	public function getExtendedBacktrace(){
+		return $this->_extendedBacktrace;
 	}
 
 	/**
@@ -248,15 +267,20 @@ class CoreException extends Exception {
 						echo "<div class='exceptionRemoteTitle'>Remote Backtrace <span class='exceptionActor'>(Actor: ".$this->_remoteActor.")</span></div>";
 						foreach($this->_remoteBacktrace as $remoteTrace){
 							if(isset($remoteTrace['file'])){
-								echo "<div class='exceptionRemoteTrace'>".$remoteTrace['file']." <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
+								//print_r($remoteTrace);
+								if($remoteTrace['function']){
+									echo "<div class='exceptionRemoteTrace'>".$remoteTrace['file']." &gt; ".$remoteTrace['function']." <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
+								} else {
+									echo "<div class='exceptionRemoteTrace'>".$remoteTrace['file']." <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
+								}
 							}
 						}
 						echo "</pre>";
 					}
 				}
 
-				if(count($this->extendedBacktrace)>0){
-					$traceback = array_merge($this->extendedBacktrace, $traceback);
+				if(count($this->_extendedBacktrace)>0){
+					$traceback = array_merge($this->_extendedBacktrace, $traceback);
 				}
 				if(strpos($this->getFile(), 'apps')){
 					$firstLine = array(array(
@@ -279,7 +303,7 @@ class CoreException extends Exception {
 							$className = 'exceptionLineNotActiveOdd';
 							$numberLines = count($lines);
 							for($i =(($eline-4)<0 ? 0: $eline-4);$i<=($eline+2>$numberLines-1?$numberLines-1:$eline+2);++$i){
-								$cline = str_replace("\t", "&nbsp;", htmlentities($lines[$i]));
+								$cline = str_replace("\t", "&nbsp;", htmlentities($lines[$i], ENT_COMPAT, 'UTF-8'));
 								if($i==$eline-1){
 									echo "<tr><td width='30' class='exceptionLineTd'>".($i+1).".</td>
 									<td><div  class='exceptionLineActive'>&nbsp;<strong>";
@@ -378,83 +402,83 @@ class CoreException extends Exception {
 				}
 
 				echo "<div class='exceptionAditionalInfo' align='left'>";
-				echo "<i><strong>Información Adicional:</strong></i><br>";
+				echo "<i><strong>Información Adicional</strong></i><br>";
 				echo "<div style='padding: 5px'>";
 				echo "<table cellspacing='0' width='100%' cellpadding='3'>
 				<tr class='rowInfoEven'>
-					<td align='right' width='200'><strong>Versión Framework:</strong></td>
+					<td align='right' width='200'><strong>Versión Framework</strong></td>
 					<td> ".Core::FRAMEWORK_VERSION."</td>
 				</tr>
 				<tr class='rowInfoOdd'>
-					<td align='right'><strong>Nombre de la Instancia:</strong></td>
+					<td align='right'><strong>Nombre de la Instancia</strong></td>
 					<td>".$instanceName."</td>
 				</tr>
 				<tr class='rowInfoEven'>
-					<td align='right'><strong>Fecha del Sistema:</strong></td
+					<td align='right'><strong>Fecha del Sistema</strong></td
 					><td>".date("r")."</td>
 				</tr>
 				<tr class='rowInfoOdd'>
-					<td align='right'><strong>Aplicación actual:</strong></td>
+					<td align='right'><strong>Aplicación actual</strong></td>
 					<td>".Router::getApplication()."</td>
 				</tr>
 				<tr class='rowInfoEven'>
-					<td align='right'><strong>Entorno actual:</strong></td>
+					<td align='right'><strong>Entorno actual</strong></td>
 					<td>".$config->application->mode."</td>
 				</tr>";
 				$url = Router::getApplication()."/".Router::getController()."/".Router::getAction();
 				echo "
 				<tr class='rowInfoOdd'>
-					<td align='right'><strong>Ubicación actual:</strong></td>
+					<td align='right'><strong>Ubicación actual</strong></td>
 					<td>".$url."</td>
 				</tr>
 				<tr class='rowInfoEven'>
-					<td align='right'><strong>Modelos Cargados:</strong></td>
+					<td align='right'><strong>Modelos Cargados</strong></td>
 					<td>".join(", ", array_keys(EntityManager::getEntities()))."</td>
 				</tr>";
 				if(isset($_SESSION['KMOD'][$instanceName][$activeApp])){
 					echo "<tr class='rowInfoOdd'>
-						<td align='right'><strong>Modulos Cargados:</strong></td>
+						<td align='right'><strong>Modulos Cargados</strong></td>
 						<td>".join(", ", $_SESSION['KMOD'][$instanceName][$activeApp])."</td>
 					</tr>";
 				}
 				if(isset($_SESSION['KPC'][$instanceName][$activeApp])){
 					echo "<tr class='rowInfoEven'>
-						<td align='right'><strong>Plugins Cargados:</strong></td>
+						<td align='right'><strong>Plugins Cargados</strong></td>
 						<td>".join(", ", $_SESSION['KPC'][$instanceName][$activeApp])."</td>
 					</tr>";
 				}
 				if(isset($_SESSION['session_data'])){
 					if(is_array($_SESSION['session_data'])){
 						echo "<tr class='rowInfoOdd'>
-							<td align='right'><strong>Datos de Session:</strong></td
+							<td align='right'><strong>Datos en Session</strong></td
 							><td>".join(", ", $_SESSION['session_data'])."</td>
 						</tr>";
 					} else {
 						echo "<tr class='rowInfoOdd'>
-							<td align='right'><strong>Datos de Session:</strong></td>
+							<td align='right'><strong>Datos en Session</strong></td>
 							<td>".print_r(unserialize($_SESSION['session_data']), 1)."</td>
 						</tr>";
 					}
 				}
 				echo "<tr class='rowInfoEven'>
-					<td align='right'><strong>Memoria Total Utilizada:</strong></td>
+					<td align='right'><strong>Memoria Total Utilizada</strong></td>
 					<td>".(Helpers::toHuman($memoryPeekUsage))."</td>
 				</tr>
 				<tr class='rowInfoOdd'>
-					<td align='right'><strong>Memoria Actual:</strong></td>
+					<td align='right'><strong>Memoria Actual</strong></td>
 					<td>".(Helpers::toHuman($memoryUsage))."</td>
 				</tr>
 				<tr class='rowInfoEven'>
-					<td align='right'><strong>Tiempo empleado para<br/>atender la petición:</strong></td>
+					<td align='right'><strong>Tiempo empleado para<br/>atender la petición</strong></td>
 					<td>".(round($requestTime-$_SERVER['REQUEST_TIME'], 3))." segs </td>
 				</tr></table>";
 				echo "</div></div>";
 			} else {
 				$traceback = $this->getTrace();
-				if(count($this->extendedBacktrace)>0){
-					$traceback = array_merge($this->extendedBacktrace, $traceback);
+				if(count($this->_extendedBacktrace)>0){
+					$traceback = array_merge($this->_extendedBacktrace, $traceback);
 				}
-				echo "<pre class='exceptionPreDesc'><span id='backtrace-title'><b>Backtrace:</b></span>\n";
+				echo "<pre class='exceptionPreDesc'><span id='backtrace-title'><b>Backtrace</b></span>\n";
 				$i = 0;
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){
@@ -471,7 +495,7 @@ class CoreException extends Exception {
 					if(!isset($trace['function'])){
 						$trace['function'] = "";
 					}
-					echo "#$i $file -&gt; ".$trace['class'].$trace['type'].$trace['function']." (".$trace['line'].")\n";
+					echo '#'.$i.' '.$file.' -&gt; '.$trace['class'].$trace['type'].$trace['function'].' ('.$trace['line'].')\n';
 					++$i;
 				}
 				echo '</pre>';
@@ -707,6 +731,20 @@ class CoreException extends Exception {
 	 */
 	public function getConsoleMessage(){
 		return html_entity_decode($this->getMessage(), ENT_COMPAT, 'UTF-8');
+	}
+
+	/**
+	 * Combina la traza extendida con la traza interna de la excepción
+	 *
+	 * @return array
+	 */
+	public function getCompleteTrace(){
+		if(count($this->_extendedBacktrace)>0){
+			return $this->_extendedBacktrace;
+		} else {
+			return $this->getTrace();
+		}
+		//return array_merge($this->_extendedBacktrace, $this->getTrace());
 	}
 
 }

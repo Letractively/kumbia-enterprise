@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Extensions
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2008-2008 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
  * @license		New BSD License
@@ -28,7 +28,7 @@
  *
  * @category	Kumbia
  * @package		Extensions
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2008-2008 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
  * @license		New BSD License
@@ -56,6 +56,14 @@ abstract class Extensions {
 	 * @var string
 	 */
 	static private $_zendDirectory = '';
+
+	/**
+	 * Limpia la extensiones cargadas
+	 *
+	 */
+	static public function cleanExtensions(){
+		self::$_extensions = array();
+	}
 
 	/**
 	 * Carga los modulos que esten en el archivo boot.ini de cada
@@ -112,18 +120,26 @@ abstract class Extensions {
 				if($files[0]!=''){
 					foreach($files as $file){
 						$_SESSION['KFIL'][$instanceName][$activeApp][] = $file;
+						unset($file);
 					}
 				}
+				unset($files);
 			}
 		}
 		foreach($_SESSION['KMOD'][$instanceName][$activeApp] as $extension){
 			require $extension;
+			unset($extension);
 		}
 		if(isset($_SESSION['KFIL'][$instanceName][$activeApp])){
 			foreach($_SESSION['KFIL'][$instanceName][$activeApp] as $file){
 				require $file;
+				unset($file);
 			}
 		}
+
+		unset($activeApp);
+		unset($instanceName);
+
 	}
 
 	/**

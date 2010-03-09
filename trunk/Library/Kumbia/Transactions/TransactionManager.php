@@ -83,6 +83,7 @@ abstract class TransactionManager
 			self::$_dependencyPointer+=2048;
 			self::$_transactions[] = $transaction;
 		} else {
+			print_r(self::$_transactions);
 			$transaction = self::$_transactions[count(self::$_transactions)-1];
 			$transaction->setIsNewTransaction(false);
 		}
@@ -96,7 +97,7 @@ abstract class TransactionManager
 	 * @static
 	 */
 	public static function initializeManager(){
-		register_shutdown_function(array("TransactionManager", "rollbackPendent"));
+		register_shutdown_function(array('TransactionManager', 'rollbackPendent'));
 	}
 
 	/**
@@ -110,7 +111,7 @@ abstract class TransactionManager
 			self::rollback();
 		}
 		catch(Exception $e){
-			print get_class($e).": ".$e->getMessage();
+			echo get_class($e).': '.$e->getMessage();
 		}
 	}
 
@@ -132,14 +133,19 @@ abstract class TransactionManager
 	/**
 	 * Realiza commit a todas las transacciones del TransactionManager
 	 *
-	 * @access public
+	 * @access	public
+	 * @param 	boolean $collect
 	 * @static
 	 */
-	public static function rollback(){
+	public static function rollback($collect=false){
 		foreach(self::$_transactions as $transaction){
 			$connection = $transaction->getConnection();
 			if($connection->isUnderTransaction()==true){
 				$connection->rollback();
+				$connection->close();
+			}
+			if($collect==true){
+				self::_collectTransaction($transaction);
 			}
 		}
 	}
@@ -181,6 +187,27 @@ abstract class TransactionManager
 					unset(self::$_transactions[$number]);
 					unset($transaction);
 				}
+				$number++;
+			}
+			$transactions = array();
+			foreach(self::$_transactions as $managedTransaction){
+				$transactions[] = $managedTransaction;
+			}
+			self::$_transactions = $transactions;
+		}
+	}
+
+	/**
+	 * Destruye todas las transacciones activas
+	 *
+	 * @static
+	 */
+	public static function collectTransactions(){
+		if(count(self::$_transactions)>0){
+			$number = 0;
+			foreach(self::$_transactions as $managedTransaction){
+				unset(self::$_transactions[$number]);
+				unset($transaction);
 				$number++;
 			}
 		}

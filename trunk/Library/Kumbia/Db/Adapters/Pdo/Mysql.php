@@ -344,4 +344,14 @@ class DbPdoMySQL extends DbPDO {
 		return 'pdo_mysql';
 	}
 
+	/**
+	 * Devuelve el SQL Dialect que debe ser usado
+	 *
+	 * @return	string
+	 * @static
+	 */
+	public static function getSQLDialect(){
+		return 'MysqlSQLDialect';
+	}
+
 }
