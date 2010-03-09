@@ -1,19 +1,42 @@
+
+/**
+ * Kumbia Enterprise Framework
+ *
+ * LICENSE
+ *
+ * This source file is subject to the New BSD License that is bundled
+ * with this package in the file docs/LICENSE.txt.
+ *
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@loudertechnology.com so we can send you a copy immediately.
+ *
+ * @category	Kumbia
+ * @package		Core
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @license		New BSD License
+ */
+
 .exceptionDescription {
 	font-family: Lucida Grande, sans-serif;
-	background: #B72F09;
+	background: #C11321;
 	padding: 10px;
 	font-size: 14px;
-	color: white;
+	color: #ffffff;
 	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	text-align: left;
 }
 
+.exceptionDescription a {
+	color: #fafafa;
+}
+
 .exceptionPre {
 	font-family: Lucida Console;
 	margin:10px;
-	color: white;
+	color: #171717;
 	text-align: left;
 	padding: 5px;
 }
@@ -21,7 +44,7 @@
 .exceptionPreDesc {
 	font-family: Lucida Console;
 	margin: 10px;
-	border:1px solid #969696;
+	border: 1px solid #969696;
 	background: #fafafa;
 	font-size: 12px;
 	text-align: left;
@@ -30,7 +53,7 @@
 
 .exceptionLocation {
 	font-size: 12px;
-	color: #F4FCCA;
+	color: #eaeaea;
 }
 
 .exceptionContainer {
@@ -41,11 +64,12 @@
 .exceptionBacktraceContainer {
 	font-size:12px;
 	margin: 5px;
-	background: #404040;
+	background: #fbfbfb;
 	font-family: Monaco, Lucida Console;
 	margin:10px;
-	color: white;
+	color: #ffffff;
 	padding: 2px;
+	border: 1px solid #c0c0c0;
 	-moz-border-radius: 7px;
 	-webkit-border-radius: 7px;
 	border-radius: 7px;
@@ -54,7 +78,7 @@
 .exceptionBacktracePre {
 	font-family: Monaco,Lucida Console;
 	margin:5px;
-	color: white;
+	color: #171717;
 	font-size: 12px;
 	text-align: left;
 }
@@ -79,14 +103,14 @@
 .exceptionRemoteContainer {
 	padding-left: 20px;
 	font-family: Monaco,'Consolas','Lucida Console','Courier New',monospace;
-	color: white;
+	color: #ffffff;
 	font-size: 12px;
-	text-align:left;
+	text-align: left;
 }
 
 .exceptionRemoteTitle {
-	color: white;
-	background: #3769A0;
+	color: #ffffff;
+	background: #1D5900;
 	padding: 5px;
 }
 
@@ -105,7 +129,7 @@
 .exceptionLineNote {
 	font-family: Lucida Grande, sans-serif;
 	font-size: 12px;
-	color: #F4FCCA;
+	color: #111111;
 	font-weight: bold;
 	padding-left: 10px;
 }
@@ -138,44 +162,52 @@
 }
 
 .exceptionLineTd {
-	background: #9B2700;
-	color: white;
+	background: #C11321;
+	color: #ffffff;
 	padding-left: 3px;
 	border-right: 1px solid #333333;
 }
 
 .exceptionLine {
-	color: #969696;
+	color: #808080;
 }
 
 .exceptionAditionalInfo {
 	font-family: verdana, sans-serif;
 	font-size:12px;
 	margin: 0px 15px 0px 15px;
-	padding: 5px;
-	border:1px solid #969696;
-	background: #232323;
-	color: #969696;
+	background: #f9f9f9;
+	color: #333333;
 	-moz-border-radius: 7px;
 	-webkit-border-radius: 7px;
 	border-radius: 7px;
+	margin-top: 20px;
+	padding: 5px;
+	padding-top: 10px;
+}
+
+.exceptionAditionalInfo td {
+	padding: 1px;
+	padding-right: 5px;
 }
 
 .rowInfoOdd {
-	background: #111111;
-}
-
-.rowInfoOdd td, .rowInfoEven td {
-	color: white;
-}
-
-.rowInfoOdd strong, .rowInfoEven strong {
-	color: #F4FCCA;
-	font-weight: normal;
+	background: transparent;
 }
 
 .rowInfoEven {
-	background: #151515;
+	background: transparent;
+}
+
+.rowInfoOdd td, .rowInfoEven td {
+	color: #000000;
+	font-weight: bold;
+	font-size: 10px;
+}
+
+.rowInfoOdd strong, .rowInfoEven strong {
+	color: #000000;
+	font-weight: normal;
 }
 
 .tString {
@@ -253,24 +285,29 @@ div.debugInformation pre {
 div.debugInformation td, div.debugInformation th {
 	font-size: 11px;
 	padding: 2px;
-	background: #111111;
-	color: #AAAAAA;
+	background: #fefefe;
+	color: #111111;
+}
+
+div.debugInformation table {
+	border-right: 1px dotted #1D5900;
 }
 
 div.debugInformation td {
-	border-bottom: 1px dotted #333333;
+	border-left: 1px dotted #1D5900;
+	border-bottom: 1px dotted #1D5900;
 }
 
 div.debugInformation th.debugThEven {
-	background: #3769A0;
-	color: white;
+	background: #1D5900;
+	color: #ffffff;
 	font-size: 11px;
 	padding: 3px;
 }
 
 div.debugInformation th.debugThOdd {
-	background: #2B5481;
-	color: white;
+	background: #1D5900;
+	color: #ffffff;
 	font-size: 11px;
 	padding: 3px;
 }
