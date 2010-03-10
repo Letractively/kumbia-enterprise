@@ -269,7 +269,7 @@ class Locale extends Object {
 		$data = $this->_getLocaleData();
 		$yesstrList = $data->queryLanguage($this->getLanguage(), '/ldml/posix/messages/yesstr');
 		foreach($yesstrList as $yesstr){
-			$allYesStr = explode(':', $yesstr->nodeValue);
+			$allYesStr = split(':', $yesstr->nodeValue);
 			if(isset($allYesStr[0])){
 				if($all==false){
 					return $allYesStr[0];
@@ -293,7 +293,7 @@ class Locale extends Object {
 		$data = $this->_getLocaleData();
 		$nostrList = $data->queryLanguage($this->getLanguage(), '/ldml/posix/messages/nostr');
 		foreach($nostrList as $nostr){
-			$allNoStr = explode(':', $nostr->nodeValue);
+			$allNoStr = split(':', $nostr->nodeValue);
 			if(isset($allNoStr[0])){
 				if($all==false){
 					return $allNoStr[0];
@@ -439,7 +439,7 @@ class Locale extends Object {
 	}
 
 	/**
-	 * Devuelve el formato numerico
+	 * Devuelve el formato numérico
 	 *
 	 * @return string
 	 */
@@ -513,6 +513,183 @@ class Locale extends Object {
 	}
 
 	/**
+	 * Obtiene las letras consideradas como vocales
+	 *
+	 * @return array
+	 */
+	public function getAllVowels(){
+		$data = $this->_getLocaleData();
+		$path = '/ldml/linguistics/vowels/vowel';
+		$vowels = $data->queryLanguage($this->getLanguage(), $path);
+		$arrayVowels = array();
+		foreach($vowels as $vowel){
+			$arrayVowels[] = $vowel->nodeValue;
+			unset($vowel);
+		}
+		return $arrayVowels;
+	}
+
+	/**
+	 * Obtiene las letras no acentuadas consideradas como vocales
+	 *
+	 * @return array
+	 */
+	public function getVowels(){
+		$data = $this->_getLocaleData();
+		$path = '/ldml/linguistics/vowels/vowel[@accented="no"]';
+		$vowels = $data->queryLanguage($this->getLanguage(), $path);
+		$arrayVowels = array();
+		foreach($vowels as $vowel){
+			$arrayVowels[] = $vowel->nodeValue;
+			unset($vowel);
+		}
+		return $arrayVowels;
+	}
+
+	/**
+	 * Obtiene una relación de las vocales no acentuadas y acentuadas
+	 *
+	 * @return array
+	 */
+	public function getAccentedVowels(){
+		$data = $this->_getLocaleData();
+		$path = '/ldml/linguistics/accentedVowels/accentedVowel';
+		$accentedVowels = $data->queryLanguage($this->getLanguage(), $path);
+		$arrayAcentedVowels = array();
+		foreach($accentedVowels as $accentedVowel){
+			if(!isset($arrayAcentedVowels[$accentedVowel->nodeValue])){
+				$arrayAcentedVowels[$accentedVowel->nodeValue] = array($accentedVowel->getAttribute('accent'));
+			} else {
+				$arrayAcentedVowels[$accentedVowel->nodeValue][] = $accentedVowel->getAttribute('accent');
+			}
+		}
+		return $arrayAcentedVowels;
+	}
+
+	/**
+	 * Obtiene preposiciones comunes lingüisticas de la localización
+	 *
+	 * @return array
+	 */
+	public function getLinguisticPrepositions(){
+		$data = $this->_getLocaleData();
+		$path = '/ldml/linguistics/prepositions/preposition';
+		$prepositions = $data->queryLanguage($this->getLanguage(), $path);
+		$arrayPrepositions = array();
+		foreach($prepositions as $preposition){
+			$arrayPrepositions[$preposition->getAttribute('type')] = $preposition->nodeValue;
+		}
+		return $arrayPrepositions;
+	}
+
+	/**
+	 * Obtiene las articulos indeterminados y determinados de la localización
+	 *
+	 * @return array
+	 */
+	public function getLinguisticArticles(){
+		$articles = array(
+			'indefinite' => array(
+				'male' => array(
+					'one' => '',
+					'other' => ''
+				),
+				'female' => array(
+					'one' => '',
+					'other' => ''
+				)
+			),
+			'definite' => array(
+				'male' => array(
+					'one' => '',
+					'other' => ''
+				),
+				'female' => array(
+					'one' => '',
+					'other' => ''
+				)
+			)
+		);
+		$data = $this->_getLocaleData();
+		$path = '/ldml/linguistics/articles/indefinite';
+		$indefiniteArticles = $data->queryLanguage($this->getLanguage(), $path);
+		foreach($indefiniteArticles as $indefiniteArticle){
+			$genre = $indefiniteArticle->getAttribute('genre');
+			foreach($indefiniteArticle->childNodes as $node){
+				if($node->nodeType==1){
+					$articles['indefinite'][$genre][$node->getAttribute('count')] = $node->nodeValue;
+				}
+			}
+		}
+		$path = '/ldml/linguistics/articles/definite';
+		$definiteArticles = $data->queryLanguage($this->getLanguage(), $path);
+		foreach($definiteArticles as $definiteArticle){
+			$genre = $definiteArticle->getAttribute('genre');
+			foreach($definiteArticle->childNodes as $node){
+				if($node->nodeType==1){
+					$articles['definite'][$genre][$node->getAttribute('count')] = $node->nodeValue;
+				}
+			}
+		}
+		return $articles;
+	}
+
+	/**
+	 * Obtiene las reglas para el idioma para identificar palabras de genero femenino
+	 *
+	 * @param 	string $genre
+	 * @return	array
+	 */
+	public function getWordRules($genre){
+		$arrayGenreRules = array();
+		$data = $this->_getLocaleData();
+		$path = '/ldml/linguistics/genres/genre[@type="'.$genre.'"]/wordend';
+		$genreRules = $data->queryLanguage($this->getLanguage(), $path);
+		foreach($genreRules as $genreRule){
+			$arrayGenreRules[] = $genreRule->nodeValue;
+		}
+		return $arrayGenreRules;
+	}
+
+	/**
+	 * Obtiene las traducciones de cantidades según la localización
+	 *
+	 * @return unknown
+	 */
+	public function getQuantities(){
+		$arrayQuantities = array();
+		$data = $this->_getLocaleData();
+		$path = '/ldml/linguistics/quantities/quantity';
+		$quantities = $data->queryLanguage($this->getLanguage(), $path);
+		foreach($quantities as $quantity){
+			$arrayQuantities[$quantity->getAttribute('type')] = $quantity->nodeValue;
+		}
+		return $arrayQuantities;
+	}
+
+	/**
+	 * Realiza una conjunción de valores
+	 *
+	 * @param mixed $values
+	 */
+	public function getConjunction($values){
+		$length = count($values);
+		if($length>1){
+			$data = $this->_getLocaleData();
+			$path = '/ldml/linguistics/conjunction';
+			$conjunction = $data->queryLanguage($this->getLanguage(), $path);
+			if($conjunction->length>0){
+				$and = $conjunction->item(0)->nodeValue;
+			} else {
+				$and = 'y';
+			}
+			return join(', ', array_slice($values, 0, $length-1)).' '.$and.' '.$values[$length-1];
+		} else {
+			return $values;
+		}
+	}
+
+	/**
 	 * Indica si la localización es la misma que la predeterminada
 	 *
 	 * @return boolean
@@ -532,7 +709,7 @@ class Locale extends Object {
 	}
 
 	/**
-	 * Obtiene la localizacion acual
+	 * Obtiene la localización acual
 	 *
 	 * @param 	string $localeValue
 	 * @return 	array
@@ -548,7 +725,7 @@ class Locale extends Object {
 				'language' => ''
 			);
 		}
-		$localeParts = explode('_', $localeValue);
+		$localeParts = split('_', $localeValue);
 		if(isset($localeParts[1])){
 			$locale = array(
 				'locale' => $localeValue,
@@ -573,14 +750,14 @@ class Locale extends Object {
 	 */
 	public static function getEnvironmentAll(){
 		$language = setlocale(LC_ALL, 0);
-        $languages = explode(';', $language);
+        $languages = split(';', $language);
         $elocales = array();
         foreach($languages as $lang){
-        	$lc = explode("/", $lang);
-        	$localeParts = explode("_", $lc[0]);
+        	$lc = split('/', $lang);
+        	$localeParts = split('_', $lc[0]);
 			$elocales[] = array(
-				'locale' => str_replace("-", "_", $lc[0]),
-				'country' => isset($localeParts[1]) ? strtoupper($localeParts[1]) : "",
+				'locale' => str_replace('-', '_', $lc[0]),
+				'country' => isset($localeParts[1]) ? strtoupper($localeParts[1]) : '',
 				'language' => $localeParts[0],
 				'quality' => 1.0
 			);
@@ -595,13 +772,13 @@ class Locale extends Object {
 	 * @static
 	 */
 	public static function getEnviroment(){
-		if(self::$_environ!=""){
+		if(self::$_environ!=''){
 			return self::$_environ;
 		}
 		$locales = self::getEnvironmentAll();
 		foreach($locales as $locale){
 			if($locale['quality']==1.0){
-				if($locale['country']!=""){
+				if($locale['country']!=''){
 					self::$_environ = new self($locale['language'].'_'.$locale['country']);
 				} else {
 					self::$_environ = new self($locale['language']);
@@ -609,7 +786,7 @@ class Locale extends Object {
 				return self::$_environ;
 			}
 		}
-		return "";
+		return '';
 	}
 
 	/**
@@ -621,13 +798,13 @@ class Locale extends Object {
 	static public function getBrowserAll(){
 		$elocales = array();
 		if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
-			$locales = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+			$locales = split(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 			foreach($locales as $locale){
-				$elocale = explode(';', $locale);
-				$localeParts = explode('-', $elocale[0]);
+				$elocale = split(';', $locale);
+				$localeParts = split('-', $elocale[0]);
 				$elocales[] = array(
-					'locale' => str_replace("-", "_", $elocale[0]),
-					'country' => isset($localeParts[1]) ? strtoupper($localeParts[1]) : "",
+					'locale' => str_replace('-', '_', $elocale[0]),
+					'country' => isset($localeParts[1]) ? strtoupper($localeParts[1]) : '',
 					'language' => $localeParts[0],
 					'quality' => isset($elocale[1]) ? substr($elocale[1], 2) : 1.0
 				);
@@ -643,13 +820,13 @@ class Locale extends Object {
 	 * @static
 	 */
 	static public function getBrowser(){
-		if(self::$_browser!=""){
+		if(self::$_browser!=''){
 			return self::$_browser;
 		}
 		$locales = self::getBrowserAll();
 		foreach($locales as $locale){
 			if($locale['quality']==1.0){
-				if($locale['country']!=""){
+				if($locale['country']!=''){
 					self::$_browser = new self($locale['language'].'_'.$locale['country']);
 				} else {
 					self::$_browser = new self($locale['language']);

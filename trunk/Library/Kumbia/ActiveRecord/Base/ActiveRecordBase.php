@@ -2595,44 +2595,44 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Valida los llamados a los metodos del modelo cuando se llame un metodo que no exista
+	 * Valida los llamados a los métodos del modelo cuando se llame un método que no exista
 	 *
 	 * @param	string $method
-	 * @param	array $args
+	 * @param	array $arguments
 	 * @return	mixed
 	 * @throws	ActiveRecordException
 	 */
-	public function __call($method, $args = array()){
+	public function __call($method, $arguments = array()){
 		$this->_connect();
 		if(substr($method, 0, 6)=='findBy'){
 			$field = Utils::uncamelize(Utils::lcfirst(substr($method, 6)));
-			if (isset($args[0])) {
-				$arg = array('conditions' => $field.' = '.$this->_db->addQuotes($args[0]));
-				unset($args[0]);
+			if (isset($arguments[0])) {
+				$argument = array('conditions' => $field.' = '.$this->_db->addQuotes($arguments[0]));
+				unset($arguments[0]);
 			} else {
-				$arg = array();
+				$argument = array();
 			}
-			return call_user_func_array(array($this, 'findFirst'), array_merge($arg, $args));
+			return call_user_func_array(array($this, 'findFirst'), array_merge($argument, $arguments));
 		}
 		if(substr($method, 0, 7)=='countBy'){
 			$field = Utils::uncamelize(Utils::lcfirst(substr($method, 7)));
-			if (isset($args[0])) {
-				$arg = array($field.' = '.$this->_db->addQuotes($args[0]));
-				unset($args[0]);
+			if (isset($arguments[0])) {
+				$argument = array($field.' = '.$this->_db->addQuotes($arguments[0]));
+				unset($arguments[0]);
 			} else {
-				$arg = array();
+				$argument = array();
 			}
-			return call_user_func_array(array($this, 'count'), array_merge($arg, $args));
+			return call_user_func_array(array($this, 'count'), array_merge($argument, $arguments));
 		}
 		if(substr($method, 0, 9)=='findAllBy'){
 			$field = Utils::uncamelize(Utils::lcfirst(substr($method, 9)));
-			if (isset($args[0])) {
-				$arg = array($field.' = '.$this->_db->addQuotes($args[0]));
-				unset($args[0]);
+			if (isset($arguments[0])) {
+				$argument = array($field.' = '.$this->_db->addQuotes($arguments[0]));
+				unset($arguments[0]);
 			} else {
-				$arg = array();
+				$argument = array();
 			}
-			return call_user_func_array(array($this, 'find'), array_merge($arg, $args));
+			return call_user_func_array(array($this, 'find'), array_merge($argument, $arguments));
 		}
 
 		$entityName = get_class($this);
@@ -2641,11 +2641,11 @@ abstract class ActiveRecordBase extends Object
 			$requestedRelation = ucfirst($requestedRelation);
 			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
 				$arguments = array($entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($arguments, $args));
+				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($arguments, $arguments));
 			}
 			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
 				$arguments = array($entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($arguments, $args));
+				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($arguments, $arguments));
 			}
 			if(EntityManager::existsHasOne($entityName, $requestedRelation)==true){
 				return EntityManager::getHasOneRecords($entityName, $requestedRelation, $this);
@@ -2685,16 +2685,6 @@ abstract class ActiveRecordBase extends Object
 				}
 			}
 		}*/
-	}
-
-	/**
-	 * Sleep de ActiveRecordBase
-	 *
-	 * @access public
-	 * @return array
-	 */
-	public function __sleep(){
-		return array('_schema', '_source', '_dependencyPointer', '_dumped');
 	}
 
 }

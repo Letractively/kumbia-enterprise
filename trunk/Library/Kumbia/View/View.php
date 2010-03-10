@@ -600,7 +600,9 @@ abstract class View {
 				// el contenido de las excepciones dentro de este.
 				if($controllerResponse->getResponseAdapter()!='json'){
 					Tag::removeStylesheets();
-					ob_clean();
+					if(count(ob_get_status(true))>0){
+						ob_clean();
+					}
 					$e->showMessage();
 					self::$_content = ob_get_contents();
 					ob_end_clean();

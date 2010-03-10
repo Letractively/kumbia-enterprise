@@ -39,7 +39,7 @@
 abstract class Object {
 
 	/**
-	 * Devuelve el nombre de la clase actual;
+	 * Devuelve el nombre de la clase actual
 	 *
 	 * @return string
 	 */
@@ -69,7 +69,17 @@ abstract class Object {
 	}
 
 	/**
-	 * Implementacion del Metodo toString
+	 * Lanza una excepción cuando el método no está definido en el objeto
+	 *
+	 * @param	string $method
+	 * @param	array $arguments
+	 */
+	public function __call($method, $arguments=array()){
+		throw new CoreException('Llamado a método no definido "'.$method.'" en la clase "'.get_class($this)."'");
+	}
+
+	/**
+	 * Implementacion del método toString
 	 *
 	 */
 	public function __toString(){

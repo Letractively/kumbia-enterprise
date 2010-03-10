@@ -15,7 +15,7 @@
  * @category 	Kumbia
  * @package		Locale
  * @subpackage 	Data
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license 	New BSD License
@@ -30,7 +30,7 @@
  * @category 	Kumbia
  * @package 	Locale
  * @subpackage 	Data
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -81,8 +81,8 @@ class LocaleData {
 	/**
 	 * Constructor de LocaleData
 	 *
-	 * @param string $language
-	 * @param string $country
+	 * @param	string $language
+	 * @param	string $country
 	 */
 	public function __construct($language, $country=''){
 		if(!isset(self::$_ldmlLang[$language])){
@@ -110,8 +110,8 @@ class LocaleData {
 	/**
 	 * Consulta los datos complementarios
 	 *
-	 * @param string $path
-	 * @return DOMNodeList
+	 * @param	string $path
+	 * @return	DOMNodeList
 	 */
 	public function querySupplementalData($path){
 		if(self::$_ldmlSupplemental==null){
@@ -126,9 +126,9 @@ class LocaleData {
 	/**
 	 * Hace una consulta en el arbol LDML del Idioma
 	 *
-	 * @param string $language
-	 * @param string $path
-	 * @return DOMNodeList
+	 * @param	string $language
+	 * @param	string $path
+	 * @return	DOMNodeList
 	 */
 	public function queryLanguage($language, $path){
 		return self::$_ldmlLangXpath[$language]->query($path);
@@ -137,9 +137,9 @@ class LocaleData {
 	/**
 	 * Hace una consulta en el arbol LDML del Territorio
 	 *
-	 * @param string $country
-	 * @param string $path
-	 * @return DOMNodeList
+	 * @param	string $country
+	 * @param	string $path
+	 * @return	DOMNodeList
 	 */
 	public function queryCountry($country, $path){
 		return self::$_ldmlCountryXpath[$country]->query($path);
@@ -148,10 +148,10 @@ class LocaleData {
 	/**
 	 * Hace una consulta en el arbol LDML del Territorio e Idioma
 	 *
-	 * @param string $language
-	 * @param string $country
-	 * @param string $path
-	 * @return DOMNodeList
+	 * @param	string $language
+	 * @param	string $country
+	 * @param	string $path
+	 * @return	DOMNodeList
 	 */
 	public function queryAny($language, $country, $path){
 		$result = self::$_ldmlCountryXpath[$country]->query($path);

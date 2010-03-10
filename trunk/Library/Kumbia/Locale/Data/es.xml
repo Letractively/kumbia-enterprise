@@ -3680,4 +3680,80 @@
 			<nostr>no:n</nostr>
 		</messages>
 	</posix>
+	<linguistics>
+		<vowels>
+			<vowel accented="no">a</vowel>
+			<vowel accented="no">e</vowel>
+			<vowel accented="no">i</vowel>
+			<vowel accented="no">o</vowel>
+			<vowel accented="no">u</vowel>
+			<vowel accented="yes">á</vowel>
+			<vowel accented="yes">é</vowel>
+			<vowel accented="yes">í</vowel>
+			<vowel accented="yes">ó</vowel>
+			<vowel accented="yes">ú</vowel>
+		</vowels>
+		<accentedVowels>
+			<accentedVowel accent="á">a</accentedVowel>
+			<accentedVowel accent="é">e</accentedVowel>
+			<accentedVowel accent="í">i</accentedVowel>
+			<accentedVowel accent="ó">o</accentedVowel>
+			<accentedVowel accent="ú">u</accentedVowel>
+		</accentedVowels>
+		<articles>
+			<indefinite genre="female">
+				<article count="one">una</article>
+				<article count="other">unas</article>
+			</indefinite>
+			<indefinite genre="male">
+				<article count="one">un</article>
+				<article count="other">unos</article>
+			</indefinite>
+		</articles>
+		<articles>
+			<definite genre="female">
+				<article count="one">la</article>
+				<article count="other">las</article>
+			</definite>
+			<definite genre="male">
+				<article count="one">el</article>
+				<article count="other">los</article>
+			</definite>
+		</articles>
+		<prepositions>
+			<preposition type="of">de</preposition>
+		</prepositions>
+		<genres>
+			<genre type="female">
+				<wordend>umbre</wordend>
+				<wordend>ion</wordend>
+				<wordend>is</wordend>
+				<wordend>ez</wordend>
+				<wordend>uz</wordend>
+				<wordend>un</wordend>
+				<wordend>ud</wordend>
+				<wordend>ad</wordend>
+				<wordend>a</wordend>
+			</genre>
+			<genre type="male">
+				<wordend>l</wordend>
+				<wordend>o</wordend>
+				<wordend>n</wordend>
+				<wordend>e</wordend>
+				<wordend>r</wordend>
+				<wordend>s</wordend>
+			</genre>
+		</genres>
+		<conjunction>y</conjunction>
+		<quantities>
+			<quantity type="minus">menos</quantity>
+			<quantity type="nothing">ningún</quantity>
+			<quantity type="some">alguno</quantity>
+			<quantity type="several">mucho</quantity>
+			<quantity type="dozens">decenas</quantity>
+			<quantity type="hundreds">centenas</quantity>
+			<quantity type="thousands">miles</quantity>
+			<quantity type="millions">millones</quantity>
+		</quantities>
+	</linguistics>
 </ldml>
