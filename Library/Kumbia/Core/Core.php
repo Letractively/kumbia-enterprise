@@ -286,7 +286,7 @@ abstract class Core {
 		#if[no-plugins]
 		PluginManager::notifyFromApplication('beforeStartApplication');
 		#endif
-		if(class_exists('ControllerBase')){
+		if(class_exists('ControllerBase', false)){
 			$controllerBase = new ControllerBase();
 			if(method_exists($controllerBase, 'onStartApplication')){
 				$controllerBase->onStartApplication();
@@ -307,7 +307,7 @@ abstract class Core {
 		#if[no-plugins]
 		PluginManager::notifyFromApplication('beforeChangeInstance');
 		#endif
-		if(class_exists('ControllerBase')){
+		if(class_exists('ControllerBase', false)){
 			$controllerBase = new ControllerBase();
 			if(method_exists($controllerBase, 'onChangeInstance')){
 				$controllerBase->onChangeApplication(self::getInstanceName());

@@ -251,6 +251,7 @@ class CoreException extends Exception {
 							}
 						}
 						++$i;
+						unset($message);
 					}
 					echo "</table>";
 					echo "</div>";
@@ -274,6 +275,7 @@ class CoreException extends Exception {
 									echo "<div class='exceptionRemoteTrace'>".$remoteTrace['file']." <span class='exceptionRemoteLine'>({$remoteTrace['line']})</span></div>";
 								}
 							}
+							unset($remoteTrace);
 						}
 						echo "</pre>";
 					}
@@ -297,6 +299,19 @@ class CoreException extends Exception {
 							$file = $trace['file'];
 							$line = $trace['line'];
 							echo "</pre><span class='exceptionLineNote'>La excepción se ha generado en el archivo '$rfile' en la línea '$line':</span><br/>";
+							$lines = file($file);
+							$numberLines = count($lines);
+							$firstLine = ($line-7)<0 ? 0 : ($line-7);
+							echo "<pre class='brush: php; first-line: ", ($firstLine+1), "; highlight: [", ($line), "]; smart-tabs: true'>";
+							for($i=$firstLine;$i<=($line+7>$numberLines-1 ? $numberLines-1 : $line+7);++$i){
+								$cline = htmlentities($lines[$i], ENT_COMPAT, 'UTF-8');
+								echo $cline;
+								unset($cline);
+							}
+							unset($lines);
+							unset($line);
+
+							/*
 							echo "<div class='exceptionFileViewver'><table cellspacing='0' cellpadding='0' width='100%'>";
 							$lines = file($file);
 							$eline = $line;
@@ -321,13 +336,16 @@ class CoreException extends Exception {
 									$className = 'exceptionLineNotActiveOdd';
 								}
 							}
-							echo "</table></div><pre class='exceptionPre'>";
+							echo "</table></div>";*/
+							echo "</pre><pre class='exceptionPre'>";
 						} else {
 							$rfile = preg_replace('/\.php$/', '', $rfile);
 							echo $rfile." <span class='exceptionLine'>(".$trace['line'].")</span>\n";
 						}
 					}
+					unset($trace);
 				}
+				unset($traceback);
 				echo "</div>";
 
 				$debugMemory = Debug::getMemory();
@@ -384,6 +402,8 @@ class CoreException extends Exception {
 							<td>$value</td>
 							<td>$type</td>
 						</tr>";
+						unset($key);
+						unset($value);
 					}
 					foreach($_POST as $key => $value){
 						$type = gettype($value);
@@ -396,6 +416,8 @@ class CoreException extends Exception {
 							<td>$value</td>
 							<td>$type</td>
 						</tr>";
+						unset($key);
+						unset($value);
 					}
 					echo "</table>";
 					echo "</div>";
@@ -511,6 +533,10 @@ class CoreException extends Exception {
 			}
 		}
 		echo "</div>";
+
+		//Agregar syntax highlight
+		echo Tag::javascriptLibrary('sh/sh');
+		echo '<script type="text/javascript">SyntaxHighlighter.all()</script>';
 	}
 
 	/**

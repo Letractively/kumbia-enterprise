@@ -127,7 +127,7 @@ abstract class Utils {
 	}
 
 	/**
- 	 * Convierte los parametros de una funcion o metodo a parametros por nombre
+ 	 * Convierte los parámetros de una funcion o metodo a parámetros por nombre
 	 *
 	 * @access 	public
 	 * @param 	array $params
@@ -153,7 +153,7 @@ abstract class Utils {
 	}
 
 	/**
-	 * Convierte un parametro por nombre en un array
+	 * Convierte un parámetro por nombre en un array
 	 *
 	 * @access 	public
 	 * @param 	string $param
@@ -210,7 +210,7 @@ abstract class Utils {
 	}
 
 	/**
-     * Coloca la primera letra en minuscula
+     * Coloca la primera letra en minúscula
      *
      * @access 	public
      * @param 	string $s
@@ -280,7 +280,7 @@ abstract class Utils {
 	}
 
 	/**
-	 * Cambia la primera letra de las palabras a mayusculas
+	 * Cambia la primera letra de las palabras a mayúsculas
 	 *
 	 * @access 	public
 	 * @param 	string $words

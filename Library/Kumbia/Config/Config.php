@@ -107,12 +107,12 @@ class Config extends Object {
 	 * @param string $method
 	 * @param array $arguments
 	 */
-	public function __call($method, $arguments){
+	public function __call($method, $arguments=array()){
 		$property = Utils::uncamelize(substr($method, 3));
 		if(isset($this->{$property})){
 			return $property;
 		} else {
-			throw new CoreException("No existe la propiedad $method en el objeto Config");
+			throw new CoreException('No existe la propiedad "'.$method.'" en el objeto Config');
 		}
 	}
 
