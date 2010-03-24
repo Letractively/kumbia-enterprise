@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Kumbia
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright  	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -31,7 +31,7 @@
  *
  * @category 	Kumbia
  * @package 	Kumbia
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @abstract
@@ -83,7 +83,12 @@ abstract class Object {
 	 *
 	 */
 	public function __toString(){
-		return '<Object '.get_class($this).'>';
+		$parentClass = get_parent_class($this);
+		if($parentClass){
+			return '<Object '.get_class($this).'#'.$parentClass.'>';
+		} else {
+			return '<Object '.get_class($this).'>';
+		}
 	}
 
 }

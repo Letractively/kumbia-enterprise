@@ -284,7 +284,7 @@ class CoreException extends Exception {
 				if(count($this->_extendedBacktrace)>0){
 					$traceback = array_merge($this->_extendedBacktrace, $traceback);
 				}
-				if(strpos($this->getFile(), 'apps')){
+				if(strpos($this->getFile(), 'apps')!==false){
 					$firstLine = array(array(
 						'file' => $this->getFile(),
 						'line' => $this->getLine()
@@ -301,42 +301,14 @@ class CoreException extends Exception {
 							echo "</pre><span class='exceptionLineNote'>La excepción se ha generado en el archivo '$rfile' en la línea '$line':</span><br/>";
 							$lines = file($file);
 							$numberLines = count($lines);
-							$firstLine = ($line-7)<0 ? 0 : ($line-7);
-							echo "<pre class='brush: php; first-line: ", ($firstLine+1), "; highlight: [", ($line), "]; smart-tabs: true'>";
-							for($i=$firstLine;$i<=($line+7>$numberLines-1 ? $numberLines-1 : $line+7);++$i){
-								$cline = htmlentities($lines[$i], ENT_COMPAT, 'UTF-8');
-								echo $cline;
-								unset($cline);
+							$firstLine = ($line-7)<1 ? 1 : $line-7;
+							$lastLine = ($line+7>$numberLines ? $numberLines : $line+7);
+							echo "<pre class='brush: php; first-line: ", ($firstLine), "; highlight: [", ($line), "]; smart-tabs: true'>";
+							for($i=$firstLine;$i<=$lastLine;++$i){
+								echo htmlentities($lines[$i-1], ENT_COMPAT, 'UTF-8');
 							}
 							unset($lines);
 							unset($line);
-
-							/*
-							echo "<div class='exceptionFileViewver'><table cellspacing='0' cellpadding='0' width='100%'>";
-							$lines = file($file);
-							$eline = $line;
-							$className = 'exceptionLineNotActiveOdd';
-							$numberLines = count($lines);
-							for($i =(($eline-4)<0 ? 0: $eline-4);$i<=($eline+2>$numberLines-1?$numberLines-1:$eline+2);++$i){
-								$cline = str_replace("\t", "&nbsp;", htmlentities($lines[$i], ENT_COMPAT, 'UTF-8'));
-								if($i==$eline-1){
-									echo "<tr><td width='30' class='exceptionLineTd'>".($i+1).".</td>
-									<td><div  class='exceptionLineActive'>&nbsp;<strong>";
-									echo $cline;
-									echo "</strong></div></td></tr>\n";
-								} else {
-									echo "<tr><td class='exceptionLineTd'>".($i+1).".</td>
-									<td class='$className'>&nbsp;";
-									echo $cline;
-									echo "</td></tr>";
-								}
-								if($className=='exceptionLineNotActiveOdd'){
-									$className = 'exceptionLineNotActiveEven';
-								} else {
-									$className = 'exceptionLineNotActiveOdd';
-								}
-							}
-							echo "</table></div>";*/
 							echo "</pre><pre class='exceptionPre'>";
 						} else {
 							$rfile = preg_replace('/\.php$/', '', $rfile);
@@ -351,10 +323,10 @@ class CoreException extends Exception {
 				$debugMemory = Debug::getMemory();
 				if(count($debugMemory)>0){
 					echo "<div class='debugInformation'>\n";
-					echo "<strong>Datos de la Memoria:</strong>";
+					echo "<strong>Datos de la Memoria</strong>";
 					echo "<table cellspacing='0' width='100%' align='center'>
 						<thead>
-							<th class='debugThOdd'>#</th>
+							<th class='debugThOdd' width='3%'>#</th>
 							<th class='debugThEven'>Variable</th>
 							<th class='debugThOdd'>Valor</th>
 						</thead>\n";

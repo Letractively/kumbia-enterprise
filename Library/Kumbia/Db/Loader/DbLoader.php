@@ -44,11 +44,17 @@ abstract class DbLoader {
 	 */
 	public static function factory($adapterName, $options){
 		$descriptor = new stdClass();
-		if(!is_array($options)){
-			throw new DbLoaderException("El parámetro 'options' debe ser un Array");
+		#if[compile-time]
+		if(!is_array($options)&&!is_object($options)){
+			throw new DbLoaderException("El parámetro 'options' debe ser un Array ó un Objeto");
 		}
-		foreach($options as $key => $value){
-			$descriptor->$key = $value;
+		#endif
+		if(is_array($options)){
+			foreach($options as $key => $value){
+				$descriptor->$key = $value;
+			}
+		} else {
+			$descriptor = $options;
 		}
 		if(isset($descriptor->layer)){
 			$layer = $descriptor->layer;
@@ -167,7 +173,7 @@ abstract class DbLoader {
 	static public function factoryFromDescriptor($descriptor){
 		$descriptorParts = explode(':', $descriptor);
 		$adapterName = $descriptorParts[0];
-		$settings = explode(";", $descriptorParts[1]);
+		$settings = explode(';', $descriptorParts[1]);
 		$dbDescriptor = array();
 		foreach($settings as $param){
 			$paramData = explode('=', $param);

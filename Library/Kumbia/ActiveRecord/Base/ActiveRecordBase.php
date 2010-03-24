@@ -556,9 +556,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Find all records in this table using a SQL Statement
 	 *
-	 * @access public
-	 * @param string $sqlQuery
-	 * @return ActiveRecordResultset
+	 * @access	public
+	 * @param	string $sqlQuery
+	 * @return	ActiveRecordResultset
 	 */
 	public function findAllBySql($sqlQuery){
 		$this->_connect();
@@ -573,9 +573,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Find a record in this table using a SQL Statement
 	 *
-	 * @access public
-	 * @param string $sqlQuery
-	 * @return ActiveRecord Cursor
+	 * @access	public
+	 * @param	string $sqlQuery
+	 * @return	ActiveRecordResultset
 	 */
 	public function findBySql($sqlQuery){
 		$this->_connect();
@@ -587,6 +587,17 @@ abstract class ActiveRecordBase extends Object
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Consulta todos los registros en una entidad de forma estática
+	 *
+	 * @return ActiveRecordResultset
+	 */
+	public static function findAll(){
+		$activeModel = EntityManager::getEntityInstance(get_called_class());
+		$arguments = func_get_args();
+		return call_user_func_array(array($activeModel, 'find'), $arguments);
 	}
 
 	/**
@@ -604,10 +615,10 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Return Fist Record
 	 *
-	 * @access public
-	 * @param mixed $params
-	 * @param boolean $debug
-	 * @return ActiveRecord
+	 * @access	public
+	 * @param	mixed $params
+	 * @param	boolean $debug
+	 * @return	ActiveRecordBase
 	 */
 	public function findFirst($params=''){
 		$this->_connect();
@@ -763,10 +774,10 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Find data on Relational Map table and locks Resultset
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return ActiveRecordResulset
-	 * @throws ActiveRecordException
+	 * @access	public
+	 * @param	string $params
+	 * @return	ActiveRecordResulset
+	 * @throws	ActiveRecordException
 	 */
 	public function findForUpdate($params=''){
 		$this->_connect();
@@ -2529,15 +2540,6 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Implementación de __toString Standard
-	 *
-	 * @return string
-	 */
-	public function __toString(){
-		return '<'.get_class().' Object>';
-	}
-
-	/**
 	 * Indica si los eventos de validacion estan activos o no
 	 *
 	 * @param boolean $disableEvents
@@ -2636,21 +2638,38 @@ abstract class ActiveRecordBase extends Object
 		}
 
 		$entityName = get_class($this);
+
 		if(substr($method, 0, 3)=='get'){
-			$requestedRelation = preg_replace('/^get/', '', $method);
-			$requestedRelation = ucfirst($requestedRelation);
+			$requestedRelation = ucfirst(substr($method, 3));
 			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
-				$arguments = array($entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($arguments, $arguments));
+				$entityArguments = array('findFirst', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($argument, $entityArguments));
 			}
 			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
-				$arguments = array($entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($arguments, $arguments));
+				$entityArguments = array('find', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($arguments, $entityArguments));
 			}
 			if(EntityManager::existsHasOne($entityName, $requestedRelation)==true){
-				return EntityManager::getHasOneRecords($entityName, $requestedRelation, $this);
+				return EntityManager::getHasOneRecords('findFirst', $entityName, $requestedRelation, $this);
 			}
 		}
+
+		if(substr($method, 0, 5)=='count'){
+			$requestedRelation = ucfirst(substr($method, 5));
+			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
+				$entityArguments = array('count', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($argument, $entityArguments));
+			}
+			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
+				$entityArguments = array('count', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($arguments, $entityArguments));
+			}
+			if(EntityManager::existsHasOne($entityName, $requestedRelation)==true){
+				return EntityManager::getHasOneRecords('count', $entityName, $requestedRelation, $this);
+			}
+		}
+
+
 		throw new ActiveRecordException('No se encontró el método "'.$method.'" en el modelo "'.get_class($this).'"');
 
 		/*

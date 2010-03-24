@@ -13,22 +13,22 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category 	Kumbia
- * @package 	Linguistics
+ * @package 	Highlight
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
  * @version 	$Id$
  */
 
 /**
- * LinguisticsException
+ * HighlightException
  *
- * Excepciones generadas por el componente Linguistics
+ * Excepciones generadas por el componente Highlight
  *
  * @category 	Kumbia
- * @package 	Linguistics
+ * @package 	Highlight
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
  */
-class LinguisticsException extends CoreException {
+class HighlightException extends CoreException {
 
 }

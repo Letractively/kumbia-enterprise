@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Script
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -27,7 +27,7 @@
  *
  * @category 	Kumbia
  * @package 	Script
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @abstract
@@ -39,7 +39,7 @@ abstract class Script extends Object {
 	 *
 	 * @var string
 	 */
-	private $_encoding = "UTF-8";
+	private $_encoding = 'UTF-8';
 
 	/**
 	 * Parametros recibidos por el script
@@ -62,13 +62,13 @@ abstract class Script extends Object {
 			if(strpos($parameter, "=")!==false){
 				$parameterParts = explode("=", $parameter);
 				if(count($parameterParts)!=2){
-					throw new ScriptException("Definición invalida para el parámetro '$parameter'");
+					throw new ScriptException("Definición inválida para el parámetro '$parameter'");
 				}
 				if(strlen($parameterParts[0])==""){
-					throw new ScriptException("Definición invalida para el parámetro '$parameter'");
+					throw new ScriptException("Definición inválida para el parámetro '".$parameter."'");
 				}
 				if(!in_array($parameterParts[1], array('s', 'i'))){
-					throw new ScriptException("Tipo de dato incorrecto en parámetro '$parameter'");
+					throw new ScriptException("Tipo de dato incorrecto en parámetro '".$parameter."'");
 				}
 				$posibleArguments[] = $parameterParts[0];
 				$arguments[$parameterParts[0]] = array(
@@ -204,7 +204,7 @@ abstract class Script extends Object {
 	}
 
 	/**
-	 * Devuelve el valor de una opcion recibida
+	 * Devuelve el valor de una opción recibida
 	 *
 	 * @param string $option
 	 */
@@ -224,6 +224,68 @@ abstract class Script extends Object {
 	 */
 	public function isReceivedOption($option){
 		return isset($this->_parameters[$option]);
+	}
+
+	/**
+	 * Muestra un mensaje en la consola de texto
+	 *
+	 * @param Exception $exception
+	 */
+	public static function showConsoleException($exception){
+
+		$isXTermColor = false;
+		if(isset($_ENV['TERM'])){
+			foreach(array('256color') as $term){
+				if(preg_match('/'.$term.'/', $_ENV['TERM'])){
+					$isXTermColor = true;
+				}
+			}
+		}
+
+		$isSupportedShell = false;
+		if($isXTermColor){
+			if(isset($_ENV['SHELL'])){
+				foreach(array('bash', 'tcl') as $shell){
+					if(preg_match('/'.$shell.'/', $_ENV['SHELL'])){
+						$isSupportedShell = true;
+					}
+				}
+			}
+		}
+
+		if(!class_exists('ScriptColor', false)){
+			require 'Library/Kumbia/Script/Color/ScriptColor.php';
+		}
+
+		ScriptColor::setFlags($isSupportedShell && $isSupportedShell);
+
+		$output = "";
+		$output.= ScriptColor::colorize(get_class($exception).': ', ScriptColor::RED, ScriptColor::BOLD);
+		$message = str_replace("\"", "\\\"", $exception->getMessage());
+		$output.= ScriptColor::colorize($message, ScriptColor::WHITE, ScriptColor::BOLD);
+		$output.='\\n';
+
+		$output.= Highlight::getString(file_get_contents($exception->getFile()), 'console', array(
+			'firstLine' => ($exception->getLine()-3<0 ? $exception->getLine() : $exception->getLine()-3),
+			'lastLine' => $exception->getLine()+3
+		));
+
+		$i = 1;
+		$getcwd = getcwd();
+		foreach($exception->getTrace() as $trace){
+			$output.= ScriptColor::colorize('#'.$i, ScriptColor::WHITE, ScriptColor::UNDERLINE);
+			$output.= ' ';
+			$file = str_replace($getcwd, '', $trace['file']);
+			$output.= ScriptColor::colorize($file.'\\n', ScriptColor::NORMAL);
+			$i++;
+		}
+
+		if($isSupportedShell){
+			system('echo -e "'.$output.'"');
+		} else {
+			echo $output;
+		}
+
 	}
 
 }

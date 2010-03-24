@@ -468,7 +468,7 @@ abstract class Core {
 			//Iniciar el buffer de salida
 			ob_start();
 
- 	 	    //El driver de la BD es cargado segun lo que diga en config.ini
+ 	 	    //El driver de la BD es cargado según lo que diga en config.ini
 			if(DbLoader::loadDriver()==false){
 				return false;
 			}

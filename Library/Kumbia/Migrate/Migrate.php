@@ -1,10 +1,55 @@
 <?php
 
+/**
+ * Kumbia Enterprise Framework
+ *
+ * LICENSE
+ *
+ * This source file is subject to the New BSD License that is bundled
+ * with this package in the file docs/LICENSE.txt.
+
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@loudertechnology.com so we can send you a copy immediately.
+ *
+ * @category 	Kumbia
+ * @package 	Migrate
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @license 	New BSD License
+ * @version 	$Id$
+ */
+
+/**
+ * Migrate
+ *
+ * Subcomponente que permite actualizar versiones anteriores del framework a la más reciente
+ *
+ * @category 	Kumbia
+ * @package 	Migrate
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @license 	New BSD License
+ */
 class Migrate {
 
+	/**
+	 * Indica si el controlador actual es StandardForm
+	 *
+	 * @var boolean
+	 */
 	private $_isStandardForm = false;
+
+	/**
+	 * Nombre de la clase actual
+	 *
+	 * @var string
+	 */
 	private $_className = '';
 
+	/**
+	 * Relación de métodos de ActiveRecord
+	 *
+	 * @var array
+	 */
 	private $_activeRecordMethodMap = array(
 		'find_first' => 'findFirst',
 		'belongs_to' => 'belongsTo',
@@ -12,6 +57,11 @@ class Migrate {
 		'has_one' => 'hasOne'
 	);
 
+	/**
+	 * Relación de métodos de Db
+	 *
+	 * @var array
+	 */
 	private $_dbMethodMap = array(
 		'fetch_one' => 'fetchOne'
 	);
@@ -36,7 +86,7 @@ class Migrate {
 	);
 
 	/**
-	 * Mapa de Funciones a migrar de controladores
+	 * Mapa de funciones a migrar de controladores
 	 *
 	 * @var array
 	 */
@@ -83,6 +133,11 @@ class Migrate {
 		'before_update' => 'beforeUpdate'
 	);
 
+	/**
+	 * Relación de componentes y sus métodos
+	 *
+	 * @var unknown_type
+	 */
 	private $_commonMap = array(
 		'Kumbia' => array(
 			'route_to' => array('Router', 'routeTo'),
@@ -108,6 +163,11 @@ class Migrate {
 		),
 	);
 
+	/**
+	 * Relación de Helpers
+	 *
+	 * @var array
+	 */
 	private $_tagHelpers = array(
 		'form_tag' => 'Tag::form',
 		'link_to' => 'Tag::linkTo',
@@ -139,7 +199,6 @@ class Migrate {
 	 * @param int $i
 	 */
 	private function _isActiveRecordMethod($tokens, $i){
-		//hidden_field
 		if(isset($tokens[$i-4])){
 			if(isset($tokens[$i-4][1])){
 				if($tokens[$i-4][1]=='$this'){
@@ -315,25 +374,49 @@ class Migrate {
 		}
 	}
 
+	/**
+	 * Indica si es un método de acceso a la base de datos
+	 *
+	 * @param	array $tokens
+	 * @param	int $i
+	 * @return 	boolean
+	 */
 	private function _isDbMethod($tokens, $i){
 		if(isset($this->_dbMethodMap[$tokens[$i][1]])){
 			$tokens[$i][1] = $this->_dbMethodMap[$tokens[$i][1]];
 			return true;
 		}
+		return false;
 	}
 
+	/**
+	 * Indica si es un helper en una vista
+	 *
+	 * @param	array $tokens
+	 * @param	int $i
+	 * @return 	boolean
+	 */
 	private function _isInViewActiveRecord($tokens, $i){
 		if(isset($this->_activeRecordMethodMap[$tokens[$i][1]])){
 			$tokens[$i][1] = $this->_activeRecordMethodMap[$tokens[$i][1]];
 			return true;
 		}
+		return false;
 	}
 
+	/**
+	 * Migra el antiguo KUMBIA_PATH
+	 *
+	 * @param	array $tokens
+	 * @param 	int $i
+	 * @return	booelan
+	 */
 	private function _isKumbiaPath($tokens, $i){
 		if($tokens[$i][1]=='KUMBIA_PATH'){
 			$tokens[$i][1] = 'Core::getInstancePath()';
 			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -443,6 +526,12 @@ class Migrate {
 		return $migratedSource;
 	}
 
+	/**
+	 * Migra una vista de cualquier tipo
+	 *
+	 * @param	string $source
+	 * @return	string
+	 */
 	public function migrateView($source){
 		$migratedSource = "";
 		$tokens = token_get_all($source);
@@ -481,7 +570,6 @@ class Migrate {
 								}
 							}
 						}
-						#$migratedSource.=$token[0];
 						$migratedSource.=$token[1];
 					}
 				}
