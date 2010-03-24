@@ -55,7 +55,7 @@ class JsonViewResponse implements ViewResponseInterface {
 	 */
 	public function render($controllerResponse, $valueReturned){
 		$this->_prepareOutput($controllerResponse);
-		print json_encode($valueReturned);
+		echo json_encode($valueReturned);
 	}
 
 	/**
@@ -66,12 +66,24 @@ class JsonViewResponse implements ViewResponseInterface {
 	 */
 	public function renderException($controllerResponse, $e){
 		$this->_prepareOutput($controllerResponse);
-		$exception = array(
-			'type' => get_class($e),
-			'code' => $e->getCode(),
-			'message' => $e->getMessage()
-		);
-		print json_encode($exception);
+		$config = CoreConfig::readAppConfig();
+		if(isset($config->application->debug)&&$config->application->debug){
+			$exception = array(
+				'type' => get_class($e),
+				'code' => $e->getCode(),
+				'message' => $e->getMessage(),
+				'file' => $e->getFile(),
+				'line' => $e->getLine(),
+				'trace' => $e->getTrace()
+			);
+		} else {
+			$exception = array(
+				'type' => get_class($e),
+				'code' => $e->getCode(),
+				'message' => $e->getMessage()
+			);
+		}
+		echo json_encode($exception);
 	}
 
 }

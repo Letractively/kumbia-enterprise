@@ -63,7 +63,7 @@ class Linguistics {
 	 *
 	 * @param Locale $locale
 	 */
-	public function __construct($locale){
+	public function __construct($locale=null){
 		if($locale==null){
 			$locale = Locale::getApplication();
 		}
@@ -157,7 +157,6 @@ class Linguistics {
 				if($indefinite){
 					$phrase[] = $this->a($word);
 				} else {
-					var_dump($word);
 					$phrase[] = $this->the($word);
 				}
 			} else {

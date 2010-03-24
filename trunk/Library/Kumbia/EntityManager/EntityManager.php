@@ -416,9 +416,10 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Devuelve los registros de la relación 1-1 ó n-1
+	 *  Aplica la función indicada devolviendo ó contando los registros de la relación 1-1 ó n-1
 	 *
 	 * @access 	public
+	 * @param 	string $method
 	 * @param 	string $entityName
 	 * @param 	string $relationRequested
 	 * @param 	ActiveRecord $record
@@ -441,33 +442,34 @@ abstract class EntityManager {
 			$condition = join(' AND ', $conditions);
 		}
 		$arguments = func_get_args();
-		$arguments = array_merge(array($condition), array_slice($arguments, 3));
+		$arguments = array_merge(array($condition), array_slice($arguments, 4));
 		$referenceTable = ucfirst(Utils::camelize($relation['rt']));
 		if(self::$_autoInitialize==true){
 			if(isset(self::$_entities[$referenceTable])){
-				$returnedRecord = call_user_func_array(array(self::$_entities[$referenceTable], 'findFirst'), $arguments);
+				$returnedRecord = call_user_func_array(array(self::$_entities[$referenceTable], $method), $arguments);
 				return $returnedRecord;
 			} else {
 				throw new EntityManagerException('No existe la entidad "'.$referenceTable.'" para realizar la relación n-1');
 			}
 		} else {
 			$entity = self::getEntityInstance($referenceTable);
-			$returnedRecord = call_user_func_array(array($entity, 'findFirst'), $arguments);
+			$returnedRecord = call_user_func_array(array($entity, $method), $arguments);
 			return $returnedRecord;
 		}
 	}
 
 	/**
-	 * Devuelve los registros de la relacion 1-1
+	 * Aplica la función indicada devolviendo ó contando los registros de la relacion 1-1
 	 *
 	 * @access 	public
+	 * @param 	string $method
 	 * @param 	string $entityName
 	 * @param 	string $relationRequested
 	 * @param 	ActiveRecord $record
 	 * @return 	boolean
 	 * @static
 	 */
-	static public function getHasOneRecords($entityName, $relationRequested, $record){
+	static public function getHasOneRecords($method, $entityName, $relationRequested, $record){
 		$relation = self::$_hasOne[$entityName][$relationRequested];
 		if(!is_array($relation['rf'])){
 			$value = $record->readAttribute($relation['fi']);
@@ -480,34 +482,33 @@ abstract class EntityManager {
 				$conditions[] = $relation['rf'][$i]." = '".$value."'";
 				++$i;
 			}
-			$condition = join(" AND ", $conditions);
+			$condition = join(' AND ', $conditions);
 		}
 		$referenceTable = ucfirst(Utils::camelize($relation['rt']));
 		if(self::$_autoInitialize==true){
 			if(isset(self::$_entities[$referenceTable])){
-				$returnedRecord = self::$_entities[$referenceTable]->findFirst($condition);
-				return $returnedRecord;
+				return call_user_func_array(array(self::$_entities[$referenceTable], $method), array($condition));
 			} else {
 				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación 1-1");
 			}
 		} else {
 			$entity = self::getEntityInstance($referenceTable);
-			$returnedRecord = $entity->findFirst($condition);
-			return $returnedRecord;
+			return call_user_func_array(array(self::$_entities[$referenceTable], $method), array($condition));
 		}
 	}
 
 	/**
-	 * Devuelve los registros de la relación n-1
+	 * Aplica la función indicada devolviendo ó contando los registros de la relación n-1
 	 *
 	 * @access 	public
+	 * @param 	string $method
 	 * @param 	string $entityName
 	 * @param 	string $relationRequested
 	 * @param 	ActiveRecord $record
 	 * @return 	boolean
 	 * @static
 	 */
-	static public function getHasManyRecords($entityName, $relationRequested, $record){
+	static public function getHasManyRecords($method, $entityName, $relationRequested, $record){
 		$relation = self::$_hasMany[$entityName][$relationRequested];
 		if(!is_array($relation['fi'])){
 			$value = $record->readAttribute($relation['rf']);
@@ -523,11 +524,11 @@ abstract class EntityManager {
 			$condition = join(' AND ', $conditions);
 		}
 		$numberArgs = func_num_args();
-		if($numberArgs>3){
+		if($numberArgs>4){
 			$allParams = func_get_args();
 			$findParams = array();
 			$conditionsKey = false;
-			for($i=3;$i<$numberArgs;++$i){
+			for($i=4;$i<$numberArgs;++$i){
 				$param = Utils::getParam($allParams[$i]);
 				if($param['key']=='0'||$param['key']=='conditions'){
 					$allParams[$i] = $condition.' AND '.$param['value'];
@@ -544,13 +545,13 @@ abstract class EntityManager {
 		$referenceTable = ucfirst(Utils::camelize($relation['rt']));
 		if(self::$_autoInitialize==true){
 			if(isset(self::$_entities[$referenceTable])){
-				return call_user_func_array(array(self::$_entities[$referenceTable], "find"), $findParams);
+				return call_user_func_array(array(self::$_entities[$referenceTable], $method), $findParams);
 			} else {
 				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación n-1");
 			}
 		} else {
 			$referencedEntity = self::getEntityInstance($referenceTable);
-			return call_user_func_array(array($referencedEntity, 'find'), $findParams);
+			return call_user_func_array(array($referencedEntity, $method), $findParams);
 		}
 	}
 

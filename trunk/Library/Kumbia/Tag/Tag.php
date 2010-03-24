@@ -31,7 +31,7 @@
  * como CSS y Javascript.
  *
  * @category 	Kumbia
- * @package	Tag
+ * @package		Tag
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
@@ -63,6 +63,26 @@ abstract class Tag {
 	private static $_documentTitle = '';
 
 	/**
+	 * Indica si ya se ha incluido el base del framework
+	 *
+	 * @var boolean
+	 */
+	private static $_includedBase = false;
+
+	/**
+	 * PATHs a framework javascript
+	 *
+	 * @var array
+	 */
+	private static $_javascriptFrameworks = array(
+		'scriptaculous' => 'core/framework/scriptaculous/protoculous',
+		'prototype' => 'core/framework/scriptaculous/prototype',
+		'jquery' => 'core/framework/jquery/jquery',
+		'mootools' => 'core/framework/mootools/mootools',
+		'ext' => 'core/framework/ext/ext'
+	);
+
+	/**
 	 * Establece el valor de un componente de UI
 	 *
 	 * @param string $id
@@ -88,10 +108,10 @@ abstract class Tag {
 	 * @static
 	 */
 	public static function getValueFromAction($name){
-		if(@isset(self::$_displayValues[$name])){
+		if(isset(self::$_displayValues[$name])){
 			return self::$_displayValues[$name];
 		} else {
-			if(@isset($_POST[$name])){
+			if(isset($_POST[$name])){
 				if(get_magic_quotes_gpc()==false){
 					return $_POST[$name];
 				} else {
@@ -109,7 +129,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Crea un enlace en una aplicacion respetando las convenciones del framework
+	 * Crea un enlace en una aplicación respetando las convenciones del framework
 	 *
 	 * @param string $action
 	 * @param string $text
@@ -125,19 +145,23 @@ abstract class Tag {
 				if(!isset($action['onclick'])){
 					$action['onclick'] = "";
 				}
-				$action['onclick'] = "if(!confirm(\"".$action['confirm']."\")) { return false; }; ".$action['onclick'];
+				$action['onclick'] = 'if(!confirm(\''.$action['confirm'].'\')) { return false; }; '.$action['onclick'];
 				unset($action['confirm']);
 			}
-			$code = "<a href='".Utils::getKumbiaUrl($action)."' ";
-			if(!isset($action['text'])||!$action['text']){
-				$action['text'] = $action[1];
-			}
-			foreach($action as $key => $value){
-				if(!is_integer($key)&&$key!='text'){
-					$code.=" $key='$value' ";
+			$code = '<a href="'.Utils::getKumbiaUrl($action).'" ';
+			if(isset($action['text'])){
+				$text = $action['text'];
+			} else {
+				if(isset($action[1])){
+					$text = $action[1];
 				}
 			}
-			$code.='>'.$action['text'].'</a>';
+			foreach($action as $key => $value){
+				if(!is_integer($key)){
+					$code.=' '.$key.'="'.$value.'" ';
+				}
+			}
+			$code.='>'.$text.'</a>';
 			return $code;
 		} else {
 			if($text==="") {
@@ -145,57 +169,32 @@ abstract class Tag {
 				$text = str_replace('/', ' ', $text);
 				$text = ucwords($text);
 			}
-			return "<a href='".Utils::getKumbiaUrl($action)."'>".$text."</a>";
+			return '<a href="'.Utils::getKumbiaUrl($action).'">'.$text.'</a>';
 		}
 	}
 
 	/**
-	 * Crea un enlace a una accion dentro del controlador Actual
+	 * Crea un enlace a una acción dentro del controlador Actual
  	 *
 	 * @param string $action
 	 * @param string $text
 	 * @return string
 	 */
 	static public function linkToAction($action, $text=''){
-		if(func_num_args()>2){
-			$numberArguments = func_num_args();
-			$params = Utils::getParams(func_get_args(), $numberArguments);
-		}
-		$controller_name = Router::getController();
-		if(is_array($action)){
-			if(isset($action['confirm'])){
-				$action['onclick'] = "if(!confirm(\"".$action['confirm']."\")) if(document.all) event.returnValue = false; else event.preventDefault(); ".$action['onclick'];
-				unset($action['confirm']);
-			}
-			$code = "<a href='".Utils::getKumbiaUrl($controller_name."/".$action[0])."' ";
-			foreach($action as $key => $value){
-				if(!is_integer($key)){
-					$code.=' '.$key.'=\''.$value.'\'';
-				}
-			}
-			$code.=">".$action[1]."</a>";
-			return $code;
-		} else {
-			if(!$text) {
-				$text = str_replace('_', ' ', $action);
-				$text = str_replace('/', ' ', $text);
-				$text = ucwords($text);
-			}
-			return "<a href='".Utils::getKumbiaUrl("$controller_name/$action")."'>$text</a>";
-		}
+		return self::linkTo(Router::getController().'/'.$action, $text);
 	}
 
 	/**
 	 * Permite ejecutar una acción en la vista actual dentro de un contenedor
 	 * HTML usando AJAX
 	 *
-	 * confirm: Texto de Confirmación
-	 * success: Codigo JavaScript a ejecutar cuando termine la petición AJAX
-	 * before: Codigo JavaScript a ejecutar antes de la petición AJAX
-	 * oncomplete: Codigo JavaScript que se ejecuta al terminar la petición AJAX
-	 * update: Que contenedor HTML seró actualizado
-	 * action: Accion que ejecutaró la petición AJAX
-	 * text: Texto del Enlace
+	 * confirm:		Texto de Confirmación
+	 * success:		Código JavaScript a ejecutar cuando termine la petición AJAX
+	 * before:		Código JavaScript a ejecutar antes de la petición AJAX
+	 * complete:	Código JavaScript que se ejecuta al terminar la petición AJAX
+	 * update:		Que contenedor HTML será actualizado
+	 * action:		Acción que ejecutará la petición AJAX
+	 * text:		Texto del Enlace
 	 *
 	 * @access public
 	 * @return string
@@ -204,72 +203,29 @@ abstract class Tag {
 	static public function linkToRemote(){
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
-		if(!isset($params['update'])||!$params['update']){
-			$update = isset($params[2]) ? $params[2] : "";
+		$code = '';
+		#if[compile-time]
+		if(!isset($params['update'])){
+			throw new TagException('Debe indicar el elemento DOM donde se actualizará el resultado AJAX');
+		}
+		if(!isset($params['action'])&&!isset($params['url'])){
+			throw new TagException('Debe indicar la acción AJAX');
+		}
+		#endif
+		if(isset($params['action'])){
+			$url = Utils::getKumbiaUrl($params['action']);
 		} else {
-			$update = $params['update'];
-			unset($params['update']);
-		}
-		if(!isset($params['text'])||!$params['text']){
-			$text = isset($params[1]) ? $params[1] : "";
-		} else {
-			$text = $params['text'];
-		}
-		if(!$text){
-			$text = $params[0];
-		}
-		if(!isset($params['action'])||!$params['action']){
-			$action = $params[0];
-		} else {
-			$action = $params['action'];
-		}
-		$code = "<a href=\"#\" onclick=\"";
-		if(isset($params['confirm'])){
-			$code.= "if(confirm('".$params['confirm']."')){";
-		}
-		$code.= "new Ajax.Request(Utils.getKumbiaURL('$action'), {";
-		$call = array();
-		if(isset($params['asynchronous'])){
-			if($params['asynchronous']=='false'||!$params['asynchronous']){
-				$call[] = "asynchronous: false";
+			if(isset($params['url'])){
+				$url = $params['url'];
 			} else {
-				$call[] = "asynchronous: true";
-			}
-			unset($params['asynchronous']);
-		}
-		if(isset($params['onLoading'])){
-			$call[] = "onLoading: function(){ ".$params['onLoading']." }";
-			unset($params['onLoading']);
-		}
-		if(isset($params['onSuccess'])){
-			$call[] = "onSuccess: function(transport){ ".$params['onSuccess']." }";
-			unset($params['onSuccess']);
-		}
-		if(isset($params['onFailure'])){
-			$call[] = "onFailure: function(transport){ ".$params['onFailure']." }";
-			unset($params['onFailure']);
-		}
-		if(isset($params['onComplete'])){
-			$call[] = "onComplete: function(transport){ ".$params['onComplete']."; $('$update').update(transport.responseText); }";
-			unset($params['onComplete']);
-		} else {
-			$call[] = "onComplete: function(transport){ $('$update').update(transport.responseText); }";
-		}
-		if(count($call)>0){
-			$code.= join(',', $call);
-		}
-		$code.="})";
-		if(isset($params['confirm'])){
-			$code.=" }";
-			unset($params['confirm']);
-		}
-		$code.="; return false\"";
-		foreach($params as $key => $value){
-			if(!is_integer($key)){
-				$code.=" $key='$value' ";
+				throw new TagException('Debe indicar la acción ó URL AJAX');
 			}
 		}
-		return $code.">$text</a>";
+		$callbacks = array('before', 'success', 'complete', 'error');
+		$params['onclick'] = 'AJAX.update(\''.$url.'\', \''.$params['update'].'\'); return false;';
+		unset($params['update']);
+		unset($params['action']);
+		return self::linkTo($params);
 	}
 
 	/**
@@ -372,9 +328,9 @@ abstract class Tag {
 			$value = self::getValueFromAction($params[0]);
 		}
 		if(!isset($params['onkeydown'])) {
-			$params['onkeydown'] = "valNumeric(event)";
+			$params['onkeydown'] = "Base.maskNum(event)";
 		} else {
-			$params['onkeydown'].=";valNumeric(event)";
+			$params['onkeydown'].=";Base.maskNum(event)";
 		}
 		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $value){
@@ -409,9 +365,9 @@ abstract class Tag {
 			$value = self::getValueFromAction($params[0]);
 		}
 		if(!isset($params['onkeydown'])) {
-			$params['onkeydown'] = "valNumeric(event)";
+			$params['onkeydown'] = "Base.maskNum(event)";
 		} else {
-			$params['onkeydown'].=";valNumeric(event)";
+			$params['onkeydown'].=";Base.maskNum(event)";
 		}
         if(!isset($params['formatOptions'])){
             $params['formatOptions'] = '';
@@ -480,9 +436,9 @@ abstract class Tag {
 			$value = self::getValueFromAction($params[0]);
 		}
 		if(!isset($params['onkeydown'])) {
-			$params['onkeydown'] = "valNumeric(event)";
+			$params['onkeydown'] = "Base.maskNum(event)";
 		} else {
-			$params['onkeydown'].=";valNumeric(event)";
+			$params['onkeydown'].=";Base.maskNum(event)";
 		}
         if(!isset($params['formatOptions'])){
             $params['formatOptions'] = '';
@@ -529,7 +485,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Crea una caja de password que solo acepta numeros
+	 * Crea una caja de password que solo acepta números
 	 *
 	 * @param 	mixed $params
 	 * @return 	string
@@ -548,9 +504,9 @@ abstract class Tag {
 			$value = isset($params['value']) ? $params['value'] : "";
 		}
 		if(!isset($params['onkeydown'])) {
-			$params['onkeydown'] = "valNumeric(event)";
+			$params['onkeydown'] = "Base.maskNum(event)";
 		} else {
-			$params['onkeydown'].=";valNumeric(event)";
+			$params['onkeydown'].=";Base.maskNum(event)";
 		}
 		$code = "<input type='password' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $value){
@@ -886,8 +842,8 @@ abstract class Tag {
 			}
 			$callback = false;
 			if(isset($params['option_callback'])){
-				if(strpos($params['option_callback'], ".")){
-					$callback = explode(".", $params['option_callback']);
+				if(strpos($params['option_callback'], '.')){
+					$callback = split('.', $params['option_callback']);
 				} else {
 					$callback = $params['option_callback'];
 				}
@@ -932,7 +888,7 @@ abstract class Tag {
 				if(!isset($params['using'])){
 					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
-				$using = explode(",", $params['using']);
+				$using = split(',', $params['using']);
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
@@ -982,7 +938,7 @@ abstract class Tag {
 			$callback = false;
 			if(isset($params['option_callback'])){
 				if(strpos($params['option_callback'], '.')){
-					$callback = explode('.', $params['option_callback']);
+					$callback = split('.', $params['option_callback']);
 				} else {
 					$callback = $params['option_callback'];
 				}
@@ -1009,7 +965,7 @@ abstract class Tag {
 				if(!isset($params['using'])){
 					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
-				$using = explode(",", $params['using']);
+				$using = split(',', $params['using']);
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
@@ -1056,8 +1012,8 @@ abstract class Tag {
 			}
 			$callback = false;
 			if(isset($params['option_callback'])){
-				if(strpos($params['option_callback'], ".")){
-					$callback = explode(".", $params['option_callback']);
+				if(strpos($params['option_callback'], '.')){
+					$callback = split('.', $params['option_callback']);
 				} else {
 					$callback = $params['option_callback'];
 				}
@@ -1093,7 +1049,7 @@ abstract class Tag {
 				if(!isset($params['using'])){
 					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
-				$using = explode(",", $params['using']);
+				$using = split(',', $params['using']);
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
@@ -1127,9 +1083,6 @@ abstract class Tag {
 	public static function javascriptBase($validations=true){
 		$path = Core::getInstancePath();
 		$code = "<script type='text/javascript' src='".$path."javascript/core/base.js'></script>\r\n";
-		if($validations==true){
-			$code.= "<script type='text/javascript' src='".$path."javascript/core/validations.js'></script>\r\n";
-		}
 		$code.= Tag::javascriptLocation();
 		return $code;
 	}
@@ -1166,11 +1119,11 @@ abstract class Tag {
 
 	/**
 	 * Genera una etiqueta script que apunta a un archivo JavaScript
-	 * respetando las rutas y convenciones de Kumbia
+	 * respetando las rutas y convenciones del framework
  	 *
-	 * @param string $src
-	 * @param string $cache
-	 * @return string
+	 * @param	string $src
+	 * @param	string $cache
+	 * @return	string
 	 */
 	public static function javascriptInclude($src='', $noCache=true, $parameters=""){
 		if($src==""){
@@ -1271,7 +1224,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Agrega una etiqueta script que apunta a un archivo en public/javascript/kumbia
+	 * Agrega una etiqueta script que apunta a un archivo en public/javascript/core
 	 *
 	 * @param string $src
 	 * @return string
@@ -1283,7 +1236,7 @@ abstract class Tag {
 
 	/**
 	 * Permite incluir una imagen dentro de una vista respetando
-	 * las convenciones de directorios y rutas en Kumbia
+	 * las convenciones de directorios y rutas del framework
 	 *
 	 * @param string $img
 	 * @return string
@@ -1351,7 +1304,7 @@ abstract class Tag {
 			unset($params['required']);
 		} else{
 			if(!isset($params['update'])){
-				throw new ViewException('Debe indicar el contenedor a actualizar con el parámetro "update"');
+				throw new TagException('Debe indicar el contenedor a actualizar con el parámetro "update"');
 			}
 			$code = "<form action='".Utils::getKumbiaUrl($params['action'].'/'.$id)."' method='post'
 			onsubmit='return ajaxRemoteForm(this, \"".$params['update']."\", { ".join(",", $params['callbacks'])." });'";
@@ -1446,7 +1399,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Agrega al prinicipio un texto del titulo actual del documento HTML
+	 * Agrega al principio un texto del titulo actual del documento HTML
 	 *
 	 * @access public
 	 * @param string $title
@@ -1487,14 +1440,14 @@ abstract class Tag {
 			} else {
 				$kb = '/';
 			}
-			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css.php?c=$src&p=$kb&$parameters' />\r\n";
+			$code = '<link rel="stylesheet" type="text/css" href="'.$instancePath.'css.php?c='.$src.'&p='.$kb.'&'.$parameters.'" />'."\r\n";
 		} else {
 			if($parameters!=""){
 				$parameters = "?".$parameters;
 			}
-			$code = "<link rel='stylesheet' type='text/css' href='".$instancePath."css/$src.css$parameters' />\r\n";
+			$code = '<link rel="stylesheet" type="text/css" href="'.$instancePath.'css/'.$src.'.css'.$parameters.'" />'."\r\n";
 		}
-		MemoryRegistry::prepend('CORE_CSS_IMPORTS', $code);
+		MemoryRegistry::prepend('CORE_CSS', $code);
 		return $code;
 	}
 
@@ -1506,7 +1459,7 @@ abstract class Tag {
 	 * @static
 	 */
 	public static function stylesheetLinkTags(){
-		$styleSheets = MemoryRegistry::get('CORE_CSS_IMPORTS');
+		$styleSheets = MemoryRegistry::get('CORE_CSS');
 		$code = '';
 		if(is_array($styleSheets)){
 			foreach($styleSheets as $css){
@@ -1523,7 +1476,7 @@ abstract class Tag {
 	 * @static
 	 */
 	public static function resetStylesheetLinks(){
-		MemoryRegistry::reset('CORE_CSS_IMPORTS');
+		MemoryRegistry::reset('CORE_CSS');
 	}
 
 	/**
@@ -1533,7 +1486,57 @@ abstract class Tag {
 	 * @static
 	 */
 	public static function removeStylesheets(){
-		MemoryRegistry::reset('CORE_CSS_IMPORTS');
+		MemoryRegistry::reset('CORE_CSS');
+	}
+
+	/**
+	 * Agrega un Javascript a una cola para ser luego obtenidos en la vista principal con Tag::javascriptSources()
+	 *
+	 * @param	string $src
+	 * @return	string
+	 */
+	public static function addJavascript($src){
+		$instancePath = Core::getInstancePath();
+		MemoryRegistry::append('CORE_JS', '<script type="text/javascript" src="'.$instancePath.'javascript/'.$src.'.js"></script>'."\r\n");
+	}
+
+	/**
+	 * Devuelve los Javascript cargados mediante Tag::javascriptSource()
+	 *
+	 * @access 	public
+	 * @return 	string
+	 * @static
+	 */
+	public static function javascriptSources(){
+		$javascripts = MemoryRegistry::get('CORE_JS');
+		if(is_array($javascripts)){
+			return join('', $javascripts);
+		}
+	}
+
+	/**
+	 * Resetea los CSS cargados mediante Tag::javascriptSource()
+	 *
+	 * @access public
+	 * @static
+	 */
+	public static function resetJavascriptSources(){
+		MemoryRegistry::reset('CORE_JS');
+	}
+
+	/**
+	 * Carga un framework Javascript
+	 *
+	 * @access public
+	 * @static
+	 */
+	public static function addJavascriptFramework($framework){
+		if(isset(self::$_javascriptFrameworks[$framework])){
+			Tag::addJavascript(self::$_javascriptFrameworks[$framework]);
+		} else {
+			throw new TagException('No se puede encontrar el framework javascript "'.$framework.'"');
+		}
+		//MemoryRegistry::reset('CORE_JS');
 	}
 
 	/**
@@ -1712,7 +1715,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Crea una caja de texto que acepta solo texto en Mayuscula
+	 * Crea una caja de texto que acepta solo texto en mayúscula
 	 *
 	 * @access 	public
 	 * @param 	mixed $params
@@ -1735,9 +1738,47 @@ abstract class Tag {
 			$value = self::getValueFromAction($params[0]);
 		}
 		if(!isset($params['onblur'])){
-			$params['onblur'] = "keyUpper2(this)";
+			$params['onblur'] = "this.value=this.value.toUpperCase()";
 		} else {
-			$params['onblur'].=";keyUpper2(this)";
+			$params['onblur'].=";this.value=this.value.toUpperCase()";
+		}
+		$code = "<input type='text' id='".$params[0]."' value='$value' ";
+		foreach($params as $_key => $_value){
+			if(!is_integer($_key)){
+				$code.="$_key='$_value' ";
+			}
+		}
+		$code.=" />\r\n";
+		return $code;
+	}
+
+	/**
+	 * Crea una caja de texto que acepta solo texto en minúscula
+	 *
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
+	 * @static
+	 */
+	public static function textLowerField($params){
+		$numberArguments = func_num_args();
+		$params = Utils::getParams(func_get_args(), $numberArguments);
+		if(!isset($params[0])){
+			$params[0] = $params['id'];
+		}
+		if(!isset($params['name'])||$params['name']==""){
+			$params['name'] = $params[0];
+		}
+		if(isset($params['value'])){
+			$value = $params['value'];
+			unset($params['value']);
+		} else {
+			$value = self::getValueFromAction($params[0]);
+		}
+		if(!isset($params['onblur'])){
+			$params['onblur'] = "this.value=this.value.toLowerCase()";
+		} else {
+			$params['onblur'].=";this.value=this.value.toLowerCase()";
 		}
 		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $_key => $_value){

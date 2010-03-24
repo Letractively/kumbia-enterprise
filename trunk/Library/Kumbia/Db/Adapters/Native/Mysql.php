@@ -132,9 +132,9 @@ class DbMySQL extends DbBase
 		if($descriptor==''){
 			$descriptor = $this->_descriptor;
 		}
-		$host = isset($descriptor->host) ? $descriptor->host : "";
-		$username = isset($descriptor->username) ? $descriptor->username : "";
-		$password = isset($descriptor->password) ? $descriptor->password : "";
+		$host = isset($descriptor->host) ? $descriptor->host : '';
+		$username = isset($descriptor->username) ? $descriptor->username : '';
+		$password = isset($descriptor->password) ? $descriptor->password : '';
 		if(isset($descriptor->port)){
 			$dbstring = $host.':'.$descriptor->port;
 		} else {
@@ -208,7 +208,7 @@ class DbMySQL extends DbBase
 			return $resultQuery;
 		} else {
 			$this->_lastResultQuery = false;
-			$errorMessage = $this->error(" al ejecutar <i>\"$sqlStatement\"</i> en la conexión \"".$this->getConnectionId(true)."\"");
+			$errorMessage = $this->error(' al ejecutar "'.$sqlStatement.'" en la conexión "'.$this->getConnectionId(true).'"');
 			$numberError = $this->noError();
 			if($numberError==1205||$numberError==1213){
 				throw new DbLockAdquisitionException($errorMessage, $numberError, true, $this);

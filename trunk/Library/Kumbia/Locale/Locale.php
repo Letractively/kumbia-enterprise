@@ -685,7 +685,7 @@ class Locale extends Object {
 			}
 			return join(', ', array_slice($values, 0, $length-1)).' '.$and.' '.$values[$length-1];
 		} else {
-			return $values;
+			return join('', $values);
 		}
 	}
 

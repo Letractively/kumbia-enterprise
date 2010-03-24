@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Report
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -30,7 +30,7 @@
  *
  * @category 	Kumbia
  * @package 	Report
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -74,7 +74,7 @@ class Report extends Object {
 		$adapter = (string) $adapter;
 		$className = $adapter.'Report';
 		if(class_exists($className)==false){
-			$classPath = "Library/Kumbia/Report/Adapters/".$adapter.".php";
+			$classPath = 'Library/Kumbia/Report/Adapters/'.$adapter.'.php';
 			if(Core::fileExists($classPath)){
 				Core::requireFile('Report/Adapters/'.$adapter);
 			} else {

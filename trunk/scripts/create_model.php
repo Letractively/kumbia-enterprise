@@ -59,11 +59,11 @@ class CreateModel extends Script {
 	public function __construct(){
 
 		$posibleParameters = array(
-			'table-name=s' => '--table-name nombre \t\tNombre de la tabla source del modelo',
-			'schema=s' => '--schema nombre \tNombre del schema donde est&aacute; la tabla si este difiere del schema por defecto [opcional]',
-			'application=s' => '--application nombre \tNombre de la aplicaci&oacute;n [opcional]',
-			'force' => '--force \t\tForza a que se reescriba el modelo [opcional]',
-			'help' => '--help \t\t\tMuestra esta ayuda'
+			'table-name=s' => "--table-name nombre \tNombre de la tabla source del modelo",
+			'schema=s' => "--schema nombre \tNombre del schema donde está la tabla si este difiere del schema\n\t\t\tpor defecto [opcional]",
+			'application=s' => "--application nombre \tNombre de la aplicación [opcional]",
+			'force' => "--force \t\tForza a que se reescriba el modelo [opcional]",
+			'help' => "--help \t\t\tMuestra esta ayuda"
 		);
 
 		$this->parseParameters($posibleParameters);
@@ -86,7 +86,7 @@ class CreateModel extends Script {
 		if($name){
 			$modelsDir = Core::getActiveModelsDir();
 			if(!$this->isReceivedOption('force')){
-				if(file_exists("$modelsDir/$name.php")){
+				if(file_exists($modelsDir."/".$name.".php")){
 					throw new ScriptException("El archivo del modelo '$name.php' ya existe en el directorio de modelos");
 				}
 			}
@@ -136,8 +136,8 @@ try {
 	$script = new CreateModel();
 }
 catch(CoreException $e){
-	print get_class($e)." : ".$e->getConsoleMessage()."\n";
+	echo get_class($e)." : ".$e->getConsoleMessage()."\n";
 }
 catch(Exception $e){
-	print "Exception : ".$e->getMessage()."\n";
+	echo "Exception : ".$e->getMessage()."\n";
 }

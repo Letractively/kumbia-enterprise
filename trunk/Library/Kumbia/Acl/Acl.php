@@ -96,8 +96,8 @@ class Acl extends Object {
 	 *
 	 * @param string $method
 	 */
-	public function __call($method, $args){
-		return call_user_func_array(array($this->_adapter, $method), $args);
+	public function __call($method, $arguments=array()){
+		return call_user_func_array(array($this->_adapter, $method), $arguments);
 	}
 
 	/**

@@ -383,15 +383,14 @@ abstract class Generator {
 		}
 
 		//Loading The JavaScript Functions
-		self::formsPrint("<script type='text/javascript' src='".Core::getInstancePath()."javascript/core/load.js'></script>\r\n");
+		self::formsPrint("<script type='text/javascript' src='".Core::getInstancePath()."javascript/core/standardform/load.js'></script>\r\n");
 
 		if($form['type']=='standard'){
-			self::formsPrint("<script type='text/javascript' src='".Core::getInstancePath()."javascript/core/load.standard.js'></script>\r\n");
+			self::formsPrint("<script type='text/javascript' src='".Core::getInstancePath()."javascript/core/standardform/load.standard.js'></script>\r\n");
 		}
-		self::formsPrint("<script  type='text/javascript' src='".Core::getInstancePath()."javascript/core/utilities.calendarDateInput.js'></script>\r\n");
-		self::formsPrint("<script  type='text/javascript' src='".Core::getInstancePath()."javascript/core/email.js'></script>\r\n");
+		self::formsPrint("<script  type='text/javascript' src='".Core::getInstancePath()."javascript/core/calendar.js'></script>\r\n");
 
-		if(Core::fileExists("public/javascript/$controller_name.js")){
+		if(Core::fileExists("public/javascript/".$controller_name.".js")){
 			self::formsPrint("<script type='text/javascript' src='".Core::getInstancePath()."javascript/{$_REQUEST["controller"]}.js'></script>\r\n");
 		}
 

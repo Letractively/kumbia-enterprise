@@ -175,6 +175,10 @@ class Filter extends Object {
 						}
 					}
 					array_push($this->_bufferFilters, $params[$i]);
+				} elseif(is_array($params[$i])) {
+					foreach($params[$i] as $filter){
+						$this->applyFilter($params[0], $filter);
+					}
 				} else {
 					$filter = ucfirst(Utils::camelize($params[$i])).'Filter';
 					if(!class_exists($filter, false)){

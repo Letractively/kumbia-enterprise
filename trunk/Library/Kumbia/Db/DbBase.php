@@ -592,7 +592,7 @@ class DbBase extends Object {
 			if(isset($config->database)==false){
 				throw new DbException('No se ha definido los parámetros de conexión al gestor relacional en enviroment.ini', 0, true, $this);
 			}
-			$connection = new db($config->database);
+			$connection = DbLoader::factory($config->database->type, $config->database);
 			if($renovate==true){
 				self::$_rawConnection = $connection;
 			}
@@ -600,8 +600,8 @@ class DbBase extends Object {
 			if(isset($config->database)==false){
 				throw new DbException('No se ha definido los parámetros de conexión al gestor relacional en enviroment.ini');
 			}
-			if(self::$_rawConnection==null){
-				self::$_rawConnection = new db($config->database);
+			if(self::$_rawConnection==null){				
+				self::$_rawConnection = DbLoader::factory($config->database->type, $config->database);				
 			}
 			$connection = self::$_rawConnection;
 		}

@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Scripts
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id: migrate_to_kef.php,v 7d4421ec642c 2010/03/04 15:12:36 andres $
@@ -67,8 +67,27 @@ class MigrateToEnterprise extends Script {
 	 *
 	 */
 	public function __construct(){
-		$iniApp = 'default';
-		$destApp = 'hot';
+
+		$posibleParameters = array(
+			'application=s' => "--application nombre \tAplicación versión >= a 0.9.22 [opcional]",
+			'from=s' => "--from nombre \tNombre de la aplicación desde la que se migra [opcional]",
+			'to=s' => "--file-dest ruta \tNombre de la aplicación a donde se migra [opcional]",
+			'force' => "--force \t\tForza a que se realice la migración [opcional]",
+			'help' => "--help \t\t\tMuestra esta ayuda"
+		);
+
+		$this->parseParameters($posibleParameters);
+
+		if($this->isReceivedOption('help')){
+			$this->showHelp($posibleParameters);
+			return;
+		}
+
+		$this->checkRequired(array('from', 'to'));
+
+		$iniApp = $this->getOption('from');
+		$destApp = $this->getOption('to');
+
 		if(!file_exists('apps/'.$destApp)){
 			throw new ScriptException('No existe la aplicación destino '.$destApp);
 		}
@@ -122,9 +141,6 @@ class MigrateToEnterprise extends Script {
 try {
 	$script = new MigrateToEnterprise();
 }
-catch(CoreException $e){
-	print get_class($e)." : ".$e->getConsoleMessage()."\n";
-}
 catch(Exception $e){
-	print "Exception : ".$e->getMessage()."\n";
+	Script::showConsoleException($e);
 }
