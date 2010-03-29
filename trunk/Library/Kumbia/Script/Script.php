@@ -262,6 +262,7 @@ abstract class Script extends Object {
 		$output = "";
 		$output.= ScriptColor::colorize(get_class($exception).': ', ScriptColor::RED, ScriptColor::BOLD);
 		$message = str_replace("\"", "\\\"", $exception->getMessage());
+		$message.= ' ('.$exception->getCode().')';
 		$output.= ScriptColor::colorize($message, ScriptColor::WHITE, ScriptColor::BOLD);
 		$output.='\\n';
 

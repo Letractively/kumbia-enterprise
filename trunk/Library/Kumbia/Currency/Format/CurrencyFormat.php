@@ -64,13 +64,14 @@ class CurrencyFormat {
 	/**
 	 * Constructor de CurrencyFormat
 	 *
-	 * @param array $currency
-	 * @param double $quantity
+	 * @param	array $currency
+	 * @param	double $quantity
+	 * @param	int $decimalPlaces
 	 */
-	public function __construct($currency, $quantity=null){
+	public function __construct($currency, $quantity=null, $decimalPlaces=null){
 		$this->setPattern($currency);
 		if($quantity!==null){
-			$this->toCurrency($quantity);
+			$this->toCurrency($quantity, $decimalPlaces);
 		}
 	}
 
@@ -93,21 +94,29 @@ class CurrencyFormat {
 	/**
 	 * Obtiene la cantidad formateada monetariamente
 	 *
-	 * @param double $quantity
+	 * @param	double $quantity
+	 * @param	int $decimalPlaces
 	 */
-	public function toCurrency($quantity){
-		$quantity = LocaleMath::round($quantity, $this->_decimalPlaces);
-		$this->_quantity = number_format($quantity, $this->_decimalPlaces, $this->_decimalSeparator, $this->_thousandsSeparator);
+	public function toCurrency($quantity, $decimalPlaces=null){
+		if($decimalPlaces==null){
+			$decimalPlaces = $this->_decimalPlaces;
+		}
+		$quantity = LocaleMath::round($quantity, $decimalPlaces);
+		$this->_quantity = number_format($quantity, $decimalPlaces, $this->_decimalSeparator, $this->_thousandsSeparator);
 	}
 
 	/**
 	 * Obtiene la cantidad formateada numéricamente
 	 *
-	 * @param double $quantity
+	 * @param	double $quantity
+	 * @param	double $decimalPlaces
 	 */
-	public function toNumeric($quantity){
-		$quantity = LocaleMath::round($quantity, $this->_decimalPlaces);
-		$this->_quantity = number_format($quantity, $this->_decimalPlaces, $this->_decimalSeparator, $this->_thousandsSeparator);
+	public function toNumeric($quantity, $decimalPlaces=null){
+		if($decimalPlaces==null){
+			$decimalPlaces = $this->_decimalPlaces;
+		}
+		$quantity = LocaleMath::round($quantity, $decimalPlaces);
+		$this->_quantity = number_format($quantity, $decimalPlaces, $this->_decimalSeparator, $this->_thousandsSeparator);
 	}
 
 	/**

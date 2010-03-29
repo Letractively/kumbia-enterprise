@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		Db
  * @subpackage	PDOAdapters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -30,7 +30,7 @@
  * @category	Kumbia
  * @package		Db
  * @subpackage	PDOAdapters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @link		http://www.php.net/manual/es/ref.pdo-informix.php
@@ -121,17 +121,16 @@ class DbPdoInformix extends DbPDO  {
 	/**
 	 * Devuelve un LIMIT valido para un SELECT del RBDM
 	 *
+	 * @param 	string	$sqlQuery
 	 * @param 	integer $number
 	 * @return 	string
 	 */
 	public function limit($sql, $number){
 		$number = (int) $number;
-		if($number==0){
-			$sql = str_ireplace('SELECT', 'SELECT * FROM (SELECT', $sql);
-			$sql .= ') WHERE 0 = 1';
-			$sql = str_ireplace('SELECT', 'SELECT FIRST '.$count, $sql);
+		if($number>0){
+			 return str_ireplace('SELECT', 'SELECT FIRST '.$number, $sqlQuery);
 		}
-		return $sql;
+		return  $sqlQuery;
 	}
 
 	/**
@@ -453,6 +452,16 @@ class DbPdoInformix extends DbPDO  {
 	 */
 	public static function getPHPExtensionRequired(){
 		return 'pdo_informix';
+	}
+
+	/**
+	 * Devuelve el SQL Dialect que debe ser usado
+	 *
+	 * @return	string
+	 * @static
+	 */
+	public static function getSQLDialect(){
+		return 'MysqlSQLDialect';
 	}
 
 }

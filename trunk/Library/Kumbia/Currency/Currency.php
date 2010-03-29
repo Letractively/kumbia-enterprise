@@ -221,15 +221,16 @@ class Currency {
 	 *
 	 * @access 	public
 	 * @param 	string $quantity
+	 * @param 	int $decimalPlaces
 	 * @static
 	 */
-	public static function number($quantity){
+	public static function number($quantity, $decimalPlaces=null){
 		if(self::$_currencyFormater==null){
 			$locale = Locale::getApplication();
 			$pattern = $locale->getNumericFormat();
-			self::$_currencyFormater = new CurrencyFormat($pattern, $quantity);
+			self::$_currencyFormater = new CurrencyFormat($pattern, $quantity, $decimalPlaces);
 		} else {
-			self::$_currencyFormater->toNumeric($quantity);
+			self::$_currencyFormater->toNumeric($quantity, $decimalPlaces);
 		}
 		return self::$_currencyFormater->getQuantity();
 	}

@@ -14,14 +14,14 @@
  *
  * @category 	Kumbia
  * @package 	Scripts
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
  */
 
 if(isset($_SERVER['SERVER_SOFTWARE'])){
-	header('Location: index.php');
+	header('Location: /');
 	exit;
 }
 
@@ -53,17 +53,27 @@ while($_c = fgets($fp)){
 					}
 				}
 			}
-			echo "\niphp> ";
+			#echo "\niphp> ";
 		} else {
 			echo "iphp> ";
 		}
 	}
-	catch(KumbiaException $e){
+	catch(CoreException $e){
 		echo $e->getMessage()."\n";
 		$i = 1;
 		foreach($e->getTrace() as $trace){
 			if($trace['class']){
-				echo "#$i {$trace['class']}::{$trace['function']}(".join(",",$trace['args']).") en ".basename($trace['file'])."\n";
+				echo "#$i {$trace['class']}::{$trace['function']}(".join(",", $trace['args']).") en ".basename($trace['file'])."\n";
+			}
+			$i++;
+		}
+	}
+	catch(PDOException $e){
+		echo $e->getMessage()."\n";
+		$i = 1;
+		foreach($e->getTrace() as $trace){
+			if($trace['class']){
+				echo "#$i {$trace['class']}::{$trace['function']}(".join(",", $trace['args']).") en ".basename($trace['file'])."\n";
 			}
 			$i++;
 		}
