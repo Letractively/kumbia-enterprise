@@ -639,7 +639,7 @@ abstract class ActiveRecordBase extends Object
 		if(!isset($params['limit'])){
 			$params['limit'] = 1;
 		}
-		$select.= $this->convertParamsToSql($params);
+		$select = $this->convertParamsToSql($select, $params);
 		$resp = false;
 		try {
 			$this->_db->setFetchmode(DbBase::DB_ASSOC);
@@ -814,17 +814,14 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Arma una consulta SQL con el parámetro $params, aso:
-	 * 	$params = Utils::getParams(func_get_args());
-	 * 	$select = "SELECT * FROM clientes";
-	 *	$select.= $this->convertParamsToSql($params);
+	 * Arma una consulta SQL con el parámetro $params
      *
      * @access	public
+     * @param 	string $select
 	 * @param	string $params
 	 * @return	string
 	 */
-	public function convertParamsToSql($params = ''){
-		$select = '';
+	public function convertParamsToSql($select, $params=''){
 		if(is_array($params)){
 			if(isset($params['conditions'])&&$params['conditions']){
 				$select.= ' WHERE '.$params["conditions"].' ';
@@ -854,7 +851,7 @@ abstract class ActiveRecordBase extends Object
 				$select.=' ORDER BY 1';
 			}
 			if(isset($params['limit'])&&$params['limit']) {
-				$select = $this->_limit($select, $params['limit']);
+				$select = $this->_limit($preSelect.$select, $params['limit']);
 			}
 			if(isset($params['for_update'])){
 				if($params['for_update']==true){
@@ -881,10 +878,10 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve una clausula LIMIT adecuada al RDBMS empleado
 	 *
-	 * @access private
-	 * @param string $sqlStatement
-	 * @param $number
-	 * @return string
+	 * @access	private
+	 * @param	string $sqlStatement
+	 * @param	$number
+	 * @return	string
 	 */
 	private function _limit($sqlStatement, $number = 1){
 		return $this->_db->limit($sqlStatement, $number);
@@ -2643,7 +2640,7 @@ abstract class ActiveRecordBase extends Object
 			$requestedRelation = ucfirst(substr($method, 3));
 			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
 				$entityArguments = array('findFirst', $entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($argument, $entityArguments));
+				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($arguments, $entityArguments));
 			}
 			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
 				$entityArguments = array('find', $entityName, $requestedRelation, $this);
@@ -2658,7 +2655,7 @@ abstract class ActiveRecordBase extends Object
 			$requestedRelation = ucfirst(substr($method, 5));
 			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
 				$entityArguments = array('count', $entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($argument, $entityArguments));
+				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($arguments, $entityArguments));
 			}
 			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
 				$entityArguments = array('count', $entityName, $requestedRelation, $this);

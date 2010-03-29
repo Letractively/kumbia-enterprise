@@ -108,7 +108,6 @@ class DateFormat {
 		$formatParts[] = $token;
 		$toReplace = array();
 		$defaultPart = false;
-		#print_r($formatParts);
 		foreach($formatParts as $formatPart){
 			switch($formatPart){
 				case 'MMMM':

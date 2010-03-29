@@ -426,7 +426,7 @@ abstract class EntityManager {
 	 * @return 	boolean
 	 * @static
 	 */
-	static public function getBelongsToRecords($entityName, $relationRequested, $record){
+	static public function getBelongsToRecords($method, $entityName, $relationRequested, $record){
 		$relation = self::$_belongsTo[$entityName][$relationRequested];
 		if(!is_array($relation['rf'])){
 			$value = $record->readAttribute($relation['fi']);

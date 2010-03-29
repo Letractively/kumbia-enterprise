@@ -187,6 +187,14 @@ class DbBase extends Object {
 			}
 		}
 		$this->_descriptor = $descriptor;
+	}
+
+	/**
+	 * Ejecuta tareas trás crear la conexión
+	 *
+	 * @access protected
+	 */
+	public function connect(){
 		#if[no-plugins]
 		PluginManager::notifyFrom('Db', 'onCreateConnection', $this);
 		#endif
@@ -218,20 +226,25 @@ class DbBase extends Object {
 		$this->debug($sqlStatement);
 		$this->log($sqlStatement, Logger::DEBUG);
 		$this->trace($sqlStatement);
+		#if[no-plugins]
+		PluginManager::notifyFrom('Db', 'beforeQuery', $sqlStatement);
+		#endif
 	}
 
 	/**
 	 * Ejecuta las tareas de Profile en la conexion
 	 *
-	 * @access protected
-	 * @param string $sqlStatement
+	 * @access	protected
+	 * @param	string $sqlStatement
 	 */
 	protected function afterQuery($sqlStatement){
-
+		#if[no-plugins]
+		PluginManager::notifyFrom('Db', 'afterQuery', $sqlStatement);
+		#endif
 	}
 
 	/**
-	 * Ejecuta tareas antes de cerrar la conexion
+	 * Ejecuta tareas antes de cerrar la conexión
 	 *
 	 * @access protected
 	 */
@@ -299,9 +312,9 @@ class DbBase extends Object {
 	 * Realiza un query SQL y devuelve un array con los array resultados en forma
 	 * indexada asociativamente
 	 *
-	 * @param string $sqlQuery
-	 * @param integer $type
-	 * @return array
+	 * @param	string $sqlQuery
+	 * @param	integer $type
+	 * @return	array
 	 */
 	public function inQueryAssoc($sqlQuery){
 		$q = $this->query($sqlQuery);
@@ -336,7 +349,7 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Devuelve un array del resultado de un select de un solo registro
+	 * Devuelve un array del resultado de un SELECT de un solo registro
 	 *
 	 * @access	public
 	 * @param	string $sqlQuery
@@ -346,9 +359,11 @@ class DbBase extends Object {
 	public function fetchOne($sqlQuery){
 		$resultQuery = $this->query($sqlQuery);
 		if($resultQuery){
+			#if[compile-time]
 			if($this->numRows($resultQuery)>1){
 				Flash::warning("Una sentencia SQL: \"$sqlQuery\" retornó más de una fila cuando se esperaba una sola");
 			}
+			#endif
 			return $this->fetchArray($resultQuery);
 		} else {
 			return array();
@@ -415,9 +430,11 @@ class DbBase extends Object {
 			throw new DbException("No se puede efectuar la operación. La transacción es de solo lectura", 0, true, $this);
 		}
 		$updateSql = 'UPDATE '.$table.' SET ';
+		#if[compile-time]
 		if(count($fields)!=count($values)){
 			throw new DbException('Los número de valores a actualizar no es el mismo de los campos', 0, true, $this);
 		}
+		#endif
 		$i = 0;
 		$updateValues = array();
 		foreach($fields as $field){
@@ -575,10 +592,6 @@ class DbBase extends Object {
 
 	/**
 	 * Realiza una conexión directa al motor de base de datos
-	 * usando el driver de Kumbia
-	 *
-	 * $newConnection = Si es verdadero devuelve un objeto
-	 * db nuevo y no el del singleton
 	 *
 	 * @access	public
 	 * @param	boolean $renovate
@@ -600,8 +613,8 @@ class DbBase extends Object {
 			if(isset($config->database)==false){
 				throw new DbException('No se ha definido los parámetros de conexión al gestor relacional en enviroment.ini');
 			}
-			if(self::$_rawConnection==null){				
-				self::$_rawConnection = DbLoader::factory($config->database->type, $config->database);				
+			if(self::$_rawConnection==null){
+				self::$_rawConnection = DbLoader::factory($config->database->type, $config->database);
 			}
 			$connection = self::$_rawConnection;
 		}

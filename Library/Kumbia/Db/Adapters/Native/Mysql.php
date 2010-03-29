@@ -125,8 +125,8 @@ class DbMySQL extends DbBase
 	/**
 	 * Hace una conexión a la base de datos de MySQL
 	 *
-	 * @param stdClass $descriptor
-	 * @return resource
+	 * @param	stdClass $descriptor
+	 * @return	resource
 	 */
 	public function connect($descriptor=''){
 		if($descriptor==''){
@@ -180,6 +180,7 @@ class DbMySQL extends DbBase
 			$this->_autoCommit = $autocommit;
 			$this->_fetchMode = MYSQL_BOTH;
 			parent::__construct($descriptor);
+			parent::connect();
 			return true;
 		} else {
 			throw new DbException($this->error($php_errormsg), $this->noError(), false);
@@ -190,8 +191,8 @@ class DbMySQL extends DbBase
 	/**
 	 * Efectua operaciones SQL sobre la base de datos
 	 *
-	 * @param string $sqlStatement
-	 * @return resource|false
+	 * @param	string $sqlStatement
+	 * @return	resource|false
 	 */
 	public function query($sqlStatement){
 		parent::beforeQuery($sqlStatement);
@@ -231,10 +232,10 @@ class DbMySQL extends DbBase
 	}
 
 	/**
-	 * Cierra la Conexion al Motor de Base de datos
+	 * Cierra la conexión al motor de base de datos
 	 *
-	 * @access public
-	 * @return boolean
+	 * @access	public
+	 * @return	boolean
 	 */
 	public function close(){
 		if($this->_idConnection){
@@ -269,8 +270,8 @@ class DbMySQL extends DbBase
 	/**
 	 * Devuelve el numero de filas de un select
 	 *
-	 * @access public
-	 * @param boolean $resultQuery
+	 * @access	public
+	 * @param	boolean $resultQuery
 	 */
 	public function numRows($resultQuery=''){
 		if(!$this->_idConnection){

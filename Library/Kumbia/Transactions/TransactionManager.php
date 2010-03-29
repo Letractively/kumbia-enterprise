@@ -83,7 +83,6 @@ abstract class TransactionManager
 			self::$_dependencyPointer+=2048;
 			self::$_transactions[] = $transaction;
 		} else {
-			print_r(self::$_transactions);
 			$transaction = self::$_transactions[count(self::$_transactions)-1];
 			$transaction->setIsNewTransaction(false);
 		}

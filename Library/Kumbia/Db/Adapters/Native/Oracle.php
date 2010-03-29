@@ -127,11 +127,11 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			$date_format = isset($descriptor->date_format) ? $descriptor->date_format : 'YYYY-MM-DD HH24:MI:SS';
 			$this->query("ALTER SESSION SET nls_date_format='$date_format' nls_territory=$territory nls_language=$language nls_sort=$sort nls_comp=$comp");*/
 			parent::__construct($descriptor);
+			parent::connect();
 		}
 		if(!$this->_idConnection){
 			throw new DbException($this->error($php_errormsg), $this->noError(), false);
 		} else {
-			//register_shutdown_function(array($this, 'close'));
 			return true;
 		}
 	}
@@ -207,9 +207,10 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	 * @return	boolean
 	 */
 	public function close(){
-		/*if($this->_idConnection) {
+		if($this->_idConnection){
 			return oci_close($this->_idConnection);
-		}*/
+		}
+		parent::close();
 	}
 
 	/**
@@ -250,7 +251,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 			return false;
 		}
 		$sql = $this->_lastQuery;
-		if(preg_match('/SELECT [COUNT|MIN|MAX|AVG]/i', $sql)===false){
+		if(preg_match('/SELECT [COUNT|MIN|MAX|AVG]/i', $sql)==false){
 			$fromPosition = stripos($sql, 'FROM');
 			if($fromPosition===false){
 				return 0;
@@ -585,6 +586,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 	 *
 	 * @param	string $table
 	 * @param	array $identityColumn
+	 * @param 	string $sequenceName
 	 * @return	integer
 	 */
 	public function lastInsertId($table='', $identityColumn='', $sequenceName=''){
