@@ -141,9 +141,11 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 */
 	public function connect($descriptor){
 
+		#if[compile-time]
 		if(!extension_loaded('pdo')){
 			throw new DbException('Debe cargar la extensión de PHP llamada php_pdo');
 		}
+		#endif
 
 		$username = isset($descriptor->username) ? $descriptor->username : null;
 		$password = isset($descriptor->password) ? $descriptor->password : null;

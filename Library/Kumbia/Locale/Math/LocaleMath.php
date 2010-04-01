@@ -15,7 +15,7 @@
  * @category 	Kumbia
  * @package 	Locale
  * @subpackage 	LocaleMath
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -23,12 +23,12 @@
 /**
  * LocaleMath
  *
- * Clase para ejecutar operaciones matematicas usando la extension bcmath si esta disponible
+ * Clase para ejecutar operaciones matemáticas usando la extension bcmath si esta disponible
  *
  * @category 	Kumbia
  * @package 	Locale
  * @subpackage 	LocaleMath
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -165,18 +165,19 @@ class LocaleMath {
 	static public function round($value, $precision=0){
 		if(self::$_bcMathEnabled==true){
 			$roundUp = 0;
-			$position = strpos($value, ".");
-			if($position!==false){
+			$position = strpos($value, '.');
+			$scientificNotation = strpos($value, 'E-');
+			if($position!==false&&$scientificNotation===false){
 				$value = substr($value, 0, $position+$precision+2);
 				$decimalDigits = strlen(substr($value, $position))-1;
 				if($precision!=0){
 					if($decimalDigits==$precision+1){
 						$lastdigit = substr($value, strlen($value)-1, 1);
-						if($lastdigit=="5"){
-							$roundUp = "0.".str_pad($lastdigit, $decimalDigits, "0", STR_PAD_LEFT);
+						if($lastdigit=='5'){
+							$roundUp = '0.'.str_pad($lastdigit, $decimalDigits, '0', STR_PAD_LEFT);
 						} else {
 							if($lastdigit>5){
-								$roundUp = "0.".str_pad(10-$lastdigit, $decimalDigits, "0", STR_PAD_LEFT);
+								$roundUp = '0.'.str_pad(10-$lastdigit, $decimalDigits, '0', STR_PAD_LEFT);
 							}
 						}
 					}
@@ -203,10 +204,12 @@ class LocaleMath {
 	 * @static
 	 */
 	public static function enableBcMath(){
+		#if[compile-time]
 		if(extension_loaded('bcmath')==false){
 			throw new LocaleException('Debe cargar la extension de PHP llamada php_bcmath');
 			return false;
 		}
+		#endif
 		self::$_bcMathEnabled = true;
 	}
 

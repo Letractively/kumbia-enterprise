@@ -424,7 +424,7 @@ abstract class Dispatcher {
 
 				$cancelThrowException = false;
 
-				// Notifica la excepcion a los Plugins
+				// Notifica la excepción a los Plugins
 				#if[no-plugins]
 				$cancelThrowException = PluginManager::notifyFromApplication('onControllerException', $e);
 				#endif

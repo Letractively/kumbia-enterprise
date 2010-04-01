@@ -181,6 +181,17 @@ abstract class CoreConfig {
 	}
 
 	/**
+	 * Lee una configuración del apartado [application] de config.ini
+	 *
+	 * @param	string $setting
+	 * @return	string
+	 */
+	public static function getAppSetting($setting){
+		$config = self::readAppConfig();
+		return $config->application->$setting;
+	}
+
+	/**
 	 * Lee el archivo de carga de extensiones
 	 *
 	 * @return Config

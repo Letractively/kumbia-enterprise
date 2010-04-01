@@ -250,8 +250,8 @@ abstract class PluginManager {
 	/**
 	 * Notifica un evento de los controladores a los plugins
 	 *
-	 * @param string $event
-	 * @param Controller $controller
+	 * @param	string $event
+	 * @param	Controller $controller
 	 */
 	static public function notifyFromController($event, $controller){
 		if(count(self::$_pluginsController)>0){
@@ -262,14 +262,13 @@ abstract class PluginManager {
 				}
 			}
 		}
-		return Router::getController();
 	}
 
 	/**
 	 * Notifica un evento de los controladores a los plugins
 	 *
-	 * @param string $event
-	 * @param ControllerResponse $controllerResponse
+	 * @param	string $event
+	 * @param	ControllerResponse $controllerResponse
 	 * @static
 	 */
 	static public function notifyFromView($event, $controllerResponse){

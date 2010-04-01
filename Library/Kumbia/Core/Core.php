@@ -178,9 +178,11 @@ abstract class Core {
 				$timezone = 'America/Bogota';
 			}
 		}
+		#if[compile-time]
 		if(date_default_timezone_set($timezone)==false){
 			throw new CoreException('Timezone inválido \''.$timezone.'\'');
 		}
+		#endif
 		unset($timezone);
 	}
 
@@ -529,7 +531,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Realiza el proceso de atender una peticion
+	 * Realiza el proceso de atender una petición
 	 *
 	 * @access public
 	 * @static
@@ -570,28 +572,20 @@ abstract class Core {
 		while(Router::getRouted()==true){
 			Router::setRouted(false);
 
-			/**
-			 * Ejectutar Plugin::beforeDispatch()
-			 */
+			//Ejectutar Plugin::beforeDispatch()
 			#if[no-plugins]
-			$controllerName = PluginManager::notifyFromController('beforeDispatch', $controller);
+			PluginManager::notifyFromController('beforeDispatch', $controller);
 			#endif
 
-			/**
-			 * Si no hay controlador ejecuta ControllerBase::init()
-			 */
+			//Si no hay controlador ejecuta ControllerBase::init()
 			if($controllerName==null){
 				Dispatcher::initBase();
 			} else {
 
-				/**
-				 * Valida que si se tenga acceso al recurso solicitado
-				 */
+				//Valida que si se tenga acceso al recurso solicitado
 				Security::checkResourceAccess($controller);
 
-				/**
-				  * Ejectutar Plugin::beforeExecuteRoute()
-				  */
+				//Ejectutar Plugin::beforeExecuteRoute()
 				#if[no-plugins]
 				PluginManager::notifyFromController('beforeExecuteRoute', $controller);
 				#endif
@@ -599,27 +593,25 @@ abstract class Core {
 				$controller = Dispatcher::executeRoute(Router::getModule(), Router::getController(), Router::getAction(),
 				Router::getParameters(), Router::getAllParameters());
 
-				/**
-				  * Ejectutar Plugin::afterExecuteRoute()
-				  */
+				//Ejectutar Plugin::afterExecuteRoute()
 				#if[no-plugins]
 				PluginManager::notifyFromController('afterExecuteRoute', $controller);
 				#endif
 
 			}
-
 			Router::ifRouted();
 
 			// Ejectutar Plugin::afterDispatch()
 			#if[no-plugins]
-			$controllerName = PluginManager::notifyFromController('afterDispatch', $controller);
+			PluginManager::notifyFromController('afterDispatch', $controller);
 			#endif
+
+			//Nombre del último controlador
+			$controllerName = Router::getController();
 
 		}
 
-		/**
-		 * Ejectutar Plugin::afterDispatchLoop() y CommonEventManager::notifyEvent()
-		 */
+		//Ejectutar Plugin::afterDispatchLoop() y CommonEventManager::notifyEvent()
 		#if[no-common-event]
 		CommonEventManager::notifyEvent('afterDispatchLoop');
 		#endif
@@ -684,7 +676,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Carga el framework javascript y funciones auxiliares
+	 * Carga el framework javascript y funciones auxiliares. Método obsoleto
 	 *
 	 * @access 		public
 	 * @static
@@ -695,7 +687,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Imprime los CSS cargados mediante Tag::stylesheetLink
+	 * Imprime los CSS cargados mediante Tag::stylesheetLink. Método obsoleto
 	 *
 	 * @access 		public
 	 * @static

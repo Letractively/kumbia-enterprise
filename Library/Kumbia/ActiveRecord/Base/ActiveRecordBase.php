@@ -67,7 +67,7 @@ abstract class ActiveRecordBase extends Object
 	{
 
 	/**
-	 * Resource de conexion a la base de datos
+	 * Resource de conexión a la base de datos
 	 *
 	 * @var DbBase
 	 */
@@ -88,7 +88,7 @@ abstract class ActiveRecordBase extends Object
 	protected $_source = '';
 
 	/**
-	 * Numero de resultados generados en la ultima consulta
+	 * Numero de resultados generados en la última consulta
 	 *
 	 * @var integer
 	 */
@@ -125,7 +125,7 @@ abstract class ActiveRecordBase extends Object
 	private $_wherePk = '';
 
 	/**
-	 * Puntero del Objeto en la transaccion
+	 * Puntero del objeto en la transacción
 	 *
 	 * @var int
 	 */
@@ -851,7 +851,7 @@ abstract class ActiveRecordBase extends Object
 				$select.=' ORDER BY 1';
 			}
 			if(isset($params['limit'])&&$params['limit']) {
-				$select = $this->_limit($preSelect.$select, $params['limit']);
+				$select = $this->_limit($select, $params['limit']);
 			}
 			if(isset($params['for_update'])){
 				if($params['for_update']==true){
@@ -1364,10 +1364,20 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
+	 * Establece los meta-datos de un determinado campo del modelo
+	 *
+	 * @param	string $attributeName
+	 * @param	array $definition
+	 */
+	public function setAttributeMetadata($attributeName, $definition){
+		ActiveRecordMetaData::setAttributeMetadata($this->_source, $this->_schema, $attributeName, $definition);
+	}
+
+	/**
 	 * Devuelve los atributos del modelo (campos) (internal)
 	 *
-	 * @access protected
-	 * @return array
+	 * @access	protected
+	 * @return	array
 	 */
 	protected function _getAttributes(){
 		return ActiveRecordMetaData::getAttributes($this->_source, $this->_schema);
@@ -1376,8 +1386,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve los atributos del modelo (campos)
 	 *
-	 * @access public
-	 * @return array
+	 * @access	public
+	 * @return	array
 	 */
 	public function getAttributes(){
 		$this->_connect();
@@ -1387,8 +1397,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve los campos que son llave primaria (interno)
 	 *
-	 * @access protected
-	 * @return array
+	 * @access	protected
+	 * @return	array
 	 */
 	protected function _getPrimaryKeyAttributes(){
 		return ActiveRecordMetaData::getPrimaryKeys($this->_source,  $this->_schema);
@@ -1397,8 +1407,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve los campos que son llave primaria
 	 *
-	 * @access public
-	 * @return array
+	 * @access	public
+	 * @return	array
 	 */
 	public function getPrimaryKeyAttributes(){
 		$this->_connect();
@@ -1408,8 +1418,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve los campos que no son llave primaria (internal)
 	 *
-	 * @access protected
-	 * @return array
+	 * @access	protected
+	 * @return	array
 	 */
 	protected function _getNonPrimaryKeyAttributes(){
 		return ActiveRecordMetaData::getNonPrimaryKeys($this->_source,  $this->_schema);
@@ -1418,8 +1428,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve los campos que no son llave primaria
 	 *
-	 * @access public
-	 * @return array
+	 * @access	public
+	 * @return	array
 	 */
 	public function getNonPrimaryKeyAttributes(){
 		$this->_connect();
@@ -1429,8 +1439,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve los campos que son no nulos (internal)
 	 *
-	 * @access protected
-	 * @return array
+	 * @access	protected
+	 * @return	array
 	 */
 	protected function _getNotNullAttributes(){
 		return ActiveRecordMetaData::getNotNull($this->_source, $this->_schema);
@@ -1439,8 +1449,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve los campos que son no nulos
 	 *
-	 * @access public
-	 * @return array
+	 * @access	public
+	 * @return	array
 	 */
 	public function getNotNullAttributes(){
 		$this->_connect();
@@ -1476,6 +1486,26 @@ abstract class ActiveRecordBase extends Object
 	 */
 	protected function _getDataTypes(){
 		return ActiveRecordMetaData::getDataTypes($this->_source, $this->_schema);
+	}
+
+	/**
+	 * Obtiene los campos que tienen tipos de datos numéricos
+	 *
+	 * @return array
+	 */
+	public function getDataTypesNumeric(){
+		$this->_connect();
+		return array_keys($this->_getDataTypes());
+	}
+
+	/**
+	 * Obtiene los campos que tienen tipos de datos numéricos (internal)
+	 *
+	 * @access protected
+	 * @return array
+	 */
+	protected function _getDataTypesNumeric(){
+		return ActiveRecordMetaData::getDataTypesNumeric($this->_source, $this->_schema);
 	}
 
 	/**
@@ -1850,8 +1880,10 @@ abstract class ActiveRecordBase extends Object
 			$table = $this->_source;
 		}
 
+		$magicQuotesRuntime = get_magic_quotes_runtime();
 		$dataType = $this->_getDataTypes();
 		$primaryKeys = $this->_getPrimaryKeyAttributes();
+		$dataTypeNumeric = $this->_getDataTypesNumeric();
 		if($exists){
 			if(self::$_dynamicUpdate==false){
 				$fields = array();
@@ -1868,7 +1900,7 @@ abstract class ActiveRecordBase extends Object
 						if($this->$np===''||$this->$np===null){
 							$values[] = 'NULL';
 						} else {
-							if($this->isANumericType($np)==false){
+							if(!isset($dataTypeNumeric[$np])){
 								if($dataType[$np]=='date'){
 									$values[] = $this->_db->getDateUsingFormat($this->$np);
 								} else {
@@ -1912,7 +1944,7 @@ abstract class ActiveRecordBase extends Object
 								$values[] = 'NULL';
 							}
 						} else {
-							if($this->isANumericType($np)==false){
+							if(!isset($dataTypeNumeric[$np])){
 								if($dataType[$np]=='date'){
 									$value = $this->_db->getDateUsingFormat($this->$np);
 									if($record->$np!=$value){
@@ -1953,7 +1985,7 @@ abstract class ActiveRecordBase extends Object
 							throw new ActiveRecordException('El objeto instancia de "'.get_class($this->$field).'" en el campo "'.$field.'" es muy complejo, debe realizarle un "cast" a un tipo de dato escalar antes de almacenarlo');
 						}
 					} else {
-						if($this->isANumericType($field)==true||$this->$field=='NULL'){
+						if(isset($dataTypeNumeric[$field])||$this->$field=='NULL'){
 							if($this->$field===''||$this->$field===null){
 								$values[] = 'NULL';
 							} else {
@@ -1970,7 +2002,7 @@ abstract class ActiveRecordBase extends Object
 								if($this->$field===null||$this->$field===''){
 									$values[] = 'NULL';
 								} else {
-									if(get_magic_quotes_runtime()==true){
+									if($magicQuotesRuntime==true){
 										$values[] = "'".$this->$field."'";
 									} else {
 										$values[] = "'".addslashes($this->$field)."'";
@@ -2015,7 +2047,7 @@ abstract class ActiveRecordBase extends Object
 			} else {
 				if($generator===null){
 					if(count($primaryKeys)==1){
-						if($this->isANumericType($primaryKeys[0])){
+						if(isset($dataTypeNumeric[$primaryKeys[0]])){
 						    $lastId = $this->_db->lastInsertId($table, $primaryKeys[0], $sequenceName);
 						    $this->{$primaryKeys[0]} = $lastId;
 							$this->findFirst($lastId);
@@ -2396,7 +2428,7 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Permite saber si el proceso de validacion ha generado mensajes
+	 * Permite saber si el proceso de validación ha generado mensajes
 	 *
 	 * @return boolean
 	 */
@@ -2409,40 +2441,32 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Verifica si un campo es de tipo de dato numerico o no
+	 * Verifica si un campo es de tipo de dato numérico o no
 	 *
-	 * @param string $field
-	 * @return boolean
+	 * @param	string $field
+	 * @return	boolean
 	 */
 	public function isANumericType($field){
-		$dataType = $this->getDataTypes();
-		if(
-		strpos($dataType[$field], 'int')!==false||
-		strpos($dataType[$field], 'decimal')!==false||
-		strpos($dataType[$field], 'number')!==false
-		){
+		$dataTypeNumeric = $this->_getDataTypeNumeric();
+		if(isset($dataTypeNumeric[$field])){
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	/*******************************************************************************************
-	* Metodos para generacion de relaciones
-	*******************************************************************************************/
-
 	/**
-	 * Crea una relacion 1-1 entre dos modelos
+	 * Crea una relación 1-1 entre dos modelos
 	 *
-	 * @access protected
-	 * @param string $relation
+	 * @access	protected
+	 * @param	string $relation
 	 */
 	protected function hasOne($fields='', $referenceTable='', $referencedFields=''){
 		EntityManager::addHasOne(get_class($this), $fields, $referenceTable, $referencedFields);
 	}
 
 	/**
-	 * Crea una relacion 1-1 inversa entre dos entidades
+	 * Crea una relación 1-1 inversa entre dos entidades
 	 *
 	 * @param	mixed $fields
 	 * @param	string $referenceTable
@@ -2454,7 +2478,7 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Crea una relacion 1-n entre dos entidades
+	 * Crea una relación 1-n entre dos entidades
 	 *
 	 * @param	mixed $fields
 	 * @param	string $referenceTable
@@ -2465,7 +2489,7 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Crea una relacion n-m entre dos modelos
+	 * Crea una relación n-m entre dos modelos
 	 *
 	 * @param string $relation
 	 */

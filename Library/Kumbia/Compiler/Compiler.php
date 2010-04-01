@@ -97,6 +97,13 @@ class Compiler {
 	private static $_replaceSymbol = array();
 
 	/**
+	 * Path al Framework, debe ser definido si este es diferente al habitual ó es un enlace simbólico
+	 *
+	 * @var string
+	 */
+	private static $_frameworkPath = '';
+
+	/**
 	 * Tokens que deben añadir un espacio al principio
 	 *
 	 * @var array
@@ -162,7 +169,7 @@ class Compiler {
 	private static $_reflectedClasses = array();
 
 	/**
-	 * Array de Mensajes Producidos en la compilación
+	 * Array de mensajes producidos en la compilación
 	 *
 	 * @var array
 	 */
@@ -176,7 +183,7 @@ class Compiler {
 	private static $_compilation = '';
 
 	/**
-	 * Indica secciones de codigo que no deben incluirse en la compilación
+	 * Indica secciones de código que no deben incluirse en la compilación
 	 *
 	 * @var boolean
 	 */
@@ -201,8 +208,20 @@ class Compiler {
 	const MESSAGE_NOTICE = 2;
 
 	/**
-	 * Compila la aplicacion actual
+	 * Path al Framework, debe ser definido si este es diferente al habitual ó es un enlace simbólico
 	 *
+	 * @param	string $path
+	 */
+	public static function setFrameworkPath($path){
+		self::$_frameworkPath = $path;
+	}
+
+	/**
+	 * Compila los componentes del framework requeridos para la aplicación actual
+	 *
+	 * @param	string $outputFile
+	 * @param	array $otherFiles
+	 * @return	string
 	 */
 	public static function compileFramework($outputFile, $otherFiles=array()){
 		set_time_limit(0);
@@ -210,16 +229,17 @@ class Compiler {
 		self::$_requiredFiles = get_required_files();
 		$i = 0;
 		$currentDirectory = getcwd();
-		foreach(self::$_requiredFiles as $requiredFile){
-			self::$_requiredFiles[$i] = str_replace('/Applications/MAMP/htdocs/kef/kumbia-ef', $currentDirectory, $requiredFile);
-			++$i;
+		if(self::$_frameworkPath!=''){
+			foreach(self::$_requiredFiles as $requiredFile){
+				self::$_requiredFiles[$i] = str_replace(self::$_frameworkPath, $currentDirectory, $requiredFile);
+				++$i;
+			}
 		}
 		self::compileFile('Library/Kumbia/Autoload.php');
 		$includeControllerBase = false;
 		foreach(self::$_requiredFiles as $requiredFile){
 			if(
 			  strpos($requiredFile, '/Library/Kumbia/Controller/')===false&&
-			  //strpos($requiredFile, '/Library/Kumbia/Tag/')===false&&
 			  strpos($requiredFile, '/Library/Kumbia/Compiler/')===false&&
 			  strpos($requiredFile, '/Library/Kumbia/Autoload.php')===false&&
 			  strpos($requiredFile, 'public/index.php')===false&&
@@ -259,6 +279,12 @@ class Compiler {
 		}
 	}
 
+	/**
+	 * Compila un fragmento de código PHP
+	 *
+	 * @param	string $source
+	 * @return	string
+	 */
 	public static function compileSource($source){
 		self::$_oldToken = 0;
 		self::$_replaceSymbol = array(97);
@@ -326,7 +352,7 @@ class Compiler {
 									$jp = true;
 									$i = $r+1;
 								}
-								break;
+								break;*/
 							case T_VARIABLE:
 								if(preg_match('/^\$/', $token[1])==false){
 									if($tokens[$i-2][0]==T_FUNCTION){
@@ -365,7 +391,6 @@ class Compiler {
 									$token[1] = "";
 								}
 								break;
-							*/
 						}
 						if($jp==false){
 							if(in_array($token[0], self::$_beforeSpaceTokens)){
@@ -472,10 +497,23 @@ class Compiler {
 		return $messages;
 	}
 
+	/**
+	 * Agrega un mensaje en el compilador
+	 *
+	 * @param	string $message
+	 * @param	string $type
+	 */
 	private static function _addMessage($message, $type){
 		self::$_messages[$type][] = $message;
 	}
 
+	/**
+	 * Verifica la existencia de una constante de clase
+	 *
+	 * @param	array $className
+	 * @param	string $constant
+	 * @return	string
+	 */
 	public static function _checkClassConstant($className, $constant){
 		if(class_exists($className)){
 			if(!isset(self::$_reflectedClasses[$className])){
@@ -684,7 +722,7 @@ class Compiler {
 	}
 
 	/**
-	 * Obtiene el resultado temporal de la compilacion
+	 * Obtiene el resultado temporal de la compilación
 	 *
 	 * @return string
 	 */

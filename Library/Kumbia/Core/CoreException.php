@@ -281,9 +281,27 @@ class CoreException extends Exception {
 					}
 				}
 
+				//Une el backtrace extendido con el traceback y elimina las entradas repetidas
 				if(count($this->_extendedBacktrace)>0){
 					$traceback = array_merge($this->_extendedBacktrace, $traceback);
+					$uniqueTraceback = array();
+					foreach($traceback as $trace){
+						if(isset($trace['file'])){
+							$file = $trace['file'];
+						} else {
+							$file = '';
+						}
+						if(isset($trace['line'])){
+							$line = $trace['line'];
+						} else {
+							$line = '';
+						}
+						$uniqueTraceback[$file.$line] = $trace;
+					}
+					$traceback = $uniqueTraceback;
 				}
+
+				//Agrea linea de excepción al backtrace
 				if(strpos($this->getFile(), 'apps')!==false){
 					$firstLine = array(array(
 						'file' => $this->getFile(),
@@ -291,6 +309,8 @@ class CoreException extends Exception {
 					));
 					$traceback = array_merge($firstLine, $traceback);
 				}
+
+				//Imprime el backtrace
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){
 						$rfile = self::getSafeFileName($trace['file']);
@@ -302,10 +322,14 @@ class CoreException extends Exception {
 							$lines = file($file);
 							$numberLines = count($lines);
 							$firstLine = ($line-7)<1 ? 1 : $line-7;
-							$lastLine = ($line+7>$numberLines ? $numberLines : $line+7);
+							$lastLine = ($line+5>$numberLines ? $numberLines : $line+5);
 							echo "<pre class='brush: php; first-line: ", ($firstLine), "; highlight: [", ($line), "]; smart-tabs: true'>";
 							for($i=$firstLine;$i<=$lastLine;++$i){
-								echo htmlentities($lines[$i-1], ENT_COMPAT, 'UTF-8');
+								if($lines[$i-1]!=PHP_EOL){
+									echo htmlentities($lines[$i-1], ENT_COMPAT, 'UTF-8');
+								} else {
+									echo '&nbsp;'."\n";
+								}
 							}
 							unset($lines);
 							unset($line);

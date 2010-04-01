@@ -16,8 +16,6 @@
  * @package		ActiveRecord
  * @subpackage	ActiveRecordMetaData
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
  * @license		New BSD License
  * @version 	$Id$
  */
@@ -43,7 +41,6 @@
  * @package		ActiveRecord
  * @subpackage	ActiveRecordMetaData
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
  */
@@ -109,16 +106,22 @@ abstract class ActiveRecordMetaData {
 	const MODELS_DATA_TYPE = 4;
 
 	/**
+	 * Constante para indexar datos de tipo numérico
+	 *
+	 */
+	const MODELS_DATA_TYPE_NUMERIC = 5;
+
+	/**
 	 * Constante para indexar campos de fecha automática al crear
 	 *
 	 */
-	const MODELS_DATE_AT = 5;
+	const MODELS_DATE_AT = 6;
 
 	/**
 	 * Constante para indexar campos de fecha automática al modificar
 	 *
 	 */
-	const MODELS_DATE_IN = 6;
+	const MODELS_DATE_IN = 7;
 
 	/**
 	 * Permite definir los atributos de un modelo en forma de memoria compartida
@@ -256,6 +259,21 @@ abstract class ActiveRecordMetaData {
 	}
 
 	/**
+	 * Obtiene los tipos de datos de atributos que sean numéricos en forma de memoria compartida
+	 *
+	 * @param	string $tableName
+	 * @param	string $schemaName
+	 * @return	array
+	 */
+	static public function getDataTypesNumeric($tableName, $schemaName){
+		if(isset(self::$_metaData[$schemaName][$tableName][self::MODELS_DATA_TYPE_NUMERIC])){
+			return self::$_metaData[$schemaName][$tableName][self::MODELS_DATA_TYPE_NUMERIC];
+		} else {
+			return array();
+		}
+	}
+
+	/**
 	 * Permite definir los tipos de datos de atributos de un modelo en forma de memoria compartida
 	 *
 	 * @param	string $tableName
@@ -351,6 +369,24 @@ abstract class ActiveRecordMetaData {
 	}
 
 	/**
+	 * Establece los meta-datos de una tabla
+	 *
+	 * @param	string $table
+	 * @param	string $schema
+	 * @param	string $attribute
+	 * @param	array $definition
+	 */
+	static public function setAttributeMetadata($table, $schema, $attribute, $definition){
+		if(!isset(self::$_metaData[$schema][$table][self::MODELS_ATTRIBUTES])){
+			self::$_metaData[$schema][$table][self::MODELS_ATTRIBUTES] = array($attribute);
+		} else {
+			if(!in_array($attribute, self::$_metaData[$schema][$table][self::MODELS_ATTRIBUTES])){
+		 		self::$_metaData[$schema][$table][self::MODELS_ATTRIBUTES][] = $attribute;
+			}
+		}
+	}
+
+	/**
 	 * Inicializa el puntero de memoria compartida
 	 *
 	 */
@@ -366,7 +402,7 @@ abstract class ActiveRecordMetaData {
 	}
 
 	/**
-	 * Devuelve un identicador unico de acuerdo al source
+	 * Devuelve un identicador único de acuerdo al source
 	 *
 	 * @param	string $source
 	 * @return	int
@@ -400,8 +436,10 @@ abstract class ActiveRecordMetaData {
 		$nonPrimary = array();
 		$notNull = array();
 		$dataType = array();
+		$dataTypeNumeric = array();
 		$at = array();
 		$in = array();
+		$numericTypes = array('int', 'decimal', 'number', 'smallint', 'float', 'smallfloat', 'bigint');
 		foreach($metaData as $field){
 			$fields[] = $field['Field'];
 			if($field['Key']=='PRI'){
@@ -412,7 +450,7 @@ abstract class ActiveRecordMetaData {
 			if($field['Null']=='NO'){
 				$notNull[] = $field['Field'];
 			}
-			if($field['Type']){
+			if(isset($field['Type'])){
 				$dataType[$field['Field']] = strtolower($field['Type']);
 			}
 			if(preg_match('/_at$/', $field['Field'])){
@@ -422,6 +460,11 @@ abstract class ActiveRecordMetaData {
 					$in[$field['Field']] = 1;
 				}
 			}
+			foreach($numericTypes as $type){
+				if(preg_match('/^'.$type.'/', $field['Type'])){
+					$dataTypeNumeric[$field['Field']] = true;
+				}
+			}
 			unset($field);
 		}
 		if($schema){
@@ -429,32 +472,37 @@ abstract class ActiveRecordMetaData {
 		} else {
 			$source = $table;
 		}
+		#if[compile-time]
 		if(count($fields)==0){
 			throw new ActiveRecordMetaDataException("Meta-datos inválidos para '$table'");
 		}
+		#endif
 		self::$_metaData[$schema][$table][self::MODELS_ATTRIBUTES] = $fields;
 		self::$_metaData[$schema][$table][self::MODELS_PRIMARY_KEY] = $primaryKey;
 		self::$_metaData[$schema][$table][self::MODELS_NON_PRIMARY_KEY] = $nonPrimary;
 		self::$_metaData[$schema][$table][self::MODELS_NOT_NULL] = $notNull;
 		self::$_metaData[$schema][$table][self::MODELS_DATA_TYPE] = $dataType;
+		self::$_metaData[$schema][$table][self::MODELS_DATA_TYPE_NUMERIC] = $dataTypeNumeric;
 		self::$_metaData[$schema][$table][self::MODELS_DATE_AT] = $at;
 		self::$_metaData[$schema][$table][self::MODELS_DATE_IN] = $in;
 
 		//Grabar meta-data en un archivo persistente
-
-		$modelsDir = Core::getActiveModelsDir();
-		self::_initializeSharedMemory();
-		if(self::$_hasSharedMemory==true){
-			$sharedKey = self::_getSharedKey($source);
-			shm_put_var(self::$_sharedId, $sharedKey, self::$_metaData[$schema][$table]);
-			unset($sharedKey);
-		} else {
-			if(!file_exists($modelsDir.'/metadata')){
-				mkdir($modelsDir.'/metadata');
-			}
-			file_put_contents($modelsDir.'/metadata/'.$source.'.php', serialize(self::$_metaData[$schema][$table]));
+		$enviroment = CoreConfig::getAppSetting('mode');
+		if($enviroment=='production'){
+			$modelsDir = Core::getActiveModelsDir();
+			self::_initializeSharedMemory();
+			if(self::$_hasSharedMemory==true){
+				$sharedKey = self::_getSharedKey($source);
+				shm_put_var(self::$_sharedId, $sharedKey, self::$_metaData[$schema][$table]);
+				unset($sharedKey);
+			} else {
+				if(!file_exists($modelsDir.'/metadata')){
+					mkdir($modelsDir.'/metadata');
+				}
+				file_put_contents($modelsDir.'/metadata/'.$source.'.php', serialize(self::$_metaData[$schema][$table]));
+		 	}
+			unset($modelsDir);
 		}
-		unset($modelsDir);
 		unset($schema);
 		unset($table);
 		unset($source);
@@ -463,6 +511,7 @@ abstract class ActiveRecordMetaData {
 		unset($nonPrimary);
 		unset($notNull);
 		unset($dataType);
+		unset($dataTypeNumeric);
 		unset($at);
 		unset($in);
 	}
