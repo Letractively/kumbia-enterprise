@@ -129,7 +129,7 @@ class Date extends Object {
 	const INTERVAL_WEEK = 3;
 
 	/**
-     * Tabla de los dias del Mes
+     * Tabla del número de días de cada mes
      *
      * @var array
      */

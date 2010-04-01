@@ -36,9 +36,7 @@ function __autoload($className){
 		$classPath = CoreClassPath::getClassPath($className);
 		require $classPath;
 	} else {
-		/**
-		 * Incluir Componentes Personalizados
-		 */
+		//Incluir Componentes Personalizados
 		$activeApp = Router::getApplication();
 		if($activeApp){
 			$config = CoreConfig::readAppConfig();

@@ -288,13 +288,13 @@ abstract class Tag {
 	public static function textArea($configuration){
 		$numberArguments = func_num_args();
 		$configuration = Utils::getParams(func_get_args(), $numberArguments);
-		if(!isset($configuration['name'])||$configuration['name']) {
+		if(!isset($configuration['name'])||$configuration['name']){
 			$configuration['name'] = $configuration[0];
 		}
-		if(!isset($configuration['cols'])||!$configuration['cols']) {
+		if(!isset($configuration['cols'])||!$configuration['cols']){
 			$configuration['cols'] = 40;
 		}
-		if(!isset($configuration['rows'])||!$configuration['rows']) {
+		if(!isset($configuration['rows'])||!$configuration['rows']){
 			$configuration['rows'] = 25;
 		}
 		if(!isset($configuration['value'])){
@@ -519,7 +519,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Crea un campo que acepta solo fechas
+	 * Helper para capturar fechas
 	 *
 	 * @access 	public
 	 * @param 	mixed $params
@@ -529,6 +529,7 @@ abstract class Tag {
 	public static function dateField($params){
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
+
 		if(!isset($params[0])){
 			$params[0] = $params['id'];
 		}
@@ -543,14 +544,15 @@ abstract class Tag {
 		}
 
 		if($value){
-			$ano = substr($value, 0, 4);
-			$mes = substr($value, 5, 2);
-			$dia = substr($value, 8, 2);
+			$year = substr($value, 0, 4);
+			$month = substr($value, 5, 2);
+			$day = substr($value, 8, 2);
 		} else {
-			$ano = date('Y');
-			$mes = 0;
-			$dia = 0;
+			$year = date('Y');
+			$month = 0;
+			$day = 0;
 		}
+
 		if(isset($params['useDummy'])&&$params['useDummy']){
 			$useDummy = true;
 			unset($params['useDummy']);
@@ -560,74 +562,95 @@ abstract class Tag {
 		$attributes = array();
 		foreach($params as $_key => $_value){
 			if(in_array($_key, array('name'))==false&&!is_integer($_key)){
-				$attributes[] = "$_key='$_value'";
+				$attributes[] = $_key.'="'.$_value.'"';
 			}
 		}
-		$code ="<table ".join(" ", $attributes)."><tr><td>";
+		$code = '<table '.join(' ', $attributes).'><tr><td>';
 		if(self::$_useLocale){
-			$locale = Locale::getApplication();
+			if(!isset($params['locale'])){
+				$locale = Locale::getApplication();
+			} else {
+				$locale = $params['locale'];
+			}
 			if($locale->isDefaultLocale()==false){
-				$meses = array();
+				$months = array();
 				$i = 1;
-				foreach($locale->getAbrevMonthList() as $month){
-					$meses[sprintf('%02s', $i)] = ucfirst($month);
+				if(isset($params['months'])){
+					if($params['months']=='complete'){
+						$monthNames = $locale->getMonthList();
+					} else {
+						$monthNames = $locale->getAbrevMonthList();
+					}
+				} else {
+					$monthNames = $locale->getAbrevMonthList();
+				}
+				foreach($monthNames as $monthName){
+					if($i<10){
+						$months['0'.$i] = ucfirst($monthName);
+					} else {
+						$months[$i] = ucfirst($monthName);
+					}
 					++$i;
 				}
 			}
 		}
-		if(!isset($meses)){
-			$meses = array(
-				'01' => 'Ene', '02' => 'Feb',
-				'03' => 'Mar', '04' => 'Abr',
-				'05' => 'May', '06' => 'Jun',
-				'07' => 'Jul', '08' => 'Ago',
-				'09' => 'Sep', '10' => 'Oct',
-				'11' => 'Nov', '12' => 'Dic'
-			);
+		if(!isset($months)){
+			if(isset($params['months'])&&$params['months']=='complete'){
+				$months = array(
+					'01' => 'Enero', '02' => 'Febrero',
+					'03' => 'Marzo', '04' => 'Abril',
+					'05' => 'Mayo', '06' => 'Junio',
+					'07' => 'Julio', '08' => 'Agosto',
+					'09' => 'Septiembre', '10' => 'Octubre',
+					'11' => 'Noviembre', '12' => 'Diciembre'
+				);
+			} else {
+				$months = array(
+					'01' => 'Ene', '02' => 'Feb',
+					'03' => 'Mar', '04' => 'Abr',
+					'05' => 'May', '06' => 'Jun',
+					'07' => 'Jul', '08' => 'Ago',
+					'09' => 'Sep', '10' => 'Oct',
+					'11' => 'Nov', '12' => 'Dic'
+				);
+			}
 		}
 		if($useDummy){
-			$displayJS = 'if(this.selectedIndex>0){$(\''.$params[0].'_day\').show();$(\''.$params[0].'_year\').show();}else{$(\''.$params[0].'_day\').hide();$(\''.$params[0].'_year\').hide();$(\''.$params[0].'\').value = \'\'};';
+			$displayJS = 'if(this.selectedIndex>0){Base.show(\''.$params[0].'_day\');Base.show(\''.$params[0].'_year\')}else{Base.hide(\''.$params[0].'_day\');Base.hide(\''.$params[0].'_year\');$(\''.$params[0].'\').setValue(\'\')};';
+			$display = 'style="display:none"';
 		} else {
 			$displayJS = '';
+			$display = '';
 		}
-		$code .= "<select id='".$params[0]."_month' onchange=\"$displayJS$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+\$F('".$params[0]."_month')+'-'+\$F('".$params[0]."_day')\">";
+
+		$code.='<select id="'.$params[0].'Month" onchange="'.$displayJS.'DateField.refresh(\''.$params[0].'\')">';
 		if($useDummy){
-			$code.="<option value='@'>Sel...</option>\n";
+			$code.='<option value="@">Sel...</option>';
 		}
-		foreach($meses as $numero_mes => $nombre_mes){
-			if($numero_mes==$mes){
-				$code.="<option value='$numero_mes' selected='selected'>$nombre_mes</option>\n";
+		foreach($months as $number => $name){
+			if($number==$month){
+				$code.='<option value="'.$number.'" selected="selected">'.$name.'</option>';
 			} else {
-				$code.="<option value='$numero_mes'>$nombre_mes</option>\n";
+				$code.='<option value="'.$number.'">'.$name.'</option>';
 			}
 		}
 		$code.="</select></td><td>";
 
-		if($useDummy){
-			$display = 'style="display:none"';
-		} else {
-			$display = '';
-		}
-		$code.="<select id='".$params[0]."_day' onchange=\"$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+$('".$params[0]."_month').options[$('".$params[0]."_month').selectedIndex].value+'-'+$('".$params[0]."_day').options[$('".$params[0]."_day').selectedIndex].value;\" $display>";
+		$code.='<select id="'.$params[0].'Day" onchange="DateField.refresh(\''.$params[0].'\')" '.$display.">";
 		for($i=1;$i<=31;++$i){
-			$n = $i<10 ? '0'.$i : $i;
-			if($n==$dia){
-				$code.="<option value='$n' selected='selected'>$n</option>\n";
+			$number = $i<10 ? '0'.$i : $i;
+			if($number==$day){
+				$code.='<option value="'.$number.'" selected="selected">'.$number.'</option>';
 			} else {
-				$code.="<option value='$n'>$n</option>\n";
+				$code.='<option value="'.$number.'">'.$number.'</option>';
 			}
 		}
-		$code.="</select></td><td>";
-		if($useDummy){
-			$display = 'style="display:none"';
-		} else {
-			$display = '';
-		}
-		$code.="<select id='".$params[0]."_year' onchange=\"$('".$params[0]."').value = \$F('".$params[0]."_year')+'-'+\$F('".$params[0]."_month')+'-'+\$F('".$params[0]."_day')\" $display>\n";
+		$code.='</select></td><td>';
+		$code.='<select id="'.$params[0].'Year" onchange="DateField.refresh(\''.$params[0].'\')" '.$display.">";
 		if(isset($params['startYear'])){
 			$startYear = $params['startYear'];
 		} else {
-			$startYear = 1900;
+			$startYear = 1925;
 		}
 		if(isset($params['finalYear'])){
 			$finalYear = $params['finalYear'];
@@ -635,126 +658,90 @@ abstract class Tag {
 			$finalYear = date('Y')+5;
 		}
 		for($i=$finalYear;$i>=$startYear;$i--){
-			if($i==$ano){
-				$code.="<option value='$i' selected='selected'>$i</option>\n";
+			if($i==$year){
+				$code.='<option value="'.$i.'" selected="selected">'.$i.'</option>';
 			} else {
-				$code.="<option value='$i'>$i</option>\n";
+				$code.='<option value="'.$i.'">'.$i.'</option>';
 			}
 		}
-		$code.="</select></td><td>";
-		$code.="</table>";
-		$code.="<input type='hidden' id='".$params[0]."' name='".$params[0]."' value='$value' />";
+		$code.="</select></td><td></table>";
+		$code.="<input type='text' id='".$params[0]."' name='".$params[0]."' value='$value' />";
 
 		return $code;
 	}
 
 	/**
-	 * Crea un campo para la captura de fechas que permite personalizar
-	 * los meses de acuerdo a la localizacion
+	 * Helper para capturar idiomas
 	 *
 	 * @access 	public
 	 * @param 	mixed $params
-	 * @param 	Traslate $traslate
 	 * @return 	string
 	 * @static
 	 */
-	public static function localeDateField($params, $traslate){
-
+	public static function languageField($params=''){
 		$numberArguments = func_num_args();
-		$params = Utils::getParams(func_get_args(), $numberArguments);
-
-		if(!isset($params[0])){
-			$params[0] = $params['id'];
-		}
-		if(!isset($params['name'])||!$params['name']) {
-			$params['name'] = $params[0];
-		}
-
-		if(isset($params['value'])){
-			$value = $params['value'];
-			unset($params['value']);
+		$arguments = func_get_args();
+		$params = Utils::getParams($arguments, $numberArguments);
+		if(!isset($params['locale'])){
+			$locale = Locale::getApplication();
 		} else {
-			$value = self::getValueFromAction($params[0]);
+			$locale = $params['locale'];
 		}
+		$params[1] = array();
+		foreach($locale->getLanguagesList() as $code => $language){
+		 	$params[1][$code] = ucfirst($language);
+		}
+		return self::selectStatic($params);
+	}
 
-		if($value){
-			$ano = substr($value, 0, 4);
-			$mes = substr($value, 5, 2);
-			$dia = substr($value, 8, 2);
+	/**
+	 * Helper para capturar territorios
+	 *
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
+	 * @static
+	 */
+	public static function territoryField($params=''){
+		$numberArguments = func_num_args();
+		$arguments = func_get_args();
+		$params = Utils::getParams($arguments, $numberArguments);
+		if(!isset($params['locale'])){
+			$locale = Locale::getApplication();
 		} else {
-			$ano = date('Y');
-			$mes = 0;
-			$dia = 0;
+			$locale = $params['locale'];
 		}
-
-		$attributes = array();
-		foreach($params as $_key => $_value){
-			if(in_array($_key, array("name"))==false&&!is_integer($_key)){
-				$attributes[] = "$_key = '$_value'";
-			}
+		$params[1] = array();
+		foreach($locale->getTerritoriesList() as $code => $territory){
+		 	$params[1][$code] = ucfirst($territory);
 		}
+		sort($params[1]);
+		return self::selectStatic($params);
+	}
 
-		$code ="<table ".join(" ", $attributes)."><tr><td>";
-
-		$meses = array(
-			'01' => $traslate->_('Ene'),
-			'02' => $traslate->_('Feb'),
-			'03' => $traslate->_('Mar'),
-			'04' => $traslate->_('Abr'),
-			'05' => $traslate->_('May'),
-			'06' => $traslate->_('Jun'),
-			'07' => $traslate->_('Jul'),
-			'08' => $traslate->_('Ago'),
-			'09' => $traslate->_('Sep'),
-			'10' => $traslate->_('Oct'),
-			'11' => $traslate->_('Nov'),
-			'12' => $traslate->_('Dic'),
-		);
-		$code .= "<select name='".$params[0]."_month' id='".$params[0]."_month' onchange=\"$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+$('".$params[0]."_month').options[$('".$params[0]."_month').selectedIndex].value+'-'+$('".$params[0]."_day').options[$('".$params[0]."_day').selectedIndex].value\">";
-		foreach($meses as $numero_mes => $nombre_mes){
-			if($numero_mes==$mes){
-				$code.="<option value='$numero_mes' selected='selected'>$nombre_mes</option>\n";
-			} else {
-				$code.="<option value='$numero_mes'>$nombre_mes</option>\n";
-			}
-		}
-		$code.="</select></td><td>";
-
-		$code.="<select name='".$params[0]."_day' id='".$params[0]."_day' onchange=\"$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+$('".$params[0]."_month').options[$('".$params[0]."_month').selectedIndex].value+'-'+$('".$params[0]."_day').options[$('".$params[0]."_day').selectedIndex].value\">";
-		for($i=1;$i<=31;++$i){
-			$n = sprintf("%02s", $i);
-			if($n==$dia){
-				$code.="<option value='$n' selected='selected'>$n</option>\n";
-			} else {
-				$code.="<option value='$n'>$n</option>\n";
-			}
-		}
-		$code.="</select></td><td>";
-
-		$code.="<select name='".$params[0]."_year' id='".$params[0]."_year' onchange=\"$('".$params[0]."').value = $('".$params[0]."_year').options[$('".$params[0]."_year').selectedIndex].value+'-'+$('".$params[0]."_month').options[$('".$params[0]."_month').selectedIndex].value+'-'+$('".$params[0]."_day').options[$('".$params[0]."_day').selectedIndex].value\">";
-		if(isset($params['startYear'])){
-			$startYear = $params['startYear'];
+	/**
+	 * Helper para capturar zonas horarias
+	 *
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
+	 * @static
+	 */
+	public static function timezoneField($params=''){
+		$numberArguments = func_num_args();
+		$arguments = func_get_args();
+		$params = Utils::getParams($arguments, $numberArguments);
+		if(!isset($params['locale'])){
+			$locale = Locale::getApplication();
 		} else {
-			$startYear = 1900;
+			$locale = $params['locale'];
 		}
-		if(isset($params['finalYear'])){
-			$finalYear = $params['finalYear'];
-		} else {
-			$finalYear = date('Y')+5;
+		$params[1] = array();
+		foreach($locale->getTimezonesList() as $code => $timezone){
+		 	$params[1][$code] = ucfirst($timezone);
 		}
-		for($i=$finalYear;$i>=$startYear;$i--){
-			if($i==$ano){
-				$code.="<option value='$i' selected='selected'>$i</option>\n";
-			} else {
-				$code.="<option value='$i'>$i</option>\n";
-			}
-		}
-		$code.="</select></td><td>";
-		$code.="</table>";
-
-		$code.="<input type='hidden' id='".$params[0]."' name='".$params[0]."' value='$value' />";
-
-		return $code;
+		sort($params[1]);
+		return self::selectStatic($params);
 	}
 
 	/**
@@ -843,13 +830,15 @@ abstract class Tag {
 			$callback = false;
 			if(isset($params['option_callback'])){
 				if(strpos($params['option_callback'], '.')){
-					$callback = split('.', $params['option_callback']);
+					$callback = explode('.', $params['option_callback']);
 				} else {
 					$callback = $params['option_callback'];
 				}
+				#if[compile-time]
 				if(is_callable($callback)==false){
 					throw new TagException("El option_callback no es valido");
 				}
+				#endif
 				unset($params['option_callback']);
 			}
 			$code ="<select id='".$params[0]."' name='".$params[0]."' ";
@@ -885,10 +874,12 @@ abstract class Tag {
 				}
 			}
 			if(is_object($params[1])){
+				#if[compile-time]
 				if(!isset($params['using'])){
 					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
-				$using = split(',', $params['using']);
+				#endif
+				$using = explode(',', $params['using']);
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
@@ -938,13 +929,15 @@ abstract class Tag {
 			$callback = false;
 			if(isset($params['option_callback'])){
 				if(strpos($params['option_callback'], '.')){
-					$callback = split('.', $params['option_callback']);
+					$callback = explode('.', $params['option_callback']);
 				} else {
 					$callback = $params['option_callback'];
 				}
+				#if[compile-time]
 				if(is_callable($callback)==false){
 					throw new TagException('El option_callback no es valido');
 				}
+				#endif
 				unset($params['option_callback']);
 			}
 			$code ="<select id='".$params[0]."' name='".$params[0]."' ";
@@ -962,10 +955,12 @@ abstract class Tag {
 				$code.="\t<option value='@'>Seleccione...</option>\r\n";
 			}
 			if(is_object($params[1])){
+				#if[compile-time]
 				if(!isset($params['using'])){
 					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
-				$using = split(',', $params['using']);
+				#endif
+				$using = explode(',', $params['using']);
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
@@ -1013,13 +1008,15 @@ abstract class Tag {
 			$callback = false;
 			if(isset($params['option_callback'])){
 				if(strpos($params['option_callback'], '.')){
-					$callback = split('.', $params['option_callback']);
+					$callback = explode('.', $params['option_callback']);
 				} else {
 					$callback = $params['option_callback'];
 				}
+				#if[compile-time]
 				if(is_callable($callback)==false){
 					throw new TagException("El option_callback no es valido");
 				}
+				#endif
 				unset($params['option_callback']);
 			}
 			$code ="<select id='".$params[0]."' name='".$params[0]."' ";
@@ -1046,10 +1043,12 @@ abstract class Tag {
 				}
 			}
 			if(is_object($params[1])){
+				#if[compile-time]
 				if(!isset($params['using'])){
 					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
 				}
-				$using = split(',', $params['using']);
+				#endif
+				$using = explode(',', $params['using']);
 				foreach($params[1] as $o){
 					if($callback==false){
 						if($value==$o->readAttribute($using[0])){
@@ -1303,9 +1302,11 @@ abstract class Tag {
 			onsubmit='if(validaForm(this,new Array(".$requiredFields."))){ return ajaxRemoteForm(this,\"".$params['update']."\",{".join(",",$params['callbacks'])."}); } else{ return false; }'";
 			unset($params['required']);
 		} else{
+			#if[compile-time]
 			if(!isset($params['update'])){
 				throw new TagException('Debe indicar el contenedor a actualizar con el parámetro "update"');
 			}
+			#endif
 			$code = "<form action='".Utils::getKumbiaUrl($params['action'].'/'.$id)."' method='post'
 			onsubmit='return ajaxRemoteForm(this, \"".$params['update']."\", { ".join(",", $params['callbacks'])." });'";
 		}
@@ -2233,9 +2234,11 @@ abstract class Tag {
 			}
 			if(is_object($items)){
 				if($items instanceof ActiveRecordResultset){
+					#if[compile-time]
 					if($start<0){
-						throw new CoreException("El número de la página es negativo ó cero ($start)");
+						throw new TagException("El número de la página es negativo ó cero ($start)");
 					}
+					#endif
 					$page->items = array();
 					$total = count($items);
 					if($total>0){

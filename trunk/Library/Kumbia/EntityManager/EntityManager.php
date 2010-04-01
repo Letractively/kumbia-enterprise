@@ -219,8 +219,8 @@ abstract class EntityManager {
 				}
 			} else {
 				$model = Utils::uncamelize($entityName);
-				if(Core::fileExists(self::$_modelsDir."/$model.php")){
-					require self::$_modelsDir."/$model.php";
+				if(Core::fileExists(self::$_modelsDir.'/'.$model.'.php')){
+					require self::$_modelsDir.'/'.$model.'.php';
 					self::_initializeModel($entityName, $model);
 					if($newInstance==true){
 						return clone self::$_entities[$entityName];
@@ -228,7 +228,7 @@ abstract class EntityManager {
 						return self::$_entities[$entityName];
 					}
 				} else {
-					throw new EntityManagerException("No existe la entidad '$entityName' ($model)");
+					throw new EntityManagerException('No existe la entidad "'.$entityName.'" ('.$model.')');
 				}
 			}
 		}
@@ -241,9 +241,11 @@ abstract class EntityManager {
 	 * @param string $model
 	 */
 	private static function _initializeModel($entityName, $model){
+		#if[compile-time]
 		if(class_exists($entityName, false)==false){
-			throw new EntityManagerException("No se encontró la clase \"$entityName\", es necesario definir una clase en el modelo '$model' llamado '$entityName' para que esto funcione correctamente.");
+			throw new EntityManagerException('No se encontró la clase "'.$entityName.'", es necesario definir una clase en el modelo "'.$model.'" llamado "'.$entityName.'" para que esto funcione correctamente.');
 		} else {
+		#endif
 			self::$_entities[$entityName] = new $entityName();
 			#if[compile-time]
 			if(!is_subclass_of(self::$_entities[$entityName], 'ActiveRecordBase')){
@@ -257,7 +259,9 @@ abstract class EntityManager {
 			} else {
 				self::$_sources[$entityName] = $sourceName;
 			}
+		#if[compile-time]
 		}
+		#endif
 	}
 
 	/**
@@ -272,11 +276,15 @@ abstract class EntityManager {
 		 * Inicializa los Modelos. modelBase es el modelo base
 		 */
 		if(class_exists('ActiveRecord', false)==false){
-			if(Core::fileExists("$modelsDir/base/modelBase.php")){
-				require "$modelsDir/base/modelBase.php";
+			#if[compile-time]
+			if(Core::fileExists($modelsDir.'/base/modelBase.php')){
+			#endif
+				require $modelsDir.'/base/modelBase.php';
+			#if[compile-time]
 			} else {
-				throw new EntityManagerException("No existe el archivo de modelo Base ($modelsDir/base/modelBase.php)");
+				throw new EntityManagerException('No existe el archivo de modelo Base ('.$modelsDir.'/base/modelBase.php)');
 			}
+			#endif
 		}
 	}
 
@@ -295,7 +303,7 @@ abstract class EntityManager {
 				}
 			}
 			if(preg_match('/([a-zA-Z_0-9]+)\.php$/', $model, $matches)==true){
-				require "$modelsDir/$model";
+				require $modelsDir.'/'.$model;
 				$objectModel = Utils::camelize($matches[1]);
 				self::_initializeModel($objectModel, $matches[1]);
 				unset($matches);
@@ -335,13 +343,17 @@ abstract class EntityManager {
 				return true;
 			} else {
 				$model = Utils::uncamelize($modelName);
+				#if[compile-time]
 				if(Core::fileExists(self::$_modelsDir.'/'.$model.'.php')){
+				#endif
 					require self::$_modelsDir.'/'.$model.'.php';
 					self::_initializeModel($modelName, $model);
 					return true;
+				#if[compile-time]
 				} else {
 					return false;
 				}
+				#endif
 			}
 		}
 	}
@@ -585,9 +597,11 @@ abstract class EntityManager {
 		}
 		if(!isset(self::$_belongsTo[$entityName][$indexKey])){
 			if(is_array($fields)){
+				#if[compile-time]
 				if(count($fields)>0&&$referenceTable==''){
 					throw new EntityManagerException('Debe indicar la tabla referenciada en la relación belongsTo');
 				}
+				#endif
 			} else {
 				if($referenceTable==''){
 					$referenceTable = $fields;
@@ -598,11 +612,13 @@ abstract class EntityManager {
 			if($referencedFields==''){
 				$referencedFields = $fields;
 			}
+			#if[compile-time]
 			if(is_array($referencedFields)){
 				if(count($fields)!=count($referencedFields)){
 					throw new EntityManagerException('El número de campos referenciados no es el mismo');
 				}
 			}
+			#endif
 			self::$_belongsTo[$entityName][$indexKey] = array(
 				'fi' => $fields,
 				'rt' => $referenceTable,
@@ -638,9 +654,11 @@ abstract class EntityManager {
 		}
 		if(!isset(self::$_hasMany[$entityName][$indexKey])){
 			if(is_array($fields)){
+				#if[compile-time]
 				if(count($fields)>0&&$referenceTable==''){
 					throw new EntityManagerException('Debe indicar la tabla referenciada en la relación hasMany');
 				}
+				#endif
 			} else {
 				if($referenceTable==''){
 					$referenceTable = $fields;
@@ -651,11 +669,13 @@ abstract class EntityManager {
 			if($referencedFields==''){
 				$referencedFields = $fields;
 			}
+			#if[compile-time]
 			if(is_array($referencedFields)){
 				if(count($fields)!=count($referencedFields)){
 					throw new EntityManagerException('El número de campos referenciados no es el mismo');
 				}
 			}
+			#endif
 			self::$_hasMany[$entityName][$indexKey] = array(
 				'fi' => $fields,
 				'rt' => $referenceTable,
@@ -691,9 +711,11 @@ abstract class EntityManager {
 		}
 		if(!isset(self::$_hasOne[$entityName][$indexKey])){
 			if(is_array($fields)){
+				#if[compile-time]
 				if(count($fields)>0&&$referenceTable==''){
 					throw new EntityManagerException('Debe indicar la tabla referenciada en la relación hasOne');
 				}
+				#endif
 			} else {
 				if($referenceTable==''){
 					$referenceTable = $fields;
@@ -704,11 +726,13 @@ abstract class EntityManager {
 			if($referencedFields==''){
 				$referencedFields = $fields;
 			}
+			#if[compile-time]
 			if(is_array($referencedFields)){
 				if(count($fields)!=count($referencedFields)){
 					throw new EntityManagerException('El número de campos referenciados no es el mismo');
 				}
 			}
+			#endif
 			self::$_hasOne[$entityName][$indexKey] = array(
 				'fi' => $fields,
 				'rt' => $referenceTable,
@@ -966,9 +990,11 @@ abstract class EntityManager {
 		}
 		if(!isset(self::$_foreignKeys[$entityName][$indexKey])){
 			if(is_array($fields)){
+				#if[compile-time]
 				if(count($fields)>0&&$referenceTable==''){
 					throw new EntityManagerException('Debe indicar la tabla referenciada en la llave foránea virtual');
 				}
+				#endif
 			} else {
 				if($referenceTable==''){
 					$referenceTable = $fields;
@@ -979,11 +1005,13 @@ abstract class EntityManager {
 			if($referencedFields==''){
 				$referencedFields = $fields;
 			}
+			#if[compile-time]
 			if(is_array($referencedFields)){
 				if(count($fields)!=count($referencedFields)){
 					throw new EntityManagerException('El número de campos referenciados no es el mismo');
 				}
 			}
+			#endif
 			self::$_foreignKeys[$entityName][$indexKey] = array(
 				'fi' => $fields,
 				'rt' => $referenceTable,
@@ -996,7 +1024,7 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Devuelve las llaves foraneas de una entidad
+	 * Devuelve las llaves foráneas de una entidad
 	 *
 	 * @param 	string $entityName
 	 * @param 	string $indexKey

@@ -120,6 +120,210 @@ class Locale extends Object {
     );
 
     /**
+	 * Lista del idioma oficial más hablado y la localización de cada país
+	 *
+	 * @var array
+	 */
+	private static $_countries = array(
+		'Afghanistan' => array('Dar', ''),
+		'Albania' => array('Alb', ''),
+		'Algeria' => array('Ara', 'ar'),
+		'Andorra' => array('Cat', 'ca'),
+		'Angola' => array('Por', 'pt'),
+		'Antigua and Barbuda' => array('Eng', 'en'),
+		'Argentina' => array('Spa', 'es_AR'),
+		'Armenia' => array('Arm', ''),
+		'Australia' => array('Eng', 'en_AU'),
+		'Austria' => array('Ger', 'de'),
+		'Azerbaijan' => array('Aze', ''),
+		'Bahamas' => array('Eng', 'en'),
+		'Bahrain' => array('Ara', 'ar'),
+		'Bangladesh' => array('Ban', ''),
+		'Barbados' => array('Eng', 'en'),
+		'Belarus' => array('Bel', 'be'),
+		'Belgium' => array('Dut', 'fr_BE'),
+		'Belize' => array('Eng', 'en_BE'),
+		'Benin' => array('Fre', 'fr_BE'),
+		'Bhutan' => array('Dzo', ''),
+		'Bolivia' => array('Spa', 'es_BO'),
+		'Bosnia and Herzegovina' => array('Bos', ''),
+		'Botswana' => array('Eng', 'en_BW'),
+		'Brazil' => array('Por', 'pt_BR'),
+		'Brunei' => array('Mal', 'mt'),
+		'Bulgaria' => array('Bul', 'bg'),
+		'Burkina Faso' => array('Fre', 'fr'),
+		'Burundi' => array('Kir', ''),
+		'Cambodia' => array('Khm', ''),
+		'Cameroon' => array('Fre', 'fr_CA'),
+		'Canada' => array('Eng', 'fr_CA'),
+		'Cape Verde' => array('Por', 'pt'),
+		'Central African Republic' => array('Fre', 'fr'),
+		'Chad' => array('Fre', 'fr_CH'),
+		'Chile' => array('Spa', 'es_CL'),
+		'China' => array('Sta', 'zh_CN'),
+		'Colombia' => array('Spa', 'es_CO'),
+		'Comoros' => array('Ara', 'ar'),
+		'Congo, Democratic Republic of the' => array('Fre', 'fr'),
+		'Congo, Republic of' => array('Fre', 'fr'),
+		'Costa Rica' => array('Spa', 'es_CR'),
+		'Côte d\'Ivoire' => array('Fre', 'fr'),
+		'Croatia' => array('Cro', 'hr_HR'),
+		'Cuba' => array('Spa', 'es'),
+		'Cyprus' => array('Gre', 'el_CY'),
+		'Czech Republic' => array('Cze', 'cs_CZ'),
+		'Denmark' => array('Dan', 'da_DK'),
+		'Djibouti' => array('Fre', 'fr'),
+		'Dominica' => array('Eng', 'en'),
+		'Dominican Republic' => array('Spa', 'es_DO'),
+		'East Timor' => array('Tet', ''),
+		'Ecuador' => array('Spa', 'es_EC'),
+		'Egypt' => array('Ara', 'ar_EG'),
+		'El Salvador' => array('Spa', 'es_SV'),
+		'Equatorial Guinea' => array('Spa', 'es'),
+		'Eritrea' => array('Afa', 'aa_ER'),
+		'Estonia' => array('Est', 'et_EE'),
+		'Ethiopia' => array('Amh', ''),
+		'Fiji' => array('Eng', 'en'),
+		'Finland' => array('Fin', 'fi_FI'),
+		'France' => array('Fre', 'fr_FR'),
+		'Gabon' => array('Fre', 'fr'),
+		'Gambia' => array('Eng', 'en'),
+		'Georgia' => array('Geo', ''),
+		'Germany' => array('Ger', 'de'),
+		'Ghana' => array('Eng', 'en'),
+		'Greece' => array('Gre', 'el_GR'),
+		'Grenada' => array('Eng', 'en'),
+		'Guatemala' => array('Spa', 'es_GT'),
+		'Guinea' => array('Fre', 'fr'),
+		'Guinea-Bissau' => array('Por', 'pt'),
+		'Guyana' => array('Eng', 'en_GU'),
+		'Haiti' => array('Cre', 'fr_FR'),
+		'Honduras' => array('Spa', 'es_HN'),
+		'Hungary' => array('Mag', 'hu_HU'),
+		'Iceland' => array('Ice', 'is_IS'),
+		'India' => array('Hin', 'hi_IN'),
+		'Indonesia' => array('Bah', ''),
+		'Iran' => array('Per', 'fa_IR'),
+		'Iraq' => array('Ara', 'ar_IQ'),
+		'Ireland' => array('Eng', 'en_IE'),
+		'Israel' => array('Heb', 'he_IL'),
+		'Italy' => array('Ita', 'it_IT'),
+		'Jamaica' => array('Eng', 'en_JM'),
+		'Japan' => array('Jap', 'jp_JP'),
+		'Jordan' => array('Ara', 'ar_JO'),
+		'Kazakhstan' => array('Kaz', ''),
+		'Kenya' => array('Eng', 'en'),
+		'Kiribati' => array('Eng', 'en'),
+		'Korea, North' => array('Kor', 'ko_KR'),
+		'Korea, South' => array('Kor', 'ko_KR'),
+		'Kuwait' => array('Ara', 'ar'),
+		'Kyrgyzstan' => array('Kyr', ''),
+		'Laos' => array('Lao', ''),
+		'Latvia' => array('Lat', ''),
+		'Lebanon' => array('Ara', 'ar'),
+		'Lesotho' => array('Eng', 'en'),
+		'Liberia' => array('Eng', 'en'),
+		'Libya' => array('Ara', 'ar'),
+		'Liechtenstein' => array('Ger', 'de_LI'),
+		'Lithuania' => array('Lit', 'lt_LT'),
+		'Luxembourg' => array('Lux', 'de_LU'),
+		'Macedonia' => array('Mac', ''),
+		'Madagascar' => array('Mal', 'mt'),
+		'Malawi' => array('Chi', 'zh'),
+		'Malaysia' => array('Bah', ''),
+		'Maldives' => array('Mal', 'mt'),
+		'Mali' => array('Fre', 'fr'),
+		'Malta' => array('Mal', 'mt'),
+		'Marshall Islands' => array('Mar', ''),
+		'Mauritania' => array('Has', ''),
+		'Mauritius' => array('Eng', 'en'),
+		'Mexico' => array('Spa', 'es_MX'),
+		'Micronesia' => array('Eng', 'en'),
+		'Moldova' => array('Mol', ''),
+		'Monaco' => array('Fre', 'fr'),
+		'Mongolia' => array('Mon', ''),
+		'Montenegro' => array('Ser', ''),
+		'Morocco' => array('Ara', 'ar'),
+		'Mozambique' => array('Por', 'pt'),
+		'Myanmar' => array('Bur', ''),
+		'Namibia' => array('Eng', 'en_NA'),
+		'Nauru' => array('Nau', ''),
+		'Nepal' => array('Nep', ''),
+		'Netherlands' => array('Dut', 'nl_NL'),
+		'New Zealand' => array('Eng', 'en_NZ'),
+		'Nicaragua' => array('Spa', 'es_NI'),
+		'Niger' => array('Fre', 'fr'),
+		'Nigeria' => array('Eng', 'en'),
+		'Norway' => array('Bok', 'nn_NO'),
+		'Oman' => array('Ara', 'ar_OM'),
+		'Pakistan' => array('Urd', 'ur_PK'),
+		'Palau' => array('Pal', ''),
+		'Palestinian State (proposed)' => array('Ara', 'ar'),
+		'Panama' => array('Spa', 'es_PA'),
+		'Papua New Guinea' => array('Tok', ''),
+		'Paraguay' => array('Spa', 'es_PY'),
+		'Peru' => array('Spa', 'es_PE'),
+		'Philippines' => array('Fil', 'tl_PH'),
+		'Poland' => array('Pol', 'pl_PL'),
+		'Portugal' => array('Por', 'pt_PT'),
+		'Qatar' => array('Ara', 'ar_QA'),
+		'Romania' => array('Rom', 'ro_RO'),
+		'Russia' => array('Rus', 'ru_RU'),
+		'Rwanda' => array('Kin', ''),
+		'St. Kitts and Nevis' => array('Eng', 'en'),
+		'St. Lucia' => array('Eng', 'en'),
+		'St. Vincent and the Grenadines' => array('Eng', 'en'),
+		'Samoa' => array('Sam', ''),
+		'San Marino' => array('Ita', 'it'),
+		'São Tomé and Príncipe' => array('Por', 'pt'),
+		'Saudi Arabia' => array('Ara', 'ar_SA'),
+		'Senegal' => array('Fre', 'fr'),
+		'Serbia' => array('Ser', 'sr_YU'),
+		'Seychelles' => array('Ses', ''),
+		'Sierra Leone' => array('Eng', 'en'),
+		'Singapore' => array('Man', 'en_SG'),
+		'Slovakia' => array('Slo', 'sk_SK'),
+		'Slovenia' => array('Slo', 'sl_SI'),
+		'Solomon Islands' => array('Eng', 'en'),
+		'Somalia' => array('Som', ''),
+		'South Africa' => array('Isi', 'af_ZA'),
+		'Spain' => array('Spa', 'es_ES'),
+		'Sri Lanka' => array('Sin', ''),
+		'Sudan' => array('Ara', 'ar_SD'),
+		'Suriname' => array('Dut', 'nl'),
+		'Swaziland' => array('Eng', 'en'),
+		'Sweden' => array('Swe', 'sv'),
+		'Switzerland' => array('Ger', 'de_CH'),
+		'Syria' => array('Ara', 'ar_SY'),
+		'Taiwan' => array('Chi', 'zh_TW'),
+		'Tajikistan' => array('Taj', ''),
+		'Tanzania' => array('Swa', ''),
+		'Thailand' => array('Tha', ''),
+		'Togo' => array('Fre', 'fr'),
+		'Tonga' => array('Ton', 'to_TO'),
+		'Trinidad and Tobago' => array('Eng', 'en'),
+		'Tunisia' => array('Ara', 'ar'),
+		'Turkey' => array('Tur', 'tr'),
+		'Turkmenistan' => array('Tur', ''),
+		'Tuvalu' => array('Tuv', 'tv'),
+		'Uganda' => array('Eng', 'en'),
+		'Ukraine' => array('Ukr', 'uk'),
+		'United Arab Emirates' => array('Ara', 'ar'),
+		'United Kingdom' => array('Eng', 'en_GB'),
+		'United States' => array('Eng', 'en_US'),
+		'Uruguay' => array('Spa', 'es_UY'),
+		'Uzbekistan' => array('Uzb', 'uz_UZ'),
+		'Vanuatu' => array('Bis', ''),
+		'Vatican City (Holy See)' => array('Ita', 'it'),
+		'Venezuela' => array('Spa', 'es_VE'),
+		'Vietnam' => array('Vie', 'vi_VN'),
+		'Western Sahara (proposed state)' => array('Has', ''),
+		'Yemen' => array('Ara', 'ar_YE'),
+		'Zambia' => array('Eng', 'en_ZA'),
+		'Zimbabwe' => array('Eng', 'en_ZW'),
+	);
+
+    /**
      * Localización activa en el objeto
      *
      * @var string
@@ -217,7 +421,7 @@ class Locale extends Object {
 		if(is_array($this->_locale)){
 			$this->_locale = Locale::getLocale($this->_locale['language'].'_'.strtoupper($country));
 		} else {
-			throw new LocaleException("El objeto no tiene una localización válida");
+			throw new LocaleException('El objeto no tiene una localización válida');
 		}
 	}
 
@@ -269,7 +473,7 @@ class Locale extends Object {
 		$data = $this->_getLocaleData();
 		$yesstrList = $data->queryLanguage($this->getLanguage(), '/ldml/posix/messages/yesstr');
 		foreach($yesstrList as $yesstr){
-			$allYesStr = split(':', $yesstr->nodeValue);
+			$allYesStr = explode(':', $yesstr->nodeValue);
 			if(isset($allYesStr[0])){
 				if($all==false){
 					return $allYesStr[0];
@@ -293,7 +497,7 @@ class Locale extends Object {
 		$data = $this->_getLocaleData();
 		$nostrList = $data->queryLanguage($this->getLanguage(), '/ldml/posix/messages/nostr');
 		foreach($nostrList as $nostr){
-			$allNoStr = split(':', $nostr->nodeValue);
+			$allNoStr = explode(':', $nostr->nodeValue);
 			if(isset($allNoStr[0])){
 				if($all==false){
 					return $allNoStr[0];
@@ -356,6 +560,56 @@ class Locale extends Object {
 	}
 
 	/**
+	 * Obtiene la lista de nombres de los idiomas en el idioma de la localización actual
+	 *
+	 * @return array
+	 */
+	public function getLanguagesList(){
+		$data = $this->_getLocaleData();
+		$path = '/ldml/localeDisplayNames/languages/language';
+		$languagesList = $data->queryLanguage($this->getLanguage(), $path);
+		$localeLanguages = array();
+		foreach($languagesList as $language){
+			$localeLanguages[$language->getAttribute('type')] = $language->nodeValue;
+		}
+		return $localeLanguages;
+	}
+
+	/**
+	 * Obtiene la lista de nombres de los territorios en el idioma de la localización actual
+	 *
+	 * @return array
+	 */
+	public function getTerritoriesList(){
+		$data = $this->_getLocaleData();
+		$path = '/ldml/localeDisplayNames/territories/territory';
+		$territoriesList = $data->queryLanguage($this->getLanguage(), $path);
+		$localeTerritories = array();
+		foreach($territoriesList as $territory){
+			$localeTerritories[$territory->getAttribute('type')] = $territory->nodeValue;
+		}
+		return $localeTerritories;
+	}
+
+	/**
+	 * Obtiene la lista de zonas horarias en el idioma de la localización actual
+	 *
+	 * @return array
+	 */
+	public function getTimezonesList(){
+		$data = $this->_getLocaleData();
+		$path = '/ldml/dates/timeZoneNames/zone';
+		$timezonesList = $data->queryLanguage($this->getLanguage(), $path);
+		$localeTimezones = array();
+		foreach($timezonesList as $timezone){
+			if(trim($timezone->nodeValue)){
+				$localeTimezones[$timezone->getAttribute('type')] = $timezone->nodeValue;
+			}
+		}
+		return $localeTimezones;
+	}
+
+	/**
 	 * Obtiene la lista de nombres de dias de la localización actual en forma abreviada
 	 *
 	 * @return array
@@ -372,7 +626,7 @@ class Locale extends Object {
 	}
 
 	/**
-	 * Obtiene el formato segun el tipo de la localización
+	 * Obtiene el formato según el tipo de la localización
 	 *
 	 * @param 	string $type
 	 * @return 	string
@@ -466,7 +720,7 @@ class Locale extends Object {
 			}
 			return $currency;
 		} else {
-			throw new LocaleException('El formato numerico "'.$type."' no existe");
+			throw new LocaleException('El formato numérico "'.$type."' no existe");
 		}
 	}
 
@@ -725,7 +979,7 @@ class Locale extends Object {
 				'language' => ''
 			);
 		}
-		$localeParts = split('_', $localeValue);
+		$localeParts = explode('_', $localeValue);
 		if(isset($localeParts[1])){
 			$locale = array(
 				'locale' => $localeValue,
@@ -750,11 +1004,11 @@ class Locale extends Object {
 	 */
 	public static function getEnvironmentAll(){
 		$language = setlocale(LC_ALL, 0);
-        $languages = split(';', $language);
+        $languages = explode(';', $language);
         $elocales = array();
         foreach($languages as $lang){
-        	$lc = split('/', $lang);
-        	$localeParts = split('_', $lc[0]);
+        	$lc = explode('/', $lang);
+        	$localeParts = explode('_', $lc[0]);
 			$elocales[] = array(
 				'locale' => str_replace('-', '_', $lc[0]),
 				'country' => isset($localeParts[1]) ? strtoupper($localeParts[1]) : '',
@@ -798,10 +1052,10 @@ class Locale extends Object {
 	static public function getBrowserAll(){
 		$elocales = array();
 		if(isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])){
-			$locales = split(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
+			$locales = explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE']);
 			foreach($locales as $locale){
-				$elocale = split(';', $locale);
-				$localeParts = split('-', $elocale[0]);
+				$elocale = explode(';', $locale);
+				$localeParts = explode('-', $elocale[0]);
 				$elocales[] = array(
 					'locale' => str_replace('-', '_', $elocale[0]),
 					'country' => isset($localeParts[1]) ? strtoupper($localeParts[1]) : '',
@@ -814,7 +1068,22 @@ class Locale extends Object {
 	}
 
 	/**
-	 * Devuelve la localizacion del Explorador
+	 * Devuelve una localización apartir del nombre del país
+	 *
+	 * @param	string $country
+	 * @return	Locale
+	 * @static
+	 */
+	static public function fromCountry($country){
+		if(isset(self::$_countries[$country])){
+			return new Locale(self::$_countries[$country][1]);
+		} else {
+			return new Locale();
+		}
+	}
+
+	/**
+	 * Devuelve la localización del explorador
 	 *
 	 * @return Locale
 	 * @static
@@ -890,10 +1159,10 @@ class Locale extends Object {
 	}
 
 	/**
-	 * Genera un numero formateado con la localización actual
+	 * Genera un número formateado con la localización actual
 	 *
-	 * @param double $number
-	 * @return string
+	 * @param	double $number
+	 * @return	string
 	 */
 	public static function round($x){
 		return LocaleMath::round($x, 0);
@@ -902,8 +1171,8 @@ class Locale extends Object {
 	/**
 	 * Genera un numero formateado con la localización actual para monedas
 	 *
-	 * @param double $number
-	 * @return string
+	 * @param	double $number
+	 * @return	string
 	 */
 	public static function money($number){
 		return Currency::money($number);
@@ -914,7 +1183,7 @@ class Locale extends Object {
 	}
 
 	/**
-	 * Genera un numero formateado con la localización actual
+	 * Genera un número formateado con la localización actual
 	 *
 	 * @param double $number
 	 * @return string
@@ -932,7 +1201,7 @@ class Locale extends Object {
 	}
 
 	/**
-	 * Metodo magico __toString devuelve el identificador de localizacion del objeto
+	 * Metodo mágico __toString devuelve el identificador de localizacion del objeto
 	 *
 	 * @return string
 	 */
