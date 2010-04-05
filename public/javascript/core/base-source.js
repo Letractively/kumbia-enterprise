@@ -67,6 +67,30 @@ var Base = {
 		return document.getElementById(element);
 	},
 
+	show: function(element){
+		document.getElementById(element).style.display = "";
+	},
+
+	hide: function(element){
+		document.getElementById(element).style.display = "none";
+	},
+
+	setValue: function(element, value){
+		document.getElementById(element).value = value;
+	},
+
+	getValue: function(element){
+		element = document.getElementById(element);
+		if(element.tagName=='SELECT'){
+			return element.options[element.selectedIndex].value;
+		} else {
+			return element.value;
+		}
+	}
+};
+
+var NumericField = {
+
 	maskNum: function(evt){
 		evt = (evt) ? evt : ((window.event) ? window.event : null);
 		var kc = evt.keyCode;
@@ -80,10 +104,41 @@ var Base = {
 
 };
 
-if(document.addEventListener){
-	document.addEventListener('DOMContentLoaded', Base._checkFramework, false);
-} else {
-	document.attachEvent('readystatechange', Base._checkFramework);
+var DateField = {
+
+	refresh: function(name){
+
+		var monthTable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+		var year = Base.getValue(name+'Year');
+		var month = Base.getValue(name+'Month');
+		var day = Base.getValue(name+'Day');
+		var daySelect = Base.$(name+'Day');
+		var html = '', n, numberDays;
+
+		Base.setValue(name, year+'-'+month+'-'+day)
+
+		while(daySelect.lastChild){
+			daySelect.removeChild(daySelect.lastChild);
+		};
+
+		month = parseInt(month);
+		numberDays = monthTable[month-1];
+		if(month==2){
+			if(parseInt(year)%4==0){
+				numberDays = 29;
+			}
+		};
+		for(var i=1;i<=numberDays;++i){
+			n = (i < 10) ? '0'+i : i;
+			if(n==day){
+				html+='<option value="'+n+'" selected="selected">'+n+'</option>';
+			} else {
+				html+='<option value="'+n+'">'+n+'</option>';
+			}
+		}
+		daySelect.innerHTML = html;
+	}
+
 };
 
 var Utils = {
@@ -111,7 +166,7 @@ var Utils = {
 		win = win ? win : window;
 		win.location = Utils.getKumbiaURL() + url;
 	}
-}
+};
 
 function ajaxRemoteForm(form, up, callback){
 	if(callback==undefined){
@@ -265,3 +320,9 @@ AJAX.query = function(queryAction){
 	});
 	return me;
 }
+
+if(document.addEventListener){
+	document.addEventListener('DOMContentLoaded', Base._checkFramework, false);
+} else {
+	document.attachEvent('readystatechange', Base._checkFramework);
+};
