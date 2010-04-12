@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Traslate
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -23,16 +23,17 @@
 /**
  * TraslateInterface
  *
- * Interfaz para adaptadores de traduccion
+ * Interface para adaptadores de traducción
  *
  * @category 	Kumbia
  * @package 	Traslate
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
 interface TraslateInterface {
 
 	public function query($index);
+	public function exists($index);
 
 }

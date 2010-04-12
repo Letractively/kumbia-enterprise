@@ -46,28 +46,40 @@ abstract class CoreConfig {
 	static private $_configAdapter = 'ini';
 
 	/**
-	 * Lee un archivo de configuracion
+	 * Lee un archivo de configuración
 	 *
-	 * @param string $file
-	 * @return Config
+	 * @param	string $file
+	 * @return	Config
+	 * @static
 	 */
-	static public function read($file){
-		return Config::read($file);
+	static public function read($path){
+		return Config::read($path);
 	}
 
 	/**
-	 * Lee el archivo de configuracion Environment
+	 * Lee un archivo de configuración usando el adaptador por defecto
 	 *
-	 * @access public
-	 * @return Config
-	 * @throws CoreConfigException
+	 * @param	string $file
+	 * @return	Config
+	 * @static
+	 */
+	static public function readFile($name){
+		return self::readFromActiveApplication($name.'.'.self::$_configAdapter, self::$_configAdapter);
+	}
+
+	/**
+	 * Lee el archivo de configuración Environment
+	 *
+	 * @access	public
+	 * @return	Config
+	 * @throws	CoreConfigException
 	 * @static
 	 */
 	static public function readEnviroment(){
 		$application = Router::getApplication();
 
 		//Configuración entorno
-		$config = self::readFromActiveApplication('environment.'.self::$_configAdapter, self::$_configAdapter);
+		$config = self::readFile('environment');
 
 		//Configuración general
 		$core = self::readAppConfig();
@@ -81,7 +93,7 @@ abstract class CoreConfig {
 		$mode = $core->application->mode;
 		if(isset($config->$mode)){
 			foreach($config->$mode as $conf => $value){
-				if(preg_match('/([a-z0-9A-Z]+)\.([a-z0-9A-Z]+)/', $conf, $registers)){
+				if(preg_match('/(\w+)\.(\w+)/', $conf, $registers)){
 					if(!isset($config->{$registers[1]})){
 						$config->{$registers[1]} = new stdClass();
 					}
@@ -99,7 +111,7 @@ abstract class CoreConfig {
 		//Carga las variables de la seccion [project]
 		if(isset($config->project)){
 			foreach($config->project as $conf => $value){
-				if(preg_match('/([a-z0-9A-Z]+)\.([a-z0-9A-Z]+)/', $conf, $registers)){
+				if(preg_match('/(\w+)\.(\w+)/', $conf, $registers)){
 					if(!isset($config->{$registers[1]})){
 						$config->{$registers[1]} = new stdClass();
 					}
@@ -145,7 +157,7 @@ abstract class CoreConfig {
 	 */
 	public static function getConfigurationFrom($application, $file, $adapter=''){
 		if($application==''){
-			throw new CoreConfigException("Debe indicar el nombre de la aplicación donde está el archivo '$file'");
+			throw new CoreConfigException('Debe indicar el nombre de la aplicación donde está el archivo "'.$file.'"');
 		}
 		if($adapter==''){
 			$adapter = self::$_configAdapter;
@@ -154,7 +166,7 @@ abstract class CoreConfig {
 	}
 
 	/**
-	 * Devuelve la configuracion de la aplicacion actual
+	 * Devuelve la configuración de la aplicación actual
 	 *
 	 * @access 	public
 	 * @param 	string $file
@@ -164,7 +176,7 @@ abstract class CoreConfig {
 	 */
 	public static function readFromActiveApplication($file, $adapter=''){
 		$application = Router::getApplication();
-		return self::getConfigurationFrom($application, $file);
+		return self::getConfigurationFrom($application, $file, $adapter);
 	}
 
 	/**
@@ -198,7 +210,7 @@ abstract class CoreConfig {
 	 * @static
 	 */
 	public static function readBootConfig(){
-		return self::readFromActiveApplication('boot.'.self::$_configAdapter, self::$_configAdapter);
+		return self::readFile('boot');
 	}
 
 	/**
@@ -208,7 +220,7 @@ abstract class CoreConfig {
 	 * @static
 	 */
 	public static function readRoutesConfig(){
-		return self::readFromActiveApplication('routes.'.self::$_configAdapter, self::$_configAdapter);
+		return self::readFile('routes');
 	}
 
 	/**

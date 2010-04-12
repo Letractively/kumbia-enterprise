@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Registry
- * @subpackage 	MemoryRegistry
+ * @subpackage 	Memory
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
@@ -29,7 +29,7 @@
  *
  * @category	Kumbia
  * @package		Registry
- * @subpackage	MemoryRegistry
+ * @subpackage	Memory
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
@@ -45,10 +45,24 @@ abstract class MemoryRegistry {
 	private static $_registry = array();
 
 	/**
+	 * Indica si hay un valor establecido en alguna clave
+	 *
+	 * @param 	string $index
+	 * @return 	boolean
+	 */
+	public static function exists($index){
+		if(isset(self::$_registry[$index])){
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Establece un valor del registro
 	 *
-	 * @param string $index
-	 * @param string $value
+	 * @param	string $index
+	 * @param	string $value
 	 */
 	public static function set($index, $value){
 		self::$_registry[$index] = $value;
@@ -57,8 +71,8 @@ abstract class MemoryRegistry {
 	/**
 	 * Agrega un valor al registro a uno ya establecido
 	 *
-	 * @param string $index
-	 * @param string $value
+	 * @param	string $index
+	 * @param	string $value
 	 */
 	public static function append($index, $value){
 		if(!isset(self::$_registry[$index])){
@@ -70,8 +84,8 @@ abstract class MemoryRegistry {
 	/**
 	 * Agrega un valor al registro al inicio de uno ya establecido
 	 *
-	 * @param string $index
-	 * @param string $value
+	 * @param	string $index
+	 * @param	string $value
 	 */
 	public static function prepend($index, $value){
 		if(!isset(self::$_registry[$index])){
@@ -83,8 +97,8 @@ abstract class MemoryRegistry {
 	/**
 	 * Obtiene un valor del registro
 	 *
-	 * @param string $index
-	 * @return mixed
+	 * @param	string $index
+	 * @return	mixed
 	 */
 	public static function get($index){
 		if(isset(self::$_registry[$index])){
@@ -97,7 +111,7 @@ abstract class MemoryRegistry {
 	/**
 	 * Resetea un valor del registro
 	 *
-	 * @param string $index
+	 * @param	string $index
 	 */
 	public static function reset($index){
 		unset(self::$_registry[$index]);

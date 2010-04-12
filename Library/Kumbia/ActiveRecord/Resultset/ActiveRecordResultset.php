@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		ActiveRecord
  * @subpackage	ActiveRecordResultset
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -97,6 +97,7 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	public function __construct($activeRecordObject, $resultResource, $sqlQuery){
 		$this->_activeRecordObject = $activeRecordObject;
 		$this->_resultResource = $resultResource;
+		$this->_sqlQuery = $sqlQuery;
 	}
 
 	/**
@@ -127,8 +128,8 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	/**
 	 * Devuelve el record actual en el iterador
 	 *
-	 * @access public
-	 * @return ActiveRecord
+	 * @access	public
+	 * @return	ActiveRecord
 	 */
 	public function current(){
 		return $this->_activeRow;
@@ -156,8 +157,8 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	/**
 	 * Devuelve el iterador a su estado inicial
 	 *
-	 * @access public
-	 * @return boolean
+	 * @access	public
+	 * @return	boolean
 	 */
 	public function rewind(){
 		if($this->_resultResource===false){
@@ -171,8 +172,8 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	/**
 	 * Mueve el puntero interno del iterador a una posicion en especial
 	 *
-	 * @access public
-	 * @param integer $position
+	 * @access	public
+	 * @param	integer $position
 	 */
 	public function seek($position){
 		$this->_pointer = (int) $position;
@@ -181,10 +182,10 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	}
 
 	/**
-	 * Devuelve el numero de registros del iterador
+	 * Devuelve el número de registros del iterador
 	 *
-	 * @access public
-	 * @return integer
+	 * @access	public
+	 * @return	integer
 	 */
 	public function count(){
 		if($this->_resultResource===false){
@@ -200,8 +201,8 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	/**
 	 * Requerido por la interfase SeekableIterator
 	 *
-	 * @param integer $index
-	 * @return boolean
+	 * @param	integer $index
+	 * @return	boolean
 	 */
 	public function offsetExists($index){
 		if($index<$this->count()){
@@ -212,8 +213,8 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	/**
 	 * Requerido por la interfase SeekableIterator
 	 *
-	 * @param integer $index
-	 * @return ActiveRecord
+	 * @param	integer $index
+	 * @return	ActiveRecord
 	 */
 	public function offsetGet($index){
 		if($index<$this->count()){
@@ -231,8 +232,8 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	/**
 	 * Requerido por la interfase SeekableIterator
 	 *
-	 * @param string $index
-	 * @param mixed $value
+	 * @param	string $index
+	 * @param	mixed $value
 	 */
 	public function offsetSet($index, $value){
 		throw new ActiveRecordException('El cursor es de solo lectura');
@@ -241,8 +242,8 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	/**
 	 * Requerido por la interfase SeekableIterator
 	 *
-	 * @access public
-	 * @param integer $offset
+	 * @access	public
+	 * @param	integer $offset
 	 */
 	public function offsetUnset($offset){
 		throw new ActiveRecordException('El cursor es de solo lectura');
@@ -251,7 +252,7 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	/**
 	 * Obtiene el primer registro del cursor
 	 *
-	 * @return ActiveRecord
+	 * @return	ActiveRecord
 	 */
 	public function getFirst(){
 		if($this->_pointer!=1){
@@ -265,7 +266,7 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	}
 
 	/**
-	 * Obtiene el primer registro del cursor
+	 * Obtiene el último registro del cursor
 	 *
 	 * @return ActiveRecord
 	 */
@@ -294,6 +295,20 @@ class ActiveRecordResultset implements Iterator, ArrayAccess, SeekableIterator, 
 	 */
 	public function getEntity(){
 		return $this->_activeRecordObject;
+	}
+
+	/**
+	 * Recorre un cursor
+	 *
+	 * @param lambda $lambda
+	 */
+	public function each($lambda){
+		$this->rewind();
+		while($this->valid()){
+			$record = $this->current();
+			$lambda($record);
+			$this->next();
+		}
 	}
 
 }

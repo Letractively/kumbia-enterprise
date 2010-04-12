@@ -62,7 +62,7 @@ require 'Library/Kumbia/ActiveRecord/Interface.php';
  */
 abstract class ActiveRecordBase extends Object
 #if[compile-time]
-	implements ActiveRecordResultInterface
+	implements ActiveRecordResultInterface, EntityInterface
 #endif
 	{
 
@@ -143,7 +143,7 @@ abstract class ActiveRecordBase extends Object
 	 * Indica si hay bloqueo sobre los warnings cuando una propiedad
 	 * del modelo no esta definida
 	 *
-	 * @var boolean
+	 * @var	boolean
 	 * @access protected
 	 */
 	protected $_dumpLock = false;
@@ -157,7 +157,7 @@ abstract class ActiveRecordBase extends Object
 	protected $_errorMessages = '';
 
 	/**
-	 * Indica la ultima operación realizada en el modelo
+	 * Indica la última operación realizada en el modelo
 	 *
 	 * @var int
 	 */
@@ -166,19 +166,33 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Indica si la entidad ya existe y/o obliga a comprobarlo
 	 *
-	 * @var bool
+	 * @var boolean
 	 */
 	protected $_forceExists = false;
 
 	/**
-	 * Indica si se debe hacer dynamic update
+	 * Indica si el modelo debe usar la conexión predeterminada
+	 *
+	 * @var boolean
+	 */
+	protected $_defaultConnection = true;
+
+	/**
+	 * Nombre de la conexión que debe usar el modelo
+	 *
+	 * @var string
+	 */
+	protected $_connectionName;
+
+	/**
+	 * Indica si el UPDATE debe actualizar solo los campos que cambiaron
 	 *
 	 * @var boolean
 	 */
 	private static $_dynamicUpdate = false;
 
 	/**
-	 * Indica si se debe hacer dynamic insert
+	 * Indica si el INSERT debe insertar solo los campos que contienen valores no-nulos
 	 *
 	 * @var boolean
 	 */
@@ -192,13 +206,13 @@ abstract class ActiveRecordBase extends Object
 	private static $_disableEvents = false;
 
 	/**
-	 * Indica que la ultima operación fue una inserción
+	 * Indica que la última operación fue una inserción
 	 *
 	 */
 	const OP_CREATE = 1;
 
 	/**
-	 * Indica que la ultima operación fue una actualización
+	 * Indica que la última operación fue una actualización
 	 *
 	 */
 	const OP_UPDATE = 2;
@@ -252,10 +266,10 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Establece publicamente el $source de la tabla
+	 * Establece públicamente el $source de la tabla
 	 *
-	 * @param string $source
-	 * @access public
+	 * @param	string $source
+	 * @access	public
 	 */
 	public function setSource($source){
 		$this->_source = $source;
@@ -264,15 +278,15 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Devuelve el source actual
 	 *
-	 * @access public
-	 * @return string
+	 * @access	public
+	 * @return	string
 	 */
 	public function getSource(){
 		return $this->_source;
 	}
 
 	/**
-	 * Establece el Schema de la tabla
+	 * Establece el schema del source
 	 *
 	 * @param string $schema
 	 */
@@ -285,10 +299,10 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Devuelve el schema donde está tabla
+	 * Devuelve el schema donde está la tabla
 	 *
-	 * @param string $schema
-	 * @return string
+	 * @param	string $schema
+	 * @return	string
 	 */
 	public function getSchema(){
 		return $this->_schema;
@@ -297,18 +311,34 @@ abstract class ActiveRecordBase extends Object
 	/**
      * Establece la conexión con la que trabajará el modelo
      *
-     * @access public
-     * @param string $mode
+     * @access	public
+     * @param	string $mode
      */
     public function setConnection($db){
         $this->_db = $db;
+        if($this->_debug==true){
+			$this->_db->setDebug($this->_debug);
+		}
+		if($this->_logger!=false){
+			$this->_db->setLogger($this->_logger);
+		}
     }
 
     /**
-     * Devuelve el conteo del ultimo find ejecutado en el modelo
+     * Establece el nombre de la conexión que debe usarse en el modelo
      *
-     * @access public
-     * @return integer
+     * @param string $name
+     */
+    protected function setConnectionName($name){
+		$this->_defaultConnection = false;
+		$this->_connectionName = $name;
+    }
+
+    /**
+     * Devuelve el conteo del último Find ejecutado en el modelo
+     *
+     * @access	public
+     * @return	integer
      */
     public function getCount(){
     	return $this->_count;
@@ -318,8 +348,8 @@ abstract class ActiveRecordBase extends Object
 	 * Pregunta si el ActiveRecord ya ha consultado la informacion de metadatos
 	 * de la base de datos o del registro persistente
 	 *
-	 * @access public
-	 * @return boolean
+	 * @access	public
+	 * @return	boolean
 	 */
 	public function isDumped(){
 		return $this->_dumped;
@@ -328,18 +358,22 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Se conecta a la base de datos y descarga los meta-datos si es necesario
 	 *
-	 * @param boolean $newConnection
-	 * @access protected
+	 * @param	boolean $newConnection
+	 * @access	protected
 	 */
 	protected function _connect($newConnection=false){
-		if($newConnection||!is_object($this->_db)){
-			$this->_db = DbBase::rawConnect($newConnection);
-		}
-		if($this->_debug==true){
-			$this->_db->setDebug($this->_debug);
-		}
-		if($this->_logger!=false){
-			$this->_db->setLogger($this->_logger);
+		if($newConnection||$this->_db===''){
+			if($this->_defaultConnection==true){
+				$this->_db = DbBase::rawConnect($newConnection);
+			} else {
+				$this->_db = DbLoader::factoryFromName($this->_connectionName);
+			}
+			if($this->_debug==true){
+				$this->_db->setDebug($this->_debug);
+			}
+			if($this->_logger!=false){
+				$this->_db->setLogger($this->_logger);
+			}
 		}
 		$this->dump();
 	}
@@ -357,9 +391,9 @@ abstract class ActiveRecordBase extends Object
 	 * Verifica si la tabla definida en $this->_source existe
 	 * en la base de datos y la vuelca en dumpInfo
 	 *
-	 * @access protected
-	 * @return boolean
-	 * @throws ActiveRecordException
+	 * @access	protected
+	 * @return	boolean
+	 * @throws	ActiveRecordException
 	 */
 	protected function dump(){
 		if($this->_dumped===true){
@@ -428,10 +462,10 @@ abstract class ActiveRecordBase extends Object
 	 * Volca la información de la tabla ó vista $table en la base de datos
 	 * para crear los atributos y meta-data del ActiveRecord
 	 *
-	 * @access protected
-	 * @param string $tablename
-	 * @param string $schemaName
-	 * @return boolean
+	 * @access	protected
+	 * @param	string $tablename
+	 * @param	string $schemaName
+	 * @return	boolean
 	 */
 	protected function _dumpInfo($tableName, $schemaName=''){
 		$this->_dumpLock = true;
@@ -450,7 +484,7 @@ abstract class ActiveRecordBase extends Object
 			} else {
 				$tableName = '"'.$tableName.'"';
 			}
-			throw new ActiveRecordException('No se pudo obtener los meta-datos de la entidad '.$tableName);
+			throw new ActiveRecordException('No se pudo obtener los meta-datos del source: '.$tableName);
 		}
 		foreach($fields as $field){
 			if(!isset($this->$field)){
@@ -489,8 +523,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Permite especificar si esta en modo debug o no
 	 *
-	 * @access public
-	 * @param boolean $debug
+	 * @access	public
+	 * @param	boolean $debug
 	 */
 	public function setDebug($debug){
 		CoreType::assertBool($debug);
@@ -504,8 +538,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Permite especificar el logger del Modelo
 	 *
-	 * @access public
-	 * @param boolean $logger
+	 * @access	public
+	 * @param	boolean $logger
 	 */
 	public function setLogger($logger){
 		$this->_logger = $logger;
@@ -514,9 +548,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Establece el administrador de Transaciones del Modelo
 	 *
-	 * @access public
-	 * @param ActiveRecordTransaction $transaction
-	 * @throws ActiveRecordException
+	 * @access	public
+	 * @param	ActiveRecordTransaction $transaction
+	 * @throws	ActiveRecordException
 	 */
 	public function setTransaction(ActiveRecordTransaction $transaction){
 		if($transaction->getConnection()->isUnderTransaction()==false){
@@ -534,7 +568,7 @@ abstract class ActiveRecordBase extends Object
 	 * @access public
 	 */
 	public function detachTransaction(){
-		$this->_db = Db::rawConnect();
+		$this->_db = DbBase::rawConnect();
 	}
 
 	/**
@@ -603,9 +637,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Execute a SQL Query Statement directly
 	 *
-	 * @access public
-	 * @param string $sqlQuery
-	 * @return DbResource
+	 * @access	public
+	 * @param	string $sqlQuery
+	 * @return	DbResource
 	 */
 	public function sql($sqlQuery){
 		$this->_connect();
@@ -659,11 +693,11 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Crea una sentencia SQL
 	 *
-	 * @access private
-	 * @param array $params
-	 * @return string
+	 * @access	private
+	 * @param	array $params
+	 * @return	string
 	 */
-	private function _createSQLSelect($params){
+	private function _createSQLSelect(array $params){
 		$select = 'SELECT ';
 		if(isset($params['columns'])){
 			$this->clear();
@@ -970,7 +1004,7 @@ abstract class ActiveRecordBase extends Object
 	 * @static
 	 */
 	static public function singleSelect($sql){
-		$db = db::rawConnect();
+		$db = DbBase::rawConnect();
 		if(substr(ltrim($sql), 0, 7)!='SELECT') {
 			$sql = 'SELECT '.$sql;
 		}
@@ -1306,8 +1340,8 @@ abstract class ActiveRecordBase extends Object
 	 * Iguala los valores de un resultado de la base de datos
 	 * con sus correspondientes atributos de la clase
 	 *
-	 * @access public
-	 * @param array $result
+	 * @access	public
+	 * @param	array $result
 	 */
 	public function dumpResultSelf(array $result){
 		$this->_connect();
@@ -1323,7 +1357,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Obtiene los mensajes de error generados en el proceso de validación
 	 *
-	 * @return array
+	 * @access	public
+	 * @return	array
 	 */
 	public function getMessages(){
 		return $this->_errorMessages;
@@ -1332,9 +1367,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Agrega un mensaje a la lista de errores de validación
 	 *
-	 * @param string $field
-	 * @param string $message
-	 * @throws ActiveRecordException
+	 * @param	string $field
+	 * @param	string $message
+	 * @throws	ActiveRecordException
 	 */
 	public function appendMessage($message){
 		if(is_object($message)&&get_class($message)!='ActiveRecordMessage'){
@@ -1541,10 +1576,10 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Devuelve los campos fecha que asignan la fecha del sistema automaticamente al modificar
+	 * Devuelve los campos fecha que asignan la fecha del sistema automáticamente al modificar
 	 *
-	 * @access public
-	 * @return array
+	 * @access	public
+	 * @return	array
 	 */
 	public function getDatesInAttributes(){
 		$this->_connect();
@@ -1554,9 +1589,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Lee un atributo de la entidad por su nombre
 	 *
-	 * @access public
-	 * @param string $attribute
-	 * @return mixed
+	 * @access	public
+	 * @param	string $attribute
+	 * @return	mixed
 	 */
 	public function readAttribute($attribute){
 		CoreType::assertString($attribute);
@@ -1567,9 +1602,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Escribe el valor de un atributo de la entidad por su nombre
 	 *
-	 * @access public
-	 * @param string $attribute
-	 * @param mixed $value
+	 * @access	public
+	 * @param	string $attribute
+	 * @param	mixed $value
 	 */
 	public function writeAttribute($attribute, $value){
 		CoreType::assertString($attribute);
@@ -1580,8 +1615,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Indica si el modelo tiene el campo indicado
 	 *
-	 * @param string $field
-	 * @return boolean
+	 * @param	string $field
+	 * @return	boolean
 	 */
 	public function hasField($field){
 		CoreType::assertString($field);
@@ -1592,8 +1627,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Indica si el modelo tiene el campo indicado
 	 *
-	 * @param string $field
-	 * @return boolean
+	 * @param	string $field
+	 * @return	boolean
 	 */
 	public function isAttribute($field){
 		return $this->hasField($field);
@@ -1617,11 +1652,11 @@ abstract class ActiveRecordBase extends Object
 					foreach($fields as $field){
 						$this->$field = '';
 					}
-					foreach($value as $k => $r){
-						if(isset($this->$k)){
-							$this->$k = $r;
+					foreach($value as $key => $r){
+						if(isset($this->$key)){
+							$this->$key = $r;
 						} else {
-							throw new ActiveRecordException('No existe el Atributo "'.$k.'" en la entidad "'.$this->_source.'" al ejecutar la inserción');
+							throw new ActiveRecordException('No existe el Atributo "'.$key.'" en la entidad "'.get_class($this).'" al ejecutar la inserción');
 						}
 					}
 					if($primaryKeys[0]=='id'){
@@ -1633,11 +1668,11 @@ abstract class ActiveRecordBase extends Object
 				foreach($fields as $f){
 					$this->$f = '';
 				}
-				foreach($values as $k => $r){
-					if(isset($this->$k)){
-						$this->$k = $r;
+				foreach($values as $key => $r){
+					if(isset($this->$key)){
+						$this->$key = $r;
 					} else {
-						throw new ActiveRecordException('No existe el atributo "'.$k.'" en la entidad "'.$this->_source.'" al ejecutar la inserción');
+						throw new ActiveRecordException('No existe el atributo "'.$key.'" en la entidad "'.$this->_source.'" al ejecutar la inserción');
 					}
 				}
 				if($primaryKeys[0]=='id'){
@@ -1647,9 +1682,9 @@ abstract class ActiveRecordBase extends Object
 			}
 		} else {
 			if($values!==''){
-				throw new ActiveRecordException("Parámetro incompatible en acción 'create'. No se pudo crear ningun registro");
+				throw new ActiveRecordException("Parámetro incompatible en acción 'create'. No se pudo crear ningún registro");
 			} else {
-				//Detectar campo autonumerico
+				//Detectar campo autonumérico
 				$this->_forceExists = true;
 				if($primaryKeys[0]=='id'){
 					$this->id = null;
@@ -1737,7 +1772,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Saves Information on the ActiveRecord Properties
 	 *
-	 * @return boolean
+	 * @return	boolean
+	 * @throws	ActiveRecordException
 	 */
 	public function save(){
 
@@ -2214,14 +2250,16 @@ abstract class ActiveRecordBase extends Object
 
 	/**
 	 * Actualiza todos los atributos de la entidad
-	 * $Clientes->updateAll("estado='A', fecha='2005-02-02'", "id>100");
-	 * $Clientes->updateAll("estado='A', fecha='2005-02-02'", "id>100", "limit: 10");
+	 *
+	 * Clientes::updateAll("estado='A', fecha='2005-02-02'", "id>100");
+	 * Clientes::updateAll("estado='A', fecha='2005-02-02'", "id>100", "limit: 10");
 	 *
 	 * @access	public
 	 * @param	string $values
 	 * @return	boolean
+	 * @throws	ActiveRecordException
 	 */
-	public function updateAll($values){
+	public static function updateAll($values){
 		$this->_connect();
 		$params = array();
 		if($this->_schema){
@@ -2254,11 +2292,11 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Delete All data from Relational Map Table
 	 *
-	 * @access public
-	 * @param string $conditions
-	 * @return boolean
+	 * @access	public
+	 * @param	string $conditions
+	 * @return	boolean
 	 */
-	public function deleteAll($conditions=''){
+	public static function deleteAll($conditions=''){
 		CoreType::assertString($conditions);
 		$this->_connect();
 		if($this->_schema){
@@ -2277,12 +2315,6 @@ abstract class ActiveRecordBase extends Object
 			return $this->_db->delete($table);
 		}
 	}
-
-	/**
-	 * *********************************************************************************
-	 * Metodos de Debug
-	 * *********************************************************************************
-	 */
 
 	/**
 	 * Imprime una version humana de los valores de los campos
@@ -2313,8 +2345,8 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Ejecuta el evento del modelo
 	 *
-	 * @param string $eventName
-	 * @return boolean
+	 * @param	string $eventName
+	 * @return	boolean
 	 */
 	private function _callEvent($eventName){
 		if(self::$_disableEvents==false){
@@ -2333,12 +2365,6 @@ abstract class ActiveRecordBase extends Object
 		}
 		return true;
 	}
-
-	/**
-	 * *********************************************************************************
-	 * Métodos de Validación
-	 * ********************************************************************************
-	 */
 
 	/**
 	 * Ejecuta un validador sobre un campo de la entidad

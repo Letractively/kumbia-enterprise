@@ -822,7 +822,7 @@ abstract class StandardForm extends Controller {
 	public function fetchAction($id=0){
 
 		$this->view = 'index';
-		$db = db::rawConnect();
+		$db = DbBase::rawConnect();
 		if(!$this->query){
 			return $this->routeTo(array('action' => 'index'));
 		}
@@ -1002,7 +1002,7 @@ abstract class StandardForm extends Controller {
 	public function _save_helperAction(){
 
 		$this->set_response('view');
-		$db = db::rawConnect();
+		$db = DbBase::rawConnect();
 		Generator::scaffold($this->form, $this->scaffold);
 
 		$field = $this->form['components'][$this->request('name')];
@@ -1020,7 +1020,7 @@ abstract class StandardForm extends Controller {
 	public function _get_detailAction(){
 
 		$this->set_response('xml');
-		$db = db::rawConnect();
+		$db = DbBase::rawConnect();
 		Generator::scaffold($this->form, $this->scaffold);
 
 		$name = $this->request('name');
@@ -1085,7 +1085,7 @@ abstract class StandardForm extends Controller {
 	 */
 	public function __check_value_inAction(){
 		$this->set_response('xml');
-		$db = db::rawConnect();
+		$db = DbBase::rawConnect();
 		$_REQUEST['condition'] = str_replace(";", "", urldecode($_REQUEST['condition']));
 		ActiveRecord::sql_item_sanizite($_REQUEST['ftable']);
 		ActiveRecord::sql_item_sanizite($_REQUEST['dfield']);

@@ -189,7 +189,7 @@ class DbMySQL extends DbBase
 	}
 
 	/**
-	 * Efectua operaciones SQL sobre la base de datos
+	 * Efectúa operaciones SQL sobre la base de datos
 	 *
 	 * @param	string $sqlStatement
 	 * @return	resource|false
@@ -249,7 +249,7 @@ class DbMySQL extends DbBase
 	}
 
 	/**
-	 * Devuelve fila por fila el contenido de un select
+	 * Devuelve registro por registro el contenido de una consulta
 	 *
 	 * @param	resource $resultQuery
 	 * @return	array
@@ -268,7 +268,7 @@ class DbMySQL extends DbBase
 	}
 
 	/**
-	 * Devuelve el numero de filas de un select
+	 * Devuelve el número de filas de un SELECT
 	 *
 	 * @access	public
 	 * @param	boolean $resultQuery
@@ -293,11 +293,11 @@ class DbMySQL extends DbBase
 	}
 
 	/**
-	 * Devuelve el nombre de un campo en el resultado de un select
+	 * Devuelve el nombre de un campo en el resultado de un SELECT
 	 *
-	 * @param integer $number
-	 * @param resource $resultQuery
-	 * @return string
+	 * @param	integer $number
+	 * @param	resource $resultQuery
+	 * @return	string
 	 */
 	public function fieldName($number, $resultQuery=''){
 		if(!$this->_idConnection){
@@ -319,11 +319,11 @@ class DbMySQL extends DbBase
 	}
 
 	/**
-	 * Se Mueve al resultado indicado por $number en un select
+	 * Se mueve al resultado indicado por $number en un SELECT
 	 *
-	 * @param integer $number
-	 * @param resource $resultQuery
-	 * @return boolean
+	 * @param	integer $number
+	 * @param	resource $resultQuery
+	 * @return	boolean
 	 */
 	public function dataSeek($number, $resultQuery=null){
 		if(!$resultQuery){
@@ -342,10 +342,10 @@ class DbMySQL extends DbBase
 	}
 
 	/**
-	 * Numero de Filas afectadas en un insert, update o delete
+	 * Número de filas afectadas en un INSERT, UPDATE ó DELETE
 	 *
-	 * @param resource $resultQuery
-	 * @return integer
+	 * @param	resource $resultQuery
+	 * @return	integer
 	 */
 	public function affectedRows($resultQuery=''){
 		if(($numberRows = @mysql_affected_rows($this->_idConnection))!==false){

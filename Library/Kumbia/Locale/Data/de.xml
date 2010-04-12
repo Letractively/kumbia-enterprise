@@ -3020,6 +3020,7 @@
 		<messages>
 			<yesstr>ja:j</yesstr>
 			<nostr>nein:n</nostr>
+			<choosestr>Wählen Sie</choosestr>
 		</messages>
 	</posix>
 </ldml>

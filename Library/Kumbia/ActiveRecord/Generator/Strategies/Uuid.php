@@ -69,13 +69,11 @@ class UuidGenerator implements ActiveRecordGeneratorInterface {
 	 */
 	public function generateUUID(){
 		$pr_bits = false;
-		if(is_a($this, 'uuid')){
-			if(is_resource($this->urand)){
-				$pr_bits .= @fread($this->urand, 16);
-			}
+		if(is_resource($this->urand)){
+			$pr_bits .= @fread($this->urand, 16);
 		}
 		if(!$pr_bits){
-			$fp = @fopen ('/dev/urandom', 'rb');
+			$fp = @fopen('/dev/urandom', 'rb');
 			if($fp!==false){
 				$pr_bits.=@fread($fp,16);
 				@fclose($fp);

@@ -207,11 +207,8 @@ abstract class Dispatcher {
 	 * @static
 	 */
 	static private function _runBeforeFilters($appController, $controller, $action, $params){
-
-		/**
-   	     * El metodo beforeFilter es llamado antes de ejecutar una accion en un
-		 * controlador, puede servir para realizar ciertas validaciones
-		 */
+   	    // El método beforeFilter es llamado antes de ejecutar una acción en un
+		// controlador, puede servir para realizar ciertas validaciones
 		#if[dispatcher-status]
 		self::$_requestStatus = self::STATUS_RUNNING_BEFORE_FILTERS;
 		#endif
@@ -231,17 +228,15 @@ abstract class Dispatcher {
 	/**
 	 * Corre los filtros after en el controlador actual
 	 *
-	 * @param string $appController
-	 * @param string $controller
-	 * @param string $action
-	 * @param array $params
+	 * @param	string $appController
+	 * @param	string $controller
+	 * @param	string $action
+	 * @param	array $params
 	 * @static
 	 */
 	static private function _runAfterFilters($appController, $controller, $action, $params){
-		/**
-		 * El metodo afterFilter es llamado despues de ejecutar una accion en un
-		 * controlador, puede servir para realizar ciertas validaciones
-		 */
+		// El método afterFilter es llamado despues de ejecutar una accion en un
+		// controlador, puede servir para realizar ciertas validaciones
 		#if[dispatcher-status]
 		self::$_requestStatus = self::STATUS_RUNNING_BEFORE_FILTERS;
 		#endif
@@ -515,10 +510,10 @@ abstract class Dispatcher {
 	}
 
 	/**
- 	 * Obtener el controlador en ejecucion
+ 	 * Obtener el controlador en ejecución
 	 *
-	 * @access public
-	 * @return mixed
+	 * @access	public
+	 * @return	Controller
 	 * @static
 	 */
 	public static function getController(){
@@ -526,7 +521,7 @@ abstract class Dispatcher {
 	}
 
 	/**
-	 * Devuelve el valor devuelto por el metodo ejecutado en la ultima accion
+	 * Devuelve el valor devuelto por el método ejecutado en la ultima acción
 	 *
 	 * @access 	public
 	 * @return	mixed

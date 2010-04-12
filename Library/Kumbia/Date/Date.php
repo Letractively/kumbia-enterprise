@@ -59,7 +59,7 @@ class Date extends Object {
 	private $_day;
 
 	/**
-	 * Valor interno del A&ntilde;o
+	 * Valor interno del Año
 	 *
 	 * @var string
 	 */
@@ -244,10 +244,10 @@ class Date extends Object {
 	/**
 	 * Genera una marca de tiempo
 	 *
-	 * @param int $month
-	 * @param int $day
-	 * @param int $year
-	 * @return unknown
+	 * @param	int $month
+	 * @param	int $day
+	 * @param	int $year
+	 * @return	int
 	 */
 	static public function mktime($month, $day, $year){
 		if(!$year){
@@ -285,8 +285,10 @@ class Date extends Object {
 	            // gregorian correction for 5.Oct.1582
 	            if($date<-12220185600){
 	                $date+=864000;
-	            } else if($date<-12219321600){
-	                $date=-12219321600;
+	            } else {
+	            	if($date<-12219321600){
+	                	$date=-12219321600;
+	            	}
 	            }
 			} else {
 				for($count=1970;$count<=$year;++$count){
@@ -714,10 +716,10 @@ class Date extends Object {
 	}
 
 	/**
-	 * Resta una fecha de otra
+	 * Resta una fecha de otra y devuelve el número de días de diferencia
 	 *
-	 * @access public
-	 * @param string $date
+	 * @access	public
+	 * @param	string $date
 	 */
 	public function diffDate($date){
 		if(is_object($date) && $date instanceof Date){
@@ -725,7 +727,7 @@ class Date extends Object {
 		}
 		$dateParts = preg_split('#[/-]#', $date);
 		if(count($dateParts)!=3){
-			throw new DateException("La fecha '$date' es invalida");
+			throw new DateException('La fecha "'.$date.'" es inválida');
 		}
 		$year = (int) $dateParts[0];
 		$month = (int) $dateParts[1];
@@ -761,7 +763,7 @@ class Date extends Object {
 	}
 
 	/**
-	 * Devuelve true si la fecha interna esta en el a&ntilde;o actual
+	 * Devuelve true si la fecha interna esta en el año actual
 	 *
 	 * @return boolean
 	 */
@@ -791,7 +793,7 @@ class Date extends Object {
 	}
 
 	/**
-	 * Devuelve true si la fecha interna es la de ma#ana
+	 * Devuelve true si la fecha interna es la de mañana
 	 *
 	 * @return boolean
 	 */
@@ -808,7 +810,7 @@ class Date extends Object {
 	}
 
 	/**
-	 * Indica si el a&ntilde;o interno es biciesto
+	 * Indica si el año interno es biciesto
 	 *
 	 * @return boolean
 	 */
@@ -819,9 +821,9 @@ class Date extends Object {
 	/**
 	 * Indica si la fecha actual esta en un rango
 	 *
-	 * @param string $initialDate
-	 * @param string $finalDate
-	 * @return boolean
+	 * @param	string $initialDate
+	 * @param	string $finalDate
+	 * @return	boolean
 	 */
 	public function isBetween($initialDate, $finalDate){
 		$fecha = $this->getDate();
@@ -833,9 +835,9 @@ class Date extends Object {
 	/**
 	 * Indica si la fecha actual NO esta en un rango
 	 *
-	 * @param string $initialDate
-	 * @param string $finalDate
-	 * @return boolean
+	 * @param	string $initialDate
+	 * @param	string $finalDate
+	 * @return	boolean
 	 */
 	public function isNotBetween($initialDate, $finalDate){
 		return !$this->isBetween($initialDate, $finalDate);
@@ -844,7 +846,8 @@ class Date extends Object {
 	/**
 	 * Indica si la fecha esta en el pasado
 	 *
-	 * @return boolean
+	 * @param 	string $referenceDate
+	 * @return	boolean
 	 */
 	public function isPast($referenceDate=''){
 		if(!$referenceDate){
@@ -857,7 +860,8 @@ class Date extends Object {
 	/**
 	 * Indica si la fecha esta en el futuro
 	 *
-	 * @return boolean
+	 * @param 	string $referenceDate
+	 * @return	boolean
 	 */
 	public function isFuture($referenceDate=''){
 		if(!$referenceDate){
@@ -908,11 +912,11 @@ class Date extends Object {
 		if(!preg_match($pattern,$date)){
 		    return null;
 		}
-		$count = substr_count($format,'Y');
-		$tmp = str_repeat('\\d',$count);
-		$pattern_year = preg_replace('/[^Y]/','.',$format);
-		$pattern_year = '/^'.preg_replace('/Y{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
-		preg_match($pattern_year,$date,$matches);
+		$count = substr_count($format, 'Y');
+		$tmp = str_repeat('\\d', $count);
+		$patternYear = preg_replace('/[^Y]/','.', $format);
+		$patternYear = '/^'.preg_replace('/Y{'.$count.'}/', '('.$tmp.')', $pattern_year).'$/';
+		preg_match($patternYear, $date, $matches);
 		$year = $matches[1];
         if(strlen($year) == 2){
             $year = (int)$year;
@@ -924,9 +928,9 @@ class Date extends Object {
         }
 		$count = substr_count($format,'M');
 		$tmp = str_repeat('\\d',$count);
-		$pattern_year = preg_replace('/[^M]/','.',$format);
-		$pattern_year = '/^'.preg_replace('/M{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
-		preg_match($pattern_year,$date,$matches);
+		$patternYear = preg_replace('/[^M]/','.',$format);
+		$patternYear = '/^'.preg_replace('/M{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
+		preg_match($patternYear, $date, $matches);
 		if(isset($matches[1])){
 			$month = $matches[1];
 		}
@@ -934,7 +938,7 @@ class Date extends Object {
 		$tmp = str_repeat('\\d',$count);
 		$pattern_year = preg_replace('/[^D]/','.',$format);
 		$pattern_year = '/^'.preg_replace('/D{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
-		preg_match($pattern_year,$date,$matches);
+		preg_match($pattern_year, $date, $matches);
 		$day = $matches[1];
 		return new Date($year.'-'.$month.'-'.$day);
     }
@@ -1049,7 +1053,7 @@ class Date extends Object {
 		} else {
 			$year = (int) $year;
 		}
-		return "$year-01-01";
+		return $year."-01-01";
 	}
 
 	/**
@@ -1066,7 +1070,7 @@ class Date extends Object {
 		} else {
 			$year = (int) $year;
 		}
-		return "$year-12-31";
+		return $year.'-12-31';
 	}
 
 	/**
@@ -1082,11 +1086,11 @@ class Date extends Object {
 		if(!$year){
 			$year = date('Y');
 		}
-		return "$year-".sprintf("%02s", $month)."-01";
+		return $year.'-'.sprintf('%02s', $month).'-01';
 	}
 
 	/**
-	 * Devuelve el primer dia de la semana
+	 * Devuelve el primer día de la semana
 	 *
 	 * @param integer $day
 	 * @param integer $month
@@ -1119,7 +1123,7 @@ class Date extends Object {
 
 
 	/**
-	 * Devuelve el ultimo dia de la semana
+	 * Devuelve el último dia de la semana
 	 *
 	 * @param integer $day
 	 * @param integer $month
@@ -1163,7 +1167,7 @@ class Date extends Object {
 		if(self::isYearLeapYear($year)&&$month==2){
 			++$day;
 		}
-		return "$year-".sprintf("%02s", $month)."-".sprintf("%02s", $day);
+		return $year.'-'.sprintf('%02s', $month).'-'.sprintf('%02s', $day);
 	}
 
 	/**
@@ -1194,7 +1198,7 @@ class Date extends Object {
 	 */
 	static public function getLastNonWeekendDayOfMonth($month, $year=''){
 		if(!$year){
-			$year = date("Y");
+			$year = date('Y');
 		}
 		$lastDay = self::$_monthTable[$month-1];
 		if($month==2&&self::isYearLeapYear($year)){
@@ -1211,13 +1215,13 @@ class Date extends Object {
 	}
 
 	/**
-	 * Devuelve un objeto fecha sumandole un intervalo
+	 * Devuelve un objeto fecha sumándole un intervalo
 	 *
-	 * @access public
-	 * @param string $date
-	 * @param integer $number
-	 * @param string $type
-	 * @return Date
+	 * @access	public
+	 * @param	string $date
+	 * @param	integer $number
+	 * @param	string $type
+	 * @return	Date
 	 * @static
 	 */
 	static public function addInterval($date, $number, $type){
@@ -1245,20 +1249,38 @@ class Date extends Object {
 				$resultDate->addYears($number);
 				return $resultDate;
 			}
-			throw new DateException("Tipo de Intervalo invalido");
+			throw new DateException('Tipo de intervalo inválido');
 		} else {
 			return $resultDate;
 		}
 	}
 
 	/**
-	 * Devuelve un objeto fecha restandole un intervalo
+	 * Resta una fecha de otra y devuelve el número de días de diferencia
 	 *
-	 * @access public
-	 * @param string $date
-	 * @param integer $number
-	 * @param string $type
-	 * @return Date
+	 * @access	public
+	 * @param	mixed $fromDate
+	 * @param	mixed $diffDate
+	 * @return 	int
+	 */
+	static public function difference($fromDate, $diffDate){
+		if(is_object($fromDate)==false){
+			$fromDate = new Date($fromDate);
+		}
+		if(is_object($diffDate)==false){
+			$diffDate = new Date($diffDate);
+		}
+		return $fromDate->diffDate($diffDate);
+	}
+
+	/**
+	 * Devuelve un objeto fecha restándole un intervalo
+	 *
+	 * @access	public
+	 * @param	string $date
+	 * @param	integer $number
+	 * @param	string $type
+	 * @return	Date
 	 * @static
 	 */
 	static public function diffInterval($date, $number, $type){

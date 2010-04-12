@@ -35,7 +35,7 @@
 abstract class Security extends Object {
 
 	/**
-	 * Objeto ACL que administra el acceso a la aplicacion
+	 * Objeto ACL que administra el acceso a la aplicación
 	 *
 	 * @var Acl
 	 */
@@ -74,7 +74,7 @@ abstract class Security extends Object {
 	}
 
 	/**
-	 * Devuelve el nombre del rol activo en la sesion
+	 * Devuelve el nombre del rol activo en la sesión
 	 *
 	 * @return string
 	 */
@@ -184,6 +184,43 @@ abstract class Security extends Object {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Calcula un porcentaje de fortaleza de un password
+	 *
+	 * @param	string $password
+	 * @return unknown
+	 */
+	static public function passwordStrength($password){
+		if($password==''){
+			return 0;
+		}
+		$failTests = 0;
+		$length = i18n::strlen($password);
+		if($length<8){
+			++$failTests;
+		}
+		if(i18n::strtolower($password)==$password){
+			++$failTests;
+		}
+		if(i18n::strtoupper($password)==$password){
+			++$failTests;
+		}
+		if(preg_match('/[0-9]/', $password)==false){
+			++$failTests;
+		}
+		if(preg_match('/\W/', $password)==false){
+			++$failTests;
+		}
+		if(preg_match('/[bcdfghijklmnpqrstvwxyz][aeiou]/i', $password)){
+			++$failTests;
+		}
+		$eachchar = str_split($password);
+    	if(count(array_unique($eachchar))<5){
+			++$failTests;
+    	}
+    	return 1-($failTests/7);
 	}
 
 }

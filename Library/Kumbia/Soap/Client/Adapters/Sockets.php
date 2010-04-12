@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Soap
- * @subpackage 	Client
+ * @subpackage 	Adapters
  * @subpackage 	Client
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
@@ -28,6 +28,7 @@
  *
  * @category	Kumbia
  * @package 	Soap
+ * @subpackage 	Adapters
  * @subpackage 	Client
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
@@ -168,7 +169,7 @@ class SocketsCommunicator {
 	}
 
 	/**
-	 * Valida si un metodo HTTP está soportado por el Adaptador
+	 * Valida si un método HTTP está soportado por el Adaptador
 	 *
 	 * @param string $method
 	 */
@@ -246,7 +247,7 @@ class SocketsCommunicator {
 	}
 
 	/**
-	 * Envia la peticion HTTP
+	 * Envía la petición HTTP
 	 *
 	 * @access public
 	 */
@@ -306,7 +307,7 @@ class SocketsCommunicator {
 			if($header==true){
 				if($i==0){
 					if($line!==false){
-						$fline = split(' ', $line);
+						$fline = explode(' ', $line);
 						$this->_responseCode = $fline[1];
 						$this->_responseStatus = rtrim($fline[2]);
 					} else {
@@ -314,7 +315,7 @@ class SocketsCommunicator {
 					}
 				} else {
 					if($line!="\r\n"){
-						$pline = split(': ', $line, 2);
+						$pline = explode(': ', $line, 2);
 						if(count($pline)==2){
 							$this->_responseHeaders[$pline[0]] = substr($pline[1], 0, strlen($pline[1])-2);
 						} else {
@@ -337,9 +338,6 @@ class SocketsCommunicator {
     	} else {
     		throw new CoreException('La respuesta no incluia el encabezado Content-Length', 0);
     	}
-
-    	print $this->_responseBody;
-
     	if($this->_enableCookies==true){
     		if(!isset($_SESSION['KHC'][$this->_host])){
     			$_SESSION['KHC'][$this->_host] = $this->getResponseCookies();
@@ -382,9 +380,9 @@ class SocketsCommunicator {
 	public function getResponseCookies(){
 		if(isset($this->_responseHeaders['Set-Cookie'])){
 			$responseCookies = array();
-			$cookies = split('; ', $this->_responseHeaders['Set-Cookie']);
+			$cookies = explode('; ', $this->_responseHeaders['Set-Cookie']);
 			foreach($cookies as $cookie){
-				$cook = split('=', $cookie);
+				$cook = explode('=', $cookie);
 				if(!in_array($cook[0], array('path', 'expires', 'domain', 'secure'))){
 					$responseCookies[$cook[0]] = $cook[1];
 				}

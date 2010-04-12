@@ -168,7 +168,7 @@ class DbMongo extends DbBase
 	}
 
 	/**
-	 * Devuelve el error de MySQL
+	 * Devuelve el error de MongoDB
 	 *
 	 * @param	string $errorString
 	 * @return	string
@@ -178,7 +178,7 @@ class DbMongo extends DbBase
 	}
 
 	/**
-	 * Devuelve el no error de MySQL
+	 * Devuelve el no error de MongoDB
 	 *
 	 * @return integer|boolean
 	 */
@@ -371,7 +371,7 @@ class DbMongo extends DbBase
 	}
 
 	/**
-	 * Destructor de DbMysql
+	 * Destructor de DbMongoDB
 	 *
 	 */
 	public function __destruct(){
@@ -386,7 +386,7 @@ class DbMongo extends DbBase
 	 * @static
 	 */
 	public static function getPHPExtensionRequired(){
-		return array('mongo');
+		return 'mongo';
 	}
 
 	/**

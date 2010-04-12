@@ -77,6 +77,24 @@ abstract class Facility {
 	const AUDIT = 6;
 
 	/**
+	 * Issue de tipo Notificación
+	 *
+	 */
+	const I_NOTICE = 0;
+
+	/**
+	 * Issue de tipo Advertencia
+	 *
+	 */
+	const I_WARNING = 1;
+
+	/**
+	 * Issue de tipo error
+	 *
+	 */
+	const I_ERROR = 2;
+
+	/**
 	 * Facility actual
 	 *
 	 * @var int
@@ -109,5 +127,15 @@ abstract class Facility {
 	 */
 	public static function getFacility(){
 		return self::$_facility;
+	}
+
+	/**
+	 * Envia un evento al facility actual
+	 *
+	 * @param string $message
+	 * @param int $level
+	 */
+	public function issueEvent($message, $level=self::I_NOTICE){
+
 	}
 }

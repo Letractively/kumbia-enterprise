@@ -23,12 +23,11 @@
 /**
  * Config
  *
- * Clase para la carga de Archivos .INI y de configuracion
+ * Componente para cargar en datos nativos de PHP archivos de configuración en diferentes
+ * formatos.
  *
- * Aplica el patrón Singleton que utiliza un array
- * indexado por el nombre del archivo para evitar que
- * un .ini de configuracion sea leido más de una
- * vez en runtime con lo que se aumenta la velocidad.
+ * Aplica el patrón Singleton que utiliza un array indexado por el nombre del archivo para evitar que
+ * un archivo de configuración sea leido más de una vez en runtime con lo que se aumenta el rendimiento.
  *
  * @category	Kumbia
  * @package		Config
@@ -69,7 +68,7 @@ class Config extends Object {
 		$config = new Config();
 		#if[compile-time]
 		if(Core::fileExists($file)==false){
-			throw new ConfigException("No existe el archivo de configuración '$file'");
+			throw new ConfigException('No existe el archivo de configuración "'.$file.'"');
 		}
 		#endif
 		$adapterInstance = self::factory($adapter);
@@ -83,6 +82,7 @@ class Config extends Object {
 	 *
 	 * @access 	public
 	 * @param 	string $adapter
+	 * @return 	Config
 	 * @static
 	 */
 	public static function factory($adapter){
@@ -93,7 +93,7 @@ class Config extends Object {
 				if(Core::fileExists($path)){
 					require $path;
 				} else {
-					throw new ConfigException("No existe el adaptador de configuración '$adapter'");
+					throw new ConfigException('No existe el adaptador de configuración "'.$adapter.'"');
 				}
 			}
 			self::$_adapterInstances[$adapter] = new $className();

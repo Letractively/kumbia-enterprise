@@ -63,20 +63,20 @@ class ActiveRecordRow extends Object
 	}
 
 	/**
-	 * Establece la conexion interna para obtener los resultados
+	 * Establece la conexión interna para obtener los resultados
 	 *
-	 * @param dbBase $db
-	 * @access public
+	 * @param	DbBase $db
+	 * @access	public
 	 */
 	public function setConnection($db){
 		$this->_db = $db;
 	}
 
 	/**
-	 * Devuelve el objeto de conexion interna
+	 * Devuelve el objeto de conexión interna
 	 *
-	 * @access public
-	 * @return dbBase
+	 * @access	public
+	 * @return	DbBase
 	 */
 	public function getConnection(){
 		return $this->_db;
@@ -85,8 +85,8 @@ class ActiveRecordRow extends Object
 	/**
 	 * Devuelve un resultado con los valores establecidos
 	 *
-	 * @access public
-	 * @param array $result
+	 * @access	public
+	 * @param	array $result
 	 */
 	public function dumpResult(array $result){
 		$objectRow = clone $this;
@@ -110,11 +110,12 @@ class ActiveRecordRow extends Object
 	/**
 	 * Envia una excepcion cuando se accede a una propiedad no inicializada
 	 *
-	 * @access public
-	 * @param string $property
+	 * @access	public
+	 * @param	string $property
+	 * @throws	ActiveRecordException
 	 */
 	public function __get($property){
-		throw new ActiveRecordException("No existe el atributo '$property' en la consulta");
+		throw new ActiveRecordException('No existe el atributo "'.$property.'" en la consulta');
 	}
 
 	/**
@@ -128,7 +129,7 @@ class ActiveRecordRow extends Object
 	}
 
 	/**
-	 * Genera una excepcion cuando se trata de sobreescribir algun miembro del resultado
+	 * Genera una excepción cuando se trata de sobreescribir algun miembro del resultado
 	 *
 	 * @access public
 	 * @param string $property
@@ -143,17 +144,19 @@ class ActiveRecordRow extends Object
 	 *
 	 * @param	string $method
 	 * @param	array $arguments
+	 * @return 	mixed
+	 * @throws	ActiveRecordException
 	 */
-	public function __call($method, $arguments){
+	public function __call($method, $arguments=array()){
 		if(substr($method, 0, 3)=='get'){
 			$property = Utils::uncamelize(substr($method, 3));
 			if(isset($this->_columns[$property])){
 				return $this->$property;
 			} else {
-				throw new ActiveRecordException("El método '".$method."' ó miembro '".$property."' del resultset no existe");
+				throw new ActiveRecordException('El método "'.$method.'" ó atributo "'.$property.'" del resultset no existe');
 			}
 		} else {
-			throw new ActiveRecordException("El método ó miembro '".$method."' del resultset no existe");
+			throw new ActiveRecordException('El método ó atributo "'.$method.'" del resultset no existe');
 		}
 	}
 

@@ -553,35 +553,45 @@ class Controller extends ControllerBase {
 	/**
 	 * Devuelve el nombre del controlador actual
 	 *
-	 * @access public
-	 * @return string
+	 * @access	public
+	 * @return	string
 	 */
 	public function getControllerName(){
-		return self::$_controllerName[get_class($this)];
+		$className = get_class($this);
+		if(isset(self::$_controllerName[$className])){
+			return self::$_controllerName[$className];
+		} else {
+			return $className;
+		}
 	}
 
 	/**
 	 * Establece el nombre del controlador actual
 	 *
-	 * @access public
-	 * @param string $controllerName
+	 * @access	public
+	 * @param	string $controllerName
 	 */
 	public function setControllerName($controllerName){
 		self::$_controllerName[get_class($this)] = $controllerName;
 	}
 
 	/**
-	 * Devuelve el nombre de la accion actual
+	 * Devuelve el nombre de la acción actual
 	 *
 	 * @access public
 	 * @return string
 	 */
 	public function getActionName(){
-		return self::$_actionName[get_class($this)];
+		$className = get_class($this);
+		if(isset(self::$_actionName[$className])){
+			return self::$_actionName[$className];
+		} else {
+			return '';
+		}
 	}
 
 	/**
-	 * Establece el nombre de la accion actual
+	 * Establece el nombre de la acción actual
 	 *
 	 * @access	public
 	 * @param	string $actionName
@@ -606,7 +616,12 @@ class Controller extends ControllerBase {
 	 * @access public
 	 */
 	public function getId(){
-		return self::$_id[get_class($this)];
+		$className = get_class($this);
+		if(isset(self::$_id[$className])){
+			return self::$_id[$className];
+		} else {
+			return '';
+		}
 	}
 
 	/**

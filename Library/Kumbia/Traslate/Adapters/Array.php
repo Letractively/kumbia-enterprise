@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Traslate
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -23,18 +23,18 @@
 /**
  * ArrayTraslate
  *
- * Traduccion de contenido multi-idioma
+ * Traducción de contenido multi-idioma
  *
  * @category 	Kumbia
  * @package 	Traslate
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
 class ArrayTraslate implements TraslateInterface {
 
 	/**
-	 * Datos de Traduccion
+	 * Datos de Traducción
 	 *
 	 * @var array
 	 */
@@ -50,10 +50,10 @@ class ArrayTraslate implements TraslateInterface {
 	}
 
 	/**
-	 * Realiza una consulta en los datos de traduccion
+	 * Realiza una consulta en los datos de traducción
 	 *
-	 * @param string $index
-	 * @return string
+	 * @param	string $index
+	 * @return	string
 	 */
 	public function query($index){
 		if(isset($this->_traslate[$index])){
@@ -61,6 +61,16 @@ class ArrayTraslate implements TraslateInterface {
 		} else {
 			return $index;
 		}
+	}
+
+	/**
+	 * Indica si está definido un indice de traducción en el diccionario
+	 *
+	 * @param 	string $index
+	 * @return	string
+	 */
+	public function exists($index){
+		return isset($this->_traslate[$index]);
 	}
 
 }

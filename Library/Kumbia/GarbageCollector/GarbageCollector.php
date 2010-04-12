@@ -201,4 +201,17 @@ class GarbageCollector {
 		}
 	}
 
+	/**
+	 * Invoca el Garbage Collector de PHP y libera los objetos ZVAL que no están
+	 * siendo referenciados por ninguna variable del proceso actual
+	 *
+	 * @access public
+	 * @static
+	 */
+	static public function collectCycles(){
+		if(function_exists('gc_collect_cycles')){
+			gc_collect_cycles();
+		}
+	}
+
 }

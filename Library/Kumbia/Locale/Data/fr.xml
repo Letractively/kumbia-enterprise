@@ -5567,6 +5567,7 @@
 		<messages>
 			<yesstr>oui:o</yesstr>
 			<nostr>non:n</nostr>
+			<choosestr>Choisissez</choosestr>
 		</messages>
 	</posix>
 </ldml>

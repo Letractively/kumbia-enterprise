@@ -605,7 +605,7 @@ abstract class View {
 					}
 					$e->showMessage();
 					self::$_content = ob_get_contents();
-					ob_end_clean();
+					@ob_end_clean();
 					View::xhtmlTemplate('white');
 				} else {
 					self::_handleExceptionAdapter($e);
@@ -931,16 +931,21 @@ abstract class View {
 	 * @static
  	 */
 	public static function xhtmlTemplate($template='template'){
-		Tag::stylesheetLink("style");
 		echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
  <head>
   '.Tag::getDocumentTitle().'
   <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />'."\n";
-		Core::stylesheetLinkTags();
-		echo '</head>
- <body class="'.$template.'">';
-		echo View::getContent();
+
+		//Cargar estilos
+		Tag::stylesheetLink('style');
+		echo Tag::stylesheetLinkTags();
+
+		//Cargar Javascripts
+		echo Tag::javascriptSources();
+
+		echo '</head><body class="'.$template.'">';
+		View::getContent();
 		echo '
  </body>
 </html>';

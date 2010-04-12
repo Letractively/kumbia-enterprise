@@ -14,20 +14,21 @@
  *
  * @category 	Kumbia
  * @package 	Locale
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license 	New BSD License
+ * @version 	$Id$
  */
 
 /**
  * Locale
  *
- * Proporciona capacidades de localizacion para aplicaciones Web
+ * Proporciona capacidades de localización para aplicaciones Web
  *
  * @category 	Kumbia
  * @package 	Locale
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
  * @license 	New BSD License
@@ -172,10 +173,10 @@ class Locale extends Object {
 		'Cyprus' => array('Gre', 'el_CY'),
 		'Czech Republic' => array('Cze', 'cs_CZ'),
 		'Denmark' => array('Dan', 'da_DK'),
-		'Djibouti' => array('Fre', 'fr'),
-		'Dominica' => array('Eng', 'en'),
+		'Djibouti' => array('Fre', 'fr_FR'),
+		'Dominica' => array('Eng', 'en_US'),
 		'Dominican Republic' => array('Spa', 'es_DO'),
-		'East Timor' => array('Tet', ''),
+		'East Timor' => array('Tet', 'en_US'),
 		'Ecuador' => array('Spa', 'es_EC'),
 		'Egypt' => array('Ara', 'ar_EG'),
 		'El Salvador' => array('Spa', 'es_SV'),
@@ -183,26 +184,26 @@ class Locale extends Object {
 		'Eritrea' => array('Afa', 'aa_ER'),
 		'Estonia' => array('Est', 'et_EE'),
 		'Ethiopia' => array('Amh', ''),
-		'Fiji' => array('Eng', 'en'),
+		'Fiji' => array('Eng', 'en_US'),
 		'Finland' => array('Fin', 'fi_FI'),
 		'France' => array('Fre', 'fr_FR'),
-		'Gabon' => array('Fre', 'fr'),
+		'Gabon' => array('Fre', 'fr_FR'),
 		'Gambia' => array('Eng', 'en'),
-		'Georgia' => array('Geo', ''),
-		'Germany' => array('Ger', 'de'),
-		'Ghana' => array('Eng', 'en'),
+		'Georgia' => array('Geo', 'en_GB'),
+		'Germany' => array('Ger', 'de_DE'),
+		'Ghana' => array('Eng', 'en_GB'),
 		'Greece' => array('Gre', 'el_GR'),
 		'Grenada' => array('Eng', 'en'),
 		'Guatemala' => array('Spa', 'es_GT'),
-		'Guinea' => array('Fre', 'fr'),
-		'Guinea-Bissau' => array('Por', 'pt'),
+		'Guinea' => array('Fre', 'fr_FR'),
+		'Guinea-Bissau' => array('Por', 'pt_PT'),
 		'Guyana' => array('Eng', 'en_GU'),
 		'Haiti' => array('Cre', 'fr_FR'),
 		'Honduras' => array('Spa', 'es_HN'),
 		'Hungary' => array('Mag', 'hu_HU'),
 		'Iceland' => array('Ice', 'is_IS'),
 		'India' => array('Hin', 'hi_IN'),
-		'Indonesia' => array('Bah', ''),
+		'Indonesia' => array('Bah', 'en_US'),
 		'Iran' => array('Per', 'fa_IR'),
 		'Iraq' => array('Ara', 'ar_IQ'),
 		'Ireland' => array('Eng', 'en_IE'),
@@ -211,9 +212,9 @@ class Locale extends Object {
 		'Jamaica' => array('Eng', 'en_JM'),
 		'Japan' => array('Jap', 'jp_JP'),
 		'Jordan' => array('Ara', 'ar_JO'),
-		'Kazakhstan' => array('Kaz', ''),
-		'Kenya' => array('Eng', 'en'),
-		'Kiribati' => array('Eng', 'en'),
+		'Kazakhstan' => array('Kaz', 'ru_RU'),
+		'Kenya' => array('Eng', 'en_US'),
+		'Kiribati' => array('Eng', 'en_US'),
 		'Korea, North' => array('Kor', 'ko_KR'),
 		'Korea, South' => array('Kor', 'ko_KR'),
 		'Kuwait' => array('Ara', 'ar'),
@@ -221,27 +222,27 @@ class Locale extends Object {
 		'Laos' => array('Lao', ''),
 		'Latvia' => array('Lat', ''),
 		'Lebanon' => array('Ara', 'ar'),
-		'Lesotho' => array('Eng', 'en'),
-		'Liberia' => array('Eng', 'en'),
+		'Lesotho' => array('Eng', 'en_US'),
+		'Liberia' => array('Eng', 'en_US'),
 		'Libya' => array('Ara', 'ar'),
 		'Liechtenstein' => array('Ger', 'de_LI'),
 		'Lithuania' => array('Lit', 'lt_LT'),
 		'Luxembourg' => array('Lux', 'de_LU'),
 		'Macedonia' => array('Mac', ''),
 		'Madagascar' => array('Mal', 'mt'),
-		'Malawi' => array('Chi', 'zh'),
+		'Malawi' => array('Chi', 'zh_ZH'),
 		'Malaysia' => array('Bah', ''),
 		'Maldives' => array('Mal', 'mt'),
-		'Mali' => array('Fre', 'fr'),
+		'Mali' => array('Fre', 'fr_FR'),
 		'Malta' => array('Mal', 'mt'),
 		'Marshall Islands' => array('Mar', ''),
 		'Mauritania' => array('Has', ''),
-		'Mauritius' => array('Eng', 'en'),
+		'Mauritius' => array('Eng', 'en_US'),
 		'Mexico' => array('Spa', 'es_MX'),
-		'Micronesia' => array('Eng', 'en'),
+		'Micronesia' => array('Eng', 'en_US'),
 		'Moldova' => array('Mol', ''),
-		'Monaco' => array('Fre', 'fr'),
-		'Mongolia' => array('Mon', ''),
+		'Monaco' => array('Fre', 'fr_FR'),
+		'Mongolia' => array('Mon', 'zh_ZH'),
 		'Montenegro' => array('Ser', ''),
 		'Morocco' => array('Ara', 'ar'),
 		'Mozambique' => array('Por', 'pt'),
@@ -598,13 +599,12 @@ class Locale extends Object {
 	 */
 	public function getTimezonesList(){
 		$data = $this->_getLocaleData();
-		$path = '/ldml/dates/timeZoneNames/zone';
-		$timezonesList = $data->queryLanguage($this->getLanguage(), $path);
+		$path = '/supplementalData/timezoneData/mapTimezones/mapZone[@territory="001"]';
 		$localeTimezones = array();
+		$timezonesList = $data->querySupplementalData($path);
 		foreach($timezonesList as $timezone){
-			if(trim($timezone->nodeValue)){
-				$localeTimezones[$timezone->getAttribute('type')] = $timezone->nodeValue;
-			}
+			$type = $timezone->getAttribute('type');
+			$localeTimezones[$type] = $type;
 		}
 		return $localeTimezones;
 	}
@@ -638,7 +638,7 @@ class Locale extends Object {
 		if($dateFormat->length>0){
 			return $dateFormat->item(0)->nodeValue;
 		} else {
-			throw new LocaleException('El formato de fecha "'.$type."' no existe");
+			throw new LocaleException('El formato de fecha "'.$type.'" no existe');
 		}
 	}
 

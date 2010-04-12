@@ -289,7 +289,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 		if(!$resultQuery){
 			$resultQuery = $this->_lastResultQuery;
 			if(!$resultQuery){
-				throw new DbException($this->error('Resource invalido para db::field_name'), $this->noError());
+				throw new DbException($this->error('Resource invalido para DbBase::fieldName'), $this->noError());
 				return false;
 			}
 		}
@@ -314,7 +314,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 		if(!$resultQuery){
 			$resultQuery = $this->_lastResultQuery;
 			if(!$resultQuery){
-				throw new DbException($this->error('Resource invalido para db::dataSeek'), $this->noError());
+				throw new DbException($this->error('Resource invalido para '.__CLASS__.'::dataSeek'), $this->noError());
 				return false;
 			}
 		}
@@ -359,7 +359,7 @@ class DbOracle extends DbBase implements DbBaseInterface  {
 		if(($numberRows = oci_num_rows($resultQuery))!==false){
 			return $numberRows;
 		} else {
-			throw new DbException($this->error('Resource invalido para db::affectedRows'), $this->noError());
+			throw new DbException($this->error('Resource inválido para '.__CLASS__.'::affectedRows'), $this->noError());
 			return false;
 		}
 		return false;
