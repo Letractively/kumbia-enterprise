@@ -114,6 +114,11 @@ abstract class DbLoader {
 			throw new DbLoaderException('No existe la clase '.$className.', necesaria para iniciar el adaptador', 0);
 		}
 
+		//Verificar extensiones requeridas
+		#if[compile-time]
+		self::_checkRequiredExtensions($className);
+		#endif
+
 		//Verificar si requiere de un SQLDialect
 		$sqlDialect = call_user_func_array(array($className, 'getSQLDialect'), array());
 		if($sqlDialect!==null){
@@ -125,7 +130,7 @@ abstract class DbLoader {
 	}
 
 	/**
-	 * Carga un driver según lo especificado en environment.ini
+	 * Carga un driver según lo especificado en config/environment
 	 *
 	 * @static
 	 * @return boolean
@@ -141,27 +146,37 @@ abstract class DbLoader {
 			$type = $config->database->type;
 		}
 		$className = self::_loadAdapterClass($layer, $type);
-		eval('class Db extends '.$className.' {}');
 		#if[compile-time]
-		$extensionRequired = Db::getPHPExtensionRequired();
-		if(is_array($extensionRequired)){
-			$someExtension = false;
-			foreach($extensionRequired as $extension){
-				if(extension_loaded($extension)){
-					$someExtension = true;
-					break;
-				}
-			}
-			if($someExtension==false){
-				throw new DbException("Debe cargar alguna de las siguientes extensiones de PHP: ".join(", ", $extensionRequired), 0);
-			}
-		} else {
-			if(extension_loaded($extensionRequired)==false){
-				throw new DbException("Debe cargar la extensión de PHP llamada php_$extensionRequired", 0);
-			}
-		}
+		self::_checkRequiredExtensions($className);
 		#endif
 		return true;
+	}
+
+	/**
+	 * Comprueba si están cargadas las extensiones del adaptador
+	 *
+	 * @param	string $className
+	 */
+	private static function _checkRequiredExtensions($className){
+		$extensionRequired = call_user_func(array($className, 'getPHPExtensionRequired'));
+		if($extensionRequired!==null){
+			if(is_array($extensionRequired)){
+				$someExtension = false;
+				foreach($extensionRequired as $extension){
+					if(extension_loaded($extension)){
+						$someExtension = true;
+						break;
+					}
+				}
+				if($someExtension==false){
+					throw new DbException('Debe cargar alguna de las siguientes extensiones de PHP: '.join(', ', $extensionRequired), 0);
+				}
+			} else {
+				if(extension_loaded($extensionRequired)==false){
+					throw new DbException('Debe cargar la extensión de PHP llamada php_'.$extensionRequired, 0);
+				}
+			}
+		}
 	}
 
 	/**
@@ -180,6 +195,22 @@ abstract class DbLoader {
 			$dbDescriptor[$paramData[0]] = $paramData[1];
 		}
 		return self::factory($adapterName, $dbDescriptor);
+	}
+
+	/**
+	 * Crea una conexión apartir de una configuración en el databases.ini
+	 *
+	 * @param	string $name
+	 * @return	DbBase
+	 */
+	static public function factoryFromName($name){
+		$databases = CoreConfig::readFile('databases');
+		if(isset($databases->$name)){
+			$descriptor = $databases->$name;
+			return self::factory($descriptor->type, $descriptor);
+		} else {
+			throw new DbException('La base de datos "'.$name.'" no está definida en config/databases', 0);
+		}
 	}
 
 }

@@ -21,6 +21,11 @@
  */
 
 /**
+ * @see EntityInterface
+ */
+require 'Library/Kumbia/EntityManager/Entity/Interface.php';
+
+/**
  * EntityManager
  *
  * El componente EntityManager es usado internamente por el framework y
@@ -134,7 +139,7 @@ abstract class EntityManager {
 	static private $_generators = array();
 
 	/**
-	 * Registro de la existencia de entidades temporal por conexion
+	 * Registro de la existencia de entidades temporal por conexión
 	 *
 	 * @var array
 	 * @staticvar
@@ -207,7 +212,7 @@ abstract class EntityManager {
 					return self::$_entities[$entityName];
 				}
 			} else {
-				throw new EntityManagerException("No existe la entidad '$entityName'");
+				throw new EntityManagerException('No existe la entidad "'.$entityName.'"');
 			}
 		} else {
 			if(isset(self::$_entities[$entityName])){
@@ -237,8 +242,8 @@ abstract class EntityManager {
 	/**
 	 * Inicializa un modelo
 	 *
-	 * @param string $entityName
-	 * @param string $model
+	 * @param	string $entityName
+	 * @param	string $model
 	 */
 	private static function _initializeModel($entityName, $model){
 		#if[compile-time]
@@ -248,8 +253,8 @@ abstract class EntityManager {
 		#endif
 			self::$_entities[$entityName] = new $entityName();
 			#if[compile-time]
-			if(!is_subclass_of(self::$_entities[$entityName], 'ActiveRecordBase')){
-				throw new EntityManagerException("Error inicializando modelo '$entityName', el modelo '$model' debe heredar ActiveRecord");
+			if(!class_implements(self::$_entities[$entityName], 'EntityInterface')){
+				throw new EntityManagerException('Error inicializando modelo "'.$entityName.'", el modelo "'.$model.'" debe implementar la interface EntityInterface');
 			}
 			#endif
 			$sourceName = self::$_entities[$entityName]->getSource();
@@ -265,10 +270,10 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Inicializa el modelo ActiveRecord base de la aplicacion
+	 * Inicializa el modelo ActiveRecord base de la aplicación
 	 *
-	 * @access public
-	 * @param string $modelsDir
+	 * @access	public
+	 * @param	string $modelsDir
 	 * @static
 	 */
 	public static function initModelBase($modelsDir){
@@ -325,7 +330,7 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Verifica si $model es un modelo de la Aplicacion
+	 * Verifica si $modelName es un modelo de la aplicación activa
 	 *
 	 * @access 	public
 	 * @param 	string $modelName
@@ -342,16 +347,22 @@ abstract class EntityManager {
 			if(isset(self::$_entities[self::getEntityName($modelName)])==true){
 				return true;
 			} else {
-				$model = Utils::uncamelize($modelName);
 				#if[compile-time]
-				if(Core::fileExists(self::$_modelsDir.'/'.$model.'.php')){
+				if(class_exists($modelName, false)==false){
 				#endif
-					require self::$_modelsDir.'/'.$model.'.php';
-					self::_initializeModel($modelName, $model);
-					return true;
-				#if[compile-time]
+					$model = Utils::uncamelize($modelName);
+					#if[compile-time]
+					if(Core::fileExists(self::$_modelsDir.'/'.$model.'.php')){
+					#endif
+						require self::$_modelsDir.'/'.$model.'.php';
+						self::_initializeModel($modelName, $model);
+						return true;
+					#if[compile-time]
+					} else {
+						return false;
+					}
 				} else {
-					return false;
+					throw new EntityManagerException('La entidad "'.$entityName.'" no se inicializó con EntityManager');
 				}
 				#endif
 			}
@@ -389,46 +400,118 @@ abstract class EntityManager {
 	}
 
 	/**
-	 * Indica si hay una relacion tipo belongsTo en la entidad solicitada
+	 * Indica si hay una relación tipo belongsTo en la entidad solicitada
 	 *
 	 * @access 	public
 	 * @param 	string $entityName
-	 * @param 	string $relationRequested
+	 * @param 	string $entityRelation
 	 * @return 	boolean
 	 * @static
 	 */
-	 static public function existsBelongsTo($entityName, $relationRequested){
-		return isset(self::$_belongsTo[$entityName][$relationRequested]) ? true : false;
+	 static public function existsBelongsTo($entityName, $entityRelation){
+		return isset(self::$_belongsTo[$entityName][$entityRelation]) ? true : false;
 	}
 
 	/**
-	 * Indica si hay una relacion tipo hasMany en la entidad solicitada
+	 * Indica si hay una relación tipo hasMany en la entidad solicitada
 	 *
 	 * @access 	public
 	 * @param 	string $entityName
-	 * @param 	string $relationRequested
+	 * @param 	string $entityRelation
 	 * @return 	boolean
 	 * @static
 	 */
-	static public function existsHasMany($entityName, $relationRequested){
-		return isset(self::$_hasMany[$entityName][$relationRequested]) ? true : false;
+	static public function existsHasMany($entityName, $entityRelation){
+		return isset(self::$_hasMany[$entityName][$entityRelation]) ? true : false;
 	}
 
 	/**
-	 * Indica si hay una relacion tipo hasOne en la entidad solicitada
+	 * Indica si hay una relación tipo hasOne en la entidad solicitada
 	 *
 	 * @access 	public
 	 * @param 	string $entityName
-	 * @param 	string $relationRequested
+	 * @param 	string $entityRelation
 	 * @return 	boolean
 	 * @static
 	 */
-	static public function existsHasOne($entityName, $relationRequested){
-		return isset(self::$_hasOne[$entityName][$relationRequested]) ? true : false;
+	static public function existsHasOne($entityName, $entityRelation){
+		return isset(self::$_hasOne[$entityName][$entityRelation]) ? true : false;
 	}
 
 	/**
-	 *  Aplica la función indicada devolviendo ó contando los registros de la relación 1-1 ó n-1
+	 * Obtiene la definición de la relación belongsTo entre 2 entidades
+	 *
+	 * @param string $entityName
+	 * @param string $entityRelation
+	 */
+	static public function getBelongsToDefinition($entityName, $entityRelation){
+		if(isset(self::$_belongsTo[$entityName][$entityRelation])){
+			return array(
+				'fields' => self::$_belongsTo[$entityName][$entityRelation]['fi'],
+				'referencedEntity' => self::$_belongsTo[$entityName][$entityRelation]['rt'],
+				'referencedFields' => self::$_belongsTo[$entityName][$entityRelation]['rf'],
+			);
+		} else {
+			throw new EntityManagerException('No existe una relación belongsTo entre "'.$entityName.'" y "'.$entityRelation.'"');
+		}
+	}
+
+	/**
+	 * Obtiene la definición de la relación hasMany entre 2 entidades
+	 *
+	 * @param string $entityName
+	 * @param string $entityRelation
+	 * @param boolean $reverseOrder
+	 */
+	static public function getHasManyDefinition($entityName, $entityRelation, $reverseOrder=false){
+		if(isset(self::$_hasMany[$entityName][$entityRelation])){
+			if($reverseOrder==false){
+				return array(
+					'fields' => self::$_hasMany[$entityName][$entityRelation]['fi'],
+					'referencedEntity' => self::$_hasMany[$entityName][$entityRelation]['rt'],
+					'referencedFields' => self::$_hasMany[$entityName][$entityRelation]['rf'],
+				);
+			} else {
+				return array(
+					'fields' => self::$_hasMany[$entityName][$entityRelation]['rf'],
+					'referencedEntity' => self::$_hasMany[$entityName][$entityRelation]['rt'],
+					'referencedFields' => self::$_hasMany[$entityName][$entityRelation]['fi'],
+				);
+			}
+		} else {
+			throw new EntityManagerException('No existe una relación hasMany entre "'.$entityName.'" y "'.$entityRelation.'"');
+		}
+	}
+
+	/**
+	 * Obtiene la definición de la relación hasOne entre 2 entidades
+	 *
+	 * @param string $entityName
+	 * @param string $entityRelation
+	 * @param boolean $reverseOrder
+	 */
+	static public function getHasOneDefinition($entityName, $entityRelation, $reverseOrder=false){
+		if(isset(self::$_hasOne[$entityName][$entityRelation])){
+			if($reverseOrder==false){
+				return array(
+					'fields' => self::$_hasOne[$entityName][$entityRelation]['fi'],
+					'referencedEntity' => self::$_hasOne[$entityName][$entityRelation]['rt'],
+					'referencedFields' => self::$_hasOne[$entityName][$entityRelation]['rf'],
+				);
+			} else {
+				return array(
+					'fields' => self::$_hasOne[$entityName][$entityRelation]['rf'],
+					'referencedEntity' => self::$_hasOne[$entityName][$entityRelation]['rt'],
+					'referencedFields' => self::$_hasOne[$entityName][$entityRelation]['fi'],
+				);
+			}
+		} else {
+			throw new EntityManagerException('No existe una relación hasOne entre "'.$entityName.'" y "'.$entityRelation.'"');
+		}
+	}
+
+	/**
+	 * Aplica la función indicada devolviendo ó contando los registros de la relación 1-1 ó n-1
 	 *
 	 * @access 	public
 	 * @param 	string $method
@@ -439,34 +522,38 @@ abstract class EntityManager {
 	 * @static
 	 */
 	static public function getBelongsToRecords($method, $entityName, $relationRequested, $record){
-		$relation = self::$_belongsTo[$entityName][$relationRequested];
-		if(!is_array($relation['rf'])){
-			$value = $record->readAttribute($relation['fi']);
-			$condition = $relation['rf'].' = \''.$value.'\'';
-		} else {
-			$i = 0;
-			$conditions = array();
-			foreach($relation['rf'] as $referencedField){
-				$value = $record->readAttribute($relation['fi'][$i]);
-				$conditions[] = $relation['rf'][$i].' = \''.$value.'\'';
-				++$i;
-			}
-			$condition = join(' AND ', $conditions);
-		}
-		$arguments = func_get_args();
-		$arguments = array_merge(array($condition), array_slice($arguments, 4));
-		$referenceTable = ucfirst(Utils::camelize($relation['rt']));
-		if(self::$_autoInitialize==true){
-			if(isset(self::$_entities[$referenceTable])){
-				$returnedRecord = call_user_func_array(array(self::$_entities[$referenceTable], $method), $arguments);
-				return $returnedRecord;
+		if(isset(self::$_belongsTo[$entityName][$relationRequested])){
+			$relation = self::$_belongsTo[$entityName][$relationRequested];
+			if(!is_array($relation['rf'])){
+				$value = $record->readAttribute($relation['fi']);
+				$condition = $relation['rf'].' = \''.$value.'\'';
 			} else {
-				throw new EntityManagerException('No existe la entidad "'.$referenceTable.'" para realizar la relación n-1');
+				$i = 0;
+				$conditions = array();
+				foreach($relation['rf'] as $referencedField){
+					$value = $record->readAttribute($relation['fi'][$i]);
+					$conditions[] = $relation['rf'][$i].' = \''.$value.'\'';
+					++$i;
+				}
+				$condition = join(' AND ', $conditions);
+			}
+			$arguments = func_get_args();
+			$arguments = array_merge(array($condition), array_slice($arguments, 4));
+			$referenceTable = ucfirst(Utils::camelize($relation['rt']));
+			if(self::$_autoInitialize==true){
+				if(isset(self::$_entities[$referenceTable])){
+					$returnedRecord = call_user_func_array(array(self::$_entities[$referenceTable], $method), $arguments);
+					return $returnedRecord;
+				} else {
+					throw new EntityManagerException('No existe la entidad "'.$referenceTable.'" para realizar la relación n-1');
+				}
+			} else {
+				$entity = self::getEntityInstance($referenceTable);
+				$returnedRecord = call_user_func_array(array($entity, $method), $arguments);
+				return $returnedRecord;
 			}
 		} else {
-			$entity = self::getEntityInstance($referenceTable);
-			$returnedRecord = call_user_func_array(array($entity, $method), $arguments);
-			return $returnedRecord;
+			throw new EntityManagerException('No existe una relación belongsTo entre "'.$entityName.'" y "'.$relationRequested.'"');
 		}
 	}
 
@@ -559,7 +646,7 @@ abstract class EntityManager {
 			if(isset(self::$_entities[$referenceTable])){
 				return call_user_func_array(array(self::$_entities[$referenceTable], $method), $findParams);
 			} else {
-				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación n-1");
+				throw new EntityManagerException('No existe la entidad "'.$referenceTable.'" para realizar la relación n-1');
 			}
 		} else {
 			$referencedEntity = self::getEntityInstance($referenceTable);
@@ -862,8 +949,8 @@ abstract class EntityManager {
 	/**
 	 * Devuelve el source de una entidad
 	 *
-	 * @param string $entityName
-	 * @return string
+	 * @param	string $entityName
+	 * @return	string
 	 * @static
 	 */
 	public static function getSourceName($entityName){
@@ -871,6 +958,23 @@ abstract class EntityManager {
 			return self::$_sources[$entityName];
 		} else {
 			return null;
+		}
+	}
+
+	/**
+	 * Devuelve el source completo de una entidad incluyendo el schema
+	 *
+	 * @param string $entityName
+	 * @return string
+	 * @static
+	 */
+	public static function getCompleteSource($entityName){
+		$entity = self::getEntityInstance($entityName);
+		$schema = $entity->getSchema();
+		if($schema!=''){
+			return $schema.'.'.$entity->getSource();
+		} else {
+			return $entity->getSource();
 		}
 	}
 

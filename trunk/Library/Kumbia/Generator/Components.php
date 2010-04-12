@@ -216,7 +216,7 @@ abstract class Component {
 			Generator::formsPrint("value = '".$_REQUEST['fl_'.$name]."'");
 		}
 		if($_REQUEST['fl_'.$name]!==""&&$_REQUEST['fl_'.$name]!==null){
-			$db = db::rawConnect();
+			$db = DbBase::rawConnect();
 			ActiveRecordUtils::sqlItemSanizite($name);
 			ActiveRecordUtils::sqlItemSanizite($com["foreignTable"]);
 			ActiveRecordUtils::sqlSanizite($com["detailField"]);
@@ -319,7 +319,7 @@ abstract class Component {
 			Generator::formsPrint("<option value='@'>Seleccione ...</option>\n");
 		}
 		if($com['class']=='dynamic'){
-			$db = db::rawConnect();
+			$db = DbBase::rawConnect();
 			if(isset($com['extraTables'])){
 				if($com['extraTables']){
 					ActiveRecord::sqlSanizite($com["extraTables"]);

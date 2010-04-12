@@ -361,7 +361,7 @@ class DbBase extends Object {
 		if($resultQuery){
 			#if[compile-time]
 			if($this->numRows($resultQuery)>1){
-				Flash::warning("Una sentencia SQL: \"$sqlQuery\" retornó más de una fila cuando se esperaba una sola");
+				Facility::issueEvent('La sentencia SQL: "'.$sqlQuery.'" retornó más de un registro cuando se esperaba uno sola', Facility::I_WARNING);
 			}
 			#endif
 			return $this->fetchArray($resultQuery);
@@ -383,12 +383,12 @@ class DbBase extends Object {
 	public function insert($table, $values, $fields=null, $automaticQuotes=false){
 		$insertSQL = '';
 		if($this->isReadOnly()==true){
-			throw new DbException("No se puede efectuar la operación. La transacción es de solo lectura", 0, true, $this);
+			throw new DbException('No se puede efectuar la operación. La transacción es de solo lectura', 0, true, $this);
 		}
+		#if[compile-time]
 		if(is_array($values)==true){
-			#if[compile-time]
 			if(count($values)==0){
-				throw new DbException("Imposible realizar inserción en $table sin datos");
+				throw new DbException('Imposible realizar inserción en '.$table.' sin datos');
 			} else {
 			#endif
 				if($automaticQuotes==true){
@@ -409,9 +409,11 @@ class DbBase extends Object {
 				$insertSQL = 'INSERT INTO '.$table.' VALUES ('.join(', ', $values).')';
 			}
 			return $this->query($insertSQL);
+		#if[compile-time]
 		} else{
 			throw new DbException('El segundo parámetro para insert no es un Array', 0, true, $this);
 		}
+		#endif
 	}
 
 	/**
@@ -591,6 +593,31 @@ class DbBase extends Object {
 	}
 
 	/**
+	 * Obtiene el descriptor de la base de datos del entorno activo
+	 *
+	 * @return stdClass
+	 */
+	private static function _getDatabaseDescriptor(){
+		$config = CoreConfig::readEnviroment();
+		#if[compile-time]
+		if(isset($config->database)==false){
+			throw new DbException('No se ha definido los parámetros de conexión de la base de datos en enviroment.ini', 0, true, $this);
+		}
+		#endif
+		if(is_object($config->database)){
+			return $config->database;
+		} else {
+			$description = $config->database;
+			$databases = CoreConfig::readFile('databases');
+			if(isset($databases->$description)){
+				return $databases->$description;
+			} else {
+				throw new DbException('Los parámetros de conexión de la base de datos no son válidos', 0, true, $this);
+			}
+		}
+	}
+
+	/**
 	 * Realiza una conexión directa al motor de base de datos
 	 *
 	 * @access	public
@@ -600,21 +627,15 @@ class DbBase extends Object {
 	 * @static
 	 */
 	public static function rawConnect($newConnection=false, $renovate=false){
-		$config = CoreConfig::readEnviroment();
+		$database = self::_getDatabaseDescriptor();
 		if($newConnection==true){
-			if(isset($config->database)==false){
-				throw new DbException('No se ha definido los parámetros de conexión al gestor relacional en enviroment.ini', 0, true, $this);
-			}
-			$connection = DbLoader::factory($config->database->type, $config->database);
+			$connection = DbLoader::factory($database->type, $database);
 			if($renovate==true){
 				self::$_rawConnection = $connection;
 			}
 		} else {
-			if(isset($config->database)==false){
-				throw new DbException('No se ha definido los parámetros de conexión al gestor relacional en enviroment.ini');
-			}
 			if(self::$_rawConnection==null){
-				self::$_rawConnection = DbLoader::factory($config->database->type, $config->database);
+				self::$_rawConnection = DbLoader::factory($database->type, $database);
 			}
 			$connection = self::$_rawConnection;
 		}
@@ -710,7 +731,7 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Indica si el Gestor tiene Autocommit habilitado
+	 * Indica si la conexión tiene auto-commit habilitado
 	 *
 	 * @access public
 	 * @return boolean
@@ -786,7 +807,7 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Devuelve el nombre del host o dirección IP del servidor del RBDM
+	 * Devuelve el nombre del host ó dirección IP del servidor del RBDM
 	 *
 	 * @access 	public
 	 * @return	string
@@ -797,6 +818,15 @@ class DbBase extends Object {
 		} else {
 			return '';
 		}
+	}
+
+	/**
+	 * Devuelve el descriptor de la base de datos
+	 *
+	 * @return stdClass
+	 */
+	public function getDescriptor(){
+		return $this->_descriptor;
 	}
 
 	/**
@@ -820,7 +850,16 @@ class DbBase extends Object {
 	}
 
 	/**
-	 * Establece el timeout de la conexion
+	 * Devuelve la última sentencia SQL ejecutada
+	 *
+	 * @return string
+	 */
+	public function getLastQuery(){
+		return $this->_lastQuery;
+	}
+
+	/**
+	 * Establece el timeout de la conexión
 	 *
 	 * @param int $timeout
 	 */

@@ -98,7 +98,7 @@ class ActiveRecordTransaction {
 	public function __construct($autoBegin=false, $definition=''){
 		if(is_object($definition)){
 			if($definition instanceof TransactionDefinition){
-				$connection = Db::rawConnect($definition->getCreateConnection());
+				$connection = DbBase::rawConnect($definition->getCreateConnection());
 				$this->_db = $connection;
 				$isolationLevel = $definition->getIsolationLevel();
 				if($isolationLevel!=TransactionDefinition::ISOLATION_DEFAULT){
@@ -111,7 +111,7 @@ class ActiveRecordTransaction {
 				throw new ActiveRecordTransactionException("Definición de transacci&oacute;n invalida");
 			}
 		} else {
-			$connection = Db::rawConnect(true);
+			$connection = DbBase::rawConnect(true);
 			$this->_db = $connection;
 		}
 		if($autoBegin==true){

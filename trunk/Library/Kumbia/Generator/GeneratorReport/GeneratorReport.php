@@ -305,7 +305,7 @@ abstract class GeneratorReport {
 		$whereCondition = "";
 		$maxCondition = "";
 		$n = 0;
-		$db = db::rawConnect();
+		$db = DbBase::rawConnect();
 		if(isset($form['dataFilter'])&&$form['dataFilter']){
 			if(strpos($form['dataFilter'], '@')){
 				ereg("[\@][A-Za-z0-9_]+", $form['dataFilter'], $regs);

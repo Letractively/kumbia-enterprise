@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		Date
  * @subpackage	Format
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -30,7 +30,7 @@
  * @category	Kumbia
  * @package		Date
  * @subpackage	Format
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
@@ -46,8 +46,8 @@ class DateFormat {
 	/**
 	 * Constructor de DateFormat
 	 *
-	 * @param string $format
-	 * @param Date $date
+	 * @param	string $format
+	 * @param	Date $date
 	 */
 	public function __construct($format, Date $date){
 		$token = "";
@@ -60,7 +60,7 @@ class DateFormat {
 			'D', 'L', 'z', 'r', 'c', 't', 'o', 'W',
 		);
 		$posibleTokens = array(
-			'MMMM', 'MM', 'm','mm', 'M', 'EEEE', 'EEE',
+			'MMMM', 'MMM', 'MM', 'm','mm', 'M', 'EEEE', 'EEE',
 			'DD', 'dd', 'z', 'd', 'EE', 'E',
 			't', 'e', 'L', 'r', 'o', 'W', 'N',
 			'yyy', 'yyyy', 'y'
@@ -112,6 +112,9 @@ class DateFormat {
 			switch($formatPart){
 				case 'MMMM':
 					$this->_formatedDate.=$date->getMonthName();
+					break;
+				case 'MMM':
+					$this->_formatedDate.=$date->getAbrevMonthName();
 					break;
 				case 'MM':
 				case 'm':

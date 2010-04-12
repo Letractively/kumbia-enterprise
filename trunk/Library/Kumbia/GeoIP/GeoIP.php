@@ -331,7 +331,7 @@ class GeoIP extends Object {
 	 * Inicializa la instancia de GeoIP en el Singleton
 	 *
 	 */
-	private function _initialize(){
+	private static function _initialize(){
 		if(self::$_instance==null){
 			self::$_instance = new self();
 		}
@@ -372,18 +372,13 @@ class GeoIP extends Object {
 	}
 
 	/**
-	 * Obtiene el país desde donde se hace la aplicación
+	 * Obtiene el país desde donde se accede la aplicación
 	 *
 	 * @return	string
 	 */
 	public static function getRequestCountry(){
-		if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
-			$ipAddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			if(isset($_SERVER['REMOTE_ADDR'])){
-				$ipAddress = $_SERVER['REMOTE_ADDR'];
-			}
-		}
+		$controllerRequest = ControllerRequest::getInstance();
+		$ipAddress = $controllerRequest->getClientAddress();
 		return self::countryByIP($ipAddress);
 	}
 

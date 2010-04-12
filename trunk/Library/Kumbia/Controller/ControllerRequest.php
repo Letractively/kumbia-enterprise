@@ -676,4 +676,21 @@ class ControllerRequest extends Object {
 		}
 	}
 
+	/**
+	 * Obtiene la IP del cliente, revisa si pasa por un Proxy HTTP
+	 *
+	 * @return string
+	 */
+	public function getClientAddress(){
+		if(isset($_SERVER['HTTP_X_FORWARDED_FOR'])){
+			return $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+			if(isset($_SERVER['REMOTE_ADDR'])){
+				return $_SERVER['REMOTE_ADDR'];
+			} else {
+				return '';
+			}
+		}
+	}
+
 }

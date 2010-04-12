@@ -218,9 +218,9 @@ class CoreException extends Exception {
 						$file = basename($file);
 						$time = round($message['time']-$_SERVER['REQUEST_TIME'], 4);
 						if($message['completeBacktrace']==true){
-							$bgcolor = "pink";
+							$bgcolor = 'pink';
 						} else {
-							$bgcolor = "#ffffff";
+							$bgcolor = '#ffffff';
 						}
 						echo "
 						<tr bgcolor='$bgcolor'>

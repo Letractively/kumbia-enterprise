@@ -132,7 +132,7 @@ class TemporaryActiveRecord extends ActiveRecord {
 				$tableDefinition['indexes'] = array();
 			}
 			if($db==null){
-				$db = Db::rawConnect();
+				$db = DbBase::rawConnect();
 			}
 			if($db->createTable(strtolower($tableName), $tableDefinition['attributes'], $tableDefinition['indexes'], array("temporary" => true))==false){
 				throw new Exception("No se pudo crear la tabla temporal '$tableName'");
@@ -319,7 +319,7 @@ class TemporaryActiveRecord extends ActiveRecord {
 			$tableDefinition = $this->_tableDefinition();
 			$datesAt = array();
 			foreach($tableDefinition['attributes'] as $attributeName => $definition){
-				if($definition['type']==db::TYPE_DATE){
+				if($definition['type']==DbBase::TYPE_DATE){
 					if(preg_match('/_at$/', $attributeName)){
 						$datesAt[] = $attributeName;
 					}

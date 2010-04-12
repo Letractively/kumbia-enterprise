@@ -229,7 +229,44 @@ abstract class Tag {
 	}
 
 	/**
-	 * Caja de Texto que autocompleta los resultados
+	 * Helper que analiza el tipo de dato del campo indicado y produce el componente de captura adecuado
+	 *
+	 * @param array $params
+	 */
+	public static function inputField($params){
+		$numberArguments = func_num_args();
+		$params = Utils::getParams(func_get_args(), $numberArguments);
+		if(isset($params[0])){
+			$name = $params[0];
+		} else {
+			throw new TagException('Debe indicar la convención modelo.atributo para generar el componente');
+		}
+		$arguments = array();
+		$tableItems = explode('.', $name);
+		if(isset($tableItems[0])){
+			$entity = EntityManager::getEntityInstance($tableItems[0]);
+			$dataTypes = $entity->getDataTypes();
+			if($entity->hasField($tableItems[1])){
+				$params[0] = $tableItems[1];
+				if(strpos($dataTypes[$tableItems[1]], 'char')!==false){
+					if(preg_match('/([0-9]+)/', $dataTypes[$tableItems[1]], $matches)){
+						$params['length'] = $matches[1];
+					}
+					return self::textField($params);
+				}
+				if($dataTypes[$tableItems[1]]=='date'){
+					return self::dateField($params);
+				}
+			} else {
+				throw new TagException('El atributo no existe en el modelo');
+			}
+		} else {
+			throw new TagException('Convención modelo.atributo inválida');
+		}
+	}
+
+	/**
+	 * Caja de texto que autocompleta los resultados
 	 *
 	 * @param mixed $params
 	 * @return string
@@ -328,9 +365,9 @@ abstract class Tag {
 			$value = self::getValueFromAction($params[0]);
 		}
 		if(!isset($params['onkeydown'])) {
-			$params['onkeydown'] = "Base.maskNum(event)";
+			$params['onkeydown'] = "NumericField.maskNum(event)";
 		} else {
-			$params['onkeydown'].=";Base.maskNum(event)";
+			$params['onkeydown'].=";NumericField.maskNum(event)";
 		}
 		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $value){
@@ -365,9 +402,9 @@ abstract class Tag {
 			$value = self::getValueFromAction($params[0]);
 		}
 		if(!isset($params['onkeydown'])) {
-			$params['onkeydown'] = "Base.maskNum(event)";
+			$params['onkeydown'] = "NumericField.maskNum(event)";
 		} else {
-			$params['onkeydown'].=";Base.maskNum(event)";
+			$params['onkeydown'].=";NumericField.maskNum(event)";
 		}
         if(!isset($params['formatOptions'])){
             $params['formatOptions'] = '';
@@ -436,9 +473,9 @@ abstract class Tag {
 			$value = self::getValueFromAction($params[0]);
 		}
 		if(!isset($params['onkeydown'])) {
-			$params['onkeydown'] = "Base.maskNum(event)";
+			$params['onkeydown'] = "NumericField.maskNum(event)";
 		} else {
-			$params['onkeydown'].=";Base.maskNum(event)";
+			$params['onkeydown'].=";NumericField.maskNum(event)";
 		}
         if(!isset($params['formatOptions'])){
             $params['formatOptions'] = '';
@@ -474,7 +511,7 @@ abstract class Tag {
 		$code = "<input type='text' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $val){
 			if(!is_integer($key)){
-				$code.="$key='$val' ";
+				$code.=$key."='$val' ";
 			}
 		}
 		$code.=" />\r\n";
@@ -504,9 +541,9 @@ abstract class Tag {
 			$value = isset($params['value']) ? $params['value'] : "";
 		}
 		if(!isset($params['onkeydown'])) {
-			$params['onkeydown'] = "Base.maskNum(event)";
+			$params['onkeydown'] = "NumericField.maskNum(event)";
 		} else {
-			$params['onkeydown'].=";Base.maskNum(event)";
+			$params['onkeydown'].=";NumericField.maskNum(event)";
 		}
 		$code = "<input type='password' id='".$params[0]."' value='$value' ";
 		foreach($params as $key => $value){
@@ -665,7 +702,7 @@ abstract class Tag {
 			}
 		}
 		$code.="</select></td><td></table>";
-		$code.="<input type='text' id='".$params[0]."' name='".$params[0]."' value='$value' />";
+		$code.="<input type='hidden' id='".$params[0]."' name='".$params[0]."' value='$value' />";
 
 		return $code;
 	}
@@ -762,7 +799,7 @@ abstract class Tag {
 			} else {
 				$value = $params['value'];
 			}
-			$code ="<select id='".$params[0]."' name='".$params[0]."' ";
+			$code = '<select id="'.$params[0].'" name="'.$params[0].'" ';
 			if(!isset($params['dummyValue'])){
 				$dummyValue = '@';
 			} else {
@@ -775,31 +812,29 @@ abstract class Tag {
 				$dummyText = $params['dummyText'];
 				unset($params['dummyText']);
 			}
-			if(is_array($params)){
-				foreach($params as $at => $val){
-					if(!is_integer($at)){
-						if(!is_array($val)){
-							$code.="$at='".$val."' ";
-						}
+			foreach($params as $attributeName => $attributeValue){
+				if(!is_integer($attributeName)){
+					if(!is_array($attributeValue)){
+						$code.= $attributeName.'="'.$attributeValue.'" ';
 					}
 				}
 			}
 			$code.=">\r\n";
-			if(isset($params['use_dummy'])&&$params['use_dummy']){
-				$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
+			if(isset($params['use_dummy'])){
+				$code.= "\t<option value='$dummyValue'>$dummyText</option>\r\n";
 				unset($params['use_dummy']);
 			} else {
-				if(isset($params['useDummy'])&&$params['useDummy']){
-					$code.="\t<option value='$dummyValue'>$dummyText</option>\r\n";
+				if(isset($params['useDummy'])){
+					$code.= "\t<option value='$dummyValue'>$dummyText</option>\r\n";
 					unset($params['useDummy']);
 				}
 			}
 			if(is_array($params[1])){
-				foreach($params[1] as $k => $d){
-					if($k==$value && $value!==''){
-						$code.="\t<option value='$k' selected='selected'>$d</option>\r\n";
+				foreach($params[1] as $optionValue => $optionText){
+					if($optionValue==$value && $value!==''){
+						$code.= "\t<option value='$optionValue' selected='selected'>$optionText</option>\r\n";
 					} else {
-						$code.="\t<option value='$k'>$d</option>\r\n";
+						$code.= "\t<option value='$optionValue'>$optionText</option>\r\n";
 					}
 				}
 			}
@@ -836,7 +871,7 @@ abstract class Tag {
 				}
 				#if[compile-time]
 				if(is_callable($callback)==false){
-					throw new TagException("El option_callback no es valido");
+					throw new TagException('El option_callback no es valido');
 				}
 				#endif
 				unset($params['option_callback']);
@@ -1081,7 +1116,7 @@ abstract class Tag {
 	 */
 	public static function javascriptBase($validations=true){
 		$path = Core::getInstancePath();
-		$code = "<script type='text/javascript' src='".$path."javascript/core/base.js'></script>\r\n";
+		$code = '<script type="text/javascript" src="'.$path.'javascript/core/base.js"></script>'."\r\n";
 		$code.= Tag::javascriptLocation();
 		return $code;
 	}
@@ -1098,7 +1133,7 @@ abstract class Tag {
 		$module = Router::getModule();
 		$id = Router::getId();
 		$path = Core::getInstancePath();
-		return "<script type='text/javascript' src='".$path."javascript/core/main.php?app=$application&module=$module&path=".urlencode($path)."&controller=$controllerName&action=$actionName&id=$id'></script>\r\n";
+		return '<script type="text/javascript" src="'.$path.'javascript/core/main.php?app='.$application.'&module='.$module.'&path='.urlencode($path).'&controller='.$controllerName.'&action='.$actionName.'&id='.$id.'"></script>'."\r\n";
 	}
 
 	/**
@@ -1141,7 +1176,7 @@ abstract class Tag {
 			}
 		}
 		$instancePath = Core::getInstancePath();
-		return "<script type='text/javascript' src='".$instancePath."javascript/".$src."'></script>\r\n";
+		return '<script type="text/javascript" src="'.$instancePath.'javascript/'.$src.'"></script>'."\r\n";
 	}
 
 	/**
@@ -1245,27 +1280,22 @@ abstract class Tag {
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
 		$code = "";
-		if(!isset($params['src'])||!$params['src']){
+		if(!isset($params['src'])){
 			$instancePath = Core::getInstancePath();
-			$code.="<img src=\"".$instancePath."img/".$params[0]."\" ";
+			$code.='<img src="'.$instancePath.'img/'.$params[0].'" ';
 		} else {
-			$code.="<img src=\"".$params['src']."\" ";
+			$code.='<img src="'.$params['src'].'" ';
 			unset($params['src']);
 		}
-		if(!isset($params['alt'])||!$params['alt']) {
+		if(!isset($params['alt'])){
 			$params['alt'] = "";
 		}
-		if(is_array($params)){
-			if(!$params['alt']){
-				$params['alt'] = "";
-			}
-			foreach($params as $at => $val){
-				if(!is_integer($at)){
-					$code.="$at=\"".$val."\" ";
-				}
+		foreach($params as $attribute => $value){
+			if(!is_integer($attribute)){
+				$code.=$attribute.'="'.$value.'" ';
 			}
 		}
-		$code.= "/>";
+		$code.= '/>';
 		return $code;
 	}
 
@@ -1340,13 +1370,22 @@ abstract class Tag {
 		if($params['success']){
 			$params['callbacks'][] = " success: function(){ ".$params['success']." }";
 		}
-		$code = "<input type='submit' value='".$params['caption']."' ";
-		foreach($params as $at => $value){
-			if(!is_integer($at)&&(!in_array($at, array("action", "complete", "before", "success", "callbacks", "caption", "update")))){
-				$code.="$at='$value' ";
+		$callbacks = array(
+			'action' => true,
+			'complete' => true,
+			'before' => true,
+			'success' => true,
+			'callbacks' => true,
+			'caption' => true,
+			'update' => true
+		);
+		$code = '<input type="submit" value="'.$params['caption'].'" ';
+		foreach($params as $attribute => $value){
+			if(!is_integer($at)&&!isset($callbacks[$attribute])){
+				$code.= $attribute.'="'.$value.'" ';
 			}
 		}
-		$code.=" onclick='return ajaxRemoteForm(this.form, \"".$params['update']."\")' />\r\n";
+		$code.=' onclick="return ajaxRemoteForm(this.form, \''.$params['update'].'\')" />'."\r\n";
 		return $code;
 	}
 
@@ -1359,7 +1398,7 @@ abstract class Tag {
 	 * @static
 	 */
 	public static function setMeta($name, $content){
-		MemoryRegistry::prepend('CORE_META_TAGS', "<meta name='$name' content='$content'/>\r\n");
+		MemoryRegistry::prepend('CORE_META_TAGS', '<meta name="'.$name.'" content="'.$content.'"/>'."\r\n");
 	}
 
 	/**
@@ -1380,8 +1419,8 @@ abstract class Tag {
 	/**
 	 * Establece el titulo del documento HTML
 	 *
-	 * @access public
-	 * @param string $title
+	 * @access	public
+	 * @param	string $title
 	 * @static
 	 */
 	public static function setDocumentTitle($title){
@@ -1391,8 +1430,8 @@ abstract class Tag {
 	/**
 	 * Agrega al final un texto del titulo actual del documento HTML
 	 *
-	 * @access public
-	 * @param string $title
+	 * @access	public
+	 * @param	string $title
 	 * @static
 	 */
 	public static function appendDocumentTitle($title){
@@ -1402,8 +1441,8 @@ abstract class Tag {
 	/**
 	 * Agrega al principio un texto del titulo actual del documento HTML
 	 *
-	 * @access public
-	 * @param string $title
+	 * @access	public
+	 * @param	string $title
 	 * @static
 	 */
 	public static function prependDocumentTitle($title){
@@ -1411,7 +1450,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Devuelve el titulo del documento HTML
+	 * Devuelve el título del documento HTML
 	 *
 	 * @access public
 	 * @return string
@@ -1425,9 +1464,9 @@ abstract class Tag {
 	 * Agrega una etiqueta link para incluir un archivo CSS respetando
 	 * las rutas y convenciones de Kumbia
 	 *
-	 * @access public
-	 * @param string $src
-	 * @param boolean $useVariables
+	 * @access	public
+	 * @param	string $src
+	 * @param	boolean $useVariables
 	 * @static
 	 */
 	public static function stylesheetLink($src='', $useVariables=false, $parameters=""){
@@ -1537,7 +1576,6 @@ abstract class Tag {
 		} else {
 			throw new TagException('No se puede encontrar el framework javascript "'.$framework.'"');
 		}
-		//MemoryRegistry::reset('CORE_JS');
 	}
 
 	/**
@@ -1548,12 +1586,16 @@ abstract class Tag {
 	 * @return 	string
 	 * @static
 	 */
-	public static function form($action){
+	public static function form($action=''){
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
 		$id = Router::getId();
 		if($action==''){
-			$action = isset($params['action']) ? $params['action'] : '';
+			if(isset($params['action'])){
+				$action = $params['action'];
+			} else {
+				$action = Router::getController().'/'.Router::getAction();
+			}
 		}
 		if(!isset($params['method'])||!$params['method']) {
 			$params['method'] = 'post';
@@ -1582,8 +1624,8 @@ abstract class Tag {
 	/**
 	 * Etiqueta para cerrar un formulario
 	 *
-	 * @access public
-	 * @return string
+	 * @access	public
+	 * @return	string
 	 * @static
 	 */
 	public static function endForm(){
@@ -1633,7 +1675,7 @@ abstract class Tag {
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
 		if(!is_array($params)){
-			return "<input type='password' id='$params' name='$params'/>\r\n";
+			return '<input type="password" id="'.$params.'" name="'.$params."/>\r\n";
 		} else {
 			if(!isset($params[0])) {
 				$params[0] = $params['id'];
@@ -1666,17 +1708,17 @@ abstract class Tag {
 	public static function submitButton($caption){
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
-		if(!isset($params['caption'])) {
+		if(!isset($params['caption'])){
 			$params['caption'] = $params[0];
 		} else {
-			if(!$params['caption']) {
+			if(!$params['caption']){
 				$params['caption'] = $params[0];
 			}
 		}
 		$code = "<input type='submit' value='".$params['caption']."' ";
 		foreach($params as $key => $value){
 			if(!is_integer($key)){
-				$code.="$key='$value' ";
+				$code.=$key."='$value' ";
 			}
 		}
 		$code.=" />\r\n";
@@ -1698,10 +1740,9 @@ abstract class Tag {
 		if(!isset($params[0])||!$params[0]) {
 			$params[0] = isset($params['id']) ? $params['id'] : "";
 		}
-		if(!isset($params['name'])||!$params['name']) {
+		if(!isset($params['name'])||!$params['name']){
 			$params['name'] = $params[0];
 		}
-
 		if($value!==""&&$value!==null){
 			$params['checked'] = "checked";
 		}

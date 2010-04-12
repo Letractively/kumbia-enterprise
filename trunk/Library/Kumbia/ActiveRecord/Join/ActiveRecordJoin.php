@@ -61,7 +61,7 @@ class ActiveRecordJoin extends Object {
 	 */
 	public function __construct($params){
 		if(!isset($params['entities'])||count($params['entities'])==0){
-			throw new ActiveRecordException("Debe indicar las entidades con las que se har&aacute; la consulta");
+			throw new ActiveRecordException('Debe indicar las entidades con las que se hará la consulta');
 		}
 		$entitiesSources = array();
 		$groupFields = array();
@@ -75,18 +75,18 @@ class ActiveRecordJoin extends Object {
 				foreach($params['groupFields'] as $alias => $field){
 					if(preg_match('/\{\#([a-zA-Z0-9\_]+)\}/', $field, $regs)){
 						if(!isset($entitiesSources[$regs[1]])){
-							throw new ActiveRecordException("La entidad '".$regs[1]."' en los campos solicitados no se encontró en la lista de entidades a agrupar");
+							throw new ActiveRecordException('La entidad "'.$regs[1].'" en los campos solicitados no se encontró en la lista de entidades a agrupar');
 						} else {
 							$sqlField = str_replace($regs[0], $entitiesSources[$regs[1]], $field);
 							if(!is_numeric($alias)){
-								$requestedFields[] = $sqlField." AS $alias";
+								$requestedFields[] = $sqlField.' AS '.$alias;
 							} else {
 								$requestedFields[] = $sqlField;
 							}
-							if(strpos($sqlField, " ")==false){
+							if(strpos($sqlField, ' ')==false){
 								$groupFields[] = $sqlField;
 							} else {
-								$groupFields[] = substr($sqlField, 0, strpos($sqlField, " "));
+								$groupFields[] = substr($sqlField, 0, strpos($sqlField, ' '));
 							}
 						}
 					} else {
@@ -108,7 +108,7 @@ class ActiveRecordJoin extends Object {
 						$replacedField = $field;
 						while(preg_match('/\{\#([a-zA-Z0-9\_]+)\}/', $replacedField, $regs)){
 							if(!isset($entitiesSources[$regs[1]])){
-								throw new ActiveRecordException("La entidad '".$regs[1]."' en los campos solicitados no se encontró en la lista de entidades con acumulado de sumatoria");
+								throw new ActiveRecordException('La entidad '.$regs[1].' en los campos solicitados no se encontró en la lista de entidades con acumulado de sumatoria');
 							} else {
 								$replacedField = str_replace($regs[0], $entitiesSources[$regs[1]], $replacedField);
 								if(is_numeric($alias)){
@@ -122,13 +122,13 @@ class ActiveRecordJoin extends Object {
 							$existsEntity = true;
 						}
 						if($existsEntity==false){
-							if($alias==""||is_numeric($alias)){
-								$requestedFields[] = "$function($field)";
+							if($alias==''||is_numeric($alias)){
+								$requestedFields[] = $function.'('.$field.')';
 							} else {
-								$requestedFields[] = "$function($field) AS $alias";
+								$requestedFields[] = $function.'('.$field.') AS '.$alias;
 							}
 						} else {
-							$requestedFields[] = "$function($replacedField) AS $alias";
+							$requestedFields[] = $function.'('.$replacedField.') AS '.$alias;
 						}
 					}
 				}
@@ -207,10 +207,10 @@ class ActiveRecordJoin extends Object {
 			if(count($join)==0){
 				if(isset($params['noRelations'])){
 					if($params['noRelations']==false){
-						throw new ActiveRecordException("No se pudo encontrar las relaciones entre las entidades");
+						throw new ActiveRecordException('No se pudo encontrar las relaciones entre las entidades');
 					}
 				} else {
-					throw new ActiveRecordException("No se pudo encontrar las relaciones entre las entidades");
+					throw new ActiveRecordException('No se pudo encontrar las relaciones entre las entidades');
 				}
 			} else {
 				$join = array_unique($join);
@@ -243,9 +243,9 @@ class ActiveRecordJoin extends Object {
 				foreach($params['order'] as $key => $valueOrder){
 					if(preg_match('/\{\#([a-zA-Z0-9]+)\}/', $valueOrder, $regs)){
 						if(in_array($regs[1], $params['entities'])){
-							$params['order'][$key] = str_replace("{#$regs[1]}", $entitiesSources[$regs[1]], $valueOrder);
+							$params['order'][$key] = str_replace('{#'.$regs[1].'}', $entitiesSources[$regs[1]], $valueOrder);
 						} else {
-							throw new DbSQLGrammarException("No se encuentra la entidad '".$regs[1]."' en la lista de ordenamiento", 0);
+							throw new DbSQLGrammarException('No se encuentra la entidad "'.$regs[1].'" en la lista de ordenamiento', 0);
 						}
 					}
 				}
@@ -271,7 +271,7 @@ class ActiveRecordJoin extends Object {
 	}
 
 	/**
-	 * Devuelve los resultados del join
+	 * Devuelve los resultados del JOIN
 	 *
 	 * @access public
 	 */

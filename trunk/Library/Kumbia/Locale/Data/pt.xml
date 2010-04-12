@@ -4339,6 +4339,7 @@
 		<messages>
 			<yesstr>sim:s</yesstr>
 			<nostr>não:nao:n</nostr>
+			<choosestr>Escolha</choosestr>
 		</messages>
 	</posix>
 </ldml>

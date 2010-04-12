@@ -513,7 +513,7 @@ abstract class StandardGenerator {
 			Generator::formsPrint("var AutoValuesFFields = [");
 			$aFields = "";
 			if(!isset($db)) {
-				$db = db::rawConnect();
+				$db = DbBase::rawConnect();
 			}
 			foreach($form['components'] as $key => $value){
 				if(!isset($value['auto_numeric'])){

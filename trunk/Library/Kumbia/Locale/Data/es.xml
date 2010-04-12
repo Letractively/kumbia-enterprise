@@ -3678,6 +3678,7 @@
 		<messages>
 			<yesstr>sí:si:s</yesstr>
 			<nostr>no:n</nostr>
+			<choosestr>Seleccione</choosestr>
 		</messages>
 	</posix>
 	<linguistics>

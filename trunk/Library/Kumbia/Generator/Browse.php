@@ -299,7 +299,7 @@ abstract class Browse {
 			}
 		}
 
-		if($db = db::rawConnect()){
+		if($db = DbBase::rawConnect()){
 			$q = $db->query($browseSelect);
 			if($q===false) {
 				Flash::error($db->error());

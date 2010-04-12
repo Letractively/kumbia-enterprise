@@ -4046,6 +4046,7 @@
 		<messages>
 			<yesstr>yes:y</yesstr>
 			<nostr>no:n</nostr>
+			<choosestr>Choose</choosestr>
 		</messages>
 	</posix>
 </ldml>

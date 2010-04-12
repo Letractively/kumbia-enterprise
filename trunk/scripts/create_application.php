@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Scripts
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -30,7 +30,7 @@ require 'Library/Kumbia/Autoload.php';
  *
  * @category 	Kumbia
  * @package 	Scripts
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -39,8 +39,8 @@ class CreateApplication extends Script {
 	public function __construct(){
 
 		$posibleParameters = array(
-			'name=s' => '--name nombre \t\tNombre de la tabla source del modelo',
-			'help' => '--help \t\t\tMuestra esta ayuda'
+			'name=s' => "--name nombre \t\tNombre de la tabla source del modelo",
+			'help' => "--help \t\t\tMuestra esta ayuda"
 		);
 
 		$this->parseParameters($posibleParameters);
@@ -61,10 +61,6 @@ class CreateApplication extends Script {
 try {
 	$script = new CreateApplication();
 }
-catch(CoreException $e){
-	print get_class($e).' : '.$e->getMessage()."\n";
-}
 catch(Exception $e){
-	print 'Exception : '.$e->getMessage()."\n";
+	Script::showConsoleException($e);
 }
-
