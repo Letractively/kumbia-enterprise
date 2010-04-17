@@ -419,7 +419,7 @@ abstract class Core {
 	 */
 	private static function _initializeCommonComponents(){
 		$commonComponents = array(
-			'CommonEventManager' => 'CommonEvent/CommonEventManager',
+			'CommonEvent' => 'CommonEvent/CommonEvent',
 			'Dispatcher' => 'Dispatcher/Dispatcher',
 			'EntityManager' => 'EntityManager/EntityManager',
 			'TransactionManager' => 'Transactions/TransactionManager',
@@ -611,9 +611,9 @@ abstract class Core {
 
 		}
 
-		//Ejectutar Plugin::afterDispatchLoop() y CommonEventManager::notifyEvent()
+		//Ejectutar Plugin::afterDispatchLoop() y CommonEvent::notifyEvent()
 		#if[no-common-event]
-		CommonEventManager::notifyEvent('afterDispatchLoop');
+		CommonEvent::notifyEvent('afterDispatchLoop');
 		#endif
 		#if[no-plugins]
 		$controllerName = PluginManager::notifyFromController('afterDispatchLoop', $controller);
@@ -629,7 +629,7 @@ abstract class Core {
 			call_user_func_array($handler, array($controller));
 		}
 		#if[no-common-event]
-		CommonEventManager::notifyEvent('finishRequest');
+		CommonEvent::notifyEvent('finishRequest');
 		#endif
 		#if[no-plugins]
 		PluginManager::notifyFromApplication('beforeFinishRequest');
@@ -676,7 +676,17 @@ abstract class Core {
 	}
 
 	/**
-	 * Carga el framework javascript y funciones auxiliares. Método obsoleto
+	 * Agrega un evento que se ejecutará dinámicamente
+	 *
+	 * @param  $eventName
+	 * @param unknown_type $callback
+	 */
+	public static function on($eventName, $callback){
+		CommonEvent::observe($eventName, $callback);
+	}
+
+	/**
+	 * Carga el framework javascript y funciones auxiliares. (Método obsoleto)
 	 *
 	 * @access 		public
 	 * @static
@@ -687,7 +697,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Imprime los CSS cargados mediante Tag::stylesheetLink. Método obsoleto
+	 * Imprime los CSS cargados mediante Tag::stylesheetLink. (Método obsoleto)
 	 *
 	 * @access 		public
 	 * @static
@@ -698,7 +708,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Proxy a Router::routeTo
+	 * Proxy a Router::routeTo (Método Obsoleto)
 	 *
 	 * @access 		public
 	 * @static
@@ -711,7 +721,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Metodo que muestra información del Framework y la licencia
+	 * Método que muestra información del Framework y la licencia (Método Obsoleto)
 	 *
 	 * @access 		public
 	 * @static
@@ -722,7 +732,7 @@ abstract class Core {
 	}
 
 	/**
-	 * Importa un archivo desde la ubicacion actual
+	 * Importa un archivo desde la ubicación actual
 	 *
 	 * @param string $dir
 	 */
@@ -780,12 +790,13 @@ abstract class Core {
 	/**
 	 * Devuelve el buffer de salida
 	 *
-	 * @access 	public
-	 * @return	string
+	 * @access 		public
+	 * @return		string
+	 * @deprecated
 	 * @static
 	 */
 	public static function getContent(){
-		return self::$_content;
+		return View::getContent(true);
 	}
 
 	/**

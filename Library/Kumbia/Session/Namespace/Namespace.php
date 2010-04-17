@@ -14,9 +14,9 @@
  *
  * @category 	Kumbia
  * @package 	Session
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright 	Copyright (C) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
+ * @copyright 	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
  */
@@ -28,9 +28,9 @@
  *
  * @category 	Kumbia
  * @package 	Session
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright 	Copyright (C) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
+ * @copyright 	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
  * @license 	New BSD License
  * @access 		public
  * @abstract
@@ -45,12 +45,12 @@ abstract class SessionNamespace extends Object {
 	static private $_preffix = 'ns_';
 
 	/**
-     * A&ntilde;ade un namespace
+     * Añade un namespace
      *
-     * @param string $namespace nombre del espacio
-     * @param string $property nombre de la propiedad
-     * @param mixed $value valor
-     * @return stdClass
+     * @param	string $namespace
+     * @param	string $property
+     * @param	mixed $value
+     * @return	stdClass
      */
 	static public function add($namespace, $property='', $value=''){
 		$namespace = (string) $namespace;
@@ -59,7 +59,7 @@ abstract class SessionNamespace extends Object {
 		}
 		$obj_namespace = Session::getData(self::$_preffix.$namespace);
 		if($property){
-			$setProperty = "set".ucfirst($property);
+			$setProperty = 'set'.ucfirst($property);
 			$obj_namespace->$setProperty($value);
 		}
 		return $obj_namespace;

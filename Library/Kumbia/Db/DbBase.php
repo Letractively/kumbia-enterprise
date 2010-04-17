@@ -178,7 +178,7 @@ class DbBase extends Object {
 		}
 		if(isset($descriptor->logging)){
 			if($descriptor->logging){
-				$this->setLogger(true);
+				$this->setLogger($descriptor->logging);
 			}
 		}
 		if(isset($descriptor->profiling)){

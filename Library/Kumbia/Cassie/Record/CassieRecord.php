@@ -300,8 +300,6 @@ class CassieRecord implements EntityInterface {
 		$insertData['Data'][$userKey] = $this->_data;
 		$insertData['Indexes'][$indexName] = $userKey;
 
-		print_r($insertData);
-
 		$this->_db->insertKey(
 			$this->_keySpace,
 			$insertData,

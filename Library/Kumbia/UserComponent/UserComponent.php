@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	UserComponent
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -27,7 +27,7 @@
  *
  * @category 	Kumbia
  * @package 	UserComponent
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -74,6 +74,26 @@ abstract class UserComponent extends Object {
 			$this->_settingLock = false;
 			return $this->$property;
 		}
+	}
+
+	/**
+	 * Filtra un valor
+ 	 *
+ 	 * @access	protected
+	 * @param	string $paramValue
+	 * @return	mixed
+	 */
+	protected function filter($paramValue){
+		//Si hay más de un argumento, toma los demas como filtros
+		if(func_num_args()>1){
+			$args = func_get_args();
+			$args[0] = $paramValue;
+			$filter = new Filter();
+			return call_user_func_array(array($filter, 'applyFilter'), $args);
+		} else {
+			throw new UserComponentException('Debe indicar al menos un filtro a aplicar');
+		}
+		return $paramValue;
 	}
 
 }

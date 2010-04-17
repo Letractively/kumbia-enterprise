@@ -354,7 +354,7 @@ class Compiler {
 								}
 								break;*/
 							case T_VARIABLE:
-								if(preg_match('/^\$/', $token[1])==false){
+								/*if(preg_match('/^\$/', $token[1])==false){
 									if($tokens[$i-2][0]==T_FUNCTION){
 										self::$_scope++;
 										self::$_replaceSymbol[self::$_scope] = 97;
@@ -390,7 +390,7 @@ class Compiler {
 								if($tokens[$i+2][0]==T_FUNCTION||$tokens[$i+4][0]==T_FUNCTION){
 									$token[1] = "";
 								}
-								break;
+								break;*/
 						}
 						if($jp==false){
 							if(in_array($token[0], self::$_beforeSpaceTokens)){
