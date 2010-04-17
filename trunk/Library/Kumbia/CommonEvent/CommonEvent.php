@@ -14,25 +14,25 @@
  *
  * @category	Kumbia
  * @package		CommonEvent
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
- * @version 	$Id$
+ * @version 	$Id: CommonEvent.php 5 2009-04-24 01:48:48Z gutierrezandresfelipe $
  */
 
 /**
- * CommonEventManager
+ * CommonEvent
  *
  * Permite agregar dinámicamente eventos que se ejecuten en la framework
  *
  * @category	Kumbia
  * @package		CommonEvent
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @abstract
  */
-abstract class CommonEventManager {
+abstract class CommonEvent {
 
 	/**
 	 * Eventos del administrador
@@ -42,11 +42,18 @@ abstract class CommonEventManager {
 	private static $_events = array();
 
 	/**
+	 * Enter description here...
+	 *
+	 * @var unknown_type
+	 */
+	private static $_callbacks = array();
+
+	/**
 	 * Agrega un evento al administrador de eventos
 	 *
 	 * @param Event $event
 	 */
-	public static function attachEvent(CommonEvent $event){
+	public static function attachEvent(Event $event){
 		if(!isset(self::$_events[$event->getEventName()])){
 			self::$_events[$event->getEventName()] = array();
 		}
@@ -64,6 +71,18 @@ abstract class CommonEventManager {
 				$event->execute();
 			}
 		}
+		if(isset(self::$_callbacks[$eventName])){
+			foreach(self::$_callbacks[$eventName] as $callback){
+				call_user_func($callback);
+			}
+		}
+	}
+
+	public static function observe($eventName, $callback){
+		if(!is_callable($callback)){
+			throw new CommonEventException('El callback no es invocable');
+		}
+		self::$_callbacks[$eventName][] = $callback;
 	}
 
 }
