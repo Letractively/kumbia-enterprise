@@ -12,14 +12,15 @@
  * obtain it through the world-wide-web, please send an email
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
- * @category Kumbia
- * @package CommonEvent
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @category	Kumbia
+ * @package		CommonEvent
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @license		New BSD License
  */
 
 /**
- * CommonEvent
+ * Event
  *
  * Permite la creación de eventos y acceso a sus datos. Los recursos de eventos
  * utilizan la API de CommonBaseEvent para crear nuevos eventos en base al
@@ -27,12 +28,13 @@
  * para leer la información en ellos. Aplicaciones de terceros pueden
  * convertir los objetos en representaciones en XML para intercambiar los datos.
  *
- * @category Kumbia
- * @package CommonEvent
- * @copyright Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @license New BSD License
+ * @category	Kumbia
+ * @package		CommonEvent
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @license		New BSD License
  */
-class CommonEvent {
+class Event extends Object {
 
 	/**
 	 * Nombre del evento a invocar
@@ -51,8 +53,8 @@ class CommonEvent {
 	/**
 	 * Constructor de Event
 	 *
-	 * @param string $eventName
-	 * @param mixed $callback
+	 * @param	string $eventName
+	 * @param	mixed $callback
 	 */
 	public function __construct($eventName, $callback){
 		CoreType::assertString($eventName);
