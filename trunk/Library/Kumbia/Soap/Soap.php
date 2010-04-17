@@ -105,7 +105,7 @@ abstract class Soap {
 
 		$response = ControllerResponse::getInstance();
 		$response->setContentType('application/soap+xml; charset=utf-8');
-		$soapAction = split('#', str_replace('"', '', $_SERVER['HTTP_SOAPACTION'])); ;
+		$soapAction = explode('#', str_replace('"', '', $_SERVER['HTTP_SOAPACTION'])); ;
 		$serviceNamespace = $soapAction[0];
 		$bodyElement = self::_createSOAPEnvelope();
 
@@ -262,101 +262,102 @@ abstract class Soap {
 		$controllerResponse = ControllerResponse::getInstance();
 		$controllerResponse->setHeader('X-Application-State: Exception', true);
 		$controllerResponse->setHeader('HTTP/1.1 500 Application Exception', true);
+		$controllerResponse->setContentType('application/soap+xml; charset=utf-8');
 
-		if(isset($_SERVER['HTTP_SOAPACTION'])){
+		$faultMessage = str_replace('\n', '', html_entity_decode($e->getMessage(), ENT_COMPAT, 'UTF-8'));
+		$controllerResponse->setResponseType(ControllerResponse::RESPONSE_OTHER);
+		$controllerResponse->setResponseAdapter('soap');
+		$bodyElement = self::_createSOAPEnvelope();
+		self::$_domDocument->createAttributeNS(self::$_faultsNS, 'fault:dummy');
+		$faultElement = new DOMElement('Fault', '', self::$_envelopeNS);
+		$bodyElement->appendChild($faultElement);
 
-			$faultMessage = str_replace('\n', '', html_entity_decode($e->getMessage(), ENT_COMPAT, 'UTF-8'));
-			$controllerResponse->setResponseType(ControllerResponse::RESPONSE_OTHER);
-			$controllerResponse->setResponseAdapter('soap');
-			$bodyElement = self::_createSOAPEnvelope();
-			self::$_domDocument->createAttributeNS(self::$_faultsNS, 'fault:dummy');
-			$faultElement = new DOMElement('Fault', '', self::$_envelopeNS);
-			$bodyElement->appendChild($faultElement);
+		//SOAP 1.1
+		#$faultElement->appendChild(new DOMElement('faultcode', 'Server'));
+		#$faultElement->appendChild(new DOMElement('faultstring', $faultMessage));
 
-			//SOAP 1.1
-			#$faultElement->appendChild(new DOMElement('faultcode', 'Server'));
-			#$faultElement->appendChild(new DOMElement('faultstring', $faultMessage));
+		//Código de la excepcion
+		$codeElement = new DOMElement('Code', '', self::$_envelopeNS);
+		$faultElement->appendChild($codeElement);
 
-			//Código de la excepcion
-			$codeElement = new DOMElement('Code', '', self::$_envelopeNS);
-			$faultElement->appendChild($codeElement);
-
-			if(get_class($e)=='SoapException'){
-				$faultCode = $e->getFaultCode();
-			} else {
-				$faultCode = 'Receiver';
-			}
-			$codeValue = new DOMElement('Value', 'SOAP-ENV:'.$faultCode, self::$_envelopeNS);
-			$codeElement->appendChild($codeValue);
-
-			//Motivo de la excepcion
-			$reasonElement = new DOMElement('Reason', '', self::$_envelopeNS);
-			$faultElement->appendChild($reasonElement);
-			$reasonText = new DOMElement('Text', $e->getMessage(), self::$_envelopeNS);
-			$reasonElement->appendChild($reasonText);
-
-			//Idioma del mensaje
-			$locale = Locale::getApplication();
-			$reasonText->setAttribute('xml:lang', $locale->getRFC4646String());
-
-			//Subcodigo de la excepcion
-			$subcodeElement = new DOMElement('Subcode', '', self::$_envelopeNS);
-			$codeElement->appendChild($subcodeElement);
-			$subcodeValue = new DOMElement('Value', 'fault:'.get_class($e), self::$_envelopeNS);
-			$subcodeElement->appendChild($subcodeValue);
-
-			//Detalle de la excepcion
-			$detailElement = new DOMElement('Detail', '', self::$_envelopeNS);
-			$faultElement->appendChild($detailElement);
-			$faultType = new DOMElement('Type', get_class($e), self::$_faultsNS);
-			$faultCode = new DOMElement('Code', $e->getCode(), self::$_faultsNS);
-			$faultTime = new DOMElement('Time', @date('r'), self::$_faultsNS);
-			$faultFile = new DOMElement('File', $e->getSafeFile(), self::$_faultsNS);
-			$faultLine = new DOMElement('Line', $e->getLine(), self::$_faultsNS);
-
-			$detailElement->appendChild($faultType);
-			$detailElement->appendChild($faultCode);
-			$detailElement->appendChild($faultFile);
-			$detailElement->appendChild($faultLine);
-			$detailElement->appendChild($faultTime);
-
-			//Remote backtrace
-			$config = CoreConfig::readAppConfig();
-			if(isset($config->application->debug)&&$config->application->debug){
-				$faultBacktrace = new DOMElement('Backtrace', '', self::$_faultsNS);
-				$detailElement->appendChild($faultBacktrace);
-				if(is_subclass_of($e, 'CoreException')){
-					$backtrace = $e->getCompleteTrace();
-				} else {
-					$backtrace = $e->getTrace();
-				}
-				foreach($backtrace as $trace){
-					$faultTrace = new DOMElement('Trace', '', self::$_faultsNS);
-					$faultBacktrace->appendChild($faultTrace);
-					if(isset($trace['file'])){
-						$faultFile = new DOMElement('File', CoreException::getSafeFileName($trace['file']), self::$_faultsNS);
-						$faultTrace->appendChild($faultFile);
-					}
-					if(isset($trace['line'])){
-						$faultLine = new DOMElement('Line', $trace['line'], self::$_faultsNS);
-						$faultTrace->appendChild($faultLine);
-					}
-					if(!isset($trace['class'])){
-						$trace['class'] = '';
-						$trace['type'] = '';
-					}
-					if(!isset($trace['function'])){
-						$trace['function'] = '';
-					}
-					$functionLocation = $trace['class'].$trace['type'].$trace['function'];
-					$faultFunction = new DOMElement('Function', $functionLocation, self::$_faultsNS);
-					$faultTrace->appendChild($faultFunction);
-				}
-			}
-
-			echo self::$_domDocument->saveXML();
-
+		if(get_class($e)=='SoapException'){
+			$faultCode = $e->getFaultCode();
+		} else {
+			$faultCode = 'Receiver';
 		}
+		$codeValue = new DOMElement('Value', 'SOAP-ENV:'.$faultCode, self::$_envelopeNS);
+		$codeElement->appendChild($codeValue);
+
+		//Motivo de la excepcion
+		$reasonElement = new DOMElement('Reason', '', self::$_envelopeNS);
+		$faultElement->appendChild($reasonElement);
+		$reasonText = new DOMElement('Text', $e->getMessage(), self::$_envelopeNS);
+		$reasonElement->appendChild($reasonText);
+
+		//Idioma del mensaje
+		$locale = Locale::getApplication();
+		$reasonText->setAttribute('xml:lang', $locale->getRFC4646String());
+
+		//Subcodigo de la excepcion
+		$subcodeElement = new DOMElement('Subcode', '', self::$_envelopeNS);
+		$codeElement->appendChild($subcodeElement);
+		$subcodeValue = new DOMElement('Value', 'fault:'.get_class($e), self::$_envelopeNS);
+		$subcodeElement->appendChild($subcodeValue);
+
+		//Detalle de la excepción
+		$detailElement = new DOMElement('Detail', '', self::$_envelopeNS);
+		$faultElement->appendChild($detailElement);
+		$faultType = new DOMElement('Type', get_class($e), self::$_faultsNS);
+		$faultCode = new DOMElement('Code', $e->getCode(), self::$_faultsNS);
+		$faultTime = new DOMElement('Time', @date('r'), self::$_faultsNS);
+		$faultFile = new DOMElement('File', $e->getSafeFile(), self::$_faultsNS);
+		$faultLine = new DOMElement('Line', $e->getLine(), self::$_faultsNS);
+
+		$detailElement->appendChild($faultType);
+		$detailElement->appendChild($faultCode);
+		$detailElement->appendChild($faultFile);
+		$detailElement->appendChild($faultLine);
+		$detailElement->appendChild($faultTime);
+
+		//Remote backtrace
+		$config = CoreConfig::readAppConfig();
+		if(isset($config->application->debug)&&$config->application->debug){
+
+			//Backtrace
+			$faultBacktrace = new DOMElement('Backtrace', '', self::$_faultsNS);
+			$detailElement->appendChild($faultBacktrace);
+			if(is_subclass_of($e, 'CoreException')){
+				$backtrace = $e->getCompleteTrace();
+			} else {
+				$backtrace = $e->getTrace();
+			}
+			foreach($backtrace as $trace){
+
+				$faultTrace = new DOMElement('Trace', '', self::$_faultsNS);
+				$faultBacktrace->appendChild($faultTrace);
+
+				if(isset($trace['file'])){
+					$faultFile = new DOMElement('File', CoreException::getSafeFileName($trace['file']), self::$_faultsNS);
+					$faultTrace->appendChild($faultFile);
+				}
+				if(isset($trace['line'])){
+					$faultLine = new DOMElement('Line', $trace['line'], self::$_faultsNS);
+					$faultTrace->appendChild($faultLine);
+				}
+				if(!isset($trace['class'])){
+					$trace['class'] = '';
+					$trace['type'] = '';
+				}
+				if(!isset($trace['function'])){
+					$trace['function'] = '';
+				}
+				$functionLocation = $trace['class'].$trace['type'].$trace['function'];
+				$faultFunction = new DOMElement('Function', $functionLocation, self::$_faultsNS);
+				$faultTrace->appendChild($faultFunction);
+			}
+		}
+		echo self::$_domDocument->saveXML();
+
 	}
 
 }

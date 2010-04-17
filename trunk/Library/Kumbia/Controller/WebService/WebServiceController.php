@@ -98,4 +98,13 @@ class WebServiceController extends Controller {
 		return array('Soap', 'faultSoapHandler');
 	}
 
+	/**
+	 * Acciones no definidas devuelven una excepción
+	 *
+	 * @return boolean
+	 */
+	public function notFoundAction(){
+		return false;
+	}
+
 }

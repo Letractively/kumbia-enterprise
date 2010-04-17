@@ -952,7 +952,7 @@ abstract class Tag {
 	 * @return 	string
 	 * @static
 	 */
-	public static function localeSelect($params='', $data='', $traslate){
+	public static function localeSelect($params='', $data='', $traslate=''){
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
 		if(is_array($params)){
@@ -989,10 +989,15 @@ abstract class Tag {
 			if(isset($params['use_dummy'])&&$params['use_dummy']==true){
 				$code.="\t<option value='@'>Seleccione...</option>\r\n";
 			}
+			if(!isset($params[2])){
+				throw new TagException('Debe indicar el recurso de traducción');
+			} else {
+				$traslate = $params[2];
+			}
 			if(is_object($params[1])){
 				#if[compile-time]
 				if(!isset($params['using'])){
-					throw new TagException("Debe indicar el parámetro 'using' para el helper Tag::select()");
+					throw new TagException('Debe indicar el parámetro "using" para el helper Tag::select()');
 				}
 				#endif
 				$using = explode(',', $params['using']);
@@ -1879,12 +1884,13 @@ abstract class Tag {
 		}
 		if(isset($params['value'])){
 			$value = $params['value'];
+			unset($params['value']);
 		} else {
 			$value = self::getValueFromAction($params[0]);
 		}
 		if(isset($params[1])&&is_array($params[1])){
 			$code = "<table><tr>";
-			foreach($params[1] as $key=>$text){
+			foreach($params[1] as $key => $text){
 				if($value==$key){
 					$code.= "<td><input type='radio' name='".$params[0]."' id='".$params[0]."' value='$key' checked='checked' /></td><td>$text</td>\r\n";
 				} else {

@@ -64,21 +64,21 @@ class Controller extends ControllerBase {
 
 
 	/**
-	 * Todos los Parametros enviados por una clean URL
+	 * Todos los parámetros enviados por una clean URL
 	 *
 	 * @var array
 	 */
 	private static $_allParameters = array();
 
 	/**
-	 * Numero de minutos que será cacheada la vista actual
+	 * Número de minutos que será cacheada la vista actual
 	 *
 	 * @var integer
 	 */
 	private static $_cacheView = array();
 
 	/**
-	 * Numero de minutos que será cacheada el layout actual
+	 * Número de minutos que será cacheada el layout actual
 	 *
 	 * @var integer
 	 */
@@ -132,8 +132,8 @@ class Controller extends ControllerBase {
 	/**
 	 * Logger implicito del controlador
 	 *
-	 * @access private
-	 * @var string
+	 * @access	private
+	 * @var		string
 	 */
 	private static $_logger;
 
@@ -223,13 +223,33 @@ class Controller extends ControllerBase {
 	}
 
 	/**
+	 * Hace un enrutamiento a otro controlador sin mantener los valores del enrutador
+	 *
+	 * @param string $controller
+	 */
+	protected function routeToController($controller){
+		return Router::routeTo(array(
+			'controller' => $controller,
+			'action' => null,
+			'id' => null
+		));
+	}
+
+	/**
+	 * Hace un enrutamiento a una acción del controlador actual sin mantener los valores del enrutador
+	 *
+	 * @param string $action
+	 */
+	protected function routeToAction($action){
+		return Router::routeTo(array(
+			'action' => $action,
+			'id' => null
+		));
+	}
+
+	/**
 	 * Hace el enrutamiento desde un controlador a otro, o desde
 	 * una accion a otra.
-	 *
-	 * Ej:
-	 * <code>
-	 * return $this->routeToURI("clientes/buscar/21");
-	 * </code>
 	 *
 	 * @access protected
 	 */
@@ -241,9 +261,9 @@ class Controller extends ControllerBase {
 	/**
 	 * Obtiene un valor del arreglo $_POST
 	 *
-	 * @access protected
-	 * @param string $paramName
-	 * @return mixed
+	 * @access	protected
+	 * @param	string $paramName
+	 * @return	mixed
 	 */
 	protected function getPostParam($paramName){
 		$funcGetArgs = func_get_args();
@@ -253,9 +273,9 @@ class Controller extends ControllerBase {
 	/**
 	 * Obtiene un valor del arreglo $_GET
 	 *
-	 * @access protected
-	 * @param string $paramName
-	 * @return mixed
+	 * @access	protected
+	 * @param	string $paramName
+	 * @return	mixed
 	 */
 	protected function getQueryParam($paramName){
 		$funcGetArgs = func_get_args();
@@ -265,9 +285,9 @@ class Controller extends ControllerBase {
 	/**
 	 * Obtiene un valor del arreglo $_REQUEST
  	 *
- 	 * @access protected
-	 * @param string $paramName
-	 * @return mixed
+ 	 * @access	protected
+	 * @param	string $paramName
+	 * @return	mixed
 	 */
 	protected function getRequestParam($paramName){
 		$funcGetArgs = func_get_args();
@@ -277,9 +297,9 @@ class Controller extends ControllerBase {
 	/**
 	 * Obtiene un valor del arreglo superglobal $_SERVER
  	 *
- 	 * @access protected
-	 * @param string $paramName
-	 * @return mixed
+ 	 * @access	protected
+	 * @param	string $paramName
+	 * @return	mixed
 	 */
 	protected function getServer($paramName){
 		$funcGetArgs = func_get_args();
@@ -289,9 +309,9 @@ class Controller extends ControllerBase {
 	/**
 	 * Obtiene un valor del arreglo superglobal $_ENV
  	 *
- 	 * @access protected
-	 * @param string $paramName
-	 * @return mixed
+ 	 * @access	protected
+	 * @param	string $paramName
+	 * @return	mixed
 	 */
 	protected function getEnvironment($paramName){
 		$funcGetArgs = func_get_args();
@@ -301,14 +321,12 @@ class Controller extends ControllerBase {
 	/**
 	 * Filtra un valor
  	 *
- 	 * @access protected
-	 * @param string $paramValue
-	 * @return mixed
+ 	 * @access	protected
+	 * @param	string $paramValue
+	 * @return	mixed
 	 */
 	protected function filter($paramValue){
-		/**
-		 * Si hay mas de un argumento, toma los demas como filtros
-		 */
+		//Si hay más de un argumento, toma los demas como filtros
 		if(func_num_args()>1){
 			$args = func_get_args();
 			$args[0] = $paramValue;
@@ -387,10 +405,10 @@ class Controller extends ControllerBase {
 	/**
 	 * Sube un archivo al directorio $dir si esta en $_FILES
 	 *
-	 * @access public
-	 * @param string $name
-	 * @param string $dir
-	 * @return string
+	 * @access	public
+	 * @param	string $name
+	 * @param	string $dir
+	 * @return	string
 	 */
 	protected function uploadFile($name, $dir){
 		if(!isset($_FILES[$name])){
@@ -635,6 +653,16 @@ class Controller extends ControllerBase {
 	}
 
 	/**
+	 * Indica si el controlador actual tiene implementada una acción con el nombre indicado
+	 *
+	 * @param 	string $actionName
+	 * @return	boolean
+	 */
+	public function hasAction($actionName){
+		return method_exists($this, $actionName.'Action');
+	}
+
+	/**
 	 * Establece el valor de todos los parametros adicionales en el controlador
 	 *
 	 * @access	public
@@ -642,27 +670,6 @@ class Controller extends ControllerBase {
 	 */
 	public function setAllParameters($allParameters){
 		self::$_allParameters[get_class($this)] = $allParameters;
-	}
-
-	/**
-	 * Devuelve un callback que administrara la forma en que se presente
-	 * la vista del controlador
-	 *
-	 * @access public
-	 */
-	public function getViewHandler(){
-		return array('View', 'handleViewRender');
-	}
-
-	/**
-	 * Devuelve un callback que administrará la forma en que se presente
-	 * la vista del controlador
-	 *
-	 * @access 	public
-	 * @return 	callback
-	 */
-	public function getViewExceptionHandler(){
-		return array('View', 'handleViewExceptions');
 	}
 
 	/**
@@ -797,9 +804,9 @@ class Controller extends ControllerBase {
 	 * Obliga a que todas las propiedades del controlador esten definidas
 	 * previamente
 	 *
-	 * @access public
-	 * @param string $property
-	 * @param string $value
+	 * @access	public
+	 * @param	string $property
+	 * @param	string $value
 	 */
 	public function __set($property, $value){
 		if(self::$_settingLock[get_class($this)]==false){
@@ -815,8 +822,8 @@ class Controller extends ControllerBase {
 	 * Obliga a que todas las propiedades del controlador esten definidas
 	 * previamente
 	 *
-	 * @access public
-	 * @param string $property
+	 * @access	public
+	 * @param	string $property
 	 */
 	public function __get($property){
 		if(EntityManager::isModel($property)==false){
@@ -896,6 +903,27 @@ class Controller extends ControllerBase {
 	 */
 	public function getValidationMessages(){
 		return Validation::getMessages();
+	}
+
+	/**
+	 * Devuelve un callback que administrara la forma en que se presente
+	 * la vista del controlador
+	 *
+	 * @access public
+	 */
+	public function getViewHandler(){
+		return array('View', 'handleViewRender');
+	}
+
+	/**
+	 * Devuelve un callback que administrará la forma en que se presente
+	 * la vista del controlador
+	 *
+	 * @access 	public
+	 * @return 	callback
+	 */
+	public function getViewExceptionHandler(){
+		return array('View', 'handleViewExceptions');
 	}
 
 }

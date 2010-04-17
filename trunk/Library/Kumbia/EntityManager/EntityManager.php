@@ -670,7 +670,7 @@ abstract class EntityManager {
 			self::$_belongsTo[$entityName] = array();
 		}
 		if($relationName==''){
-			if(!$referenceTable){
+			if($referenceTable==''){
 				if(is_array($fields)){
 					$indexKey = join('', sort(array_map('ucfirst', $fields)));
 				} else {
@@ -692,8 +692,8 @@ abstract class EntityManager {
 			} else {
 				if($referenceTable==''){
 					$referenceTable = $fields;
-					$fields = $fields.'_id';
 					$referencedFields = 'id';
+					$fields = Utils::uncamelize(Utils::lcfirst($fields)).'_id';
 				}
 			}
 			if($referencedFields==''){

@@ -143,7 +143,7 @@ abstract class Dispatcher {
 			$applicationController->init();
 		} else {
 			if(self::executeNotFound($applicationController)==false){
-				//No se encontro el método init en la clase ControllerBase
+				//No se encontró el método init en la clase ControllerBase
 				$message = CoreLocale::getErrorMessage(-103);
 				self::throwException($message, self::NOT_FOUND_INIT_ACTION);
 			} else {
@@ -160,15 +160,22 @@ abstract class Dispatcher {
 	 * @static
 	 */
 	static private function executeNotFound($applicationController=''){
-		if(!$applicationController){
+		if($applicationController==''){
 			$applicationController = new ApplicationController();
 		}
 		#if[no-plugins]
 		PluginManager::notifyFromController('beforeNotFoundAction', $applicationController);
 		#endif
 		if(method_exists($applicationController, 'notFoundAction')){
-			call_user_func_array(array($applicationController, 'notFoundAction'), Router::getAllParameters());
-			return true;
+			$notFoundStatus = call_user_func_array(
+				array($applicationController, 'notFoundAction'),
+				Router::getAllParameters()
+			);
+			if($notFoundStatus===false){
+				return false;
+			} else {
+				return true;
+			}
 		} else {
 			return false;
 		}

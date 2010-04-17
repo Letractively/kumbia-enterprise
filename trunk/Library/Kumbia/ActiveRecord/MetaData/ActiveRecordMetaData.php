@@ -340,30 +340,35 @@ abstract class ActiveRecordMetaData {
 		if(isset(self::$_metaData[$schema][$table])){
 			return true;
 		} else {
-			if($schema){
-				$source = $schema.'.'.$table;
-			} else {
-				$source = $table;
-			}
-			self::_initializeSharedMemory();
-			if(self::$_hasSharedMemory==true){
-				$sharedKey = self::_getSharedKey($source);
-				$metadata = @shm_get_var(self::$_sharedId, $sharedKey);
-				if($metadata!==false){
-					self::$_metaData[$schema][$table] = $metadata;
-					return true;
+			$enviroment = CoreConfig::getAppSetting('mode');
+			if($enviroment=='production'){
+				if($schema){
+					$source = $schema.'.'.$table;
 				} else {
-					return false;
+					$source = $table;
+				}
+				self::_initializeSharedMemory();
+				if(self::$_hasSharedMemory==true){
+					$sharedKey = self::_getSharedKey($source);
+					$metadata = @shm_get_var(self::$_sharedId, $sharedKey);
+					if($metadata!==false){
+						self::$_metaData[$schema][$table] = $metadata;
+						return true;
+					} else {
+						return false;
+					}
+				} else {
+					$modelsDir = Core::getActiveModelsDir();
+					if(file_exists($modelsDir.'/metadata/'.$source.'.php')){
+						$metadata = file_get_contents($modelsDir.'/metadata/'.$source.'.php');
+						self::$_metaData[$schema][$table] = unserialize($metadata);
+						return true;
+					} else {
+						return false;
+					}
 				}
 			} else {
-				$modelsDir = Core::getActiveModelsDir();
-				if(file_exists($modelsDir.'/metadata/'.$source.'.php')){
-					$metadata = file_get_contents($modelsDir.'/metadata/'.$source.'.php');
-					self::$_metaData[$schema][$table] = unserialize($metadata);
-					return true;
-				} else {
-					return false;
-				}
+				return false;
 			}
 		}
 	}

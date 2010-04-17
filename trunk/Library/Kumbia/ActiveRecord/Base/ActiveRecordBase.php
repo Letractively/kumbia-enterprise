@@ -607,9 +607,10 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Find a record in this table using a SQL Statement
 	 *
-	 * @access	public
-	 * @param	string $sqlQuery
-	 * @return	ActiveRecordResultset
+	 * @access		ublic
+	 * @param 		string $sqlQuery
+	 * @return		ActiveRecordBase
+	 * @deprecated
 	 */
 	public function findBySql($sqlQuery){
 		$this->_connect();
@@ -626,20 +627,34 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Consulta todos los registros en una entidad de forma estática
 	 *
-	 * @return ActiveRecordResultset
+	 * @param 	string $params
+	 * @return	ActiveRecordResultset
 	 */
-	public static function findAll(){
+	public static function findAll($params=''){
 		$activeModel = EntityManager::getEntityInstance(get_called_class());
 		$arguments = func_get_args();
 		return call_user_func_array(array($activeModel, 'find'), $arguments);
 	}
 
 	/**
+	 * Consulta los registros dadas las condiciones y devuelve solamente el primero
+	 *
+	 * @param 	string $params
+	 * @return	ActiveRecordBase
+	 */
+	public static function findOne($params=''){
+		$activeModel = EntityManager::getEntityInstance(get_called_class());
+		$arguments = func_get_args();
+		return call_user_func_array(array($activeModel, 'findFirst'), $arguments);
+	}
+
+	/**
 	 * Execute a SQL Query Statement directly
 	 *
-	 * @access	public
-	 * @param	string $sqlQuery
-	 * @return	DbResource
+	 * @access		public
+	 * @param		string $sqlQuery
+	 * @return		DbResource
+	 * @deprecated
 	 */
 	public function sql($sqlQuery){
 		$this->_connect();
@@ -647,11 +662,10 @@ abstract class ActiveRecordBase extends Object
 	}
 
 	/**
-	 * Return Fist Record
+	 * Devuelve el primer registro según las condiciones
 	 *
 	 * @access	public
 	 * @param	mixed $params
-	 * @param	boolean $debug
 	 * @return	ActiveRecordBase
 	 */
 	public function findFirst($params=''){
@@ -688,6 +702,22 @@ abstract class ActiveRecordBase extends Object
 			$this->exceptions($e);
 		}
 		return $resp;
+	}
+
+	/**
+	 * Devuelve el último registro según las condiciones
+	 *
+	 * @access	public
+	 * @param	mixed $params
+	 * @return	ActiveRecordBase
+	 */
+	public function findLast($params=''){
+		$numberArguments = func_num_args();
+		$params = Utils::getParams(func_get_args(), $numberArguments);
+		if(!isset($params['order'])){
+			$params['order'] = '1 DESC';
+		}
+		return $this->findFirst($params);
 	}
 
 	/**
@@ -927,8 +957,8 @@ abstract class ActiveRecordBase extends Object
 	 * @param	string $entityName
 	 * @param	array $conditions
 	 * @param	array $findOptions
-	 * @static
 	 * @return	ActiveRecord
+	 * @static
 	 */
 	static public function getInstance($entityName, array $conditions, array $findOptions=array()){
 		$criteria = array();
@@ -998,10 +1028,11 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Realiza un SELECT que ejecuta funciones del RBDM
 	 *
-	 * @access	public
-	 * @param	string $sql
-	 * @return	array
+	 * @access		public
+	 * @param		string $sql
+	 * @return		array
 	 * @static
+	 * @deprecated
 	 */
 	static public function singleSelect($sql){
 		$db = DbBase::rawConnect();
@@ -1292,8 +1323,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Realiza un conteo directo mediante $sql
 	 *
-	 * @param	string $sqlQuery
-	 * @return	mixed
+	 * @param		string $sqlQuery
+	 * @return		mixed
+	 * @deprecated
 	 */
 	public function countBySql($sqlQuery){
 		CoreType::assertString($sqlQuery);
@@ -2149,7 +2181,6 @@ abstract class ActiveRecordBase extends Object
 	 * @return	ActiveRecordResultset
 	 */
 	public function findAllBy($field, $value){
-		CoreType::assertString($field);
 		return $this->find(array('conditions' => $field." = '$value'"));
 	}
 
