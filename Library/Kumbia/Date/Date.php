@@ -1606,6 +1606,20 @@ class Date extends Object {
 	}
 
 	/**
+	 * Obtiene un timestamp teniendo en cuenta horas, minutos y segundos
+	 *
+	 * @param	string $date
+	 * @return	int
+	 */
+	public static function getRealTimestamp($date){
+		$dateObject = new Date($date);
+		$hour = substr($date, 11, 2);
+		$minutes = substr($date, 14, 2);
+		$seconds = substr($date, 17, 2);
+		return mktime($hour, $minutes, $seconds, $dateObject->getMonth(), $dateObject->getDay(), $dateObject->getYear());
+	}
+
+	/**
 	 * Realiza una suma en forma localizada con soporte a numeros grandes
 	 *
 	 * @param string $value1
@@ -1699,5 +1713,6 @@ class Date extends Object {
 	public function __toString(){
 		return (string) $this->_date;
 	}
+
 
 }

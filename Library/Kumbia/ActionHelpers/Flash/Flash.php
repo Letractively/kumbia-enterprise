@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		ActionHelpers
  * @subpackage 	Flash
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -30,7 +30,7 @@
  * @package		ActionHelpers
  * @subpackage	Flash
  * @abstract
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
@@ -64,7 +64,7 @@ abstract class Flash  {
 	const NOTICE = 1;
 
 	/**
-	 * Mensaje de Exito
+	 * Mensaje de éxito
 	 *
 	 */
 	const SUCCESS = 3;
@@ -76,14 +76,22 @@ abstract class Flash  {
 	const WARNING = 4;
 
 	/**
+	 * Indica si el mensaje debe ponerse inmediatamente en el buffer de salida
+	 *
+	 * @var boolean
+	 */
+	private static $_automaticOutput = true;
+
+	/**
 	 * Visualiza un mensaje de acuerdo a las clases CSS establecidas
 	 *
-	 * @access private
-	 * @param string $message
-	 * @param array $classes
+	 * @access	private
+	 * @param	string $message
+	 * @param	array $classes
 	 * @static
 	 */
 	private static function _showMessage($message, array $classes=array()){
+		$output = '';
 		if(isset($_SERVER['SERVER_SOFTWARE'])){
 			if(self::$_includeStyle==true){
 				Tag::stylesheetLink(self::$_cssStyle, true);
@@ -91,58 +99,63 @@ abstract class Flash  {
 			if(is_array($message)){
 				$clases = join(' ', $classes);
 				foreach($message as $msg){
-					echo '<div class="'.$clases.'">', $msg, '</div>', "\n";
+					$output = '<div class="'.$clases.'">'.$msg.'</div>'."\n";
 				}
 			} else {
-				echo '<div class="'.join(' ', $classes).'">', $message, '</div>', "\n";
+				$output = '<div class="'.join(' ', $classes).'">'.$message.'</div>'."\n";
 			}
 		} else {
-			echo strip_tags($message), "\n";
+			$output = strip_tags($message)."\n";
+		}
+		if(self::$_automaticOutput){
+			 echo $output;
+		} else {
+			return $output;
 		}
 	}
 
 	/**
 	 * Visualiza un mensaje de error
 	 *
-	 * @access public
-	 * @param string $message
-	 * @param array $classes
+	 * @access	public
+	 * @param	string $message
+	 * @param	array $classes
 	 * @static
 	 */
 	static public function error($message, array $cssClasses=array('kumbiaDisplay', 'errorMessage')){
-		self::_showMessage($message, $cssClasses);
+		return self::_showMessage($message, $cssClasses);
 	}
 
 	/**
-	 * Visualiza informacion en pantalla
+	 * Visualiza información en pantalla
 	 *
-	 * @access public
-	 * @param string $message
-	 * @param array $classes
+	 * @access	public
+	 * @param	string $message
+	 * @param	array $classes
 	 * @static
 	 */
 	static public function notice($message, array $cssClasses=array('kumbiaDisplay', 'noticeMessage')){
-		self::_showMessage($message, $cssClasses);
+		return self::_showMessage($message, $cssClasses);
 	}
 
 	/**
 	 * Visualiza un mensaje de exito en pantalla
 	 *
-	 * @access public
-	 * @param string $message
-	 * @param array $classes
+	 * @access	public
+	 * @param	string $message
+	 * @param	array $classes
 	 * @static
 	 */
 	static public function success($message, array $cssClasses=array('kumbiaDisplay', 'successMessage')){
-		self::_showMessage($message, $cssClasses);
+		return self::_showMessage($message, $cssClasses);
 	}
 
 	/**
 	 * Visualiza un mensaje de advertencia en pantalla
 	 *
-	 * @access public
-	 * @param string $message
-	 * @param array $classes
+	 * @access	public
+	 * @param	string $message
+	 * @param	array $classes
 	 * @static
 	 */
 	static public function warning($message, array $cssClasses=array('kumbiaDisplay', 'warningMessage')){
@@ -150,46 +163,46 @@ abstract class Flash  {
 	}
 
 	/**
-	 * Visualiza un mensaje por su codigo
+	 * Visualiza un mensaje por su código
 	 *
-	 * @access public
-	 * @param string $message
-	 * @param int $code
-	 * @param array $classes
+	 * @access	public
+	 * @param	string $message
+	 * @param	int $code
+	 * @param	array $classes
 	 * @static
 	 */
 	static public function message($message, $code, array $cssClasses=null){
 		switch($code){
 			case self::ERROR:
 				if($cssClasses){
-					self::error($message, $cssClasses);
+					return self::error($message, $cssClasses);
 				} else {
-					self::error($message);
+					return self::error($message);
 				}
 				break;
 			case self::SUCCESS:
 				if($cssClasses){
-					self::success($message, $cssClasses);
+					return self::success($message, $cssClasses);
 				} else {
-					self::success($message);
+					return self::success($message);
 				}
 				break;
 			case self::NOTICE:
 				if($cssClasses){
-					self::notice($message, $cssClasses);
+					return self::notice($message, $cssClasses);
 				} else {
-					self::notice($message);
+					return self::notice($message);
 				}
 				break;
 			case self::WARNING:
 				if($cssClasses){
-					self::warning($message, $cssClasses);
+					return self::warning($message, $cssClasses);
 				} else {
-					self::warning($message);
+					return self::warning($message);
 				}
 				break;
 			default:
-				self::notice($message);
+				return self::notice($message);
 				break;
 		}
 	}
@@ -197,7 +210,7 @@ abstract class Flash  {
 	/**
 	 * Establece si se debe cargar un archivo CSS antes de mostrar el mensaje
 	 *
-	 * @param string $style
+	 * @param	string $style
 	 */
 	public static function loadStylesheet($style){
 		if($style===true){
@@ -213,8 +226,8 @@ abstract class Flash  {
 	/**
 	 * Agrega un mensaje al buffer
 	 *
-	 * @param string $message
-	 * @param int $type
+	 * @param	string $message
+	 * @param	int $type
 	 */
 	public static function addMessage($message, $type){
 		$messages = Session::get('FLASH_MESSAGES');
@@ -231,7 +244,7 @@ abstract class Flash  {
 	/**
 	 * Devuelve los mensajes del buffer
 	 *
-	 * @return array
+	 * @return	array
 	 */
 	public static function getMessages(){
 		$messages = Session::get('FLASH_MESSAGES');
@@ -241,6 +254,15 @@ abstract class Flash  {
 			Session::unsetData('FLASH_MESSAGES');
 		}
 		return $messages;
+	}
+
+	/**
+	 * Establece si se debe poner automáticamente la salida en el buffer de salida
+	 *
+	 * @param	boolean $automaticOutput
+	 */
+	public static function setAutomaticOutput($automaticOutput){
+		self::$_automaticOutput = $automaticOutput;
 	}
 
 }

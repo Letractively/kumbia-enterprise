@@ -43,9 +43,9 @@ abstract class UserComponent extends Object {
 	/**
 	 * Obliga a que todas las propiedades esten definidas previamente
 	 *
-	 * @access public
-	 * @param string $property
-	 * @param string $value
+	 * @access	public
+	 * @param	string $property
+	 * @param	string $value
 	 */
 	public function __set($property, $value){
 		if($this->_settingLock==false){
@@ -61,8 +61,8 @@ abstract class UserComponent extends Object {
 	 * Obliga a que todas las propiedades del controlador esten definidas
 	 * previamente
 	 *
-	 * @access public
-	 * @param string $property
+	 * @access	public
+	 * @param	string $property
 	 */
 	public function __get($property){
 		if(EntityManager::isModel($property)==false){
@@ -94,6 +94,16 @@ abstract class UserComponent extends Object {
 			throw new UserComponentException('Debe indicar al menos un filtro a aplicar');
 		}
 		return $paramValue;
+	}
+
+	/**
+	 * Devuelve un modelo de forma estática
+	 *
+	 * @param	string $modelName
+	 * @return	ActiveRecordBase
+	 */
+	public static function getModel($modelName){
+		return EntityManager::getEntityInstance($modelName);
 	}
 
 }

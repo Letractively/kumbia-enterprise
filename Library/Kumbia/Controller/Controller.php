@@ -145,6 +145,20 @@ class Controller extends ControllerBase {
 	private static $_settingLock = array();
 
 	/**
+	 * Administrador de presentación por defecto
+	 *
+	 * @var array
+	 */
+	private static $_defaultOutputHandler = array('View', 'handleViewRender');
+
+	/**
+	 * Administrador de excepciones por defecto
+	 *
+	 * @var array
+	 */
+	private static $_defaultExceptionHandler = array('View', 'handleViewExceptions');
+
+	/**
 	 * Constructor de la clase
 	 *
 	 * @access public
@@ -912,7 +926,7 @@ class Controller extends ControllerBase {
 	 * @access public
 	 */
 	public function getViewHandler(){
-		return array('View', 'handleViewRender');
+		return self::$_defaultOutputHandler;
 	}
 
 	/**
@@ -923,7 +937,25 @@ class Controller extends ControllerBase {
 	 * @return 	callback
 	 */
 	public function getViewExceptionHandler(){
-		return array('View', 'handleViewExceptions');
+		return self::$_defaultExceptionHandler;
+	}
+
+	/**
+	 * Establece el administrador de presentación por defecto
+	 *
+	 * @param callback $handler
+	 */
+	public static function setDefaultOutputHandler($handler){
+		self::$_defaultOutputHandler = $handler;
+	}
+
+	/**
+	 * Establece el administrador de excepciones por defecto
+	 *
+	 * @param callback $handler
+	 */
+	public static function setDefaultExceptionHandler($handler){
+		self::$_defaultExceptionHandler = $handler;
 	}
 
 }

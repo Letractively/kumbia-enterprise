@@ -1274,7 +1274,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Permite incluir una imagen dentro de una vista respetando
+	 * Permite incluir una imágen dentro de una vista respetando
 	 * las convenciones de directorios y rutas del framework
 	 *
 	 * @param string $img
@@ -1397,13 +1397,22 @@ abstract class Tag {
 	/**
 	 * Establece una etiqueta meta
 	 *
-	 * @access public
-	 * @param string $name
-	 * @param string $content
+	 * @access	public
+	 * @param	string $name
+	 * @param	string $content
 	 * @static
 	 */
-	public static function setMeta($name, $content){
-		MemoryRegistry::prepend('CORE_META_TAGS', '<meta name="'.$name.'" content="'.$content.'"/>'."\r\n");
+	public static function setMeta($params){
+		$numberArguments = func_num_args();
+		$params = Utils::getParams(func_get_args(), $numberArguments);
+		$code = '<meta ';
+		foreach($params as $attribute => $value){
+			if(!is_integer($attribute)){
+				$code.=$attribute.'="'.$value.'" ';
+			}
+		}
+		$code.= '/>'."\r\n";
+		MemoryRegistry::prepend('CORE_META_TAGS', $code);
 	}
 
 	/**
@@ -1422,7 +1431,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Establece el titulo del documento HTML
+	 * Establece el título del documento HTML
 	 *
 	 * @access	public
 	 * @param	string $title
@@ -1594,7 +1603,7 @@ abstract class Tag {
 	public static function form($action=''){
 		$numberArguments = func_num_args();
 		$params = Utils::getParams(func_get_args(), $numberArguments);
-		$id = Router::getId();
+		$parameters = join('/', Router::getParameters());
 		if($action==''){
 			if(isset($params['action'])){
 				$action = $params['action'];
@@ -1609,10 +1618,10 @@ abstract class Tag {
 			$params['onsubmit'].= $params['onsubmit'].";if(!confirm(\"".$params['confirm']."\")) { return false; }";
 			unset($params['confirm']);
 		}
-		if($id===null||$id===''){
+		if($parameters===''){
 			$action = Utils::getKumbiaUrl($action);
 		} else {
-			$action = Utils::getKumbiaUrl($action.'/'.$id);
+			$action = Utils::getKumbiaUrl($action.'/'.$parameters);
 		}
 		if(isset($params['parameters'])){
 			$action.= '?'.$params['parameters'];
@@ -1970,7 +1979,7 @@ abstract class Tag {
 	}
 
 	/**
-	 * Crea un componente para Subir Imagenes
+	 * Crea un componente para subir Imágenes
 	 *
 	 * @access public
 	 * @return string

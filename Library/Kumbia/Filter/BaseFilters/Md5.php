@@ -15,7 +15,7 @@
  * @category	Kumbia
  * @package		Filter
  * @subpackage	BaseFilters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2007-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2007-2007 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
  * @copyright	Copyright (c) 2007-2007 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
@@ -31,7 +31,7 @@
  * @category	Kumbia
  * @package		Filter
  * @subpackage	BaseFilters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2007-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
@@ -44,7 +44,11 @@ class Md5Filter implements FilterInterface {
  	 * @return int
  	 */
 	public function execute($s){
-		return md5($s);
+		if(strlen($s)==32){
+			return preg_replace('/[^a-fA-F0-9]/', '', $s);
+		} else {
+			return null;
+		}
 	}
 
 }

@@ -66,6 +66,19 @@ class ControllerRequest extends Object {
 	}
 
 	/**
+	 * Envia una cookie al cliente
+	 *
+	 * @param string $name
+	 * @param mixed $value
+	 * @param int $expire
+	 * @param string $path
+	 * @param string $domain
+	 */
+	public function setCookie($name, $value, $expire=0, $path=null, $domain=null){
+		setcookie($name, $value, $expire, $path, $domain=null);
+	}
+
+	/**
 	 * Cambia el valor de un parámetro de $_REQUEST
 	 *
 	 * @param string $index
@@ -152,6 +165,16 @@ class ControllerRequest extends Object {
 	}
 
 	/**
+	 * Elimina un índice en $_COOKIE
+	 *
+	 * @param	mixed $index
+	 * @return	boolean
+	 */
+	public function unsetCookieParam($index){
+		unset($_COOKIE[$index]);
+	}
+
+	/**
 	 * Valida que exista un valor en $_GET
 	 *
 	 * @param mixed $index
@@ -174,9 +197,9 @@ class ControllerRequest extends Object {
 	/**
 	 * Valida que exista un valor en $_COOKIE
 	 *
-	 * @access public
-	 * @param mixed $index
-	 * @return boolean
+	 * @access	public
+	 * @param	mixed $index
+	 * @return	boolean
 	 */
 	public function isSetCookieParam($index){
 		return isset($_COOKIE[$index]);
@@ -308,6 +331,24 @@ class ControllerRequest extends Object {
 			return call_user_func_array(array($filter, 'applyFilter'), $args);
 		}
 		return isset($_ENV[$paramName]) ? $_ENV[$paramName] : '';
+	}
+
+	/**
+	 * Devuelve un parámetro enviado usando una superglobal $_COOKIE
+	 * y aplica los filtros correspondientes
+	 *
+	 * @access	public
+	 * @param	string $paramName
+	 * @return	boolean
+	 */
+	public function getParamCookie($paramName){
+		if(func_num_args()>1){
+			$args = func_get_args();
+			$args[0] = isset($_COOKIE[$paramName]) ? $_COOKIE[$paramName] : '';
+			$filter = new Filter();
+			return call_user_func_array(array($filter, 'applyFilter'), $args);
+		}
+		return isset($_COOKIE[$paramName]) ? $_COOKIE[$paramName] : '';
 	}
 
 	/**
