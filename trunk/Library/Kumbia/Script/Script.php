@@ -276,8 +276,10 @@ abstract class Script extends Object {
 		foreach($exception->getTrace() as $trace){
 			$output.= ScriptColor::colorize('#'.$i, ScriptColor::WHITE, ScriptColor::UNDERLINE);
 			$output.= ' ';
-			$file = str_replace($getcwd, '', $trace['file']);
-			$output.= ScriptColor::colorize($file.'\\n', ScriptColor::NORMAL);
+			if(isset($trace['file'])){
+				$file = str_replace($getcwd, '', $trace['file']);
+				$output.= ScriptColor::colorize($file.'\\n', ScriptColor::NORMAL);
+			}
 			$i++;
 		}
 

@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Session
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -29,7 +29,7 @@
  *
  * @category 	Kumbia
  * @package 	Session
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @access 		public
@@ -45,18 +45,25 @@ abstract class Session {
 	static private $_sessionStarted = false;
 
 	/**
-	 * Indica si los datos de sesion han sido inicializados o no
+	 * Indica si los datos de sesión han sido inicializados ó no
 	 *
 	 * @var boolean
 	 */
 	static private $_dataInitialized = false;
 
 	/**
-	 * Indica si la sesion esta bloqueada
+	 * Indica si la sesión está bloqueada
 	 *
 	 * @var boolean
 	 */
 	static private $_locked = false;
+
+	/**
+	 * Indica si el inicio automático esta deshabilitado
+	 *
+	 * @var boolean
+	 */
+	static private $_disabled = false;
 
 	/**
 	 * Deserializa los datos de sesion para su posterior uso en la aplicacion
@@ -245,7 +252,7 @@ abstract class Session {
 				}
 			}
 		}
-		if(Core::isHurricane()==false){
+		if(self::$_disabled==false){
 			session_start();
 			register_shutdown_function(array('Session', 'storeSessionData'));
 		}
@@ -262,6 +269,15 @@ abstract class Session {
 	 */
 	static public function getId(){
 		return session_id();
+	}
+
+	/**
+	 * Deshabilita el inicio automático de la sesión
+	 *
+	 * @param boolean $disable
+	 */
+	static public function disableAutoStart($disable){
+		self::$_disabled = $disable;
 	}
 
 }

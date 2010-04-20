@@ -957,7 +957,7 @@ abstract class ActiveRecordBase extends Object
 	 * @param	string $entityName
 	 * @param	array $conditions
 	 * @param	array $findOptions
-	 * @return	ActiveRecord
+	 * @return	ActiveRecordBase
 	 * @static
 	 */
 	static public function getInstance($entityName, array $conditions, array $findOptions=array()){
@@ -1175,9 +1175,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Realiza una sumatoria
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return double
+	 * @access	public
+	 * @param	string $params
+	 * @return	double
 	 */
 	public function sum($params=''){
 		$this->_connect();
@@ -1227,9 +1227,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Busca el valor máximo para el campo $params
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return mixed
+	 * @access	public
+	 * @param	string $params
+	 * @return	mixed
 	 */
 	public function maximum($params=''){
 		$this->_connect();
@@ -1275,9 +1275,9 @@ abstract class ActiveRecordBase extends Object
 	/**
 	 * Busca el valor minimo para el campo $params
 	 *
-	 * @access public
-	 * @param string $params
-	 * @return mixed
+	 * @access	public
+	 * @param	string $params
+	 * @return	mixed
 	 */
 	public function minimum($params=''){
 		$this->_connect();
@@ -1958,7 +1958,7 @@ abstract class ActiveRecordBase extends Object
 				$values = array();
 				$nonPrimary = $this->_getNonPrimaryKeyAttributes();
 				foreach($nonPrimary as $np){
-					if(isset($in[$field])){
+					if(isset($in[$np])){
 						$this->$np = Date::now();
 					}
 					$fields[] = $np;
@@ -2684,6 +2684,38 @@ abstract class ActiveRecordBase extends Object
 	 */
 	public function __call($method, $arguments = array()){
 		$this->_connect();
+
+		$entityName = get_class($this);
+		if(substr($method, 0, 3)=='get'){
+			$requestedRelation = ucfirst(substr($method, 3));
+			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
+				$entityArguments = array('findFirst', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($entityArguments, $arguments));
+			}
+			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
+				$entityArguments = array('find', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($entityArguments, $arguments));
+			}
+			if(EntityManager::existsHasOne($entityName, $requestedRelation)==true){
+				return EntityManager::getHasOneRecords('findFirst', $entityName, $requestedRelation, $this);
+			}
+		}
+
+		if(substr($method, 0, 5)=='count'){
+			$requestedRelation = ucfirst(substr($method, 5));
+			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
+				$entityArguments = array('count', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($entityArguments, $arguments));
+			}
+			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
+				$entityArguments = array('count', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($entityArguments, $arguments));
+			}
+			if(EntityManager::existsHasOne($entityName, $requestedRelation)==true){
+				return EntityManager::getHasOneRecords('count', $entityName, $requestedRelation, $this);
+			}
+		}
+
 		if(substr($method, 0, 6)=='findBy'){
 			$field = Utils::uncamelize(Utils::lcfirst(substr($method, 6)));
 			if (isset($arguments[0])) {
@@ -2713,38 +2745,6 @@ abstract class ActiveRecordBase extends Object
 				$argument = array();
 			}
 			return call_user_func_array(array($this, 'find'), array_merge($argument, $arguments));
-		}
-
-		$entityName = get_class($this);
-
-		if(substr($method, 0, 3)=='get'){
-			$requestedRelation = ucfirst(substr($method, 3));
-			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
-				$entityArguments = array('findFirst', $entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($arguments, $entityArguments));
-			}
-			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
-				$entityArguments = array('find', $entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($arguments, $entityArguments));
-			}
-			if(EntityManager::existsHasOne($entityName, $requestedRelation)==true){
-				return EntityManager::getHasOneRecords('findFirst', $entityName, $requestedRelation, $this);
-			}
-		}
-
-		if(substr($method, 0, 5)=='count'){
-			$requestedRelation = ucfirst(substr($method, 5));
-			if(EntityManager::existsBelongsTo($entityName, $requestedRelation)==true){
-				$entityArguments = array('count', $entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getBelongsToRecords'), array_merge($arguments, $entityArguments));
-			}
-			if(EntityManager::existsHasMany($entityName, $requestedRelation)==true){
-				$entityArguments = array('count', $entityName, $requestedRelation, $this);
-				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($arguments, $entityArguments));
-			}
-			if(EntityManager::existsHasOne($entityName, $requestedRelation)==true){
-				return EntityManager::getHasOneRecords('count', $entityName, $requestedRelation, $this);
-			}
 		}
 
 

@@ -545,6 +545,7 @@ class HurricaneServer {
 				Core::setInitialPath(getcwd());
 				Core::setInstanceName('');
 				TransactionManager::initializeManager();
+				Session::disableAutoStart();
 				self::$_frameworkInitialized = true;
 			}
 			if(self::$_lastApplication!=$activeApplication){
