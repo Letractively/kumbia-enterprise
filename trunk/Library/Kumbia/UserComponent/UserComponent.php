@@ -50,7 +50,7 @@ abstract class UserComponent extends Object {
 	public function __set($property, $value){
 		if($this->_settingLock==false){
 			if(EntityManager::isModel($property)==false){
-				throw new UserComponentException("Asignando propiedad indefinida '$property' al controlador");
+				throw new UserComponentException('Asignando propiedad indefinida "'.$property.'" al componente');
 			}
 		} else {
 			$this->$property = $value;
@@ -58,15 +58,14 @@ abstract class UserComponent extends Object {
 	}
 
 	/**
-	 * Obliga a que todas las propiedades del controlador esten definidas
-	 * previamente
+	 * Obliga a que todas las propiedades del controlador esten definidas previamente
 	 *
 	 * @access	public
 	 * @param	string $property
 	 */
 	public function __get($property){
 		if(EntityManager::isModel($property)==false){
-			throw new UserComponentException("Leyendo propiedad indefinida '$property' del controlador");
+			throw new UserComponentException("Leyendo propiedad indefinida '$property' del componente");
 		} else {
 			$entity = EntityManager::getEntityInstance($property);
 			$this->_settingLock = true;
@@ -86,10 +85,10 @@ abstract class UserComponent extends Object {
 	protected function filter($paramValue){
 		//Si hay más de un argumento, toma los demas como filtros
 		if(func_num_args()>1){
-			$args = func_get_args();
-			$args[0] = $paramValue;
+			$params = func_get_args();
+			unset($params[0]);
 			$filter = new Filter();
-			return call_user_func_array(array($filter, 'applyFilter'), $args);
+			return $filter->apply($paramValue, $params);
 		} else {
 			throw new UserComponentException('Debe indicar al menos un filtro a aplicar');
 		}
@@ -104,6 +103,16 @@ abstract class UserComponent extends Object {
 	 */
 	public static function getModel($modelName){
 		return EntityManager::getEntityInstance($modelName);
+	}
+
+	/**
+	 * Obtiene una instancia de un servicio web del contenedor ó mediante Naming Directory
+	 *
+	 * @param 	mixed $serviceNDI
+	 * @return  WebServiceClient
+	 */
+	public static function getService($serviceNDI){
+		return Resolver::lookUp($serviceNDI);
 	}
 
 }

@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		AuditLogger
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -27,7 +27,7 @@
  *
  * @category	Kumbia
  * @package		AuditLogger
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
@@ -62,7 +62,7 @@ class AuditLogger extends Object {
 	private $_fieldsToLog = array(
 		'IP_ADDRESS' => 'Y',
 		'MAC_ADDRESS' => 'N',
-		'USERNAME' => 'Y',
+		'USERNAME' => 'N',
 		'USER_ID' => 'Y',
 		'NOTE' => 'Y'
 	);
@@ -181,9 +181,7 @@ class AuditLogger extends Object {
 	 * @param mixed $data
 	 */
 	public function setFieldData($keyname, $data){
-		if(!isset($this->_fieldsToLog[$keyname])){
-			$this->_fieldsToLog[$keyname] = 'Y';
-		}
+		$this->_fieldsToLog[$keyname] = 'Y';
 		$this->_fieldData[$keyname] = $data;
 	}
 
@@ -203,7 +201,7 @@ class AuditLogger extends Object {
 	public function commit(){
 		if($this->_commited==false){
 			if(!$this->_model){
-				throw new AuditLoggerException("No ha definido el modelo para almacenar el log de auditoria");
+				throw new AuditLoggerException('No ha definido el modelo para almacenar el log de auditoria');
 			} else {
 				$audit = new $this->_model();
 				if($this->_transaction!==false){

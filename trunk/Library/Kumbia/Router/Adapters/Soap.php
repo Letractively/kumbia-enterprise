@@ -49,6 +49,13 @@ class SoapRouter implements RouterInterface {
 	private $_xmlSoapEnc = 'http://schemas.xmlsoap.org/soap/encoding/';
 
 	/**
+	 * Valores XSD para tipos de datos literales
+	 *
+	 * @var array
+	 */
+	private $_xsdTypes = array('xsd:string' => 1, 'xsd:boolean' => 1, 'xsd:int' => 1, 'xsd:float' => 1);
+
+	/**
 	 * Devuelve un SOAP:Array como un array numérico
 	 *
 	 * @access	private
@@ -101,7 +108,7 @@ class SoapRouter implements RouterInterface {
 										if($paramType=='ns2:Map'){
 											$value = $this->_getXSIMap($node);
 										} else {
-											if($paramType=='SOAP-ENC:Array'){
+											if($paramType=='SOAP-ENC:Array'||$paramType=='enc:Array'){
 												$value = $this->_getSoapArray($node);
 											} else {
 												$value = null;
@@ -130,15 +137,15 @@ class SoapRouter implements RouterInterface {
 	 * @param string $xsdDataType
 	 */
 	private function _isTypeLiteral($xsdDataType){
-		return in_array($xsdDataType, array('xsd:string', 'xsd:boolean', 'xsd:int', 'xsd:float'));
+		return isset($this->_xsdTypes[$xsdDataType]);
 	}
 
 	/**
 	 * Convierte el valor XSD a un valor nativo PHP
 	 *
-	 * @param string $xsdDataType
-	 * @param mixed $returnValue
-	 * @return mixed
+	 * @param	string $xsdDataType
+	 * @param	mixed $returnValue
+	 * @return	mixed
 	 */
 	private function _decodeXSDType($xsdDataType, $returnValue){
 		switch($xsdDataType){
@@ -173,7 +180,20 @@ class SoapRouter implements RouterInterface {
 			$soapException->setFaultCode('Sender');
 			throw $soapException;
 		}
-		$soapAction = explode('#', str_replace("\"", "", $_SERVER['HTTP_SOAPACTION']));
+
+		if(isset($_SERVER['HTTP_SOAPACTION'])){
+			$soapAction = str_replace("\"", "", $_SERVER['HTTP_SOAPACTION']);
+		} else {
+			if(isset($_SERVER['CONTENT_TYPE'])){
+				if(preg_match('/action="(.+)"/', $_SERVER['CONTENT_TYPE'], $matches)){
+					$soapAction = $matches[1];
+				}
+			} else {
+				throw new SoapException('No se indicó la acción SOAP a ejecutar');
+			}
+		}
+
+		$soapAction = explode('#', $soapAction);
 		foreach($domDocument->getElementsByTagNameNS($soapAction[0], $soapAction[1]) as $domElement){
 			$parameters = array();
 			foreach($domElement->childNodes as $actionParam){
@@ -182,7 +202,7 @@ class SoapRouter implements RouterInterface {
 					if($paramType=='ns2:Map'){
 						$parameters[] = $this->_getXSIMap($actionParam);
 					} else {
-						if($paramType=='SOAP-ENC:Array'){
+						if($paramType=='SOAP-ENC:Array'||$paramType=='enc:Array'){
 							$parameters[] = $this->_decodeSoapArray($actionParam);
 						} else {
 							$parameters[] = $this->_decodeXSDType($paramType, $actionParam->nodeValue);

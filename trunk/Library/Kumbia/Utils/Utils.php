@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Utils
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
  * @license 	New BSD License
@@ -30,7 +30,7 @@
  *
  * @category 	Kumbia
  * @package 	Utils
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright  	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst@gmail.com)
  * @license 	New BSD License
@@ -288,6 +288,47 @@ abstract class Utils {
 	 */
 	public static function ucwords($words){
 		return ucwords(i18n::strtolower($words));
+	}
+
+	/**
+	 * Ordena una matriz por sus claves de modo natural
+	 *
+	 * uksort($variable, array('Utils', 'natksort'));
+	 *
+	 * @access 	public
+	 * @param 	string $a
+	 * @param 	string $b
+	 * @return 	integer
+	 */
+	public static function natksort($a, $b){
+		$la = strlen($a);
+		$lb = strlen($b);
+		if($la<12){
+			$a = $a.str_repeat('0', 12-$la);
+		}
+		if($lb<12){
+			$b = $b.str_repeat('0', 12-$lb);
+		}
+		if($a<$b){
+			return -1;
+		} else {
+			if($a==$b){
+				return 0;
+			} else {
+				return 1;
+			}
+		}
+	}
+
+	/**
+	 * Devuelve un array con los parámetros ordenados ascendentemente
+	 *
+	 * @return array
+	 */
+	public static function sortRange(){
+		$params = func_get_args();
+		sort($params);
+		return $params;
 	}
 
 }

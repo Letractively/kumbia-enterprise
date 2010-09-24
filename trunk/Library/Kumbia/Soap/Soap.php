@@ -103,9 +103,21 @@ abstract class Soap {
 	 */
 	static public function serverHandler($controller){
 
+		if(isset($_SERVER['HTTP_SOAPACTION'])){
+			$soapAction = str_replace('"', '', $_SERVER['HTTP_SOAPACTION']);
+		} else {
+			if(isset($_SERVER['CONTENT_TYPE'])){
+				if(preg_match('/action="(.+)"/', $_SERVER['CONTENT_TYPE'], $matches)){
+					$soapAction = $matches[1];
+				}
+			} else {
+				throw new SoapException('No se indicó la acción SOAP a ejecutar');
+			}
+		}
+
 		$response = ControllerResponse::getInstance();
 		$response->setContentType('application/soap+xml; charset=utf-8');
-		$soapAction = explode('#', str_replace('"', '', $_SERVER['HTTP_SOAPACTION'])); ;
+		$soapAction = explode('#', $soapAction); ;
 		$serviceNamespace = $soapAction[0];
 		$bodyElement = self::_createSOAPEnvelope();
 
@@ -132,15 +144,19 @@ abstract class Soap {
 		self::$_rootElement->setAttributeNS(self::$_envelopeNS, 'encondingStyle', 'http://schemas.xmlsoap.org/soap/encoding/');
 
 		$responseElement = self::$_domDocument->createElement('ns1:'.$soapAction[1].'Response');
-		$dataEncoded = self::_getDataEncoded();
+
+		$valueReturned = Dispatcher::getValueReturned();
+		$dataEncoded = self::_getDataEncoded($valueReturned, 'return');
 		if($dataEncoded!=null){
 			$responseElement->appendChild($dataEncoded);
 		}
 		$bodyElement->appendChild($responseElement);
 
-		//Debug::addToFile('x.txt', self::$_domDocument->saveXML());
+		$xmlResponse = self::$_domDocument->saveXML();
+		$controllerResponse = ControllerResponse::getInstance();
+		$controllerResponse->setHeader('Content-Length: '.i18n::strlen($xmlResponse), true);
+		echo $xmlResponse;
 
-		echo self::$_domDocument->saveXML();
 	}
 
 	/**
@@ -160,14 +176,13 @@ abstract class Soap {
 	 * Formatea el valor devuelto por el metodo accion en el controlador
 	 * usando el tipo de dato SOAP adecuado
 	 *
-	 * @access private
-	 * @return DOMElement
+	 * @access	private
+	 * @param	mixed $valueReturned
+	 * @param 	$nodeType return
+	 * @return	DOMElement
 	 * @static
 	 */
 	private static function _getDataEncoded($valueReturned=null, $nodeType='return'){
-		if($valueReturned===null){
-			$valueReturned = Dispatcher::getValueReturned();
-		}
 		if(!is_array($valueReturned)){
 			if(is_resource($valueReturned)){
 				throw new SoapException('Los recursos no pueden ser enviados como parte de un mensaje SOAP');
@@ -337,7 +352,7 @@ abstract class Soap {
 				$faultBacktrace->appendChild($faultTrace);
 
 				if(isset($trace['file'])){
-					$faultFile = new DOMElement('File', CoreException::getSafeFileName($trace['file']), self::$_faultsNS);
+					$faultFile = new DOMElement('File', CoreException::getSafeFilePath($trace['file']), self::$_faultsNS);
 					$faultTrace->appendChild($faultFile);
 				}
 				if(isset($trace['line'])){
@@ -356,8 +371,11 @@ abstract class Soap {
 				$faultTrace->appendChild($faultFunction);
 			}
 		}
-		echo self::$_domDocument->saveXML();
 
+		$xmlResponse = self::$_domDocument->saveXML();
+		$controllerResponse = ControllerResponse::getInstance();
+		$controllerResponse->setHeader('Content-Length: '.i18n::strlen($xmlResponse), true);
+		echo $xmlResponse;
 	}
 
 }

@@ -44,13 +44,13 @@ abstract class Component {
   	 * @static
  	 */
 	static public function buildTextArea($com, $name){
-		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." :</label></td><td>");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']."</label></td><td>");
 		Generator::formsPrint("<textarea name='fl_$name' id='flid_$name' disabled='disabled' ");
 		if(!isset($com['attributes']['rows'])||!$com['attributes']['rows']) {
-			$com['attributes']['rows'] = 15;
+			$com['attributes']['rows'] = 4;
 		}
 		if(!isset($com['atributes']['cols'])||!$com['attributes']['cols']) {
-			$com['attributes']['cols'] = 40;
+			$com['attributes']['cols'] = 50;
 		}
 		if($com['attributes']){
 			foreach($com["attributes"] as $nitem => $item){
@@ -81,10 +81,10 @@ abstract class Component {
 		$dbdate = $config->application->dbdate;
 		if(isset($com['not_label'])){
 			if(!$com['not_label']){
-				Generator::formsPrint("<label for='flid_$name'>".$com['caption']." :</label></td><td>");
+				Generator::formsPrint("<label for='flid_$name'>".$com['caption']."</label></td><td>");
 			}
 		} else {
-			Generator::formsPrint("<label for='flid_$name'>".$com['caption']." :</label></td><td>");
+			Generator::formsPrint("<label for='flid_$name'>".$com['caption']."</label></td><td>");
 		}
 		if(!isset($com['valueType'])){
 			$com['valueType'] = "";
@@ -210,69 +210,14 @@ abstract class Component {
 	 * @param array $form
 	 */
 	public static function buildHelpContext($com, $name, $form){
-		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." : </label></td><td valign='top'>");
-		Generator::formsPrint("<input type='text' name='fl_$name' id='flid_$name' disabled='disabled' ");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']."</label></td><td valign='top'>");
+		Generator::formsPrint("<table cellspacing='0'><tr><td><input type='text' name='fl_$name' id='flid_$name' disabled='disabled' size='10' ");
 		if(isset($_REQUEST['fl_'.$name])){
-			Generator::formsPrint("value = '".$_REQUEST['fl_'.$name]."'");
+			$value = $_REQUEST['fl_'.$name];
+			Generator::formsPrint("value = '".$value."'");
 		}
-		if($_REQUEST['fl_'.$name]!==""&&$_REQUEST['fl_'.$name]!==null){
-			$db = DbBase::rawConnect();
-			ActiveRecordUtils::sqlItemSanizite($name);
-			ActiveRecordUtils::sqlItemSanizite($com["foreignTable"]);
-			ActiveRecordUtils::sqlSanizite($com["detailField"]);
-			if(!$com["column_relation"]){
-				ActiveRecordUtils::sqlItemSanizite($com["column_relation"]);
-				$db->query("select {$com['detailField']} from {$com['foreignTable']}
-		  		where $name = '{$_REQUEST['fl_'.$name]}'");
-			} else {
-				$db->query("select {$com['detailField']} from {$com['foreignTable']}
-		  		where {$com["column_relation"]} = '{$_REQUEST['fl_'.$name]}'");
-			}
-			$val = $db->fetchArray();
-			$val = $val[0];
-		}
-		if(!$val){
-			if($_REQUEST['fl_'.$name."_det"]){
-				$val = $_REQUEST['fl_'.$name."_det"];
-			}
-		}
-
-		if(count($com["attributes"])){
-			foreach($com["attributes"] as $nitem => $item){
-				Generator::formsPrint(" $nitem='$item' ");
-			}
-		}
-
-		//Validación contra el Motor de Base de Datos
-		$validation.="checkValueIn(\"$name\", \"".$com['foreignTable']."\", \"".$com['messageError']."\", \"".$com['detailField']."\", \"{$com['useHelper']}\", \"{$com['column_relation']}\"); ";
-
-		//Validaciones otras
-		//Numerico
-		if($com['valueType']=="numeric"){
-			Generator::formsPrint("onkeydown='valNumeric(event)'");
-		} else {
-			Generator::formsPrint("onkeydown='nextField(event, \"$name\")'");
-		}
-
-		//Texto en Mayusculas
-		if($com['valueType']=="textUpper"){
-			$validation.=";keyUpper2()";
-		}
-		Generator::formsPrint(" onblur='$validation'");
-		Generator::formsPrint(" />&nbsp;<input type='text' id='flid_$name"."_det'
-		style='border:1px solid #808080;background:#E1E1E1;font-size:11px'
-		value='$val' size='55' onblur='keyUpper2(this)'>\r\n");
-		$md5 = md5(rand(0, 100));
-		Generator::formsPrint("<span id='indicator$md5' style='display: none'>
-        <img src='".Core::getInstancePath()."img/spinner.gif' alt='' /></span>
-		<div id='{$name}_choices' class='autocomplete'></div>
-		<script>
-		// <![CDATA[
-		new Ajax.Autocompleter(\"flid_{$name}_det\",
-		 \"{$name}_choices\", \"".Core::getInstancePath()."{$_REQUEST["controller"]}/__autocomplete?f={$com['foreignTable']}&d={$com['detailField']}&n=$name&c={$com["column_relation"]}\",
-		 { paramName: \"id\", minChars: 2, indicator: 'indicator$md5', afterUpdateElement : function(obj, li){ $(\"flid_$name\").value = li.id } });
-		// ]]>
-		</script>");
+		Generator::formsPrint(" /></td><td><input type='text' id='flid_$name"."_det' class='help_context_det' value='' size='45'>
+		<div id='".$name."_choices' class='autocomplete'></div></td></tr></table>\r\n");
 	}
 
 	/**
@@ -283,7 +228,7 @@ abstract class Component {
  	 * @param string $name
  	 */
 	static function buildStandardCombo($com, $name){
-		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." : </label></td><td><select name='fl_$name' id='flid_$name' disabled='disabled' ");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']."</label></td><td><select name='fl_$name' id='flid_$name' disabled='disabled' ");
 		if(isset($com["attributes"])){
 			if(is_array($com["attributes"])){
 				foreach($com["attributes"] as $nitem => $item) {
@@ -351,27 +296,29 @@ abstract class Component {
 			if($com['column_relation']){
 				ActiveRecordUtils::sqlSanizite($com["column_relation"]);
 				if(isset($com['extraTables'])){
-					$query = "select ".$com['foreignTable'].".".$com['column_relation']." as $name,
+					$query = "SELECT ".$com['foreignTable'].".".$com['column_relation']." as $name,
 						".$com['detailField']." from
 						".$com['foreignTable'].$com['extraTables']." $where order by $ordb";
 				} else {
-					$query = "select ".$com['foreignTable'].".".$com['column_relation']." as $name,
+					$query = "SELECT ".$com['foreignTable'].".".$com['column_relation']." as $name,
 						".$com['detailField']." from
-						".$com['foreignTable']." $where order by $ordb";
+						".$com['foreignTable']." $where ORDER BY $ordb";
 				}
 				$db->query($query);
 			}else {
-				$query = "select ".$com['foreignTable'].".$name,
+				$query = "SELECT ".$com['foreignTable'].".$name,
 					  ".$com['detailField']." from ".$com['foreignTable'].$com['extraTables']." $where order by $ordb";
 				$db->query($query);
 			}
+			$db->setFetchMode(DbBase::DB_NUM);
 			while($row = $db->fetchArray()){
-				if(!isset($_REQUEST["fl_".$name])){
-					$_REQUEST["fl_".$name] = "";
+				if(!isset($_REQUEST['fl_'.$name])){
+					$_REQUEST['fl_'.$name] = '';
 				}
-				$row[0] = htmlentities($row[0]);
-				$row[1] = htmlentities($row[1]);
-				if($_REQUEST["fl_".$name]==$row[0]){
+				if(isset($com['force_charset'])){
+					$row[1] = utf8_encode($row[1]);
+				}
+				if($_REQUEST['fl_'.$name]===$row[0]){
 					Generator::formsPrint("<option value='".$row[0]."' selected='selected'>".$row[1]."</option>\r\n");
 				} else {
 					Generator::formsPrint("<option value='".$row[0]."'>".$row[1]."</option>\r\n");
@@ -414,7 +361,7 @@ abstract class Component {
  	 * @param string $name
   	 */
 	public static function buildStandardPassword($com, $name){
-		Generator::formsPrint("".$com['caption']." : </td><td id='tp' valign='top'><input type='password' name='fl_$name' id='flid_$name' disabled='disabled' ");
+		Generator::formsPrint("".$com['caption']."</td><td id='tp' valign='top'><input type='password' name='fl_$name' id='flid_$name' disabled='disabled' ");
 		if($_REQUEST['fl_'.$name]){
 			Generator::formsPrint("value = '".$_REQUEST['fl_'.$name]."'");
 		}
@@ -441,13 +388,13 @@ abstract class Component {
 	}
 
 	/**
- 	 * Crea los componentes para campos que son im�genes
+ 	 * Crea los componentes para campos que son imágenes
  	 *
  	 * @param array $com
  	 * @param string $name
  	 */
 	static function buildStandardImage($com, $name){
-		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." : </label></td><td valign='top'>");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']."</label></td><td valign='top'>");
 		Generator::formsPrint("<table><tr><td>");
 		if(!isset($_REQUEST['fl_'.$name])){
 			$_REQUEST['fl_'.$name] = 'spacer.gif';
@@ -518,7 +465,7 @@ abstract class Component {
 		if($_REQUEST["fl_$name"]){
 			preg_matcg('/([0-2][0-9]):([0-5][0-8])/', $_REQUEST["fl_$name"], $arr);
 		}
-		Generator::formsPrint("<label for='flid_$name'>".$com['caption']." :</label></td><td>\n");
+		Generator::formsPrint("<label for='flid_$name'>".$com['caption']."</label></td><td>\n");
 		Generator::formsPrint("<select name='time{$name}_hour' id='time{$name}_hour'
 		onchange='document.getElementById(\"flid_$name\").value = document.getElementById(\"time{$name}_hour\").options[document.getElementById(\"time{$name}_hour\").selectedIndex].value+\":\"+document.getElementById(\"time{$name}_minutes\").options[document.getElementById(\"time{$name}_minutes\").selectedIndex].value' disabled='disabled'>\n");
 		for($i=0;$i<=23;++$i){

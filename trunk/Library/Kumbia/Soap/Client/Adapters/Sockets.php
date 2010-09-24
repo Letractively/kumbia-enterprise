@@ -256,6 +256,7 @@ class SocketsCommunicator {
 			$this->_httpRequest = "GET /".$this->_uri." HTTP/1.1\r\n";
 		} else {
 			if($this->_method=='POST'){
+				//?XDEBUG_SESSION_START=noshe
 				$this->_httpRequest = "POST /".$this->_uri." HTTP/1.1\r\n";
 			}
 		}
@@ -280,12 +281,12 @@ class SocketsCommunicator {
 				$this->_httpRequest.="Content-Type: application/x-www-form-urlencoded\r\n";
 				$postData = array();
 				/*if(isset($_POST)){
-				foreach($_POST as $key => $value){
-				$postData[] = $key."=".urlencode($value);
-				}
-				$this->_httpRequest.="\r\n".join("&", $postData);
+					foreach($_POST as $key => $value){
+						$postData[] = $key."=".urlencode($value);
+					}
+					$this->_httpRequest.="\r\n".join("&", $postData);
 				} else {
-				$this->_httpRequest.="\r\n";
+					$this->_httpRequest.="\r\n";
 				}*/
 				$this->_httpRequest.="\r\n";
 			} else {
@@ -308,8 +309,10 @@ class SocketsCommunicator {
 				if($i==0){
 					if($line!==false){
 						$fline = explode(' ', $line);
-						$this->_responseCode = $fline[1];
-						$this->_responseStatus = rtrim($fline[2]);
+						if(count($fline)>=2){
+							$this->_responseCode = $fline[1];
+							$this->_responseStatus = rtrim($fline[2]);
+						}
 					} else {
 						throw new CoreException('La respuesta fue vacia', 0);
 					}
@@ -328,7 +331,6 @@ class SocketsCommunicator {
 			}
 			++$i;
     	}
-
     	$this->_responseBody = '';
     	if(isset($this->_responseHeaders['Content-Length'])){
     		$contentLength = $this->_responseHeaders['Content-Length'];
@@ -336,7 +338,9 @@ class SocketsCommunicator {
     			$this->_responseBody.=fgetc($this->_socketHandler);
     		}
     	} else {
-    		throw new CoreException('La respuesta no incluia el encabezado Content-Length', 0);
+    		while(!feof($this->_socketHandler)){
+    			$this->_responseBody.=fgetc($this->_socketHandler);
+    		}
     	}
     	if($this->_enableCookies==true){
     		if(!isset($_SESSION['KHC'][$this->_host])){
@@ -380,11 +384,16 @@ class SocketsCommunicator {
 	public function getResponseCookies(){
 		if(isset($this->_responseHeaders['Set-Cookie'])){
 			$responseCookies = array();
+			$notCookie = array('path' => 1, 'expires' => 1, 'domain' => 1, 'secure' => 1);
 			$cookies = explode('; ', $this->_responseHeaders['Set-Cookie']);
 			foreach($cookies as $cookie){
 				$cook = explode('=', $cookie);
-				if(!in_array($cook[0], array('path', 'expires', 'domain', 'secure'))){
-					$responseCookies[$cook[0]] = $cook[1];
+				if(!isset($notCookie[$cook[0]])){
+					if(isset($cook[1])){
+						$responseCookies[$cook[0]] = $cook[1];
+					} else {
+						$responseCookies[$cook[0]] = null;
+					}
 				}
 			}
 			return $responseCookies;

@@ -16,53 +16,23 @@
  * @package 	Report
  * @subpackage 	Adapters
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
- * @version 	$Id$
+ * @version 	$Id: Html.php 122 2010-02-11 19:09:18Z gutierrezandresfelipe $
  */
 
 /**
- * HtmlReport
+ * TextReport
  *
- * Adaptador que permite generar reportes en HTML
+ * Adaptador que permite generar reportes en Texto Plano
  *
  * @category 	Kumbia
  * @package 	Report
  * @subpackage 	Adapters
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @abstract
  */
-class HtmlReport extends ReportAdapter implements ReportInterface {
-
-	/**
-	 * Tabla de offset Ratios para Fuentes conocidas
-	 *
-	 * @var array
-	 */
-	static private $_offsetRatio = array(
-		'Arial' => array(
-			9 => 1.25,
-			10 => 1.3,
-			11 => 1.25,
-			12 => 1.2,
-			13 => 1.2,
-			14 => 1.25,
-			15 => 1.3,
-			16 => 1.35,
-		),
-		'Verdana' => array(
-			9 => 1.25,
-			10 => 1.3,
-			11 => 1.25,
-			12 => 1.2,
-			13 => 1.2,
-			14 => 1.25,
-			15 => 1.3,
-			16 => 1.35,
-		)
-	);
+class TextReport extends ReportAdapter implements ReportInterface {
 
 	/**
 	 * Salida HTML
@@ -86,7 +56,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 * @var int
 	 * @static
 	 */
-	private static $_defaultFontFamily = "Arial";
+	private static $_defaultFontFamily = "Lucida Console";
 
 	/**
 	 * Alto de cada fila
@@ -165,20 +135,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 */
 	public function getOutput(){
 		$this->_prepareHead();
-		if($this->getDisplayMode()==Report::DISPLAY_PRINT_PREVIEW){
-			$this->_appendToOutput("\t<table cellspacing='0' width='100%'><tr><td width='80%' id='preview' align='center'>
-			<div style='overflow-y: scroll; height: 580px; padding:20px'>\n");
-			$this->_renderPages();
-			$this->_appendToOutput("\t</div></td>
-			<td width='20%' id='right_pannel' valign='top' align='center'>
-			<div style='overflow-y: scroll; height: 580px; padding: 10px;'>\n");
-			for($i=1;$i<=$this->_totalPages;++$i){
-				$this->_appendToOutput($this->_getPageThumbnail($i));
-			}
-			$this->_appendToOutput("</div></td></tr></table>\n");
-		} else {
-			$this->_renderPages();
-		}
+		$this->_renderPages();
 		$this->_prepareFooter();
 		return $this->_output;
 	}
@@ -195,7 +152,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			$this->_tempFile = fopen($this->_tempFileName, 'w');
 			$this->_prepareHead();
 			$this->_renderHeader();
-			$this->_appendToOutput("\t<p><table cellspacing='0' align='center'>\n");
+			$this->_appendToOutput("<p><table cellspacing='0' align='center'>\n");
 			$this->_renderColumnHeaders();
 		}
 		$this->_started = true;
@@ -208,7 +165,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	protected function _finish(){
 		if($this->_implicitFlush==true){
 			$this->_renderTotals();
-			$this->_appendToOutput("\t</table></p>\n");
+			$this->_appendToOutput("</table></p>\n");
 			$this->_prepareFooter();
 		}
 	}
@@ -222,34 +179,16 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			$output = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
 			$output.= "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n";
 			$output.= "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n";
-			$output.= "\t<head>\n";
-			$output.= "\t\t<meta http-equiv='Content-type' content='text/html; charset=".$this->getEncoding()."' />\n";
-			$output.= "\t\t<meta http-equiv='Pragma' CONTENT='no-cache' />\n";
+			$output.= "<head>\n";
+			$output.= "<meta http-equiv='Content-type' content='text/plain; charset=".$this->getEncoding()."' />\n";
+			$output.= "<meta http-equiv='Pragma' CONTENT='no-cache' />\n";
 	   		$output.= "\t\t<meta http-equiv='Cache-Control' CONTENT='no-cache' />\n";
 			$output.= "\t\t<title>".$this->getDocumentTitle()."</title>\n";
 			$output.= "\t\t<style type='text/css'>\n";
 			$output.= "\t\t\tbody, div, td, th { font-family: \"".self::$_defaultFontFamily."\"; font-size: ".self::$_defaultFontSize."px; }\n";
-			$output.= "\t\t\ttable { border-right: 1px solid #969696;border-top: 1px solid #969696;}\n";
-			$output.= "\t\t\tth, td { border-left: 1px solid #969696;border-bottom: 1px solid #969696;}\n";
-			if($this->getDisplayMode()==Report::DISPLAY_PRINT_PREVIEW){
-				$output.= "\t\t\tbody { background: #333333; margin: 0px; padding: 0px; }\n";
-				$output.= "\t\t\t.page { padding: 20px; width: 550px; height: 700px; border: 1px solid #fafafa; background: #ffffff; margin: 10px;}\n";
-				$output.= "\t\t\t#preview { background: #676767; border: none; }\n";
-				$output.= "\t\t\t#right_pannel { background: #fafafa; }\n";
-				if(Browser::isWebKit()==true){
-					$output.= "\t\t\t.thumbnail td { height: 2px; border: 1px solid #eaeaea; }\n";
-					$output.= "\t\t\t.thumbnail th { height: 2px; border: 1px solid #eaeaea; }\n";
-				} else {
-					$output.= "\t\t\t.thumbnail td { height: 4px; border: 1px solid #eaeaea; }\n";
-					$output.= "\t\t\t.thumbnail th { height: 4px; border: 1px solid #eaeaea; }\n";
-				}
-				$output.= "\t\t\t.thumbnail a { color: #676767; font-size: 11px; text-decoration:none; }\n";
-				$output.= "\t\t\t.thumbnail { float: left; margin: 10px; border: 1px solid #eaeaea; background: #ffffff; padding: 5px; width: 50px; }\n";
-				$this->setPagination(true);
-			} else {
-				$output.= "\t\t\tbody { margin: 0px; padding: 0px; }\n";
-				$output.= "\t\t\t.page { padding: 20px; max-width: 850px; height: 700px; border: 1px solid #fafafa; background: #ffffff; }\n";
-			}
+			$output.= "\t\t\ttable { border: none; }\n";
+			$output.= "\t\t\tth, td { border: none; font-weight: normal; padding-left: 10px; }\n";
+			$output.= "\t\t\tbody { margin: 0px; padding: 0px; }\n";
 			$this->_appendToOutput($output);
 			$this->_prepareCellHeaderStyle();
 			$this->_prepareColumnStyles();
@@ -274,8 +213,9 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	private function _appendToOutput($output){
 		if($this->_implicitFlush==true){
 			fwrite($this->_tempFile, $output);
+			unset($output);
 		} else {
-			$this->_output = $output;
+			$this->_output.=$output;
 		}
 	}
 
@@ -285,11 +225,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 * @access protected
 	 */
 	protected  function _prepareCellHeaderStyle(){
-		$style = $this->getCellHeaderStyle();
-		if($style!==null){
-			$preparedStyle = $this->_prepareStyle($style->getStyles());
-			$this->_appendToOutput("\t\t\tth { ".join(";", $preparedStyle)."; }\n");
-		}
+
 	}
 
 	/**
@@ -317,41 +253,12 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 */
 	protected function _prepareColumnStyles(){
 		$styles = $this->getColumnStyles();
-		$rowHeight = 0;
-		$offsetRatio = $this->_getOffsetRatio(self::$_defaultFontFamily, self::$_defaultFontSize);
-		$fontSizeRatio = ceil((self::$_defaultFontSize+4)*$offsetRatio);
 		if(count($styles)){
 			foreach($styles as $numberColumn => $style){
 				$columnStyle = $style->getStyles();
-				if(isset($columnStyle['fontSize'])){
-					if(isset($columnStyle['fontFamily'])){
-						$offsetRatio = $this->_getOffsetRatio($columnStyle['fontFamily'], $columnStyle['fontSize']);
-					} else {
-						$offsetRatio = $this->_getOffsetRatio(self::$_defaultFontFamily, $columnStyle['fontSize']);
-					}
-					$fontSize = ceil(($columnStyle['fontSize']+4)*$offsetRatio);
-					if($rowHeight==0){
-						$rowHeight = $fontSize;
-					} else {
-						if($fontSize>$rowHeight){
-							$rowHeight = $fontSize;
-						}
-					}
-				} else {
-					$rowHeight = $fontSizeRatio;
-				}
 				$preparedStyle = $this->_prepareStyle($columnStyle);
 				$this->_appendToOutput("\t\t\t.c$numberColumn { ".join(";", $preparedStyle)."; }\n");
 			}
-			if($this->_rowHeight==0){
-				$this->_rowHeight = $rowHeight;
-			} else {
-				if($rowHeight>$this->_rowHeight){
-					$this->_rowHeight = $rowHeight;
-				}
-			}
-		} else {
-			$this->_rowHeight = $fontSizeRatio;
 		}
 	}
 
@@ -359,23 +266,8 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 		$style = array();
 		foreach($attributes as $attributeName => $value){
 			switch($attributeName){
-				case 'fontSize':
-					$style[] = 'font-size:'.$value.'px';
-					break;
-				case 'fontWeight':
-					$style[] = 'font-weight:'.$value;
-					break;
 				case 'textAlign':
 					$style[] = 'text-align:'.$value;
-					break;
-				case 'color':
-					$style[] = 'color:'.$value;
-					break;
-				case 'borderColor':
-					$style[] = 'border:1px solid '.$value;
-					break;
-				case 'backgroundColor':
-					$style[] = 'background-color:'.$value;
 					break;
 				case 'paddingRight':
 					$style[] = 'padding-right:'.$value;
@@ -391,25 +283,13 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 */
 	protected function _renderHeader(){
 		$header = $this->getHeader();
-		$headerHeight = 0;
 		if(is_array($header)){
 			foreach($header as $item){
-				$style = $this->_renderItem($item);
-				if(isset($style['fontSize'])){
-					$headerHeight+=$style['fontSize']+4;
-				} else {
-					$headerHeight+=15;
-				}
+				 $this->_renderItem($item);
 			}
 		} else {
-			$style = $this->_renderItem($item);
-			if(isset($style['fontSize'])){
-				$headerHeight+=$style['fontSize']+4;
-			} else {
-				$headerHeight+=15;
-			}
+			$this->_renderItem($item);
 		}
-		$this->_headerHeight = $headerHeight;
 	}
 
 	/**
@@ -425,7 +305,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 		}
 		if(is_object($item)==true){
 			if(get_class($item)=="ReportText"){
-				$html = "\t\t\t<div ";
+				$html = "<div ";
 				$itemStyle = $item->getAttributes();
 				$style = $this->_prepareStyle($itemStyle);
 				if(count($style)){
@@ -443,11 +323,11 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 *
 	 */
 	private function _renderColumnHeaders(){
-		$output = "\t\t\t<thead>\n";
+		$output = "<thead>\n";
 		foreach($this->getColumnHeaders() as $header){
-			$output.="\t\t\t\t<th>$header</th>\n";
+			$output.="<th>$header</th>\n";
 		}
-		$output.="\t\t\t</thead>\n";
+		$output.="</thead>\n";
 		$this->_appendToOutput($output);
 	}
 
@@ -506,7 +386,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 	 * @param array $row
 	 */
 	private function _renderRow($row){
-		$output = "\t\t\t<tr>\n";
+		$output = "<tr>\n";
 		if($row['_type']=='normal'){
 			unset($row['_type']);
 			if($this->_numberColumns===null){
@@ -522,13 +402,13 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 				if(isset($this->_columnFormats[$numberColumn])){
 					$value = $this->_columnFormats[$numberColumn]->apply($value);
 				}
-				$output.="\t\t\t\t<td class='c$numberColumn'>$value</td>\n";
+				$output.="<td class='c$numberColumn'>$value</td>\n";
 			}
 		} else {
 			if($row['_type']=='raw'){
 				unset($row['_type']);
 				foreach($row as $numberColumn => $rawColumn){
-					$output.="\t\t\t\t<td colspan='".$rawColumn->getSpan()."'";
+					$output.="<td colspan='".$rawColumn->getSpan()."'";
 					$styles = $rawColumn->getStyle();
 					if($styles){
 						$style = $this->_prepareStyle($styles);
@@ -539,7 +419,7 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 				}
 			}
 		}
-		$output.="\t\t\t</tr>\n";
+		$output.="</tr>\n";
 		$this->_appendToOutput($output);
 	}
 
@@ -563,40 +443,40 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			$pageNumber = 1;
 			if($numberRows>0){
 				while($renderRows<$numberRows){
-					$this->_appendToOutput("\t\t<div align='center'><div class='page'><a name='$pageNumber'>\n");
+					$this->_appendToOutput("<div align='center'><div class='page'><a name='$pageNumber'>\n");
 					$this->_renderHeader();
 					if($calculatedOffset==-1){
 						$calculatedOffset = ceil(($this->_rowHeight*$numberRows+$this->_headerHeight+20)/700);
 						$rowsToRender = floor($numberRows/$calculatedOffset);
 					}
-					$this->_appendToOutput("\t<p><table cellspacing='0'>\n");
+					$this->_appendToOutput("<p><table cellspacing='0'>\n");
 					$this->_renderColumnHeaders();
 					$this->_renderRows(array_slice($data, $renderRows, $rowsToRender));
 					$this->_renderTotals();
-					$this->_appendToOutput("\t</table></p>\n");
-					$this->_appendToOutput("\t\t</div></div>\n");
+					$this->_appendToOutput("</table></p>\n");
+					$this->_appendToOutput("</div></div>\n");
 					$renderRows+=$rowsToRender;
 					++$pageNumber;
 					$this->_setPageNumber($pageNumber);
 				}
 			} else {
-				$this->_appendToOutput("\t\t<div align='center'><div class='page'><a name='$pageNumber'>\n");
+				$this->_appendToOutput("<div align='center'><div class='page'><a name='$pageNumber'>\n");
 				$this->_renderHeader();
-				$this->_appendToOutput("\t<p><table cellspacing='0'>\n");
+				$this->_appendToOutput("<p><table cellspacing='0'>\n");
 				$this->_renderColumnHeaders();
-				$this->_appendToOutput("\t</table></p>\n");
-				$this->_appendToOutput("\t\t</div></div>\n");
+				$this->_appendToOutput("</table></p>\n");
+				$this->_appendToOutput("</div></div>\n");
 				++$pageNumber;
 				$this->_setPageNumber($pageNumber);
 			}
 			$this->_totalPages = $pageNumber;
 		} else {
 			$this->_renderHeader();
-			$this->_appendToOutput("\t<p><table cellspacing='0' align='center'>\n");
+			$this->_appendToOutput("<p><table cellspacing='0' align='center'>\n");
 			$this->_renderColumnHeaders();
 			$this->_renderRows($data);
 			$this->_renderTotals();
-			$this->_appendToOutput("\t</table></p>\n");
+			$this->_appendToOutput("</table></p>\n");
 		}
 	}
 
@@ -631,40 +511,6 @@ class HtmlReport extends ReportAdapter implements ReportInterface {
 			}
 			$output.='</tr>';
 			$this->_appendToOutput($output);
-		}
-	}
-
-	/**
-	 * Busca el offsetRatio de la fuente y el tamaño
-	 *
-	 * @param string $fontFamily
-	 * @param int $fontSize
-	 */
-	private function _getOffsetRatio($fontFamily, $fontSize){
-		if(isset(self::$_offsetRatio[$fontFamily])==false){
-			throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily', debe establecer manualmente el número de registros por página");
-		}
-		if(isset(self::$_offsetRatio[$fontFamily][$fontSize])==false){
-			for($i=$fontSize;$i>=0;--$i){
-				if(isset(self::$_offsetRatio[$fontFamily][$i])){
-					if($fontSize-$i<=5){
-						return self::$_offsetRatio[$fontFamily][$i]-(0.1*($i-$fontSize));
-					} else {
-						throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily' tamaño '$fontSize', debe establecer manualmente el número de registros por página");
-					}
-				}
-			}
-			for($i=$fontSize;$i<=128;++$i){
-				if(isset(self::$_offsetRatio[$fontFamily][$i])){
-					if($i-$fontSize<=6){
-						return self::$_offsetRatio[$fontFamily][$i]+(0.1*($i-$fontSize));
-					} else {
-						throw new ReportException("No existe el offsetRatio para la fuente '$fontFamily' tamaño '$fontSize', debe establecer manualmente el número de registros por página");
-					}
-				}
-			}
-		} else {
-			return self::$_offsetRatio[$fontFamily][$fontSize];
 		}
 	}
 

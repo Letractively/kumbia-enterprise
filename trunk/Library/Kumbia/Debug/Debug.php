@@ -290,12 +290,13 @@ abstract class Debug {
 	/**
 	 * Envia un debug a un archivo
 	 *
-	 * @param string $filePath
-	 * @param mixed $value
+	 * @param	string $filePath
+	 * @param	mixed $value
+	 * @param 	string $flags
 	 */
-	public static function addToFile($filePath, $value){
+	public static function addToFile($filePath, $value, $flags='w'){
 		if(!isset(self::$_fileDebugs[$filePath])){
-			self::$_fileDebugs[$filePath] = fopen($filePath, 'w');
+			self::$_fileDebugs[$filePath] = fopen($filePath, $flags);
 		}
 		fputs(self::$_fileDebugs[$filePath], print_r($value, true));
 	}

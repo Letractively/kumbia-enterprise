@@ -42,6 +42,18 @@ abstract class Core {
 	const FRAMEWORK_VERSION = '1.7.1';
 
 	/**
+	 * Permite configurar el framework para pruebas remotas
+	 *
+	 */
+	const TESTING_REMOTE = 1;
+
+	/**
+	 * Permite configurar el framework para pruebas locales
+	 *
+	 */
+	const TESTING_LOCAL = 2;
+
+	/**
 	 * PATH donde esta instalada la instancia del framework
 	 */
 	private static $_instanceName = null;
@@ -468,7 +480,9 @@ abstract class Core {
 			$controller = null;
 
 			//Iniciar el buffer de salida
-			ob_start();
+			if(self::$_testingMode<self::TESTING_LOCAL){
+				ob_start();
+			}
 
  	 	    //El driver de la BD es cargado según lo que diga en config.ini
 			if(DbLoader::loadDriver()==false){
@@ -492,10 +506,11 @@ abstract class Core {
 			Security::initAccessManager();
 
 			//Atiende la petición
-			$controller = self::handleRequest();
-
-			//Ejecuta el GC
-			self::_executeGarbageCollector($config);
+			if(self::$_testingMode<self::TESTING_LOCAL){
+				$controller = self::handleRequest();
+				//Ejecuta el GC
+				self::_executeGarbageCollector($config);
+			}
 
 		}
 		catch(CoreException $e){
@@ -554,6 +569,9 @@ abstract class Core {
 		$controller = null;
 		$controllerName = Router::getController();
 
+		// Inicia la sesion de acuerdo al adaptador instalado
+		Session::startSession();
+
 		/**
 		 * Ejectutar Plugin::beforeDispatchLoop()
 		 */
@@ -561,14 +579,10 @@ abstract class Core {
 		PluginManager::notifyFromController('beforeDispatchLoop', $controller);
 		#endif
 
-		/**
-		 * Establecer directorio de controladores
-		 */
+		//Establecer directorio de controladores
 		Dispatcher::setControllerDir(self::$_activeControllersDir);
 
-		/**
-		 * Ciclo del enrutador
-		 */
+		//Ciclo del enrutador
 		while(Router::getRouted()==true){
 			Router::setRouted(false);
 
@@ -647,6 +661,7 @@ abstract class Core {
 	 * @static
 	 */
 	private static function _handleException($e, $controller){
+
 		//Notifica la excepcion a los Plugins
 		#if[no-plugins]
 		PluginManager::notifyFromApplication('beforeUncaughtException', $e);
@@ -657,7 +672,16 @@ abstract class Core {
 		if($controller){
 			$exceptionHandler = $controller->getViewExceptionHandler();
 		} else {
-			$exceptionHandler = self::determineExceptionHandler();
+			$controllerBase = Dispatcher::getControllerBase();
+			if($controllerBase){
+				if(method_exists($controllerBase, 'getViewExceptionHandler')){
+					$exceptionHandler = $controllerBase->getViewExceptionHandler();
+				} else {
+					$exceptionHandler = self::determineExceptionHandler();
+				}
+			} else {
+				$exceptionHandler = self::determineExceptionHandler();
+			}
 		}
 		call_user_func_array($exceptionHandler, array($e, $controller));
 		return;
@@ -676,10 +700,23 @@ abstract class Core {
 	}
 
 	/**
+	 * Cambiar todo el entorno de aplicación a otra
+	 *
+	 * @param string $application
+	 */
+	public static function changeApplication($application){
+		if(!file_exists('apps/'.$application)){
+			throw new CoreException('No existe la aplicación "'.$application.'"');
+		}
+		Router::setActiveApplication($application);
+		Core::main();
+	}
+
+	/**
 	 * Agrega un evento que se ejecutará dinámicamente
 	 *
-	 * @param  $eventName
-	 * @param unknown_type $callback
+	 * @param 	$eventName
+	 * @param 	callback $callback
 	 */
 	public static function on($eventName, $callback){
 		CommonEvent::observe($eventName, $callback);
@@ -780,7 +817,7 @@ abstract class Core {
 	public static function requireLogicalFile($className){
 		if(self::$_isWebSphere==true){
 			foreach(func_get_args() as $className){
-				if(class_exists($className)==false){
+				if(class_exists($className, false)==false){
 					require CoreClassPath::getClassPath($className);
 				}
 			}
@@ -939,6 +976,9 @@ abstract class Core {
 	 */
 	public static function setTestingMode($testingMode){
 		self::$_testingMode = $testingMode;
+		if($testingMode==self::TESTING_LOCAL){
+			Session::disableAutoStart(true);
+		}
 	}
 
 	/**

@@ -63,6 +63,13 @@ class ActiveRecordTransaction {
 	private $_propagation = false;
 
 	/**
+	 * Indica si la transacción debe abortarse cuando el cliente aborta la petición
+	 *
+	 * @var boolean
+	 */
+	private $_rollbackOnAbort = false;
+
+	/**
 	 * Administrador de transacciones usado
 	 *
 	 * @var string
@@ -108,7 +115,7 @@ class ActiveRecordTransaction {
 				$this->_db->setTimeout($definition->getTimeout());
 				$this->setPropagation($definition->getPropagation());
 			} else {
-				throw new ActiveRecordTransactionException("Definición de transacci&oacute;n invalida");
+				throw new ActiveRecordTransactionException("Definición de transacción invalida");
 			}
 		} else {
 			$connection = DbBase::rawConnect(true);
@@ -170,11 +177,16 @@ class ActiveRecordTransaction {
 	}
 
 	/**
-	 * Devuelve la conexion que maneja la transaccion
+	 * Devuelve la conexion que maneja la transacción
 	 *
 	 * @return DbBase
 	 */
 	public function getConnection(){
+		if($this->_rollbackOnAbort==true){
+			if(connection_aborted()){
+				$this->rollback('La petición fue abortada');
+			}
+		}
 		return $this->_db;
 	}
 
@@ -203,6 +215,15 @@ class ActiveRecordTransaction {
 	 */
 	public function getPropagation(){
 		return $this->_propagation;
+	}
+
+	/**
+	 * Establece si se debe anular la transacción cuando el cliente aborte la petición
+	 *
+	 * @param boolean $rollbackOnAbort
+	 */
+	public function setRollbackOnAbort($rollbackOnAbort){
+		$this->_rollbackOnAbort = $rollbackOnAbort;
 	}
 
 	/**

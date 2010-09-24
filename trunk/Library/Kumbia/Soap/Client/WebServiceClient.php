@@ -21,6 +21,17 @@
  * @version 	$Id$
  */
 
+class WebServiceClient2 extends SoapClient {
+
+	public function __construct($options){
+		$options['uri'] = 'http://app-services';
+		$options['encoding'] = 'UTF-8';
+		//$options['soap_version'] = SOAP_1_2;
+		parent::__construct(null, $options);
+	}
+
+}
+
 /**
  * WebServiceClient
  *
@@ -86,7 +97,11 @@ class WebServiceClient {
 	 */
 	public function __construct($options){
 		if(!is_array($options)){
-			$options = array('wsdl' => null, 'location' => $options, 'actor' => $options);
+			$options = array(
+				'wsdl' => null,
+				'location' => $options,
+				'actor' => $options
+			);
 		}
 		if(!isset($options['wsdl'])){
 			$options['wsdl'] = null;
@@ -101,11 +116,15 @@ class WebServiceClient {
 			$options['encoding'] = 'UTF-8';
 		}
 		if(!isset($options['compression'])){
-			$options['compression'] = SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP;
+			if(extension_loaded('soap')){
+				$options['compression'] = SOAP_COMPRESSION_ACCEPT | SOAP_COMPRESSION_GZIP;
+			} else {
+				$options['compression'] = 32;
+			}
 		}
+		$this->_options = $options;
 		$this->_transport = $this->_getHTTPTransport($options['location']);
 		$this->_addHeaders();
-		$this->_options = $options;
 	}
 
 	/**
@@ -120,7 +139,9 @@ class WebServiceClient {
 		);
 		$transportHeaders = array();
 		foreach($headers as $headerName => $serverIndex){
-			$transportHeaders[$headerName] = $_SERVER[$serverIndex];
+			if(isset($_SERVER[$serverIndex])){
+				$transportHeaders[$headerName] = $_SERVER[$serverIndex];
+			}
 		}
 		$transportHeaders['User-Agent'] = 'KEF/PHP/SOAP '.Core::FRAMEWORK_VERSION.'/'.PHP_VERSION;
 		$transportHeaders['Content-Type'] = 'text/xml; charset=utf-8';
@@ -144,11 +165,17 @@ class WebServiceClient {
 	 * @return 	HTTPTransport
 	 */
 	private function _getHTTPTransport($url){
-		if(class_exists('SocketsCommunicator', false)==false){
-			require 'Library/Kumbia/Soap/Client/Adapters/Sockets.php';
+		if(!isset($this->_options['communicator'])){
+			$adapterName = 'Sockets';
+		} else {
+			$adapterName = $this->_options['communicator'];
+		}
+		$className = $adapterName.'Communicator';
+		if(class_exists($className, false)==false){
+			require 'Library/Kumbia/Soap/Client/Adapters/'.$adapterName.'.php';
 		}
 		$uri = new HttpUri($url);
-		$transport = new SocketsCommunicator($uri->getSchema(), $uri->getHostname(), $uri->getUri(), 'POST', $uri->getPort());
+		$transport = new $className($uri->getSchema(), $uri->getHostname(), $uri->getUri(), 'POST', $uri->getPort());
 		$transport->enableCookies(true);
 		return $transport;
 	}
@@ -306,7 +333,7 @@ class WebServiceClient {
 
 		$responseBody = $this->_transport->getResponseBody();
 		$responseCode = $this->_transport->getResponseCode();
-		return $this->_processResponse($method, $responseCode, &$responseBody);
+		return $this->_processResponse($method, $responseCode, $responseBody);
 	}
 
 	/**
@@ -317,11 +344,11 @@ class WebServiceClient {
 	 * @param	string $responseBody
 	 * @return	mixed
 	 */
-	private function _processResponse($method, $responseCode, $responseBody){
+	private function _processResponse($method, $responseCode, &$responseBody){
 		if($responseCode>=200&&$responseCode<300){
 			return $this->_bindResponseData($method, $responseBody);
 		} else {
-			if($responseCode>=500&&$responseCode<600){
+			if($responseCode>=400&&$responseCode<600){
 				$this->_throwSoapFault($responseBody);
 			}
 		}
@@ -493,7 +520,7 @@ class WebServiceClient {
 			}
 		}
 		if(class_exists($exceptionClassName)){
-			$exception = new $exceptionClassName($exceptionMessage);
+			$exception = new $exceptionClassName($exceptionMessage,0);
 			$exception->setRemote(true);
 			$exception->setRemoteActor($this->_options['actor']);
 			$exception->setRemoteTrace($remoteBacktrace);

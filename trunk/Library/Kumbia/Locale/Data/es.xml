@@ -3734,6 +3734,7 @@
 				<wordend>un</wordend>
 				<wordend>ud</wordend>
 				<wordend>ad</wordend>
+				<wordend>al</wordend>
 				<wordend>a</wordend>
 			</genre>
 			<genre type="male">
@@ -3746,6 +3747,7 @@
 			</genre>
 		</genres>
 		<conjunction>y</conjunction>
+		<disjunction>ó</disjunction>
 		<quantities>
 			<quantity type="minus">menos</quantity>
 			<quantity type="nothing">ningún</quantity>

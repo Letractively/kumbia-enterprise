@@ -59,7 +59,7 @@ class FileLogger extends LoggerAdapter implements LoggerInterface {
 		if($name===''||$name===true){
 			$name = 'log'.date('dmY').'.txt';
 		}
-		if(class_exists('Router')){
+		if(class_exists('Router', false)){
 			$application = Router::getApplication();
 			if($application){
 				$this->_path = 'apps/'.$application.'/'.$this->_logPath.'/'.$name;
@@ -130,7 +130,7 @@ class FileLogger extends LoggerAdapter implements LoggerInterface {
  	 */
 	public function commit(){
 		if($this->_transaction==false){
-			throw new LoggerException("No hay una transacci&oacute;n activa");
+			throw new LoggerException("No hay una transacción activa");
 		}
 		$this->_transaction = false;
 		foreach($this->_quenue as $msg){

@@ -200,7 +200,7 @@ abstract class StandardForm extends Controller {
 		 * beforeReport, si este método devuelve false termina la ejecución
 		 * de la acción
 		 */
-		if(method_exists($this, "beforeReport")){
+		if(method_exists($this, 'beforeReport')){
 			if($this->beforeReport()===false){
 				return null;
 			}
@@ -463,7 +463,12 @@ abstract class StandardForm extends Controller {
 		$primaryKey = array();
 		foreach($this->form['components'] as $fkey => $rrow){
 			if(isset($rrow['primary'])&&$rrow['primary']==1){
-				$primaryKey[] = "$fkey = '".$_REQUEST["fl_$fkey"]."'";
+				if(isset($_REQUEST["fl_$fkey"])){
+					$primaryKey[] = "$fkey = '".$_REQUEST["fl_$fkey"]."'";
+				} else {
+					Flash::error('Datos incorrectos de actualización');
+					return $this->routeTo('action: index');
+				}
 			}
 		}
 
@@ -473,7 +478,7 @@ abstract class StandardForm extends Controller {
 
 		foreach($this->{$modelName}->getAttributes() as $fieldName){
 			if(isset($_REQUEST["fl_$fieldName"])){
-				$this->{$modelName}->$fieldName = $_REQUEST["fl_$fieldName"];
+				$this->{$modelName}->writeAttribute($fieldName, $_REQUEST["fl_$fieldName"]);
 			}
 		}
 
@@ -616,7 +621,6 @@ abstract class StandardForm extends Controller {
 		$this->view = 'index';
 
 		Generator::scaffold($this->form, $this->scaffold);
-
 
 		$modelName = EntityManager::getEntityName($this->getSource());
 		if(!EntityManager::isEntity($modelName)){
@@ -795,7 +799,7 @@ abstract class StandardForm extends Controller {
 								if(isset($form['components'][$fkey]['primary'])&&$form['components'][$fkey]['primary']){
 									$query.=" and $source.$fkey = '".$_REQUEST["fl_".$fkey]."'";
 								} else {
-									$query.=" and $source.$fkey like '%".$_REQUEST["fl_".$fkey]."%'";
+									$query.=" and $source.$fkey LIKE '%".$_REQUEST["fl_".$fkey]."%'";
 								}
 							}
 						}
@@ -827,7 +831,7 @@ abstract class StandardForm extends Controller {
 			return $this->routeTo(array('action' => 'index'));
 		}
 
-		if($id!=='last') {
+		if($id!=='last'){
 			$id = $this->filter($id, "int");
 			if($id==0){
 				$id = 0;
@@ -1109,9 +1113,9 @@ abstract class StandardForm extends Controller {
 	/**
 	 * Indica que un campo tendró un helper de ayuda
 	 *
-	 * @access public
-	 * @param string $field
-	 * @param string $helper
+	 * @access	public
+	 * @param	string $field
+	 * @param	string $helper
 	 */
 	protected function useHelper($field, $helper=''){
 		if(!$helper){
@@ -1243,6 +1247,9 @@ abstract class StandardForm extends Controller {
 		} else {
 			$this->form['components'][$opt['field']]['column_relation'] = $opt['id'];
 		}
+		if(isset($opt['force_charset'])){
+			$this->form['components'][$opt['field']]['force_charset'] = $opt['force_charset'];
+		}
 	}
 
 	/**
@@ -1254,29 +1261,8 @@ abstract class StandardForm extends Controller {
 	protected function setHelpContext($what){
 		$numberArguments = func_num_args();
 		$opt = Utils::getParams(func_get_args(), $numberArguments);
-		$opt['field'] = $opt['field'] ? $opt['field'] : $opt[0];
-		$opt['relation'] = $opt['relation'] ? $opt['relation'] : $opt[1];
-		$opt['detail_field'] = $opt['detail_field'] ? $opt['detail_field'] : $opt[2];
-		$this->form['components'][$opt['field']]['type'] = 'helpText';
-		$this->form['components'][$opt['field']]['class'] = 'dynamic';
-		$this->form['components'][$opt['field']]['foreignTable'] = $opt['relation'];
-		$this->form['components'][$opt['field']]['detailField'] = $opt['detail_field'];
-		if($opt['conditions']){
-			$this->form['components'][$opt['field']]['whereCondition'] = $opt['conditions'];
-		}
-		if($opt['column_relation']){
-			$this->form['components'][$opt['field']]['column_relation'] = $opt['column_relation'];
-		}
-		if($opt['column_relation']){
-			$this->form['components'][$opt['field']]['column_relation'] = $opt['column_relation'];
-		} else {
-			$this->form['components'][$opt['field']]['column_relation'] = $opt['id'];
-		}
-		if($opt['message_error']){
-			$this->form['components'][$opt['field']]['messageError'] = $opt['message_error'];
-		} else {
-			$this->form['components'][$opt['field']]['messageError'] = "NO EXISTE EL REGISTRO DIGITADO";
-		}
+		$field = $opt['field'];
+		$this->form['components'][$field]['type'] = 'helpContext';
 	}
 
 	/**

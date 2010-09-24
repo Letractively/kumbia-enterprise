@@ -41,16 +41,16 @@ class ActiveRecordJoin extends Object {
 	/**
 	 * Conexion al motor con el que se hará la consulta
 	 *
-	 * @access private
-	 * @var dbBase
+	 * @access	private
+	 * @var		dbBase
 	 */
-	private $_db;
+	private $_db = null;
 
 	/**
 	 * Consulta generada apartir de los parámetros
 	 *
-	 * @access private
-	 * @var string
+	 * @access	private
+	 * @var		string
 	 */
 	private $_sqlQuery;
 
@@ -63,12 +63,12 @@ class ActiveRecordJoin extends Object {
 		if(!isset($params['entities'])||count($params['entities'])==0){
 			throw new ActiveRecordException('Debe indicar las entidades con las que se hará la consulta');
 		}
+		Debug::add($params);
 		$entitiesSources = array();
 		$groupFields = array();
 		$requestedFields = array();
 		foreach($params['entities'] as $entityName){
-			$entityInstance = EntityManager::getEntityInstance($entityName);
-			$entitiesSources[$entityName] = $entityInstance->getSource();
+			$entitiesSources[$entityName] = EntityManager::getCompleteSource($entityName);
 		}
 		if(!isset($params['fields'])){
 			if(isset($params['groupFields'])){
@@ -103,33 +103,12 @@ class ActiveRecordJoin extends Object {
 			);
 			foreach($groupFunctions as $key => $function){
 				if(isset($params[$key])){
-					foreach($params[$key] as $alias => $field){
-						$existsEntity = false;
-						$replacedField = $field;
-						while(preg_match('/\{\#([a-zA-Z0-9\_]+)\}/', $replacedField, $regs)){
-							if(!isset($entitiesSources[$regs[1]])){
-								throw new ActiveRecordException('La entidad '.$regs[1].' en los campos solicitados no se encontró en la lista de entidades con acumulado de sumatoria');
-							} else {
-								$replacedField = str_replace($regs[0], $entitiesSources[$regs[1]], $replacedField);
-								if(is_numeric($alias)){
-									if(strpos($replacedField, '.')==false){
-										$alias = $replacedField;
-									} else {
-										$alias = substr($replacedField, strpos($replacedField, '.')+1);
-									}
-								}
-							}
-							$existsEntity = true;
+					if(is_array($params[$key])){
+						foreach($params[$key] as $alias => $field){
+							$this->_groupFunction($requestedFields, $function, $alias, $field, $entitiesSources);
 						}
-						if($existsEntity==false){
-							if($alias==''||is_numeric($alias)){
-								$requestedFields[] = $function.'('.$field.')';
-							} else {
-								$requestedFields[] = $function.'('.$field.') AS '.$alias;
-							}
-						} else {
-							$requestedFields[] = $function.'('.$replacedField.') AS '.$alias;
-						}
+					} else {
+						$this->_groupFunction($requestedFields, $function, $key, $params[$key], $entitiesSources);
 					}
 				}
 			}
@@ -171,11 +150,13 @@ class ActiveRecordJoin extends Object {
 									$belongsTo = $relations['belongsTo'][$relationEntity];
 									$source = $entitiesSources[$entityName];
 									if(!is_array($belongsTo['rf'])){
-										$join[] = $belongsTo['rt'].'.'.$belongsTo['rf'].' = '.$source.'.'.$belongsTo['fi'];
+										$sourceName = EntityManager::getSourceName($belongsTo['rt']);
+										$join[] = $sourceName.'.'.$belongsTo['rf'].' = '.$source.'.'.$belongsTo['fi'];
 									} else {
 										$i = 0;
+										$sourceName = EntityManager::getSourceName($belongsTo['rt']);
 										foreach($belongsTo['rf'] as $rf){
-											$join[] = $belongsTo['rt'].'.'.$rf.' = '.$source.'.'.$belongsTo['fi'][$i];
+											$join[] = $sourceName.'.'.$rf.' = '.$source.'.'.$belongsTo['fi'][$i];
 											++$i;
 										}
 									}
@@ -189,12 +170,13 @@ class ActiveRecordJoin extends Object {
 								if(isset($relations['hasMany'][$relationEntity])){
 									$hasMany = $relations['hasMany'][$relationEntity];
 									$source = $entitiesSources[$entityName];
+									$sourceName = EntityManager::getSourceName($hasMany['rt']);
 									if(!is_array($hasMany['rf'])){
-										$join[] = $source.'.'.$hasMany['rf'].' = '.$hasMany['rt'].'.'.$hasMany['fi'];
+										$join[] = $source.'.'.$hasMany['rf'].' = '.$sourceName.'.'.$hasMany['fi'];
 									} else {
 										$i = 0;
 										foreach($hasMany['rf'] as $rf){
-											$join[] = $source.'.'.$rf.' = '.$hasMany['rt'].'.'.$hasMany['fi'][$i];
+											$join[] = $source.'.'.$rf.' = '.$sourceName.'.'.$hasMany['fi'][$i];
 											++$i;
 										}
 									}
@@ -204,7 +186,7 @@ class ActiveRecordJoin extends Object {
 					}
 				}
 			}
-			if(count($join)==0){
+			if(count($params['entities'])>1&&count($join)==0){
 				if(isset($params['noRelations'])){
 					if($params['noRelations']==false){
 						throw new ActiveRecordException('No se pudo encontrar las relaciones entre las entidades');
@@ -254,7 +236,9 @@ class ActiveRecordJoin extends Object {
 		} else {
 			$order = '1';
 		}
-		$this->_db = DbBase::rawConnect();
+		if($this->_db===null){
+			$this->_db = DbBase::rawConnect();
+		}
 		if(count($requestedFields)>0){
 			$fields = join(', ', $requestedFields);
 		} else {
@@ -268,12 +252,65 @@ class ActiveRecordJoin extends Object {
 			$this->_sqlQuery.=' HAVING '.$params['having'];
 		}
 		$this->_sqlQuery.=' ORDER BY '.$order;
+		if(isset($params['limit'])){
+			$this->_sqlQuery = $this->_db->limit($this->_sqlQuery, $params['limit']);
+		}
+	}
+
+	/**
+	 * Crea el SQL de una función agrupamiento
+	 *
+	 * @param array $requestedFields
+	 * @param string $function
+	 * @param string $alias
+	 * @param string $field
+	 */
+	private function _groupFunction(&$requestedFields, $function, $alias, $field, $entitiesSources){
+		$existsEntity = false;
+		$replacedField = $field;
+		while(preg_match('/\{\#([a-zA-Z0-9\_]+)\}/', $replacedField, $regs)){
+			if(!isset($entitiesSources[$regs[1]])){
+				throw new ActiveRecordException('La entidad '.$regs[1].' en los campos solicitados no se encontró en la lista de entidades con función de agrupamiento');
+			} else {
+				$replacedField = str_replace($regs[0], $entitiesSources[$regs[1]], $replacedField);
+				if(is_numeric($alias)){
+					if(strpos($replacedField, '.')==false){
+						$alias = $replacedField;
+					} else {
+						$alias = substr($replacedField, strpos($replacedField, '.')+1);
+					}
+				}
+			}
+			$existsEntity = true;
+		}
+		if($existsEntity==false){
+			if($alias==''||is_numeric($alias)){
+				$requestedFields[] = $function.'('.$field.')';
+			} else {
+				$requestedFields[] = $function.'('.$field.') AS '.$alias;
+			}
+		} else {
+			$requestedFields[] = $function.'('.$replacedField.') AS '.$alias;
+		}
+	}
+
+	/**
+	 * Coloca la conexión en modo debug
+	 *
+	 * @param boolean $debug
+	 */
+	public function setDebug($debug){
+		if($this->_db===null){
+			$this->_db = DbBase::rawConnect();
+		}
+		$this->_db->setDebug($debug);
 	}
 
 	/**
 	 * Devuelve los resultados del JOIN
 	 *
 	 * @access public
+	 * @return ActiveRecordResultset
 	 */
 	public function getResultSet(){
 		$resultResource = $this->_db->query($this->_sqlQuery);

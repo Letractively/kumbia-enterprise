@@ -336,7 +336,7 @@ class DbPdoSQLite extends DbPDO {
 	 * @static
 	 */
 	public static function getSQLDialect(){
-		return 'SQLiteSQLDialect';
+		return 'SQLite';
 	}
 
 }

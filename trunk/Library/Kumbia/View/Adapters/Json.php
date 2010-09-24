@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	View
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -28,7 +28,7 @@
  * @category 	Kumbia
  * @package 	View
  * @subpackage 	Adapters
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @access 		public
@@ -41,8 +41,8 @@ class JsonViewResponse implements ViewResponseInterface {
 	 * @param ControllerResponse $controllerResponse
 	 */
 	private function _prepareOutput($controllerResponse){
-		$controllerResponse->setHeader('X-Content-Type: text/json', true);
-		$controllerResponse->setHeader('Content-Type: text/json', true);
+		//$controllerResponse->setHeader('X-Content-Type: text/json', true);
+		//$controllerResponse->setHeader('Content-Type: text/json', true);
 		$controllerResponse->setHeader('Pragma: no-cache', true);
 		$controllerResponse->setHeader('Expires: 0', true);
 	}
@@ -61,20 +61,29 @@ class JsonViewResponse implements ViewResponseInterface {
 	/**
 	 * Administra las excepciones en JSON
 	 *
-	 * @param ControllerResponse $controllerResponse
-	 * @param Exception $e
+	 * @param	ControllerResponse $controllerResponse
+	 * @param	Exception $e
 	 */
 	public function renderException($controllerResponse, $e){
 		$this->_prepareOutput($controllerResponse);
 		$config = CoreConfig::readAppConfig();
 		if(isset($config->application->debug)&&$config->application->debug){
+			$traceback = array();
+			foreach($e->getTrace() as $trace){
+				if(isset($trace['file'])){
+					$traceback[] = array(
+						'file' => CoreException::getSafeFilePath($trace['file']),
+						'line' => $trace['line']
+					);
+				}
+			}
 			$exception = array(
 				'type' => get_class($e),
 				'code' => $e->getCode(),
 				'message' => $e->getMessage(),
-				'file' => $e->getFile(),
+				'file' => CoreException::getSafeFilePath($e->getFile()),
 				'line' => $e->getLine(),
-				'trace' => $e->getTrace()
+				'trace' => $traceback
 			);
 		} else {
 			$exception = array(

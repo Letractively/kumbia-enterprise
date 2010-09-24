@@ -196,6 +196,18 @@ abstract class EntityManager {
 	}
 
 	/**
+	 * Devuelve la instancia de un modelo, alias de getEntityInstance
+	 *
+	 * @param 	string $entityName
+	 * @param 	boolean $newInstance
+	 * @return 	ActiveRecordBase
+	 * @throws  EntityManagerException
+	 */
+	public static function get($entityName, $newInstance=true){
+		return self::getEntityInstance($entityName, $newInstance);
+	}
+
+	/**
 	 * Devuelve la instancia de un modelo
 	 *
 	 * @param 	string $entityName
@@ -237,6 +249,19 @@ abstract class EntityManager {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Devuelve la instancia de un modelo apartir del nombre de su entidad
+	 *
+	 * @param 	string $sourceName
+	 * @param 	boolean $newInstance
+	 * @return 	ActiveRecordBase
+	 * @throws  EntityManagerException
+	 */
+	public static function getEntityFromSource($sourceName, $newInstance=true){
+		$entityName = self::getEntityName($sourceName);
+		return self::getEntityInstance($entityName, $newInstance);
 	}
 
 	/**
@@ -362,7 +387,7 @@ abstract class EntityManager {
 						return false;
 					}
 				} else {
-					throw new EntityManagerException('La entidad "'.$entityName.'" no se inicializó con EntityManager');
+					throw new EntityManagerException('La entidad "'.$modelName.'" no se inicializó con EntityManager');
 				}
 				#endif
 			}
@@ -377,11 +402,11 @@ abstract class EntityManager {
 	 * @return 	string
 	 * @static
 	 */
-	static public function getEntityName($model){
-		if($model==''){
+	static public function getEntityName($source){
+		if($source==''){
 			return false;
 		}
-		return Utils::camelize($model);
+		return Utils::camelize($source);
 	}
 
 	/**
@@ -542,13 +567,16 @@ abstract class EntityManager {
 			$referenceTable = ucfirst(Utils::camelize($relation['rt']));
 			if(self::$_autoInitialize==true){
 				if(isset(self::$_entities[$referenceTable])){
-					$returnedRecord = call_user_func_array(array(self::$_entities[$referenceTable], $method), $arguments);
+					$entity = self::$_entities[$referenceTable];
+					$entity->setConnection($record->getConnection());
+					$returnedRecord = call_user_func_array(array($entity, $method), $arguments);
 					return $returnedRecord;
 				} else {
 					throw new EntityManagerException('No existe la entidad "'.$referenceTable.'" para realizar la relación n-1');
 				}
 			} else {
 				$entity = self::getEntityInstance($referenceTable);
+				$entity->setConnection($record->getConnection());
 				$returnedRecord = call_user_func_array(array($entity, $method), $arguments);
 				return $returnedRecord;
 			}
@@ -586,13 +614,16 @@ abstract class EntityManager {
 		$referenceTable = ucfirst(Utils::camelize($relation['rt']));
 		if(self::$_autoInitialize==true){
 			if(isset(self::$_entities[$referenceTable])){
-				return call_user_func_array(array(self::$_entities[$referenceTable], $method), array($condition));
+				$entity = self::$_entities[$referenceTable];
+				$entity->setConnection($record->getConnection());
+				return call_user_func_array(array($entity, $method), array($condition));
 			} else {
 				throw new EntityManagerException("No existe la entidad '$referenceTable' para realizar la relación 1-1");
 			}
 		} else {
 			$entity = self::getEntityInstance($referenceTable);
-			return call_user_func_array(array(self::$_entities[$referenceTable], $method), array($condition));
+			$entity->setConnection($record->getConnection());
+			return call_user_func_array(array($entity, $method), array($condition));
 		}
 	}
 
@@ -644,12 +675,15 @@ abstract class EntityManager {
 		$referenceTable = ucfirst(Utils::camelize($relation['rt']));
 		if(self::$_autoInitialize==true){
 			if(isset(self::$_entities[$referenceTable])){
-				return call_user_func_array(array(self::$_entities[$referenceTable], $method), $findParams);
+				$entity = self::$_entities[$referenceTable];
+				$entity->setConnection($record->getConnection());
+				return call_user_func_array(array($entity, $method), $findParams);
 			} else {
 				throw new EntityManagerException('No existe la entidad "'.$referenceTable.'" para realizar la relación n-1');
 			}
 		} else {
 			$referencedEntity = self::getEntityInstance($referenceTable);
+			$referencedEntity->setConnection($record->getConnection());
 			return call_user_func_array(array($referencedEntity, $method), $findParams);
 		}
 	}
@@ -876,12 +910,13 @@ abstract class EntityManager {
 	 * Indica si un modelo temporal existe
 	 *
 	 * @access 	public
-	 * @param 	string $entityName
+	 * @param 	string $sourceName
+	 * @param 	string $schemaName
 	 * @return 	boolean
 	 * @static
 	 */
-	public static function existsTemporaryEntity($entityName){
-		return in_array($entityName, self::$_temporaryEntities);
+	public static function existsTemporaryEntity($sourceName, $schemaName){
+		return in_array($sourceName, self::$_temporaryEntities);
 	}
 
 	/**
@@ -957,7 +992,11 @@ abstract class EntityManager {
 		if(isset(self::$_sources[$entityName])){
 			return self::$_sources[$entityName];
 		} else {
-			return null;
+			if(self::$_autoInitialize==true){
+				return null;
+			} else {
+				return Utils::uncamelize($entityName);
+			}
 		}
 	}
 

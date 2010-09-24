@@ -98,9 +98,20 @@ class Linguistics {
 	 * Pluralizar una palabra
 	 *
 	 * @param  $word
+	 * @return string
 	 */
 	public function pluralize($word){
 		return $this->_rules->pluralize($word);
+	}
+
+	/**
+	 * Indica si una palabra tiene genero femenino
+	 *
+	 * @param  $word
+	 * @return string
+	 */
+	public function isFemale($word){
+		return $this->_rules->isFemale($word);
 	}
 
 	/**
@@ -148,7 +159,7 @@ class Linguistics {
 	 */
 	public function getConjunction($values, $indefinite=false){
 		if(!is_array($values)){
-			$values = split(' ', $values);
+			$values = explode(' ', $values);
 		}
 		$values = array_count_values($values);
 		$phrase = array();

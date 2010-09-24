@@ -110,11 +110,13 @@ class ControllerResponse extends Object {
 	 * @param 	string $header
 	 * @param 	boolean $replace
 	 */
-	public function setHeader($header, $replace=true){
+	public function setHeader($header, $replace=false){
 		if(Core::isHurricane()==false){
-			header($header, $replace);
+			if(Core::isTestingMode()<Core::TESTING_LOCAL){
+				header($header, $replace);
+			}
 		} else {
-			$header = split(': ', $header);
+			$header = explode(': ', $header);
 			HurricaneServer::setHeader($header[0], $header[1]);
 		}
 	}

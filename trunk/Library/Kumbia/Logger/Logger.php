@@ -152,7 +152,7 @@ class Logger extends Object {
 	public function __construct($adapter='File', $name='', $options=array()){
 		$className = $adapter.'Logger';
 		if(!class_exists($className, false)){
-			require "Library/Kumbia/Logger/Adapters/$adapter.php";
+			require 'Library/Kumbia/Logger/Adapters/'.$adapter.'.php';
 		}
 		if(!class_exists($className, false)){
 			throw new LoggerException("No se encontró el adaptador '$className'");
@@ -218,46 +218,46 @@ class Logger extends Object {
 		switch($type){
 			case 'debug':
 				$args[1] = Logger::DEBUG;
-				call_user_func_array(array($this, "log"), $args);
+				call_user_func_array(array($this, 'log'), $args);
 				break;
 			case 'error':
 				$args[1] = Logger::ERROR;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			case 'warning':
 				$args[1] = Logger::WARNING;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			case 'alert':
 				$args[1] = Logger::ALERT;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			case 'notice':
 				$args[1] = Logger::NOTICE;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			case 'emergence':
 				$args[1] = Logger::EMERGENCE;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			case 'custom':
 				$args[1] = Logger::CUSTOM;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			case 'special':
 				$args[1] = Logger::SPECIAL;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			case 'info':
 				$args[1] = Logger::INFO;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			case 'critical':
 				$args[1] = Logger::CRITICAL;
-				call_user_func_array(array($this->_objectLogger, "log"), $args);
+				call_user_func_array(array($this->_objectLogger, 'log'), $args);
 				break;
 			default:
-				throw new LoggerException("Tipo indefinido de excepción [".$args[0]."]", 0);
+				throw new LoggerException('Tipo indefinido de excepción ['.$args[0].']', 0);
 		}
 	}
 

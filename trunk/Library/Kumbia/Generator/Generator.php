@@ -110,10 +110,11 @@ abstract class Generator {
 		}*/
 
 		$controller_name = Router::getController();
-		$form['force'] = eval("return {$controller_name}Controller::\$force;");
+		//$form['force'] = eval("return {$controller_name}Controller::\$force;");
+		$form['force'] = true;
 		$instanceName = Core::getInstanceName();
 		$activeApp = Router::getApplication();
-		if(!isset($_SESSION['KSF'][$instanceName])){
+		/*if(!isset($_SESSION['KSF'][$instanceName])){
 			$_SESSION['KSF'][$instanceName] = array();
 		}
 		if(!isset($_SESSION['KSF'][$instanceName][$activeApp])){
@@ -131,7 +132,7 @@ abstract class Generator {
 			}
 			$form = $data;
 			return true;
-		}
+		}*/
 		$config = CoreConfig::readAppConfig();
 		$db = DbBase::rawConnect();
 		if($form['source']==''){
@@ -189,9 +190,9 @@ abstract class Generator {
 					$form['components'][$field['Field']]['valueType'] = "email";
 				}
 			}
-			$detail = "";
-			if(preg_match("/[a-z_0-9A-Z]+_id$/", $field['Field'])){
-				$table = substr($field['Field'], 0, strpos($field['Field'], "_id"));
+			$detail = '';
+			if(preg_match('/[a-z_0-9A-Z]+_id$/', $field['Field'])){
+				$table = substr($field['Field'], 0, strpos($field['Field'], '_id'));
 				$dq = $db->describeTable($table);
 				if($dq){
 					$y = 0;
@@ -252,11 +253,11 @@ abstract class Generator {
 				}
 			}
 		}
-		$_SESSION['KSF'][$instanceName][$activeApp][$form['source'].$form['type']] = array(
+		/*$_SESSION['KSF'][$instanceName][$activeApp][$form['source'].$form['type']] = array(
 			'time' => Core::getProximityTime(),
 			'data' => serialize($form),
 			'status' => 'N'
-		);
+		);*/
 		return true;
 	}
 
@@ -367,7 +368,7 @@ abstract class Generator {
 	 */
 	static function buildForm($form, $scaffold=false){
 
-		if(!class_exists('Component')){
+		if(!class_exists('Component', false)){
 			require "Library/Kumbia/Generator/Components.php";
 		}
 
@@ -438,8 +439,8 @@ abstract class Generator {
 
 		//Standard Forms
 		if($form['type']=='standard'){
-			if(!class_exists('StandardGenerator')){
-				require "Library/Kumbia/Generator/StandardBuild.php";
+			if(!class_exists('StandardGenerator', false)){
+				require 'Library/Kumbia/Generator/StandardBuild.php';
 			}
 			StandardGenerator::buildFormStandard($form);
 		}

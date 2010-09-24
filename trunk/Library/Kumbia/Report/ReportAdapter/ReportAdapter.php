@@ -15,7 +15,7 @@
  * @category 	Kumbia
  * @package 	Report
  * @subpackage 	ReportAdapter
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -28,7 +28,7 @@
  * @category 	Kumbia
  * @package 	Report
  * @subpackage 	ReportAdapter
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -46,7 +46,7 @@ class ReportAdapter extends Object {
 	 *
 	 * @var string
 	 */
-	private $_encoding = "UTF-8";
+	private $_encoding = 'UTF-8';
 
 	/**
 	 * Numero de pagina actual
@@ -105,11 +105,25 @@ class ReportAdapter extends Object {
 	private $_columnStyles = array();
 
 	/**
+	 * Formatos de las columnas del reporte
+	 *
+	 * @var array
+	 */
+	private $_columnFormats = array();
+
+	/**
 	 * Columnas que deben ser totalizadas
 	 *
 	 * @var array
 	 */
 	protected $_totalizeColumns = array();
+
+	/**
+	 * Valores base para totales del reporte
+	 *
+	 * @var array
+	 */
+	protected $_totalizeValues = array();
 
 	/**
 	 * Datos del Reporte
@@ -119,18 +133,25 @@ class ReportAdapter extends Object {
 	private $_data = array();
 
 	/**
-	 * Activa/Desactiva la paginacion automatica
+	 * Activa/Desactiva la paginación automática
 	 *
 	 * @var boolean
 	 */
 	private $_pagination = true;
 
 	/**
-	 * Modo de visualizacion del reporte
+	 * Modo de visualización del reporte
 	 *
 	 * @var string
 	 */
 	private $_displayMode = 'normal';
+
+	/**
+	 * Indica si el reporte debe volcarse al disco a medida que se agregan los datos
+	 *
+	 * @var boolean
+	 */
+	protected $_implicitFlush = false;
 
 	/**
 	 * Establece el titulo del Reporte
@@ -261,13 +282,44 @@ class ReportAdapter extends Object {
 	}
 
 	/**
+	 * Permite establecer si los registros deben volcarse al disco a medida
+	 * que se genera el reporte
+	 *
+	 */
+	public function setImplicitFlush($implicitFlush){
+		$this->_implicitFlush = $implicitFlush;
+	}
+
+	/**
 	 * Establece el estilo de una columna
 	 *
 	 * @param integer $numberColumn
 	 * @param ReportStyle $style
 	 */
 	public function setColumnStyle($numberColumn, ReportStyle $style){
-		$this->_columnStyles[(int)$numberColumn] = $style;
+		if(is_array($numberColumn)){
+			foreach($numberColumn as $number){
+				$this->_columnStyles[(int)$number] = $style;
+			}
+		} else {
+			$this->_columnStyles[(int)$numberColumn] = $style;
+		}
+	}
+
+	/**
+	 * Establece el tipo de formato de una columna
+	 *
+	 * @param integer $numberColumn
+	 * @param ReportFormat $format
+	 */
+	public function setColumnFormat($numberColumn, ReportFormat $format){
+		if(is_array($numberColumn)){
+			foreach($numberColumn as $number){
+				$this->_columnFormats[(int)$number] = $format;
+			}
+		} else {
+			$this->_columnFormats[(int)$numberColumn] = $format;
+		}
 	}
 
 	/**
@@ -277,6 +329,15 @@ class ReportAdapter extends Object {
 	 */
 	public function getColumnStyles(){
 		return $this->_columnStyles;
+	}
+
+	/**
+	 * Devuelve los formatos de las columnas
+	 *
+	 * @return array
+	 */
+	public function getColumnFormats(){
+		return $this->_columnFormats;
 	}
 
 	/**
@@ -325,12 +386,48 @@ class ReportAdapter extends Object {
 	}
 
 	/**
+	 * Inicia el reporte, debe llamarse justo antes de empezar a agregar filas ó totales
+	 *
+	 * @param boolean $implicitFlush
+	 */
+	public function start($implicitFlush=false){
+		$this->_start($implicitFlush);
+	}
+
+	/**
+	 * Finaliza el reporte, debe llamarse justo antes de enviar el reporte a pantalla
+	 *
+	 */
+	public function finish(){
+		$this->_finish();
+	}
+
+	/**
 	 * Agrega una fila al reporte
 	 *
 	 * @param array $row
 	 */
-	public function addRow($row){
-		$this->_data[] = $row;
+	public function addRow(array $row){
+		$row['_type'] = 'normal';
+		if($this->_implicitFlush==false){
+			$this->_data[] = $row;
+		} else {
+			$this->_addRow($row);
+		}
+	}
+
+	/**
+	 * Agrega un fila con estilo y formato arbitrario
+	 *
+	 * @param array $raw
+	 */
+	public function addRawRow(array $row){
+		$row['_type'] = 'raw';
+		if($this->_implicitFlush==false){
+			$this->_data[] = $row;
+		} else {
+			$this->_addRow($row);
+		}
 	}
 
 	/**
@@ -348,9 +445,8 @@ class ReportAdapter extends Object {
 	 * @param int $column
 	 */
 	public function addTotalizeColumn($column){
-		if(!in_array($column, $this->_totalizeColumns)){
-			$this->_totalizeColumns[] = $column;
-		}
+		$this->_totalizeColumns[$column] = true;
+		$this->_totalizeValues[$column] = 0;
 	}
 
 	/**
@@ -358,17 +454,40 @@ class ReportAdapter extends Object {
 	 *
 	 * @param array $columns
 	 */
-	public function setTotalizeColumns($columns){
-		$this->_totalizeColumns = $columns;
+	public function setTotalizeColumns(array $columns){
+		foreach($columns as $column){
+			$this->_totalizeColumns[$column] = true;
+			$this->_totalizeValues[$column] = 0;
+		}
 	}
 
 	/**
-	 * Remplaza constantes en el texto
+	 * Establece los valores de totales para las columnas dadas
+	 *
+	 * @param array $totals
+	 */
+	public function setTotalizeValues($totals){
+		foreach($totals as $column => $total){
+			$this->_totalizeValues[$column] = $total;
+		}
+	}
+
+	/**
+	 * Devuelve los totales base para columnas totalizadas
+	 *
+	 * @param array
+	 */
+	public function getTotalizeValues(){
+		return $this->_totalizeValues;
+	}
+
+	/**
+	 * Reemplaza constantes en el texto
 	 *
 	 * @param string $text
 	 */
 	protected function _prepareText($text){
-		$text = str_replace("%pageNumber%", $this->_getPageNumber(), $text);
+		$text = str_replace('%pageNumber%', $this->_getPageNumber(), $text);
 		return $text;
 	}
 
@@ -448,7 +567,13 @@ class ReportAdapter extends Object {
 	 * @param string $fileName
 	 */
 	public function outputToFile($fileName){
-		file_put_contents($fileName.'.'.$this->getFileExtension(), $this->getOutput());
+		if($this->_implicitFlush==false){
+			$fileName = $fileName.'.'.$this->getFileExtension();
+			file_put_contents($fileName, $this->getOutput());
+			return $fileName;
+		} else {
+			return $this->_moveOutputTo($fileName.'.'.$this->getFileExtension());
+		}
 	}
 
 }

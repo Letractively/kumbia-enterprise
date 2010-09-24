@@ -1,6 +1,25 @@
 <?php
 
 /**
+ * Kumbia Enterprise Framework
+ *
+ * LICENSE
+ *
+ * This source file is subject to the New BSD License that is bundled
+ * with this package in the file docs/LICENSE.txt.
+ *
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@loudertechnology.com so we can send you a copy immediately.
+ *
+ * @category	Kumbia
+ * @package		HurricaneServer
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
+ * @license		New BSD License
+ * @version 	$Id$
+ */
+
+/**
  * Excepción generada por HurricaneServer
  *
  */
@@ -20,14 +39,14 @@ class HurricaneServer {
 	/**
 	 * Dirección donde va a escuchar el servidor
 	 *
-	 * @var unknown_type
+	 * @var string
 	 */
 	private static $_address = '0.0.0.0';
 
 	/**
 	 * Puerto TCP donde va a escuchar el servidor
 	 *
-	 * @var unknown_type
+	 * @var string
 	 */
 	private static $_port = 8080;
 
@@ -164,7 +183,7 @@ class HurricaneServer {
 		require 'Library/Kumbia/Plugin/Plugin.php';
 		require 'Library/Kumbia/Registry/Memory/MemoryRegistry.php';
 		require 'Library/Kumbia/Extensions/Extensions.php';
-		require 'Library/Kumbia/CommonEvent/CommonEventManager.php';
+		require 'Library/Kumbia/CommonEvent/CommonEvent.php';
 		require 'Library/Kumbia/Dispatcher/Dispatcher.php';
 		require 'Library/Kumbia/EntityManager/EntityManager.php';
 		require 'Library/Kumbia/Transactions/TransactionManager.php';
@@ -247,19 +266,14 @@ class HurricaneServer {
 	 *
 	 */
 	public static function serverAccept(){
-
 		$initialTime = time();
-
 		do {
-
 			$clientSocket = socket_accept(self::$_socket);
 			if($clientSocket===false){
 				throw new HurricaneServerException("socket_accept() failed: reason: ".socket_strerror(socket_last_error($sock)));
 				break;
 			}
-
 			$time = microtime(true);
-
 			$i = 0;
 			$line = '';
 			$rawResponse = '';
@@ -475,7 +489,6 @@ class HurricaneServer {
 				unset($requestTime);
 			}
 
-
 		} while(true);
 
 		socket_close($clientSocket);
@@ -529,9 +542,7 @@ class HurricaneServer {
 		self::$_responseHeaders['Cache-Control'] = 'no-cache';
 		ob_start();
 		try {
-
 			Core::resetRequest();
-
 			Router::handleRouterParameters();
 			$activeApplication = Router::getApplication();
 			if(self::$_lastApplication!=$activeApplication){
@@ -545,7 +556,7 @@ class HurricaneServer {
 				Core::setInitialPath(getcwd());
 				Core::setInstanceName('');
 				TransactionManager::initializeManager();
-				Session::disableAutoStart();
+				Session::disableAutoStart(true);
 				self::$_frameworkInitialized = true;
 			}
 			if(self::$_lastApplication!=$activeApplication){
@@ -568,9 +579,7 @@ class HurricaneServer {
 			}
 
 			ob_start();
-
 			$controller = Core::handleRequest();
-
 			$controllerResponse = ControllerResponse::getInstance();
 			if($controllerResponse->getResponseType()==ControllerResponse::RESPONSE_NORMAL){
 				ob_end_clean();

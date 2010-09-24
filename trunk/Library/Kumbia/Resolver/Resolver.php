@@ -14,7 +14,7 @@
  *
  * @category 	Kumbia
  * @package 	Router
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
  * @version 	$Id$
  */
@@ -27,7 +27,7 @@
  *
  * @category 	Kumbia
  * @package 	Resolver
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license  	New BSD License
  * @abstract
  */
@@ -68,7 +68,7 @@ abstract class Resolver {
 			if(strpos($serviceName, '.')===false){
 				$serviceNDI['uri'] = $serviceName;
 			} else {
-				$serviceItems = split('\.', $serviceName);
+				$serviceItems = explode('.', $serviceName);
 				$serviceNDI['app'] = $serviceItems[0];
 				$serviceNDI['uri'] = $serviceItems[1];
 			}
@@ -90,11 +90,12 @@ abstract class Resolver {
 				$serviceApp = Router::getApplication();
 				$serviceURI = str_replace('.', '/', $serviceName);
 			}
-			$serviceURL = 'http://'.$_SERVER['HTTP_HOST'].$instancePath.$serviceApp.'/'.$serviceURI;
+			$serviceURL = 'http://localhost'.$instancePath.$serviceApp.'/'.$serviceURI;
 			self::$_resolvedServices[$serviceName] = new WebServiceClient(array(
 				'actor' => 'http://app-services/'.$serviceName,
 				'location' => $serviceURL,
-				'compression' => 0
+				'compression' => 0,
+				'communicator' => 'Pecl_HTTP'
 			));
 		}
 		return self::$_resolvedServices[$serviceName];
