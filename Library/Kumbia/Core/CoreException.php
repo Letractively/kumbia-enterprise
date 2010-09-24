@@ -313,7 +313,7 @@ class CoreException extends Exception {
 				//Imprime el backtrace
 				foreach($traceback as $trace){
 					if(isset($trace['file'])){
-						$rfile = self::getSafeFileName($trace['file']);
+						$rfile = self::getSafeFilePath($trace['file']);
 						if(strpos($trace['file'], "apps")){
 							echo $rfile." <span class='exceptionLine'>(".$trace['line'].")</span>\n";
 							$file = $trace['file'];
@@ -468,13 +468,13 @@ class CoreException extends Exception {
 				if(isset($_SESSION['session_data'])){
 					if(is_array($_SESSION['session_data'])){
 						echo "<tr class='rowInfoOdd'>
-							<td align='right'><strong>Datos en Session</strong></td
-							><td>".join(", ", $_SESSION['session_data'])."</td>
+							<td align='right'><strong>Datos en Session</strong></td>
+							<td>", print_r($_SESSION['session_data'], true), "</td>
 						</tr>";
 					} else {
 						echo "<tr class='rowInfoOdd'>
 							<td align='right'><strong>Datos en Session</strong></td>
-							<td>".print_r(unserialize($_SESSION['session_data']), 1)."</td>
+							<td>", print_r(unserialize($_SESSION['session_data']), 1), "</td>
 						</tr>";
 					}
 				}
@@ -513,7 +513,7 @@ class CoreException extends Exception {
 					if(!isset($trace['function'])){
 						$trace['function'] = "";
 					}
-					echo '#'.$i.' '.$file.' -&gt; '.$trace['class'].$trace['type'].$trace['function'].' ('.$trace['line'].')\n';
+					echo '#'.$i.' '.$file.' -&gt; '.$trace['class'].$trace['type'].$trace['function'].' ('.$trace['line'].')'."\n";
 					++$i;
 				}
 				echo '</pre>';
@@ -548,7 +548,7 @@ class CoreException extends Exception {
 		Tag::setDocumentTitle(get_class($e).' - Kumbia Enterprise Framework');
 
 		ob_start();
-		$file = CoreException::getSafeFileName($e->getFile());
+		$file = CoreException::getSafeFilePath($e->getFile());
 		echo "\n<div class='exceptionContainer'>\n";
 		$message = "<div class='exceptionDescription'>".
 		get_class($e).": ".$e->getMessage()." (".$e->getCode().")<br>
@@ -559,7 +559,7 @@ class CoreException extends Exception {
 		echo '<b>Backtrace:</b><br/>'."\n";
 		foreach($e->getTrace() as $debug){
 			if(isset($debug['file'])){
-				echo CoreException::getSafeFileName($debug['file']).' ('.$debug['line'].") <br/>\n";
+				echo CoreException::getSafeFilePath($debug['file']).' ('.$debug['line'].") <br/>\n";
 			}
 		}
 		echo "</div>";
@@ -727,7 +727,7 @@ class CoreException extends Exception {
 	 * @return string
 	 */
 	public function getSafeFile(){
-		return self::getSafeFileName($this->getFile());
+		return self::getSafeFilePath($this->getFile());
 	}
 
 	/**
@@ -738,7 +738,7 @@ class CoreException extends Exception {
 	 * @param string $filePath
 	 * @return string
 	 */
-	public static function getSafeFileName($filePath){
+	public static function getSafeFilePath($filePath){
 		if(isset($_SERVER['DOCUMENT_ROOT'])){
 			return str_replace($_SERVER['DOCUMENT_ROOT'], '', $filePath);
 		} else {

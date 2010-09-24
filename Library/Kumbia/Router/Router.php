@@ -28,7 +28,7 @@
  *
  * @category 	Kumbia
  * @package 	Router
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
  * @license  	New BSD License
@@ -179,46 +179,37 @@ abstract class Router {
 	/**
 	 * Toma $url y la descompone en controlador, accion y argumentos
 	 *
-	 * @access public
+	 * @access	public
 	 * @static
-	 * @param string $url
+	 * @param	string $url
 	 */
 	static public function rewrite($url){
 
 		self::$_url = $url;
 		$urlItems = explode('/', $url);
 
-		/**
-		 * El router puede detectar si el controlador corresponde a una aplicacion
-		 * o a un controlador
-		 */
+
+		// El router puede detectar si el controlador corresponde a una aplicación
+		// o a un controlador
 		if($urlItems[0]!=""&&Core::applicationExists($urlItems[0])==true){
 
 			$config = CoreConfig::readAppConfig($urlItems[0]);
 			if(isset($config->application)){
 
-				/**
-				 * Nombre de la aplicacion actual
-				 */
+				//Nombre de la aplicacion actual
 				self::$_application = $urlItems[0];
 
-				/**
-				 * Hay algun controlador?
-				 */
+				//Hay algún controlador?
 				if(isset($urlItems[1])&&$urlItems[1]){
 					self::$_controller = $urlItems[1];
 				}
 
-				/**
-				 * Hay alguna acción
-				 */
+				//Hay alguna acción
 				if(isset($urlItems[2])&&$urlItems[2]){
 					self::$_action = $urlItems[2];
 				}
 
-				/**
-		 		 * Hay algun id
-		 		 */
+		 		//Hay algún id
 				if(isset($urlItems[3])&&$urlItems[3]){
 					self::$_id = $urlItems[3];
 				}
@@ -233,36 +224,31 @@ abstract class Router {
 
 			#if[compile-time]
 			if(!isset($appServerConfig->core)){
-				throw new RouterException("No existe la sección [core] en el archivo de configuración de la instancia");
+				throw new RouterException('No existe la sección [core] en el archivo de configuración de la instancia');
 			}
 			if(!isset($appServerConfig->core->defaultApp)){
-				throw new RouterException("No se ha indicado la aplicación por defecto en config/config.ini (defaultApp)");
-			}
-			#endif
-			$config = CoreConfig::readAppConfig($activeApp);
-			#if[compile-time]
-			if(!isset($config->application)){
-				throw new RouterException("No existe la sección [application] en el config.ini de la aplicación");
+				throw new RouterException('No se ha indicado la aplicación por defecto en config/config.ini (defaultApp)');
 			}
 			#endif
 
-			/**
-			 * Hay alguna controlador
-			 */
+			$config = CoreConfig::readAppConfig($activeApp);
+			#if[compile-time]
+			if(!isset($config->application)){
+				throw new RouterException('No existe la sección [application] en el config.ini de la aplicación');
+			}
+			#endif
+
+			//Hay alguna controlador
 			if(isset($urlItems[0])&&$urlItems[0]){
 				self::$_controller = $urlItems[0];
 			}
 
-			/**
-			 * Hay alguna accion
-			 */
+			//Hay alguna acción
 			if(isset($urlItems[1])&&$urlItems[1]){
 				self::$_action = $urlItems[1];
 			}
 
-			/**
-		 	 * Hay algun id
-		 	 */
+			//Hay algún id
 			if(isset($urlItems[2])&&$urlItems[2]){
 				self::$_id = $urlItems[2];
 			}
@@ -276,22 +262,18 @@ abstract class Router {
 		}
 
 		if(self::$_controller!=null){
-			self::$_controller = str_replace(array('/', '\\', '..'), '', self::$_controller);
+			self::$_controller = str_replace(array('/', '\\', '.'), '', self::$_controller);
 			if(Core::isDir('apps/'.$controllersDir.'/'.self::$_controller)){
 				if(self::$_application=='default'){
 
 					self::$_module = $urlItems[0];
 
-					/**
-			 	 	 * Hay alguna accion
-			 	 	 */
+			 	 	// Hay algún controlador?
 					if(isset($urlItems[1])&&$urlItems[1]){
 						self::$_controller = $urlItems[1];
 					}
 
-					/**
-			 	 	 * Hay alguna accion
-			 		 */
+			 	 	// Hay alguna acción?
 					if(isset($urlItems[2])&&$urlItems[2]){
 						self::$_action = $urlItems[2];
 					} else {
@@ -317,7 +299,7 @@ abstract class Router {
 					}
 
 					/**
-			 	 	 * Hay algun controlador
+			 	 	 * Hay algún controlador
 			 	 	 */
 					if(isset($urlItems[2])&&$urlItems[2]){
 						self::$_controller = $urlItems[2];
@@ -386,10 +368,10 @@ abstract class Router {
 							} else {
 								list($controllerSource,
 								$actionSource,
-								$id_source) = explode("/", $source);
+								$id_source) = explode('/', $source);
 								list($controller_destination,
 								$action_destination,
-								$id_destination) = explode("/", $destination);
+								$id_destination) = explode('/', $destination);
 								if(($controllerSource==$controller_destination)&&
 								($actionSource==$action_destination)&&
 								($id_source==$id_destination)){
@@ -679,10 +661,19 @@ abstract class Router {
 			self::$_parameters[0] = $route['id'];
 			self::$_routed = true;
 		}
+		if(isset($route['0'])){
+			$numberParam = 0;
+			while(isset($route[$numberParam])){
+				self::$_allParameters[$numberParam+2] = $route[$numberParam];
+				self::$_parameters[$numberParam] = $route[$numberParam];
+				$numberParam++;
+			}
+			self::$_routed = true;
+		}
 		if($cyclicRouting){
 			self::$_routedCyclic++;
 			if(self::$_routedCyclic>=1000){
-				throw new RouterException("Se ha detectado un enrutamiento ciclico. Esto puede causar problemas de estabilidad", 1000);
+				throw new RouterException('Se ha detectado un enrutamiento ciclico. Esto puede causar problemas de estabilidad', 1000);
 			}
 		} else {
 			self::$_routedCyclic = 0;
@@ -784,7 +775,7 @@ abstract class Router {
 	}
 
 	/**
-	 * Detecta como se deben tratar los parametros del enrutador
+	 * Detecta como se deben tratar los parámetros del enrutador
 	 *
 	 * @access public
 	 * @static
@@ -804,7 +795,7 @@ abstract class Router {
 		/**
 		 * @see RouterInterface
 		 */
-		if(!interface_exists('RouterInterface')){
+		if(!interface_exists('RouterInterface', false)){
 			require 'Library/Kumbia/Router/Interface.php';
 		}
 		$className = self::$_routingAdapterType.'Router';
@@ -822,9 +813,21 @@ abstract class Router {
 	 * @return int
 	 */
 	static private function _detectRoutingType(){
-		if(isset($_SERVER['HTTP_SOAPACTION'])){
-			self::$_routingAdapterType = 'Soap';
+		if(isset($_SERVER['HTTP_JSONACTION'])){
+			self::$_routingAdapterType = 'Json';
 			return self::ROUTING_OTHER;
+		} else {
+			if(isset($_SERVER['HTTP_SOAPACTION'])){
+				self::$_routingAdapterType = 'Soap';
+				return self::ROUTING_OTHER;
+			} else {
+				if(isset($_SERVER['CONTENT_TYPE'])){
+		        	if(strpos($_SERVER['CONTENT_TYPE'], 'application/soap+xml')!==false){
+		        		self::$_routingAdapterType = 'Soap';
+						return self::ROUTING_OTHER;
+		        	}
+				}
+			}
 		}
 		return self::ROUTING_DEFAULT;
 	}

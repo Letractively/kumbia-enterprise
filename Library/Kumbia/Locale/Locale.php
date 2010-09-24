@@ -156,7 +156,7 @@ class Locale extends Object {
 		'Burundi' => array('Kir', ''),
 		'Cambodia' => array('Khm', ''),
 		'Cameroon' => array('Fre', 'fr_CA'),
-		'Canada' => array('Eng', 'fr_CA'),
+		'Canada' => array('Fre', 'fr_CA'),
 		'Cape Verde' => array('Por', 'pt'),
 		'Central African Republic' => array('Fre', 'fr'),
 		'Chad' => array('Fre', 'fr_CH'),
@@ -944,6 +944,64 @@ class Locale extends Object {
 	}
 
 	/**
+	 * Realiza una disyunción de valores
+	 *
+	 * @param mixed $values
+	 */
+	public function getDisjunction($values){
+		$length = count($values);
+		if($length>1){
+			$data = $this->_getLocaleData();
+			$path = '/ldml/linguistics/disjunction';
+			$conjunction = $data->queryLanguage($this->getLanguage(), $path);
+			if($conjunction->length>0){
+				$or = $conjunction->item(0)->nodeValue;
+			} else {
+				$or = 'o';
+			}
+			return join(', ', array_slice($values, 0, $length-1)).' '.$or.' '.$values[$length-1];
+		} else {
+			return join('', $values);
+		}
+	}
+
+	/**
+	 * Si la localización no tiene un país definido le asigna uno
+	 * teniendo en cuenta la importancia política y demográfica
+	 *
+	 */
+	public function forceCountry(){
+		if($this->hasCountry()==false){
+			switch($this->getLanguage()){
+				case 'es':
+					$this->setCountry('ES');
+					break;
+				case 'en':
+					$this->setCountry('US');
+					break;
+				case 'fr':
+					$this->setCountry('FR');
+					break;
+				case 'de':
+					$this->setCountry('DE');
+					break;
+				case 'pt':
+					$this->setCountry('PT');
+					break;
+				case 'zh':
+					$this->setCountry('CN');
+					break;
+				case 'jp':
+					$this->setCountry('JP');
+					break;
+				case 'it':
+					$this->setCountry('IT');
+					break;
+			}
+		}
+	}
+
+	/**
 	 * Indica si la localización es la misma que la predeterminada
 	 *
 	 * @return boolean
@@ -1056,9 +1114,16 @@ class Locale extends Object {
 			foreach($locales as $locale){
 				$elocale = explode(';', $locale);
 				$localeParts = explode('-', $elocale[0]);
+				if(isset($localeParts[1])){
+					$country = strtoupper($localeParts[1]);
+					$localeString = $localeParts[0].'_'.$country;
+				} else {
+					$country = '';
+					$localeString = $localeParts[0];
+				}
 				$elocales[] = array(
-					'locale' => str_replace('-', '_', $elocale[0]),
-					'country' => isset($localeParts[1]) ? strtoupper($localeParts[1]) : '',
+					'locale' => $localeString,
+					'country' => $country,
 					'language' => $localeParts[0],
 					'quality' => isset($elocale[1]) ? substr($elocale[1], 2) : 1.0
 				);
@@ -1095,11 +1160,7 @@ class Locale extends Object {
 		$locales = self::getBrowserAll();
 		foreach($locales as $locale){
 			if($locale['quality']==1.0){
-				if($locale['country']!=''){
-					self::$_browser = new self($locale['language'].'_'.$locale['country']);
-				} else {
-					self::$_browser = new self($locale['language']);
-				}
+				self::$_browser = new self($locale['locale']);
 				return self::$_browser;
 			}
 		}

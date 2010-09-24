@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Date
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2008-2009 Oscar Garavito (game013@gmail.com)
  * @copyright	Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
@@ -35,7 +35,7 @@
  *
  * @category	Kumbia
  * @package		Date
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2008-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (c) 2008-2009 Oscar Garavito (game013@gmail.com)
  * @copyright	Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
@@ -181,7 +181,11 @@ class Date extends Object {
 		if($this->_day>31||$this->_month>12){
 			throw new DateException("La fecha '$date' es inválida");
 		}
-		$monthDays = self::$_monthTable[$this->_month-1];
+		if(isset(self::$_monthTable[$this->_month-1])){
+			$monthDays = self::$_monthTable[$this->_month-1];
+		} else {
+			throw new DateException("La fecha '$date' es inválida");
+		}
 		if($this->isLeapYear()==true&&$this->_month==2){
 			++$monthDays;
 		}
@@ -617,8 +621,12 @@ class Date extends Object {
 	 *
 	 * @return string
 	 */
-	public function getISO8601Date(){
-		return date('c', $this->_timestamp);
+	public function getISO8601Date($withUTC=true){
+		if($withUTC==true){
+			return date('c', $this->_timestamp);
+		} else {
+			return date("Y-m-d\TH:i:s", $this->_timestamp);
+		}
 	}
 
 	/**
@@ -640,10 +648,14 @@ class Date extends Object {
 	public function addMonths($month){
 		$month = abs($month);
 		if($this->_month+$month>12){
-			$this->_month = ($month%12)+1;
-			$this->_year+=((int)($month/12));
+			$year = ceil(($month+$this->_month)/12) - 1;
+			$this->_month = ($year * 12) - $this->_month + $month;
+			$this->_year+= $year;
 		} else {
 			$this->_month+=$month;
+		}
+		if($this->_day>30||($this->_day>28&&$this->_month==2)){
+			$this->_day = substr(self::getLastDayOfMonth($this->_month, $this->_year),-2);
 		}
 		$this->_consolideDate();
 		return $this->_date;
@@ -658,10 +670,14 @@ class Date extends Object {
 	public function diffMonths($month){
 		$month = abs($month);
 		if($this->_month-$month<1){
-			$this->_month = 13-($month%12);
-			$this->_year-=((int)($month/12));
+			$year = floor(($month-$this->_month)/12) + 1;
+			$this->_month = $this->_month + ($year * 12) - $month;
+			$this->_year-= $year;
 		} else {
 			$this->_month-=$month;
+		}
+		if($this->_day>30||($this->_day>28&&$this->_month==2)){
+			$this->_day = substr(self::getLastDayOfMonth($this->_month, $this->_year),-2);
 		}
 		$this->_consolideDate();
 		return $this->_date;
@@ -737,9 +753,23 @@ class Date extends Object {
 	}
 
 	/**
+	 * Asigna el día de la fecha como el último del mes
+	 *
+	 * @access	public
+	 */
+	public function toLastDayOfMonth(){
+		$this->_day = self::$_monthTable[$this->_month-1];
+		if(self::isYearLeapYear($this->_year)&&$this->_month==2){
+			++$this->_day;
+		}
+		$this->_consolideDate();
+	}
+
+	/**
 	 * Devuelve true si la fecha interna es la de hoy
 	 *
-	 * @return boolean
+	 * @access	public
+	 * @return	boolean
 	 */
 	public function isToday(){
 		if($this->_date==date('Y-m-d')){
@@ -800,7 +830,7 @@ class Date extends Object {
 	public function isTomorrow(){
 		if(!isset($this->_tomorrow)){
 			$time = self::mktime(date('m'), date('d'), date('Y'));
-			$this->_tomorrow = self::_add($time+86400);
+			$this->_tomorrow = self::_add($time, 86400);
 		}
 		if($this->_timestamp==$this->_tomorrow){
 			return true;
@@ -897,6 +927,63 @@ class Date extends Object {
 		return array($initialDate, $finalDate);
 	}
 
+	/**
+	 * Obtiene un vector con un rango de fechas
+	 *
+	 * @param string $initialDate
+	 * @param string $finalDate
+	 */
+	static public function getRange($initialDate, $finalDate){
+		if(!is_object($initialDate)){
+			$initialDate = new Date($initialDate);
+		}
+		if(is_object($finalDate)){
+			$finalDate = (string) $finalDate;
+		}
+		$initialTime = $initialDate->getTimestamp();
+		$date = (string) $initialDate;
+		$range = array($date);
+		while($date!=$finalDate){
+			$initialTime+=86400;
+			$date = date('Y-m-d', $initialTime);
+			$range[] = $date;
+		}
+		return $range;
+	}
+
+	/**
+	 * Obtiene un vector con un rango de fechas
+	 *
+	 * @param string $initialDate
+	 * @param int $number
+	 * @param int $type
+	 * @param int $limit
+	 */
+	static public function getRangeInterval($initialDate, $number, $type, $limit){
+		if(!is_object($initialDate)){
+			$initialDate = new Date($initialDate);
+		}
+		$initialTime = $initialDate->getTimestamp();
+		$date = (string) $initialDate;
+		$range = array($date);
+		for($i=0;$i<$limit;$i++){
+			$range[] = Date::addInterval($initialDate, $i+1, $type);
+		}
+		return $range;
+	}
+
+	/**
+	 * Crear una fecha apartir del año, mes y día
+	 *
+	 * @param	int $year
+	 * @param	int $month
+	 * @param	int $day
+	 * @return	Date
+	 */
+    static public function fromParts($year, $month, $day){
+    	return new Date(sprintf('%4s', $year).'-'.sprintf('%2s', $month).'-'.sprintf('%2s', $day));
+    }
+
     /**
      * Crea una fecha apartir de un determinado formato
      *
@@ -905,21 +992,21 @@ class Date extends Object {
      * @return	Date
      */
     static public function fromFormat($date, $format='YYYY-MM-DD'){
-		$pattern = str_replace('/','\\/',$format);
-		$pattern = '/^'.str_replace('Y','\\d',$pattern);
-		$pattern = str_replace('M','\\d',$pattern);
-		$pattern = str_replace('D','\\d',$pattern).'$/';
-		if(!preg_match($pattern,$date)){
+		$pattern = str_replace('/', '\\/', $format);
+		$pattern = '/^'.str_replace('Y','\\d', $pattern);
+		$pattern = str_replace('M', '\\d', $pattern);
+		$pattern = str_replace('D', '\\d', $pattern).'$/';
+		if(!preg_match($pattern, $date)){
 		    return null;
 		}
 		$count = substr_count($format, 'Y');
 		$tmp = str_repeat('\\d', $count);
 		$patternYear = preg_replace('/[^Y]/','.', $format);
-		$patternYear = '/^'.preg_replace('/Y{'.$count.'}/', '('.$tmp.')', $pattern_year).'$/';
+		$patternYear = '/^'.preg_replace('/Y{'.$count.'}/', '('.$tmp.')', $patternYear).'$/';
 		preg_match($patternYear, $date, $matches);
 		$year = $matches[1];
-        if(strlen($year) == 2){
-            $year = (int)$year;
+        if(strlen($year)==2){
+            $year = (int) $year;
             $siglo = floor((float)date('Y') / 100);
             if($year < 50){
                 $siglo -= 1;
@@ -929,16 +1016,16 @@ class Date extends Object {
 		$count = substr_count($format,'M');
 		$tmp = str_repeat('\\d',$count);
 		$patternYear = preg_replace('/[^M]/','.',$format);
-		$patternYear = '/^'.preg_replace('/M{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
+		$patternYear = '/^'.preg_replace('/M{'.$count.'}/','('.$tmp.')',$patternYear).'$/';
 		preg_match($patternYear, $date, $matches);
 		if(isset($matches[1])){
 			$month = $matches[1];
 		}
 		$count = substr_count($format,'D');
 		$tmp = str_repeat('\\d',$count);
-		$pattern_year = preg_replace('/[^D]/','.',$format);
-		$pattern_year = '/^'.preg_replace('/D{'.$count.'}/','('.$tmp.')',$pattern_year).'$/';
-		preg_match($pattern_year, $date, $matches);
+		$patternYear = preg_replace('/[^D]/','.',$format);
+		$patternYear = '/^'.preg_replace('/D{'.$count.'}/','('.$tmp.')',$patternYear).'$/';
+		preg_match($patternYear, $date, $matches);
 		$day = $matches[1];
 		return new Date($year.'-'.$month.'-'.$day);
     }
@@ -1053,15 +1140,15 @@ class Date extends Object {
 		} else {
 			$year = (int) $year;
 		}
-		return $year."-01-01";
+		return $year.'-01-01';
 	}
 
 	/**
 	 * Devulve el ultimo dia del año
 	 *
-	 * @access public
-	 * @param string $year
-	 * @return string
+	 * @access	public
+	 * @param	string $year
+	 * @return	string
 	 * @static
 	 */
 	static public function getLastDayOfYear($year=''){
@@ -1153,8 +1240,9 @@ class Date extends Object {
 	/**
 	 * Devuelve el ultimo dia del mes
 	 *
-	 * @param integer $month
-	 * @param integer $year
+	 * @param	integer $month
+	 * @param	integer $year
+	 * @return	string
 	 */
 	static public function getLastDayOfMonth($month='', $year=''){
 		if(!$month){
@@ -1171,10 +1259,32 @@ class Date extends Object {
 	}
 
 	/**
-	 * Devuelve el ultimo dia hábil del ano
+	 * Devuelve el número de días que tiene un mes
 	 *
-	 * @param integer $month
-	 * @param integer $year
+	 * @param	int $month
+	 * @param	int $year
+	 * @return	int
+	 */
+	static public function getNumberDaysOfMonth($month='', $year=''){
+		if(!$month){
+			$month = date('m');
+		}
+		if(!$year){
+			$year = date('Y');
+		}
+		$day = self::$_monthTable[$month-1];
+		if(self::isYearLeapYear($year)&&$month==2){
+			++$day;
+		}
+		return $day;
+	}
+
+	/**
+	 * Devuelve el último dia hábil del año
+	 *
+	 * @param	integer $month
+	 * @param	integer $year
+	 * @return	string
 	 */
 	static public function getLastNonWeekendDayOfYear($year=''){
 		if(!$year){
@@ -1184,7 +1294,7 @@ class Date extends Object {
 		for($i=$timestamp;$i>0;$i = self::_sub($i, 86400)){
 			$array = self::_getDateParts($i, false);
 			if($array['wday']!=0&&$array['wday']!=6){
-				return $array['year']."-".sprintf("%02s", $array['mon'])."-".$array['mday'];
+				return $array['year'].'-'.sprintf('%02s', $array['mon']).'-'.$array['mday'];
 			}
 		}
 		return null;
@@ -1331,6 +1441,18 @@ class Date extends Object {
 			$fecha = $dateParts['year'].'-'.sprintf('%02s', $dateParts['mon']).'-'.sprintf('%02s', $dateParts['mday']);
 			return new Date($fecha);
 		}
+	}
+
+	/**
+	 * Crea un objeto fecha apartir de su UNIX timestamp (alias de getDateFromTimestamp)
+	 *
+	 * @access	public
+	 * @param	int $timestamp
+	 * @return	string
+	 * @static
+	 */
+	static public function fromTimestamp($timestamp){
+		return self::getDatefromTimestamp($timestamp);
 	}
 
 	/**
@@ -1617,6 +1739,22 @@ class Date extends Object {
 		$minutes = substr($date, 14, 2);
 		$seconds = substr($date, 17, 2);
 		return mktime($hour, $minutes, $seconds, $dateObject->getMonth(), $dateObject->getDay(), $dateObject->getYear());
+	}
+
+	/**
+	 * Devuelve las fechas ordenadas ascendentemente ó descendentemente
+	 *
+	 * @param	string|Date $initialDate
+	 * @param	string|Date $finalDate
+	 * @param	boolean $orderAsc
+	 * @return 	array
+	 */
+	public static function orderDates($initialDate, $finalDate, $orderAsc=true){
+		if(Date::isEarlier($initialDate, $finalDate)){
+			return array($initialDate, $finalDate);
+		} else {
+			return array($finalDate, $initialDate);
+		}
 	}
 
 	/**

@@ -17,13 +17,13 @@
  * @subpackage 	Adapters
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
- * @version 	$Id$
+ * @version 	$Id: Html.php 122 2010-02-11 19:09:18Z gutierrezandresfelipe $
  */
 
 /**
- * PdfReport
+ * ExcelReport
  *
- * Adaptador que permite generar reportes en PDF
+ * Adaptador que permite generar reportes en Excel 2007
  *
  * @category 	Kumbia
  * @package 	Report
@@ -32,7 +32,7 @@
  * @license 	New BSD License
  * @abstract
  */
-class PdfReport extends ReportAdapter implements ReportInterface {
+class ExcelReport extends ReportAdapter implements ReportInterface {
 
 	/**
 	 * Salida HTML
@@ -56,7 +56,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	 * @var int
 	 * @static
 	 */
-	private static $_defaultFontFamily = "Arial";
+	private static $_defaultFontFamily = 'Arial';
 
 	/**
 	 * Totales de columnas
@@ -127,12 +127,16 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	 */
 	public function __construct(){
 		if(class_exists('PHPExcel', false)===false){
+
 			require 'Library/PHPExcel/Classes/PHPExcel.php';
-			$cacheMethod = PHPExcel_CachedObjectStorageFactory::cache_to_phpTemp;
+
+			$cacheMethod = PHPExcel_CachedObjectStorageFactory::cache_to_discISAM;
 			$cacheSettings = array(
-				'memoryCacheSize' => '64MB'
+				'memoryCacheSize' => '256MB'
 			);
-			PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings);
+			if(!PHPExcel_Settings::setCacheStorageMethod($cacheMethod, $cacheSettings)){
+				throw new ReportException('No se pudo crear el cache del reporte');
+			}
 
 			$locale = Locale::getApplication();
 			PHPExcel_Settings::setLocale((string)$locale);
@@ -237,17 +241,14 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	 * @param PHPExcel_Style $cellStyle
 	 * @param array $preparedStyle
 	 */
-	private function _extendStyle(&$preparedStyle=array()){
+	private function _extendBorder(&$preparedStyle=array()){
 		if(!isset($preparedStyle['borders']['allborders'])){
 			$preparedStyle['borders']['allborders'] = array(
 				'style' => PHPExcel_Style_Border::BORDER_THIN,
 				'color' => array(
-					'rgb' => '969696'
+					'rgb' => '111111'
 				)
 			);
-		}
-		if(!isset($preparedStyle['font']['size'])){
-			$preparedStyle['font']['size'] = 10;
 		}
 	}
 
@@ -276,7 +277,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 		foreach($headers as $header){
 			$cellStyle = $this->_appendToOutput($header);
 			if($preparedStyle!==null){
-				$this->_extendStyle($preparedStyle);
+				$this->_extendBorder($preparedStyle);
 				$cellStyle->applyFromArray($preparedStyle);
 			}
 		}
@@ -302,7 +303,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 			} else {
 				$this->_preparedStyles[$i] = array();
 			}
-			$this->_extendStyle($this->_preparedStyles[$i]);
+			$this->_extendBorder($this->_preparedStyles[$i]);
 		}
 	}
 
@@ -381,28 +382,29 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	protected function _renderItem($item){
 		if(is_string($item)){
 			$this->_appendToOutput($item);
-			return;
-		}
-		if(is_object($item)==true){
-			if(get_class($item)=='ReportText'){
-				$cellStyle = $this->_appendToOutput($item->getText());
-				$itemStyle = $item->getAttributes();
-				$style = $this->_prepareStyle($itemStyle);
-				if(count($style)){
-					$cellStyle->applyFromArray($style);
+		} else {
+			if(is_object($item)==true){
+				if(get_class($item)=='ReportText'){
+					$cellStyle = $this->_appendToOutput($item->getText());
+					$itemStyle = $item->getAttributes();
+					$style = $this->_prepareStyle($itemStyle);
+					if(count($style)){
+						$cellStyle->applyFromArray($style);
+					}
+					unset($cellStyle);
+					/*$html = "\t\t\t<div ";
+
+					if(count($style)){
+						$html.="style='".join(";", $style)."'";
+					}
+					$html.=">".$this->_prepareText($item->getText())."</div>\n";
+					$this->_appendToOutput($html);*/
+
+					//return $itemStyle;
 				}
-
-				/*$html = "\t\t\t<div ";
-
-				if(count($style)){
-					$html.="style='".join(";", $style)."'";
-				}
-				$html.=">".$this->_prepareText($item->getText())."</div>\n";
-				$this->_appendToOutput($html);*/
-
-				//return $itemStyle;
 			}
 		}
+		unset($item);
 	}
 
 	/**
@@ -455,9 +457,6 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	private function _renderRow($row){
 		if($row['_type']=='normal'){
 			unset($row['_type']);
-			if($this->_numberColumns===null){
-				$this->_numberColumns = count($row);
-			}
 			foreach($row as $numberColumn => $value){
 				if(isset($this->_totalizeColumns[$numberColumn])){
 					if(!isset($this->_totalizeValues[$numberColumn])){
@@ -481,25 +480,28 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 							$cellStyle->getNumberFormat()->setFormatCode('#,##0.00');
 							break;
 					}
+					unset($type);
+					unset($stdType);
 				} else {
 					$cellStyle = $this->_appendToOutput($value);
 				}
 				if(isset($this->_preparedStyles[$numberColumn])){
 					$cellStyle->applyFromArray($this->_preparedStyles[$numberColumn]);
 				}
+				unset($cellStyle);
+				unset($value);
 			}
 		} else {
 			if($row['_type']=='raw'){
 				unset($row['_type']);
 				foreach($row as $numberColumn => $rawColumn){
-					/*$output.="\t\t\t\t<td colspan='".$rawColumn->getSpan()."'";
+					$cellStyle = $this->_appendToOutput($rawColumn->getValue());
 					$styles = $rawColumn->getStyle();
 					if($styles){
-						$style = $this->_prepareStyle($styles);
-						$output.=" style='".join(';', $style)."'	";
+						$cellStyle->applyFromArray($this->_prepareStyle($styles));
 					}
-					$output.=">".$rawColumn->getValue()."</td>\n";*/
-					$this->_appendToOutput($rawColumn->getValue());
+					$this->_worksheet->mergeCellsByColumnAndRow($this->_column-1, $this->_row, $this->_column+$rawColumn->getSpan()-2, $this->_row);
+					$this->_column+=($rawColumn->getSpan()-1);
 					unset($rawColumn);
 				}
 			}
@@ -526,8 +528,8 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	 * @return	boolean
 	 */
 	protected function _moveOutputTo($path){
-		$objWriter = PHPExcel_IOFactory::createWriter($this->_excel, 'Pdf');
-		$objWriter->save($path);
+		$writer = PHPExcel_IOFactory::createWriter($this->_excel, 'Excel2007');
+		$writer->save($path);
 		return basename('/'.$path);
 	}
 
@@ -571,7 +573,7 @@ class PdfReport extends ReportAdapter implements ReportInterface {
 	 * @return string
 	 */
 	protected function getFileExtension(){
-		return 'pdf';
+		return 'xlsx';
 	}
 
 }

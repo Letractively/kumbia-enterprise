@@ -4049,4 +4049,82 @@
 			<choosestr>Choose</choosestr>
 		</messages>
 	</posix>
+	<linguistics>
+		<vowels>
+			<vowel accented="no">a</vowel>
+			<vowel accented="no">e</vowel>
+			<vowel accented="no">i</vowel>
+			<vowel accented="no">o</vowel>
+			<vowel accented="no">u</vowel>
+			<vowel accented="yes">á</vowel>
+			<vowel accented="yes">é</vowel>
+			<vowel accented="yes">í</vowel>
+			<vowel accented="yes">ó</vowel>
+			<vowel accented="yes">ú</vowel>
+		</vowels>
+		<accentedVowels>
+			<accentedVowel accent="á">a</accentedVowel>
+			<accentedVowel accent="é">e</accentedVowel>
+			<accentedVowel accent="í">i</accentedVowel>
+			<accentedVowel accent="ó">o</accentedVowel>
+			<accentedVowel accent="ú">u</accentedVowel>
+		</accentedVowels>
+		<articles>
+			<indefinite genre="female">
+				<article count="one">a</article>
+				<article count="other">a</article>
+			</indefinite>
+			<indefinite genre="male">
+				<article count="one">a</article>
+				<article count="other">a</article>
+			</indefinite>
+		</articles>
+		<articles>
+			<definite genre="female">
+				<article count="one">the</article>
+				<article count="other">the</article>
+			</definite>
+			<definite genre="male">
+				<article count="one">the</article>
+				<article count="other">the</article>
+			</definite>
+		</articles>
+		<prepositions>
+			<preposition type="of">of</preposition>
+		</prepositions>
+		<genres>
+			<genre type="female">
+				<wordend>umbre</wordend>
+				<wordend>ion</wordend>
+				<wordend>is</wordend>
+				<wordend>ez</wordend>
+				<wordend>uz</wordend>
+				<wordend>un</wordend>
+				<wordend>ud</wordend>
+				<wordend>ad</wordend>
+				<wordend>al</wordend>
+				<wordend>a</wordend>
+			</genre>
+			<genre type="male">
+				<wordend>l</wordend>
+				<wordend>o</wordend>
+				<wordend>n</wordend>
+				<wordend>e</wordend>
+				<wordend>r</wordend>
+				<wordend>s</wordend>
+			</genre>
+		</genres>
+		<conjunction>and</conjunction>
+		<disjunction>or</disjunction>
+		<quantities>
+			<quantity type="minus">minus</quantity>
+			<quantity type="nothing">nothing</quantity>
+			<quantity type="some">some</quantity>
+			<quantity type="several">several</quantity>
+			<quantity type="dozens">dozens</quantity>
+			<quantity type="hundreds">hundreds</quantity>
+			<quantity type="thousands">thousands</quantity>
+			<quantity type="millions">millions</quantity>
+		</quantities>
+	</linguistics>
 </ldml>

@@ -333,6 +333,17 @@ class Controller extends ControllerBase {
 	}
 
 	/**
+	 * Obtiene un archivo enviado en la petición
+	 *
+	 * @access	protected
+	 * @param	string $fileName
+	 * @return	ControllerUploadFile
+	 */
+	protected function getFileParam($fileName){
+		return $this->getRequestInstance()->getParamFile($fileName);
+	}
+
+	/**
 	 * Filtra un valor
  	 *
  	 * @access	protected
@@ -342,10 +353,9 @@ class Controller extends ControllerBase {
 	protected function filter($paramValue){
 		//Si hay más de un argumento, toma los demas como filtros
 		if(func_num_args()>1){
-			$args = func_get_args();
-			$args[0] = $paramValue;
-			$filter = new Filter();
-			return call_user_func_array(array($filter, 'applyFilter'), $args);
+			$params = func_get_args();
+			unset($params[0]);
+			return Filter::bring($paramValue, $params);
 		} else {
 			throw new ApplicationControllerException('Debe indicar al menos un filtro a aplicar');
 		}
@@ -776,11 +786,11 @@ class Controller extends ControllerBase {
 	 * Establece una variable de la vista directamente
 	 *
 	 * @access 	public
-	 * @param 	string $index
+	 * @param 	string $key
 	 * @param 	string $value
 	 */
-	public function setParamToView($index, $value){
-		View::setViewParam($index, $value);
+	public function setParamToView($key, $value){
+		View::setViewParam($key, $value);
 	}
 
 	/**

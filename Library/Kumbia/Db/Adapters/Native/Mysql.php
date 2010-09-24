@@ -181,6 +181,13 @@ class DbMySQL extends DbBase
 			$this->_fetchMode = MYSQL_BOTH;
 			parent::__construct($descriptor);
 			parent::connect();
+			if(isset($descriptor->charset)){
+				$this->query('SET NAMES '.$descriptor->charset);
+			}
+			if(isset($descriptor->collation)){
+				$this->query('SET collation_connection='.$descriptor->collation);
+				$this->query('SET collation_database='.$descriptor->collation);
+			}
 			return true;
 		} else {
 			throw new DbException($this->error($php_errormsg), $this->noError(), false);
@@ -481,10 +488,10 @@ class DbMySQL extends DbBase
 	/**
 	 * Devuelve un LIMIT valido para un SELECT del RBDM
 	 *
-	 * @access public
-	 * @param string $sqlQuery
-	 * @param integer $number
-	 * @return string
+	 * @access	public
+	 * @param	string $sqlQuery
+	 * @param	integer $number
+	 * @return	string
 	 */
 	public function limit($sqlQuery, $number){
 		if(is_numeric($number)){
@@ -498,8 +505,8 @@ class DbMySQL extends DbBase
 	/**
 	 * Devuelve un FOR UPDATE valido para un SELECT del RBDM
 	 *
-	 * @param string $sqlQuery
-	 * @return string
+	 * @param	string $sqlQuery
+	 * @return	string
 	 */
 	public function forUpdate($sqlQuery){
 		return $sqlQuery.' FOR UPDATE';
@@ -508,8 +515,8 @@ class DbMySQL extends DbBase
 	/**
 	 * Devuelve un SHARED LOCK valido para un SELECT del RBDM
 	 *
-	 * @param string $sqlQuery
-	 * @return string
+	 * @param	string $sqlQuery
+	 * @return	string
 	 */
 	public function sharedLock($sqlQuery){
 		return $sqlQuery.' LOCK IN SHARE MODE';
@@ -518,10 +525,10 @@ class DbMySQL extends DbBase
 	/**
 	 * Borra una tabla de la base de datos
 	 *
-	 * @access public
-	 * @param string $table
-	 * @param boolean $ifExists
-	 * @return boolean
+	 * @access	public
+	 * @param	string $table
+	 * @param	boolean $ifExists
+	 * @return	boolean
 	 */
 	public function dropTable($table, $ifExists=true){
 		if($ifExists==true){
@@ -541,11 +548,15 @@ class DbMySQL extends DbBase
 	 *
 	 * @access	public
 	 * @param	string $table
+	 * @param	string $schema
 	 * @param	array $definition
 	 * @param	array $index
 	 * @return	boolean
 	 */
-	public function createTable($table, $definition, $index=array(), $tableOptions=array()){
+	public function createTable($table, $schema, $definition, $index=array(), $tableOptions=array()){
+		if($schema!=''){
+			$table = $schema.'.'.$table;
+		}
 		if(isset($tableOptions['temporary'])&&$tableOptions['temporary']==true){
 			$createSQL = 'CREATE TEMPORARY TABLE '.$table.' (';
 		} else {
@@ -762,7 +773,7 @@ class DbMySQL extends DbBase
 	 * @static
 	 */
 	public static function getSQLDialect(){
-		return 'MysqlSQLDialect';
+		return 'Mysql';
 	}
 
 }

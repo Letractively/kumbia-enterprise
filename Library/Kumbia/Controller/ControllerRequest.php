@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Controller
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -28,7 +28,7 @@
  *
  * @category	Kumbia
  * @package		Controller
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
@@ -231,18 +231,36 @@ class ControllerRequest extends Object {
 	 * Devuelve un parámetro enviado usando una superglobal $_POST
 	 * y aplica los filtros correspondientes
 	 *
-	 * @access public
-	 * @param string $paramName
-	 * @return boolean
+	 * @access	public
+	 * @param	string $paramName
+	 * @return	boolean
 	 */
 	public function getParamPost($paramName){
 		if(func_num_args()>1){
-			$args = func_get_args();
-			$args[0] = isset($_POST[$paramName]) ? $_POST[$paramName] : '';
-			$filter = new Filter();
-			return call_user_func_array(array($filter, 'applyFilter'), $args);
+			$paramValue = isset($_POST[$paramName]) ? $_POST[$paramName] : '';
+			$params = func_get_args();
+			unset($params[0]);
+			return Filter::bring($paramValue, $params);
 		}
 		return isset($_POST[$paramName]) ? $_POST[$paramName] : '';
+	}
+
+	/**
+	 * Devuelve un parámetro enviado usando una superglobal $_GET
+	 * y aplica los filtros correspondientes
+	 *
+	 * @access	public
+	 * @param	string $paramName
+	 * @return	boolean
+	 */
+	public function getParamQuery($paramName){
+		if(func_num_args()>1){
+			$paramValue = isset($_GET[$paramName]) ? $_GET[$paramName] : '';
+			$params = func_get_args();
+			unset($params[0]);
+			return Filter::bring($paramValue, $params);
+		}
+		return isset($_GET[$paramName]) ? $_GET[$paramName] : '';
 	}
 
 	/**
@@ -262,24 +280,6 @@ class ControllerRequest extends Object {
 	}
 
 	/**
-	 * Devuelve un parámetro enviado usando una superglobal $_GET
-	 * y aplica los filtros correspondientes
-	 *
-	 * @access	public
-	 * @param	string $paramName
-	 * @return	boolean
-	 */
-	public function getParamQuery($paramName){
-		if(func_num_args()>1){
-			$args = func_get_args();
-			$args[0] = isset($_GET[$paramName]) ? $_GET[$paramName] : "";
-			$filter = new Filter();
-			return call_user_func_array(array($filter, "applyFilter"), $args);
-		}
-		return isset($_GET[$paramName]) ? $_GET[$paramName] : "";
-	}
-
-	/**
 	 * Devuelve un parámetro enviado usando una superglobal $_REQUEST
 	 * y aplica los filtros correspondientes
 	 *
@@ -289,10 +289,10 @@ class ControllerRequest extends Object {
 	 */
 	public function getParamRequest($paramName){
 		if(func_num_args()>1){
-			$args = func_get_args();
-			$args[0] = isset($_REQUEST[$paramName]) ? $_REQUEST[$paramName] : '';
-			$filter = new Filter();
-			return call_user_func_array(array($filter, 'applyFilter'), $args);
+			$paramValue = isset($_REQUEST[$paramName]) ? $_REQUEST[$paramName] : '';
+			$params = func_get_args();
+			unset($params[0]);
+			return Filter::bring($paramValue, $params);
 		}
 		return isset($_REQUEST[$paramName]) ? $_REQUEST[$paramName] : '';
 	}
@@ -307,10 +307,10 @@ class ControllerRequest extends Object {
 	 */
 	public function getParamServer($paramName){
 		if(func_num_args()>1){
-			$args = func_get_args();
-			$args[0] = isset($_SERVER[$paramName]) ? $_SERVER[$paramName] : '';
-			$filter = new Filter();
-			return call_user_func_array(array($filter, 'applyFilter'), $args);
+			$paramValue = isset($_SERVER[$paramName]) ? $_SERVER[$paramName] : '';
+			$params = func_get_args();
+			unset($params[0]);
+			return Filter::bring($paramValue, $params);
 		}
 		return isset($_SERVER[$paramName]) ? $_SERVER[$paramName] : '';
 	}
@@ -325,10 +325,10 @@ class ControllerRequest extends Object {
 	 */
 	public function getParamEnv(){
 		if(func_num_args()>1){
-			$args = func_get_args();
-			$args[0] = isset($_ENV[$paramName]) ? $_ENV[$paramName] : '';
-			$filter = new Filter();
-			return call_user_func_array(array($filter, 'applyFilter'), $args);
+			$paramValue = isset($_ENV[$paramName]) ? $_ENV[$paramName] : '';
+			$params = func_get_args();
+			unset($params[0]);
+			return Filter::bring($paramValue, $params);
 		}
 		return isset($_ENV[$paramName]) ? $_ENV[$paramName] : '';
 	}
@@ -343,10 +343,10 @@ class ControllerRequest extends Object {
 	 */
 	public function getParamCookie($paramName){
 		if(func_num_args()>1){
-			$args = func_get_args();
-			$args[0] = isset($_COOKIE[$paramName]) ? $_COOKIE[$paramName] : '';
-			$filter = new Filter();
-			return call_user_func_array(array($filter, 'applyFilter'), $args);
+			$paramValue = isset($_COOKIE[$paramName]) ? $_COOKIE[$paramName] : '';
+			$params = func_get_args();
+			unset($params[0]);
+			return Filter::bring($paramValue, $params);
 		}
 		return isset($_COOKIE[$paramName]) ? $_COOKIE[$paramName] : '';
 	}
@@ -383,7 +383,15 @@ class ControllerRequest extends Object {
         if(isset($_SERVER['HTTP_SOAPACTION'])){
         	return true;
         } else {
-        	return false;
+        	if(isset($_SERVER['CONTENT_TYPE'])){
+	        	if(strpos($_SERVER['CONTENT_TYPE'], 'application/soap+xml')!==false){
+	        		return true;
+	        	} else {
+	        		return false;
+	        	}
+        	} else {
+        		return false;
+        	}
         }
     }
 
@@ -407,6 +415,19 @@ class ControllerRequest extends Object {
      */
     public function getRawBody(){
         return file_get_contents('php://input');
+    }
+
+    /**
+     * Devuelve la IP del servidor
+     *
+     * @return string
+     */
+    public function getServerAddress(){
+    	if(isset($_SERVER['SERVER_ADDR'])){
+    		return $_SERVER['SERVER_ADDR'];
+    	} else {
+    		return gethostbyname('localhost');
+    	}
     }
 
     /**

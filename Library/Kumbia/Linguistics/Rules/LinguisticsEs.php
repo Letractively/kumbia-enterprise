@@ -56,10 +56,17 @@ class LinguisticsEs extends Object {
 	/**
 	 * Indica si una palabra tiene genero femenino
 	 *
-	 * @param string $word
+	 * @param	string $word
+	 * @return	boolean
 	 */
 	public function isFemale($word){
-
+		$length = i18n::strlen($word);
+		foreach($this->_locale->getWordRules('female') as $wordEnd){
+			if(i18n::substr($word, $length-i18n::strlen($wordEnd))===$wordEnd){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -103,6 +110,13 @@ class LinguisticsEs extends Object {
 		if($this->_articles===null){
 			$this->_articles = $this->_locale->getLinguisticArticles();
 		}
+		if(strpos($word, ' ')===false){
+			$completeWord = $word;
+		} else {
+			$completeWord = $word;
+			$words = preg_split('/[ ]+/', $word);
+			$word = $words[0];
+		}
 		$length = i18n::strlen($word);
 		$last = i18n::substr($word, $length-1);
 		if($isPlural==false){
@@ -114,10 +128,10 @@ class LinguisticsEs extends Object {
 		}
 		foreach($this->_locale->getWordRules('female') as $wordEnd){
 			if(i18n::substr($word, $length-i18n::strlen($wordEnd))===$wordEnd){
-				return $female.' '.$word;
+				return $female.' '.$completeWord;
 			}
 		}
-		return $male.' '.$word;
+		return $male.' '.$completeWord;
 	}
 
 	/**
@@ -127,7 +141,7 @@ class LinguisticsEs extends Object {
 	 * @return	string
 	 */
 	public function toMale($word){
-		$words = split(' ', $word);
+		$words = explode(' ', $word);
 		if(isset($words[0])){
 			if(count($words)>1){
 				$otherWords = ' '.join(' ', array_splice($words, 1));
@@ -162,7 +176,7 @@ class LinguisticsEs extends Object {
 	 * @param string $word
 	 */
 	public function toFemale($word){
-		$words = split(' ', $word);
+		$words = explode(' ', $word);
 		if(isset($words[0])){
 			if(count($words)>1){
 				$otherWords = ' '.join(' ', array_splice($words, 1));

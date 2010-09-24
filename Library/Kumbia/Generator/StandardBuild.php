@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Generator
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @copyright	Copyright (C) 2007-2007 Julian Cortes (jucorant at gmail.com)
  * @license		New BSD License
@@ -29,6 +29,8 @@
  * @category	Kumbia
  * @package		Generator
  * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2005-2008 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
+ * @copyright	Copyright (C) 2007-2007 Julian Cortes (jucorant at gmail.com)
  * @license 	New BSD License
  */
 abstract class StandardGenerator {
@@ -80,22 +82,29 @@ abstract class StandardGenerator {
 		}
 		if(!isset($form['buttons'])){
 			$form['buttons'] = array();
-			$form['buttons']["insert"] = "";
-			$form['buttons']["query"] = "";
-			$form['buttons']["browse"] = "";
-			$form['buttons']["report"] = "";
+			$form['buttons']['insert'] = '';
+			$form['buttons']['query'] = '';
+			$form['buttons']['browse'] = '';
+			$form['buttons']['report'] = '';
 		}
 
+		$appName = Router::getApplication();
 		$controller = Dispatcher::getController();
 		$controller_name = Router::getController();
-		if(!array_key_exists('dataRequisite', $form)){
+
+		$jsPath = 'public/javascript/'.$appName.'/'.$controller_name.'.js';
+		if(file_exists($jsPath)){
+			Tag::addJavascript($appName.'/'.$controller_name);
+		}
+
+		if(!isset($form['dataRequisite'])){
 			$form['dataRequisite'] = 1;
 		}
 		Generator::formsPrint("<div align='center' id='stdForm'>");
 		if(!$form['dataRequisite']) {
 			Generator::formsPrint("<div align='center' id='notFound'><b>No hay datos en consulta</b></div>");
 		} else {
-			Generator::formsPrint("<center>");
+			Generator::formsPrint("<div align='center'>");
 			if($_REQUEST['oldsubaction']=='Modificar') {
 				$_REQUEST['queryStatus'] = true;
 			}
@@ -111,7 +120,7 @@ abstract class StandardGenerator {
 					}
 					$ds = "disabled='disabled'";
 				} else {
-					$query_string = Utils::getKumbiaURL("$controller_name/fetch/");
+					$query_string = Utils::getKumbiaURL($controller_name."/fetch/");
 					Generator::formsPrint("<input type='button' id='primero' class='controlButton' onclick='window.location=\"{$query_string}0/&amp;queryStatus=1\"' value='Primero'>&nbsp;");
 					Generator::formsPrint("<input type='button' id='anterior' class='controlButton' onclick='window.location=\"{$query_string}".($_REQUEST['id']-1)."/&amp;queryStatus=1\"' value='Anterior'>&nbsp;");
 					Generator::formsPrint("<input type='button' id='siguiente' class='controlButton' onclick='window.location=\"{$query_string}".($_REQUEST['id']+1)."/&amp;queryStatus=1\"' value='Siguiente'>&nbsp;");
@@ -172,7 +181,7 @@ abstract class StandardGenerator {
 					Generator::formsPrint("<br /><br />\n<input type='button' class='controlButton' id='volver' onclick='window.location=\"".Utils::getKumbiaURL("$controller_name/back")."\"' value='Atr&aacute;s'>&nbsp;\r\n");
 				}
 
-				Generator::formsPrint("</center><br />\r\n");
+				Generator::formsPrint("</div><br />\r\n");
 				Generator::formsPrint("<table align='center'><tr>\r\n");
 				$n = 1;
 				//La parte de los Componentes
@@ -188,7 +197,7 @@ abstract class StandardGenerator {
 						Component::buildStandardCombo($com, $name);
 						break;
 
-						case 'helpText':
+						case 'helpContext':
 						Component::buildHelpContext($com, $name, $form);
 						break;
 
@@ -282,10 +291,10 @@ abstract class StandardGenerator {
 						<td align='right'>
 							<label for='reportType'>Formato Reporte:</label>
 							<select name='reportType' id='reportType'>
+								<option value='html'>HTML</option>
 								<option value='pdf'>PDF</option>
 								<option value='xls'>EXCEL</option>
 								<option value='doc'>WORD</option>
-								<option value='html'>HTML</option>
 							</select>
 						</td>
 						<td align='center'>
@@ -312,11 +321,22 @@ abstract class StandardGenerator {
 				</td>
 				</tr>");
 				Generator::formsPrint("</table><br />\r\n");
+
+				if(isset($_REQUEST['fl_id'])){
+					if($_REQUEST['fl_id']>0){
+						Generator::formsPrint('<div align="right">
+							<div class="rcs_box">
+								'.Tag::image('pos2/abook.png').' '.Tag::linkTo('rcs/revisions/'.$form['source'].'/'.$_REQUEST['fl_id'], 'Consultar Revisiones').'
+							</div>
+						</div>');
+					}
+				}
+
 			} else {
 				/**
 				 * @see Browse
 				 */
-				require_once "Library/Kumbia/Generator/Browse.php";
+				require_once 'Library/Kumbia/Generator/Browse.php';
 
 				Browse::formsBrowse($form);
 			}
@@ -324,7 +344,6 @@ abstract class StandardGenerator {
 			//Todos los Labels
 			Generator::formsPrint("<script type='text/javascript'>\nvar Labels = {");
 			$aLabels = "";
-
 			foreach($form['components'] as $key => $com){
 				if(isset($com['caption'])){
 					$aLabels.=$key.": '".$com['caption']."',";
@@ -542,11 +561,11 @@ abstract class StandardGenerator {
 			if($controller->keep_action){
 				Generator::formsPrint("\tkeep_action('".$controller->keep_action."');\n");
 			}
-			Generator::formsPrint("\tregister_form_events()\n})\n</script>\n");
+			Generator::formsPrint("\tif(typeof register_form_events != 'undefined') register_form_events()\n})\n</script>\n");
 
 			if($controller->view!='browse'){
-				Generator::formsPrint("<center><input type='button' class='controlButton' id='aceptar' value='Aceptar' disabled='disabled' onclick='form_accept()' />&nbsp;");
-				Generator::formsPrint("<input type='button' class='controlButton' id='cancelar' value='Cancelar' disabled='disabled' onclick='cancel_form()' />&nbsp;</center>");
+				Generator::formsPrint("<div align='center'><input type='button' class='controlButton' id='aceptar' value='Aceptar' disabled='disabled' onclick='form_accept()' />&nbsp;");
+				Generator::formsPrint("<input type='button' class='controlButton' id='cancelar' value='Cancelar' disabled='disabled' onclick='cancel_form()' />&nbsp;</div>");
 				Generator::formsPrint("<input type='hidden' id='actAction' value='' />\n
 				</form>
                 <form id='saveDataForm' method='post' action='' style='display:none' enctype=\"multipart/form-data\"></form>");

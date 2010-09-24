@@ -15,7 +15,7 @@
  * @category 	Kumbia
  * @package 	Report
  * @subpackage 	ReportComponent
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -24,12 +24,12 @@
 /**
  * ReportComponent
  *
- * Carga dinamicamente los componentes de reporte
+ * Carga dinámicamente los componentes de reporte
  *
  * @category 	Kumbia
  * @package 	Report
  * @subpackage 	ReportComponent
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
  */
@@ -43,9 +43,9 @@ class ReportComponent extends Object {
 	 */
 	static public function add($component, $attributes=array()){
 		$component = (string) $component;
-		$className = "Report$component";
-		if(class_exists($className)==false){
-			$classPath = "Library/Kumbia/Report/Components/Report$component/Report$component.php";
+		$className = 'Report'.$component;
+		if(class_exists($className, false)==false){
+			$classPath = 'Library/Kumbia/Report/Components/Report'.$component.'/Report'.$component.'.php';
 			if(Core::fileExists($classPath)){
 				require $classPath;
 			} else {
@@ -53,16 +53,16 @@ class ReportComponent extends Object {
 			}
 		}
 		$componentObject = new $className();
-		call_user_func_array(array($componentObject, "setParameters"), $attributes);
+		call_user_func_array(array($componentObject, 'setParameters'), $attributes);
 		return $componentObject;
 	}
 
 	static public function load($components){
 		foreach($components as $component){
 			$component = (string) $component;
-			$className = "Report$component";
-			if(class_exists($className)==false){
-				$classPath = "Library/Kumbia/Report/Components/Report$component/Report$component.php";
+			$className = 'Report'.$component;
+			if(class_exists($className, false)==false){
+				$classPath = 'Library/Kumbia/Report/Components/Report'.$component.'/Report'.$component.'.php';
 				if(Core::fileExists($classPath)){
 					require $classPath;
 				} else {

@@ -139,7 +139,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 	 * @param string $dbPass
 	 * @return $resource
 	 */
-	public function connect($descriptor){
+	public function connect($descriptor=''){
 
 		#if[compile-time]
 		if(!extension_loaded('pdo')){
@@ -150,7 +150,7 @@ abstract class DbPDO extends DbBase implements DbPDOInterface  {
 		$username = isset($descriptor->username) ? $descriptor->username : null;
 		$password = isset($descriptor->password) ? $descriptor->password : null;
 		$dsn = isset($descriptor->dsn) ? $descriptor->dsn : null;
-		$dsn = $this->_dbRBDM.":".$dsn;
+		$dsn = $this->_dbRBDM.':'.$dsn;
 		try {
 			$this->_pdo = new PDO($dsn, $username, $password);
 			if(!$this->_pdo){

@@ -14,7 +14,7 @@
  *
  * @category	Kumbia
  * @package		Controller
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @version 	$Id$
@@ -28,7 +28,7 @@
  *
  * @category	Kumbia
  * @package		Controller
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
@@ -62,6 +62,20 @@ class ControllerUploadFile extends Object {
 	 * @var string
 	 */
 	private $_temp;
+
+	/**
+	 * Indica si el archivo fue movido de su posición original
+	 *
+	 * @var boolean
+	 */
+	private $_moved = false;
+
+	/**
+	 * El path actual donde está el archivo
+	 *
+	 * @var string
+	 */
+	private $_path = '';
 
 	/**
 	 * Constructor de ControllerUploadFile
@@ -120,12 +134,31 @@ class ControllerUploadFile extends Object {
 	}
 
 	/**
+	 * Obtiene el contenido del archivo que fue subido
+	 *
+	 * @return string
+	 */
+	public function getContentData(){
+		if($this->_moved==false){
+			return file_get_contents($this->_temp);
+		} else {
+			return file_get_contents($this->_path);
+		}
+	}
+
+	/**
 	 * Mover el archivo a una ubicación
 	 *
 	 * @param string $path
 	 */
 	public function moveFileTo($path){
-		return move_uploaded_file($this->_temp, $path);
+		if(move_uploaded_file($this->_temp, $path)){
+			$this->_moved = true;
+			$this->_path = $path;
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

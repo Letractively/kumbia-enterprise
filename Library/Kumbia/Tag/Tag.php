@@ -16,7 +16,7 @@
  * @package 	Tag
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar(emilio.rst at gmail.com)
+ * @copyright 	Copyright (c) 2007-2008 Emilio Rafael Silveira Tovar (emilio.rst at gmail.com)
  * @copyright 	Copyright (c) 2007-2008 Deivinson Tejeda Brito (deivinsontejeda at gmail.com)
  * @license 	New BSD License
  * @version 	$Id$
@@ -131,9 +131,9 @@ abstract class Tag {
 	/**
 	 * Crea un enlace en una aplicación respetando las convenciones del framework
 	 *
-	 * @param string $action
-	 * @param string $text
-	 * @return string
+	 * @param	string $action
+	 * @param	string $text
+	 * @return	string
 	 */
 	public static function linkTo($action, $text=''){
 		if(func_num_args()>2){
@@ -556,6 +556,50 @@ abstract class Tag {
 	}
 
 	/**
+	 * Helper para capturar meses
+	 *
+	 * @access 	public
+	 * @param 	mixed $params
+	 * @return 	string
+	 * @static
+	 */
+	public static function monthField($params){
+		$numberArguments = func_num_args();
+		$params = Utils::getParams(func_get_args(), $numberArguments);
+		if(self::$_useLocale){
+			if(!isset($params['locale'])){
+				$locale = Locale::getApplication();
+			} else {
+				$locale = $params['locale'];
+			}
+			if($locale->isDefaultLocale()==false){
+				$i = 1;
+				$months = array();
+				$monthNames = $locale->getMonthList();
+				foreach($monthNames as $monthName){
+					if($i<10){
+						$months['0'.$i] = ucfirst($monthName);
+					} else {
+						$months[$i] = ucfirst($monthName);
+					}
+					++$i;
+				}
+			}
+		}
+		if(!isset($months)){
+			$months = array(
+				'01' => 'Enero', '02' => 'Febrero',
+				'03' => 'Marzo', '04' => 'Abril',
+				'05' => 'Mayo', '06' => 'Junio',
+				'07' => 'Julio', '08' => 'Agosto',
+				'09' => 'Septiembre', '10' => 'Octubre',
+				'11' => 'Noviembre', '12' => 'Diciembre'
+			);
+		}
+		return self::selectStatic($params[0], $months);
+	}
+
+	/**
 	 * Helper para capturar fechas
 	 *
 	 * @access 	public
@@ -585,9 +629,16 @@ abstract class Tag {
 			$month = substr($value, 5, 2);
 			$day = substr($value, 8, 2);
 		} else {
-			$year = date('Y');
-			$month = 0;
-			$day = 0;
+			if(isset($params['today'])&&$params['today']){
+				$value = date('Y-m-d');
+				$year = substr($value, 0, 4);
+				$month = substr($value, 5, 2);
+				$day = substr($value, 8, 2);
+			} else {
+				$year = date('Y');
+				$month = 0;
+				$day = 0;
+			}
 		}
 
 		if(isset($params['useDummy'])&&$params['useDummy']){
@@ -602,7 +653,7 @@ abstract class Tag {
 				$attributes[] = $_key.'="'.$_value.'"';
 			}
 		}
-		$code = '<table '.join(' ', $attributes).'><tr><td>';
+		$code = '<table cellspacing="0" '.join(' ', $attributes).'><tr><td>';
 		if(self::$_useLocale){
 			if(!isset($params['locale'])){
 				$locale = Locale::getApplication();
@@ -629,6 +680,20 @@ abstract class Tag {
 					}
 					++$i;
 				}
+			}
+		}
+		$monthTable = array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+		if($month==2){
+			if($year%4==0){
+				$numberDays = 29;
+			} else {
+				$numberDays = 28;
+			}
+		} else {
+			if($month>0){
+				$numberDays = $monthTable[$month-1];
+			} else {
+				$numberDays = 31;
 			}
 		}
 		if(!isset($months)){
@@ -674,7 +739,7 @@ abstract class Tag {
 		$code.="</select></td><td>";
 
 		$code.='<select id="'.$params[0].'Day" onchange="DateField.refresh(\''.$params[0].'\')" '.$display.">";
-		for($i=1;$i<=31;++$i){
+		for($i=1;$i<=$numberDays;++$i){
 			$number = $i<10 ? '0'.$i : $i;
 			if($number==$day){
 				$code.='<option value="'.$number.'" selected="selected">'.$number.'</option>';
@@ -701,9 +766,10 @@ abstract class Tag {
 				$code.='<option value="'.$i.'">'.$i.'</option>';
 			}
 		}
-		$code.="</select></td><td></table>";
+		$code.="</select></td>";
+		$code.='<td><img class="calendarIcon" src="'.Core::getInstancePath().'img/calendar.gif" onclick="DateField.showCalendar(this, \''.$params[0].'\')" alt="Seleccionar Fecha"/></td>';
+		$code.="</tr></table>";
 		$code.="<input type='hidden' id='".$params[0]."' name='".$params[0]."' value='$value' />";
-
 		return $code;
 	}
 
@@ -796,6 +862,7 @@ abstract class Tag {
 			$value = "";
 			if(!isset($params['value'])){
 				$value = self::getValueFromAction($params[0]);
+				unset($params['value']);
 			} else {
 				$value = $params['value'];
 			}
@@ -824,7 +891,7 @@ abstract class Tag {
 				$code.= "\t<option value='$dummyValue'>$dummyText</option>\r\n";
 				unset($params['use_dummy']);
 			} else {
-				if(isset($params['useDummy'])){
+				if(isset($params['useDummy'])&&$params['useDummy']){
 					$code.= "\t<option value='$dummyValue'>$dummyText</option>\r\n";
 					unset($params['useDummy']);
 				}
@@ -1200,7 +1267,7 @@ abstract class Tag {
 			file_put_contents($jsMinSource, $minified);
 		} else {
 			if(filemtime($jsSource)>filemtime($jsMinSource)){
-				if(class_exists('Jsmin')==false){
+				if(class_exists('Jsmin', false)==false){
 					require 'Library/Kumbia/Tag/Jsmin/Jsmin.php';
 				}
 				$minified = Jsmin::minify(file_get_contents($jsSource));
@@ -1551,7 +1618,7 @@ abstract class Tag {
 	 */
 	public static function addJavascript($src){
 		$instancePath = Core::getInstancePath();
-		MemoryRegistry::append('CORE_JS', '<script type="text/javascript" src="'.$instancePath.'javascript/'.$src.'.js"></script>'."\r\n");
+		MemoryRegistry::prepend('CORE_JS', '<script type="text/javascript" src="'.$instancePath.'javascript/'.$src.'.js"></script>'."\r\n");
 	}
 
 	/**
@@ -2186,7 +2253,7 @@ abstract class Tag {
 		if($classCSS!=''){
 			$classCSS = "class='$classCSS'";
 		}
-		return "<input type='button' $classCSS onclick='window.location=\"".Utils::getKumbiaUrl($action)."\"' value='$caption' />";
+		return "<button $classCSS onclick='window.location=\"".Utils::getKumbiaUrl($action)."\"'>$caption</button>";
 	}
 
 	/**

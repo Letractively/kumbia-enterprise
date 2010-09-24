@@ -27,7 +27,7 @@
  *
  * @category	Kumbia
  * @package		Dispatcher
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
+ * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @copyright	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  * @access		public
@@ -150,10 +150,11 @@ abstract class Dispatcher {
 				self::$_controller = $applicationController;
 			}
 		}
+
 	}
 
 	/**
-	 * Ejecuta accion notFound
+	 * Ejecuta la acción notFound si está definida
 	 *
 	 * @access 	private
 	 * @param 	Controller $applicationController
@@ -184,8 +185,8 @@ abstract class Dispatcher {
 	/**
 	 * Establece el directorio de los controladores
 	 *
-	 * @access public
-	 * @param string $directory
+	 * @access	public
+	 * @param	string $directory
 	 * @static
 	 */
 	static public function setControllerDir($directory){
@@ -206,11 +207,11 @@ abstract class Dispatcher {
 	/**
 	 * Ejecuta el filtro before presente en el controlador
 	 *
-	 * @access public
-	 * @param mixed $appController
-	 * @param string $controller
-	 * @param string $action
-	 * @param array $params
+	 * @access	public
+	 * @param	mixed $appController
+	 * @param	string $controller
+	 * @param	string $action
+	 * @param	array $params
 	 * @static
 	 */
 	static private function _runBeforeFilters($appController, $controller, $action, $params){
@@ -311,7 +312,7 @@ abstract class Dispatcher {
 			} else {
 				$applicationController = new ApplicationController();
 				if(self::executeNotFound($applicationController)==false){
-					//No se encontro el controlador
+					//No se encontró el controlador
 					$message = CoreLocale::getErrorMessage(-102, $controller);
 					self::throwException($message, self::NOT_FOUND_FILE_CONTROLLER);
 				} else {
@@ -320,9 +321,6 @@ abstract class Dispatcher {
 				}
 			}
 		}
-
-	 	// Inicia la sesion de acuerdo al adaptador instalado
-		Session::startSession();
 
 		// Incializa el nombre de la instancia
 		Core::setInstanceName();
@@ -346,7 +344,7 @@ abstract class Dispatcher {
 					self::$_controller = unserialize($persistedData['data']);
 				}
 				self::$_controllerReferences[$appController] = self::$_controller;
-				// Envia a la persistencia por si se genera una excepcion no controlada
+				// Envia a la persistencia por si se genera una excepción no controlada
 				if(self::$_controller->getPersistance()==true){
 					$_SESSION['KCON'][$instanceName][$activeApp][$module][$appController] = array(
 						'data' => serialize(self::$_controller),
@@ -396,6 +394,7 @@ abstract class Dispatcher {
 				#if[dispatcher-status]
 				self::$_requestStatus = self::STATUS_RUNNING_CONTROLLER_ACTION;
 				#endif
+
 				#if[compile-time]
 				$method = new ReflectionMethod($appController, $actionMethod);
 				if($method->isPublic()==false){
@@ -417,6 +416,7 @@ abstract class Dispatcher {
 
 			 	//Corre los filtros after
 				self::_runAfterFilters($appController, $controller, $action, $parameters);
+
 				#if[dispatcher-status]
 				self::$_requestStatus = self::STATUS_RENDER_PRESENTATION;
 				#endif
@@ -517,7 +517,20 @@ abstract class Dispatcher {
 	}
 
 	/**
- 	 * Obtener el controlador en ejecución
+	 * Devuelve una instancia del controlador base ControllerBase
+	 *
+	 * @return ApplicationController
+	 */
+	static public function getControllerBase(){
+		if(class_exists('ControllerBase', false)){
+			return new ControllerBase();
+		} else {
+			return false;
+		}
+	}
+
+	/**
+ 	 * Obtener el controlador en ejecución ó el último ejecutado
 	 *
 	 * @access	public
 	 * @return	Controller

@@ -165,20 +165,29 @@ class LocaleMath {
 	static public function round($value, $precision=0){
 		if(self::$_bcMathEnabled==true){
 			$roundUp = 0;
+			$value = (string) $value;
 			$position = strpos($value, '.');
 			$scientificNotation = strpos($value, 'E-');
-			if($position!==false&&$scientificNotation===false){
-				$value = substr($value, 0, $position+$precision+2);
-				$decimalDigits = strlen(substr($value, $position))-1;
-				if($precision!=0){
-					if($decimalDigits==$precision+1){
-						$lastdigit = substr($value, strlen($value)-1, 1);
-						if($lastdigit=='5'){
-							$roundUp = '0.'.str_pad($lastdigit, $decimalDigits, '0', STR_PAD_LEFT);
-						} else {
-							if($lastdigit>5){
-								$roundUp = '0.'.str_pad(10-$lastdigit, $decimalDigits, '0', STR_PAD_LEFT);
+			if($position!==false){
+				if($scientificNotation===false){
+					$value = substr($value, 0, $position+$precision+2);
+					$decimalDigits = strlen(substr($value, $position))-1;
+					if($precision!=0){
+						if($decimalDigits==$precision+1){
+							$lastdigit = substr($value, strlen($value)-1, 1);
+							if($lastdigit=='5'){
+								$roundUp = '0.'.str_pad($lastdigit, $decimalDigits, '0', STR_PAD_LEFT);
+							} else {
+								if($lastdigit>5){
+									$roundUp = '0.'.str_pad(10-$lastdigit, $decimalDigits, '0', STR_PAD_LEFT);
+								}
 							}
+						}
+					}
+				} else {
+					if(preg_match('/E-([0-9]+)$/', $value, $matches)){
+						if($matches[1]>$precision){
+							return '0';
 						}
 					}
 				}

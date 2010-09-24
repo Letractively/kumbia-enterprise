@@ -30,31 +30,33 @@
  * @license 	New BSD License
  * @param 		string $className
  */
-function __autoload($className){
+class Autoload {
 
-	if(CoreClassPath::lookupClass($className)){
-		$classPath = CoreClassPath::getClassPath($className);
-		require $classPath;
-	} else {
-		//Incluir Componentes Personalizados
-		$activeApp = Router::getApplication();
-		if($activeApp){
-			$config = CoreConfig::readAppConfig();
-			if(isset($config->application->libraryDir)){
-				$libraryDir = 'apps/'.$config->application->libraryDir;
-			} else {
-				$libraryDir = 'apps/'.$activeApp.'/library';
-			}
-			if(Core::fileExists($libraryDir.'/'.$className.'/'.$className.'.php')){
-				require $libraryDir.'/'.$className.'/'.$className.'.php';
-			} else {
-				$componentName = preg_replace('/Exception$/', '', $className);
-				if(Core::fileExists($libraryDir.'/'.$componentName.'/'.$className.'.php')){
-					require $libraryDir.'/'.$componentName.'/'.$className.'.php';
+	public static function load($className){
+		if(CoreClassPath::lookupClass($className)){
+			$classPath = CoreClassPath::getClassPath($className);
+			require $classPath;
+		} else {
+			//Incluir Componentes Personalizados
+			$activeApp = Router::getApplication();
+			if($activeApp){
+				$config = CoreConfig::readAppConfig();
+				if(isset($config->application->libraryDir)){
+					$libraryDir = 'apps/'.$config->application->libraryDir;
 				} else {
-					// Si los modelos no se autoinicializan trata de buscar la entidad
-					if(EntityManager::getAutoInitialize()==false){
-						EntityManager::isModel($className);
+					$libraryDir = 'apps/'.$activeApp.'/library';
+				}
+				if(Core::fileExists($libraryDir.'/'.$className.'/'.$className.'.php')){
+					require $libraryDir.'/'.$className.'/'.$className.'.php';
+				} else {
+					$componentName = preg_replace('/Exception$/', '', $className);
+					if(Core::fileExists($libraryDir.'/'.$componentName.'/'.$className.'.php')){
+						require $libraryDir.'/'.$componentName.'/'.$className.'.php';
+					} else {
+						// Si los modelos no se autoinicializan trata de buscar la entidad
+						if(EntityManager::getAutoInitialize()==false){
+							EntityManager::isModel($className);
+						}
 					}
 				}
 			}
@@ -62,3 +64,5 @@ function __autoload($className){
 	}
 
 }
+
+spl_autoload_register(array('Autoload', 'load'));

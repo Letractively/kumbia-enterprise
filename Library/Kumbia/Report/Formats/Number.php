@@ -14,59 +14,62 @@
  *
  * @category 	Kumbia
  * @package 	Report
- * @subpackage 	Components
+ * @subpackage 	Formats
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright 	Copyright (c) 2005-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license 	New BSD License
- * @version 	$Id$
+ * @version 	$Id: ReportStyle.php 5 2009-04-24 01:48:48Z gutierrezandresfelipe $
  */
 
 /**
- * ReportStyle
+ * ReportFormat
  *
- * Componente para crear estilos para Componentes
+ * Formato numérico para columnas de Report
  *
  * @category 	Kumbia
  * @package 	Report
- * @subpackage 	Components
+ * @subpackage 	Formats
  * @copyright 	Copyright (c) 2005-2010 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
- * @copyright	Copyright (c) 2008-2009 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
  */
-class ReportStyle {
+class FormatNumber {
 
 	/**
-	 * Propiedades del componente
+	 * Opciones del formateador
 	 *
 	 * @var array
 	 */
-	private $_styles = array();
+	private $_options = array();
 
 	/**
-	 * Establece los parámetros del ReportStyle
+	 * Constructor de FormatNumber
 	 *
-	 * @param array $styles
+	 * @param array $options
 	 */
-	public function __construct($styles=array()){
-		$this->_styles = $styles;
+	public function __construct($options){
+		$this->_options = $options;
 	}
 
 	/**
-	 * Establece los parámetros del ReportStyle
+	 * Aplica el formato numérico a una columna
 	 *
-	 * @param array $styles
+	 * @param	mixed $value
+	 * @return	string
 	 */
-	public function setParameters($styles=array()){
-		$this->_styles = $styles;
+	public function apply($value){
+		if(isset($this->_options['decimals'])){
+			return Currency::number($value, $this->_options['decimals']);
+		} else {
+			return Currency::number($value, 0);
+		}
 	}
 
 	/**
-	 * Devuelve los estilos
+	 * Devuelve el tipo de dato más cercano que administra el formato
 	 *
-	 * @return array
+	 * @return string
 	 */
-	public function getStyles(){
-		return $this->_styles;
+	public function getStdType(){
+		return 'number';
 	}
 
 }

@@ -13,41 +13,33 @@
  * to license@loudertechnology.com so we can send you a copy immediately.
  *
  * @category	Kumbia
- * @package		Filter
- * @subpackage	BaseFilters
+ * @package		Controller
+ * @subpackage	WebService
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright	Copyright (c) 2007-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
- * @version 	$Id$
+ * @version 	$Id: WebServiceController.php 122 2010-02-11 19:09:18Z gutierrezandresfelipe $
  */
 
 /**
- * LocaleFilter
+ * JsonController
  *
- * Filtra una cadena para que contenga solo letras
+ * Implementa un controlador estilo JSON-RPC
  *
  * @category	Kumbia
- * @package		Filter
- * @subpackage	BaseFilters
+ * @package		Controller
+ * @subpackage	Mutable
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
- * @copyright	Copyright (c) 2007-2009 Andres Felipe Gutierrez (gutierrezandresfelipe at gmail.com)
  * @license		New BSD License
  */
-class LocaleFilter implements FilterInterface {
+class JsonController extends ApplicationController {
 
 	/**
- 	 * Ejecuta el filtro
- 	 *
- 	 * @param string $s
- 	 * @return string
- 	 */
-	public function execute($s){
-		$patron = '/[a-z]{2}([\_]+[A-Z]{2}){0,1}/';
-		if(preg_match($patron, (string) $s, $matches)){
-			return $matches[0];
-		} else {
-			return '';
-		}
+	 * El inicializador del controlador, lo hace persistente si se accede por JSONP
+	 *
+	 */
+	public function initialize(){
+		$this->setPersistance(true);
+		$this->setResponse('json');
 	}
 
 }

@@ -194,7 +194,7 @@ class DbBase extends Object {
 	 *
 	 * @access protected
 	 */
-	public function connect(){
+	public function connect($descriptor=''){
 		#if[no-plugins]
 		PluginManager::notifyFrom('Db', 'onCreateConnection', $this);
 		#endif
@@ -543,12 +543,18 @@ class DbBase extends Object {
 		if($this->_logger){
 			if(is_bool($this->_logger)&&$this->_logger==true){
 				$this->_logger = new Logger('File', 'db'.date('Ymd').'.txt');
+				if(isset($this->_descriptor->log_format)){
+					$this->_logger->setFormat($this->_descriptor->log_format);
+				}
 			} else {
 				if(is_object($this->_logger)){
 					$this->_logger = $this->_logger;
 				} else {
 					if(is_string($this->_logger)){
 						$this->_logger = new Logger('File', $this->_logger);
+						if(isset($this->_descriptor->log_format)){
+							$this->_logger->setFormat($this->_descriptor->log_format);
+						}
 					} else {
 						return false;
 					}

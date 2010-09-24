@@ -418,7 +418,7 @@ abstract class ActiveRecordBase extends Object
 				$this->_dumpInfo($table, $schema);
 			} else {
 				if($schema!=''){
-					throw new ActiveRecordException('No existe la entidad "'.$schema."'.'".$table.'" en el gestor relacional: '.get_class($this));
+					throw new ActiveRecordException('No existe la entidad "'.$schema.'"."'.$table.'" en el gestor relacional: '.get_class($this));
 				} else {
 					throw new ActiveRecordException('No existe la entidad "'.$table.'" en el gestor relacional: '.get_class($this));
 				}
@@ -760,7 +760,11 @@ abstract class ActiveRecordBase extends Object
 					}
 				} else {
 					if($params[0]===''){
-						$params['conditions'] = $primaryKeys[0]." = ''";
+						if(isset($primaryKeys[0])){
+							$params['conditions'] = $primaryKeys[0]." = ''";
+						} else {
+							throw new ActiveRecordException('No se ha definido una llave primaria para este objeto');
+						}
 					} else {
 						$params['conditions'] = $params[0];
 					}
@@ -1404,8 +1408,12 @@ abstract class ActiveRecordBase extends Object
 	 * @throws	ActiveRecordException
 	 */
 	public function appendMessage($message){
-		if(is_object($message)&&get_class($message)!='ActiveRecordMessage'){
-			throw new ActiveRecordException("Formato de Mensaje invalido '".get_class($message)."'");
+		if(is_object($message)){
+			if(get_class($message)!='ActiveRecordMessage'){
+				throw new ActiveRecordException("Formato de Mensaje inválido '".get_class($message)."'");
+			}
+		} else {
+			throw new ActiveRecordException("Formato de Mensaje inválido '".gettype($message)."'");
 		}
 		$this->_errorMessages[] = $message;
 	}
@@ -1626,7 +1634,9 @@ abstract class ActiveRecordBase extends Object
 	 * @return	mixed
 	 */
 	public function readAttribute($attribute){
+		#if[compile-time]
 		CoreType::assertString($attribute);
+		#endif
 		$this->_connect();
 		return $this->$attribute;
 	}
@@ -1639,7 +1649,9 @@ abstract class ActiveRecordBase extends Object
 	 * @param	mixed $value
 	 */
 	public function writeAttribute($attribute, $value){
+		#if[compile-time]
 		CoreType::assertString($attribute);
+		#endif
 		$this->_connect();
 		$this->$attribute = $value;
 	}
@@ -1651,7 +1663,10 @@ abstract class ActiveRecordBase extends Object
 	 * @return	boolean
 	 */
 	public function hasField($field){
+		#if[compile-time]
 		CoreType::assertString($field);
+		#endif
+		$this->_connect();
 		$fields = $this->_getAttributes();
 		return in_array($field, $fields);
 	}
@@ -1850,6 +1865,9 @@ abstract class ActiveRecordBase extends Object
 			foreach($foreignKeys as $indexKey => $keyDescription){
 				$entity = EntityManager::getEntityInstance($indexKey, false);
 				$field = $keyDescription['fi'];
+				if($this->$field==''){
+					continue;
+				}
 				$conditions = $keyDescription['rf'].' = \''.$this->$field.'\'';
 				if(isset($keyDescription['op']['conditions'])){
 					$conditions.= ' AND '.$keyDescription['op']['conditions'];
@@ -2041,9 +2059,10 @@ abstract class ActiveRecordBase extends Object
 						if($this->$field==null||$this->$field===""){
 							$this->$field = $this->_db->getCurrentDate();
 						}
-					}
-					if(isset($in[$field])){
-						$this->$field = new DbRawValue('NULL');
+					} else {
+						if(isset($in[$field])){
+							$this->$field = new DbRawValue('NULL');
+						}
 					}
 					$fields[] = $field;
 					if(is_object($this->$field)){
@@ -2117,8 +2136,10 @@ abstract class ActiveRecordBase extends Object
 					if(count($primaryKeys)==1){
 						if(isset($dataTypeNumeric[$primaryKeys[0]])){
 						    $lastId = $this->_db->lastInsertId($table, $primaryKeys[0], $sequenceName);
-						    $this->{$primaryKeys[0]} = $lastId;
-							$this->findFirst($lastId);
+						    if($lastId>0){
+							    $this->{$primaryKeys[0]} = $lastId;
+								$this->findFirst($lastId);
+						    }
 						}
 					}
 				} else {
@@ -2243,40 +2264,38 @@ abstract class ActiveRecordBase extends Object
 		} else {
 			$primaryKeys = $this->_getPrimaryKeyAttributes();
 			if(is_numeric($params)){
-				$conditions = $primaryKeys[0]." = '".$params."'";
+				if(count($primaryKeys)==1){
+					$conditions = $primaryKeys[0]." = '".$params."'";
+				} else {
+					throw new ActiveRecordException('Número de parámetros insuficientes para realizar el borrado');
+				}
 			} else{
 				if($params){
 					$conditions = $params;
 				} else {
-					$primaryKey = $this->{$primaryKeys[0]};
-					$conditions = $primaryKeys[0]." = '".$primaryKey."'";
+					if(count($primaryKeys)==1){
+						$primaryKeyValue = $this->readAttribute($primaryKeys[0]);
+						$conditions = $primaryKeys[0]." = '".$primaryKeyValue."'";
+					} else {
+						$conditions = array();
+						foreach($primaryKeys as $primaryKey){
+							$primaryKeyValue = $this->readAttribute($primaryKey);
+							$conditions[] = $primaryKey." = '".$primaryKeyValue."'";
+						}
+						$conditions = join(' AND ', $conditions);
+					}
 				}
 			}
 		}
-		if(method_exists($this, 'beforeDelete')){
-			if($this->id){
-				$this->find($this->id);
-			}
-			if($this->beforeDelete()===false){
-				return false;
-			}
-		} else {
-			if(isset($this->beforeDelete)){
-				if($this->id){
-					$this->find($this->id);
-				}
-				$method = $this->beforeDelete;
-				if($this->$method()===false){
-					return false;
-				}
-			}
+		if($this->_callEvent('beforeDelete')===false){
+			return false;
 		}
-		$val = $this->_db->delete($table, $conditions);
+		$success = $this->_db->delete($table, $conditions);
 		$this->_operationMade = self::OP_DELETE;
-		if($val){
+		if($success==true){
 			$this->_callEvent('afterDelete');
 		}
-		return $val;
+		return $success;
 	}
 
 	/**
@@ -2290,7 +2309,7 @@ abstract class ActiveRecordBase extends Object
 	 * @return	boolean
 	 * @throws	ActiveRecordException
 	 */
-	public static function updateAll($values){
+	public function updateAll($values){
 		$this->_connect();
 		$params = array();
 		if($this->_schema){
@@ -2327,7 +2346,7 @@ abstract class ActiveRecordBase extends Object
 	 * @param	string $conditions
 	 * @return	boolean
 	 */
-	public static function deleteAll($conditions=''){
+	public function deleteAll($conditions=''){
 		CoreType::assertString($conditions);
 		$this->_connect();
 		if($this->_schema){
@@ -2431,7 +2450,7 @@ abstract class ActiveRecordBase extends Object
 	 * @throws	ActiveRecordException
 	 */
 	protected function validate($validatorClass, $options){
-		if(!interface_exists('ActiveRecordValidatorInterface')){
+		if(!interface_exists('ActiveRecordValidatorInterface', false)){
 			require 'Library/Kumbia/ActiveRecord/Validator/Interface.php';
 		}
 		if(!class_exists('ActiveRecordValidator', false)){
@@ -2448,7 +2467,7 @@ abstract class ActiveRecordBase extends Object
 				}
 			}
 		}
-		if(class_exists($className)==false){
+		if(class_exists($className, false)==false){
 			throw new ActiveRecordException("No se encontró el validador de entidades '$className'");
 		}
 		#if[compile-time]
@@ -2684,7 +2703,6 @@ abstract class ActiveRecordBase extends Object
 	 */
 	public function __call($method, $arguments = array()){
 		$this->_connect();
-
 		$entityName = get_class($this);
 		if(substr($method, 0, 3)=='get'){
 			$requestedRelation = ucfirst(substr($method, 3));
@@ -2697,7 +2715,8 @@ abstract class ActiveRecordBase extends Object
 				return call_user_func_array(array('EntityManager', 'getHasManyRecords'), array_merge($entityArguments, $arguments));
 			}
 			if(EntityManager::existsHasOne($entityName, $requestedRelation)==true){
-				return EntityManager::getHasOneRecords('findFirst', $entityName, $requestedRelation, $this);
+				$entityArguments = array('findFirst', $entityName, $requestedRelation, $this);
+				return call_user_func_array(array('EntityManager', 'getHasOneRecords'), array_merge($entityArguments, $arguments));
 			}
 		}
 
@@ -2746,42 +2765,18 @@ abstract class ActiveRecordBase extends Object
 			}
 			return call_user_func_array(array($this, 'find'), array_merge($argument, $arguments));
 		}
-
-
 		throw new ActiveRecordException('No se encontró el método "'.$method.'" en el modelo "'.get_class($this).'"');
+	}
 
-		/*
-		if(array_key_exists($mmodel, $this->_hasAndBelongsToMany)) {
-			$hasRelation = true;
-			$relation = $this->_hasAndBelongsToMany[$mmodel];
-			$models = EntityManager::getModels();
-			if($models[$relation->model]) {
-				if($this->{$this->primary_key[0]}) {
-					$source = $this->_source;
-					$relation_model = $models[$relation->model];
-					$relation_model->dumpModel();
-					$relation_source = $relation_model->getSource();
-					/**
-                     * Cargo atraves de que tabla se efectuara la relacion
-                     *
-					if (!isset($relation->through)) {
-						if ($source > $relation_source) {
-							$relation->through = "{$this->_source}_{$relation_source}";
-						} else {
-							$relation->through = "{$relation_source}_{$this->_source}";
-						}
-					}
-					$sql = "SELECT $relation_source.* FROM $relation_source, {$relation->through}, $source
-						WHERE {$relation->through}.{$relation->key} = {$this->_db->addQuotes($this->{$this->primary_key[0]}) }
-						AND {$relation->through}.{$relation->fk} = $relation_source.{$relation_model->primary_key[0]}
-						AND {$relation->through}.{$relation->key} = $source.{$this->primary_key[0]}
-						ORDER BY $relation_source.{$relation_model->primary_key[0]}";
-					return $models[$relation->model]->findAllBySql($sql);
-				} else {
-					return array();
-				}
-			}
-		}*/
+	/**
+	 * Método mágico al clonar el record, el nuevo objeto clonado contiene los mismos datos del original
+	 * pero desconociendo si existe o no en la persistencia
+	 *
+	 */
+	public function __clone(){
+		$this->_forceExists = false;
+		$this->_wherePk = false;
+		$this->_dumped = false;
 	}
 
 }
