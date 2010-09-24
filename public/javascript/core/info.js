@@ -15,7 +15,7 @@
  * @package 	Tag
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
- * @version 	$Id$
+ * @version 	$Id: info.js,v 77b991ea6923 2010/06/29 03:40:40 root $
  */
 
 var TwitterEcho = {

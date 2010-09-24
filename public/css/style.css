@@ -22,7 +22,7 @@ div.kumbiaDisplay {
 	margin: 0 auto;
 	padding: 2px 25px;
 	background-repeat: no-repeat;
-	background-position: 5px center;
+	background-position: 5px top;
 	text-align: left;
 }
 
@@ -90,4 +90,64 @@ div.autocomplete ul li {
 	font-size: 10px;
 	margin-top: 1px;
 	margin-bottom: 1px;
+}
+
+/* Calendario */
+img.calendarIcon {
+	cursor: pointer;
+}
+
+div.calendar {
+	position: absolute;
+	padding: 10px;
+	background: #3C3C3C;
+	width: 180px;
+	z-index: 1000;
+}
+
+table.calendarTable {
+	border-bottom: 1px solid #343434;
+	border-right: 1px solid #343434;
+	background: #444444;
+}
+
+table.calendarTable th {
+	font-family: Helvetica,arial,sans-serif;
+	font-size: 10px;
+	color: #9EA2A2;
+}
+
+table.calendarTable td {
+	font-family: Helvetica,arial,sans-serif;
+	width: 20px;
+	padding: 4px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-top: 1px inset #343434;
+	border-left: 1px inset #343434;
+	text-align: center;
+	font-size: 10px;
+	color: #ffffff;
+}
+
+table.calendarTable td.monthName {
+	text-align: center;
+	border: none;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	font-size: 11px;
+}
+
+table.calendarTable td.arrowPrev,
+table.calendarTable td.arrowNext {
+	border: none;
+}
+
+table.calendarTable td.outMonthDay {
+	background: #373737;
+	color: #686768;
+}
+
+table.calendarTable td.selectedDay {
+	background: #006B7D;
 }
