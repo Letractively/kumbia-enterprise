@@ -15,7 +15,7 @@
  * @package 	Tag
  * @copyright	Copyright (c) 2008-2010 Louder Technology COL. (http://www.loudertechnology.com)
  * @license 	New BSD License
- * @version 	$Id$
+ * @version 	$Id: base-source.js,v 52791b8011a4 2010/08/23 09:59:58 andres $
  */
 
 var Base = {
@@ -96,6 +96,15 @@ var NumericField = {
 		var kc = evt.keyCode;
 		var ev = (evt.altKey==false)&&(evt.shiftKey==false)&&((kc>=48&&kc<=57)||(kc>=96&&kc<=105)||(kc==8)||(kc==9)||(kc==13)||(kc==17)||(kc==36)||(kc==35)||(kc==37)||(kc==46)||(kc==39)||(kc==190));
 		if(!ev){
+			ev = (evt.ctrlKey==true&&(kc==67||kc==86||kc==88));
+			if(!ev){
+				ev = (evt.shiftKey==true&&(kc==9||(kc>=35&&kc<=39)));
+				if(!ev){
+					ev = (evt.altKey==true&&(kc==84||kc==82));
+				}
+			}
+		}
+		if(!ev){
 			evt.preventDefault();
     		evt.stopPropagation();
     		evt.stopped = true;
@@ -104,30 +113,165 @@ var NumericField = {
 
 };
 
+var DateCalendar = {
+
+	build: function(element, name, value){
+		var year = parseInt(value.substr(0, 4), 10);
+		var month = parseInt(value.substr(5, 2), 10);
+		var day = parseInt(value.substr(8, 2), 10);
+		DateCalendar._buildMonth(element, year, month, value);
+	},
+
+	_buildMonth: function(element, year, month, activeDate){
+		var numberDays = DateField.getNumberDays(year, month);
+		var firstDate = new Date(year, month-1, 1);
+		var lastDate = new Date(year, month-1, numberDays);
+		var html = '<table class="calendarTable" cellspacing="0">';
+		html+='<tr><td class="arrowPrev"><img src="'+$Kumbia.path+'img/prevw.gif"/></td>';
+		html+='<td colspan="5" class="monthName">'+DateCalendar.getMonthName(month)+'</td>';
+		html+='<td class="arrowNext"><img src="'+$Kumbia.path+'img/nextw.gif"/></td></tr>';
+		html+='<tr><th>Dom</th><th>Lun</th><th>Mar</th><th>Mie</th><th>Jue</th><th>Vie</th><th>Sáb</th></tr>';
+		html+='<tr>';
+		if(month==1){
+			var numberDaysPast = DateField.getNumberDays(year-1, 12);
+		} else {
+			var numberDaysPast = DateField.getNumberDays(year-1, month-1);
+		};
+		var dayOfWeek = firstDate.getDay();
+		for(var i=(numberDaysPast-dayOfWeek+1);i<numberDaysPast;i++){
+			html+='<td class="outMonthDay">'+(i+1)+'</td>';
+		};
+		var numberDay = 1;
+		var date;
+		while(numberDay<=numberDays){
+			if(month<10){
+				date = year+'-0'+month+'-'+numberDay;
+			} else {
+				date = year+'-'+month+'-'+numberDay;
+			}
+			if(activeDate==date){
+				html+='<td class="selectedDay" title="'+date+'">'+numberDay+'</td>';
+			} else {
+				html+='<td title="'+date+'">'+numberDay+'</td>';
+			};
+			if(dayOfWeek==6){
+				html+='</tr><tr>';
+				dayOfWeek = 0;
+			} else {
+				dayOfWeek++;
+			};
+			numberDay++;
+		};
+		numberDay = 1;
+		if(dayOfWeek<7){
+			for(var i=dayOfWeek;i<7;i++){
+				html+='<td class="outMonthDay">'+numberDay+'</td>';
+				numberDay++;
+			};
+		};
+		html+='</tr></table>';
+
+		var position = element.up(1).cumulativeOffset();
+		var calendarDiv = document.getElementById('calendarDiv');
+		if(calendarDiv){
+			calendarDiv.parentNode.removeChild(calendarDiv);
+		};
+		calendarDiv = document.createElement('DIV');
+		calendarDiv.id = 'calendarDiv';
+		calendarDiv.addClassName('calendar');
+		calendarDiv.update(html);
+		calendarDiv.style.top = (position[1]+22)+'px';
+		calendarDiv.style.left = (position[0])+'px';
+		document.body.appendChild(calendarDiv);
+		window.setTimeout(function(){
+			new Event.observe(window, 'click', DateCalendar.removeCalendar);
+		}, 150);
+	},
+
+	removeCalendar: function(event){
+		if(event.target.tagName!='INPUT'&&event.target.tagName!='SELECT'){
+			var calendarDiv = document.getElementById('calendarDiv');
+			if(calendarDiv){
+				calendarDiv.parentNode.removeChild(calendarDiv);
+			};
+			new Event.stopObserving(window, 'click', DateCalendar.removeCalendar);
+		}
+	},
+
+	getMonthName: function(month){
+		switch(month){
+			case 1:
+				return 'Enero';
+			case 2:
+				return 'Febrero';
+			case 3:
+				return 'Marzo';
+			case 4:
+				return 'Abril';
+			case 5:
+				return 'Mayo';
+			case 6:
+				return 'Junio';
+			case 7:
+				return 'Julio';
+			case 8:
+				return 'Agosto';
+			case 9:
+				return 'Septiembre';
+		}
+	}
+
+};
+
 var DateField = {
+
+	_monthTable: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+
+	_listeners: {},
+
+	observe: function(elementName, eventName, procedure){
+		if(typeof DateField._listeners[eventName] == "undefined"){
+			DateField._listeners[eventName] = {};
+		};
+		DateField._listeners[eventName][elementName] = procedure;
+	},
+
+	fire: function(eventName, elementValue){
+		if(typeof DateField._listeners[eventName] != "undefined"){
+			for(var elementName in DateField._listeners[eventName]){
+				DateField._listeners[eventName][elementName](elementValue);
+			}
+		}
+	},
+
+	getNumberDays: function(year, month){
+		var numberDays = DateField._monthTable[month-1];
+		if(month==2){
+			if(parseInt(year, 10)%4==0){
+				numberDays = 29;
+			}
+		};
+		return numberDays;
+	},
 
 	refresh: function(name){
 
-		var monthTable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 		var year = Base.getValue(name+'Year');
 		var month = Base.getValue(name+'Month');
 		var day = Base.getValue(name+'Day');
 		var daySelect = Base.$(name+'Day');
 		var html = '', n, numberDays;
 
-		Base.setValue(name, year+'-'+month+'-'+day)
+		var value = year+'-'+month+'-'+day;
+		Base.setValue(name, value);
 
 		while(daySelect.lastChild){
 			daySelect.removeChild(daySelect.lastChild);
 		};
-
-		month = parseInt(month);
-		numberDays = monthTable[month-1];
-		if(month==2){
-			if(parseInt(year)%4==0){
-				numberDays = 29;
-			}
+		if(month.substr(0, 1)=='0'){
+			month = month.substr(1, 1);
 		};
+		var numberDays = DateField.getNumberDays(year, month);
 		for(var i=1;i<=numberDays;++i){
 			n = (i < 10) ? '0'+i : i;
 			if(n==day){
@@ -135,8 +279,13 @@ var DateField = {
 			} else {
 				html+='<option value="'+n+'">'+n+'</option>';
 			}
-		}
+		};
 		daySelect.innerHTML = html;
+		DateField.fire('change', value);
+	},
+
+	showCalendar: function(element, name){
+		DateCalendar.build(element, name, Base.getValue(name));
 	}
 
 };
@@ -154,6 +303,25 @@ var Utils = {
 		}
 	},
 
+	getAppURL: function(url){
+		if(typeof url == "undefined"){
+			url = "";
+		};
+		if($Kumbia.app!=""){
+			return $Kumbia.path+$Kumbia.app+"/"+url;
+		} else {
+			return $Kumbia.path+url;
+		}
+	},
+
+	getURL: function(url){
+		if(typeof url == "undefined"){
+			return $Kumbia.path;
+		} else {
+			return $Kumbia.path+url;
+		}
+	},
+
 	redirectParentToAction: function(url){
 		new Utils.redirectToAction(url, window.parent);
 	},
@@ -165,7 +333,13 @@ var Utils = {
 	redirectToAction: function(url, win){
 		win = win ? win : window;
 		win.location = Utils.getKumbiaURL() + url;
+	},
+
+	upperCaseFirst: function(str){
+		var first = str.substring(0, 1).toUpperCase();
+		return first+str.substr(1, str.length-1)
 	}
+
 };
 
 function ajaxRemoteForm(form, up, callback){
@@ -289,9 +463,8 @@ AJAX.viewRequest = function(params){
 	options.evalScripts = true;
 	if(!document.getElementById(container)){
 		throw "CoreError: DOM Container '"+container+"' no encontrado";
-		return null
 	};
-	return AJAX.update(container, url, options);
+	return AJAX.update(container, options.url, options);
 };
 
 AJAX.execute = function(params){
